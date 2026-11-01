@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-01T19:52:22Z",
+  "updated_at": "2026-11-01T20:08:24Z",
   "videos": {
     "slot_1_long": {
       "slot": 1,
@@ -39,16 +39,16 @@
       "title": "[LONG-FORM] Why Claim Settlement Ratio Marketing Hides Incurred Claim Ratio Reality",
       "format": "16:9 LONG",
       "vertical": "INSURANCE",
-      "current_stage": "Stage 5/7: Kaggle T4 GPU \u2014 NVENC Encoding",
-      "stage_pct": 50,
-      "completion_pct": 65,
-      "eta_seconds": 220,
+      "current_stage": "Stage 7/7: Uploaded & Distributed",
+      "stage_pct": 100,
+      "completion_pct": 100,
+      "eta_seconds": 0,
       "compliance_status": "\ud83d\udee1\ufe0f Feedback Healed & Verified",
-      "status": "IN_PROGRESS",
-      "updated_at": "2026-11-01T19:52:22Z",
+      "status": "COMPLETED",
+      "updated_at": "2026-11-01T20:08:24Z",
       "started_at": "2026-10-26T17:21:07Z",
-      "youtube_id": "RkUYc7UA6oY",
-      "youtube_url": "https://www.youtube.com/watch?v=RkUYc7UA6oY"
+      "youtube_id": "ttU4H-Sajeg",
+      "youtube_url": "https://www.youtube.com/watch?v=ttU4H-Sajeg"
     },
     "slot_5_long": {
       "video_id": "slot_5_long",
