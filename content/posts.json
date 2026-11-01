@@ -1,5 +1,32 @@
 [
   {
+    "title": "Sebi F&O Rules: Institutional Order Flow & Trading Mechanics",
+    "slug": "TBP-SEBI-FO-04",
+    "description": "Master sebi f&o rules, institutional order flow, volume profiles, and risk management with this comprehensive educational guide from The Bull Print.",
+    "date": "2026-10-24",
+    "author": "Alex from Chennai",
+    "reading_time": "2 min read",
+    "word_count": 420,
+    "categories": [
+      "Market Education",
+      "Institutional Flow",
+      "Risk Management"
+    ],
+    "tags": [
+      "Nifty",
+      "Bitcoin",
+      "Order Flow",
+      "Beginner Guide"
+    ],
+    "youtube_video_id": "8BbbiKjf0y0",
+    "charts": [
+      "nifty_opening_range.png",
+      "nifty_order_flow_absorption.png",
+      "dxy_macro_liquidity.png"
+    ],
+    "content_path": "content/posts/sebi_fo_rules_04.md"
+  },
+  {
     "title": "How Room-Rent Sub-Limits Devour Health Insurance Claims Proportionally | The Bull Print",
     "slug": "INS-RRSL-06",
     "description": "Discover how health insurance room-rent sub-limits trigger proportional deductions on hospital bills. Learn IRDAI rules, claim settlement traps, and super top-up strategies.",
