@@ -1,51 +1,63 @@
 {
-  "updated_at": "2026-11-01T11:56:34Z",
-  "channel_median_vph": 0.06,
+  "updated_at": "2026-11-01T14:53:07Z",
+  "channel_median_vph": 0.05,
   "top_outperformers": [
     {
       "video_id": "qHk7dPmZ-tM",
       "title": "Why 90% of Traders Lose in Crypto Derivatives! | The Math That Settles It #Shorts",
       "format": "SHORT",
       "published_at": "2026-10-31T18:41:54Z",
-      "hours_live": 17.2,
-      "view_count": 6,
+      "hours_live": 20.2,
+      "view_count": 7,
       "like_count": 0,
       "comment_count": 1,
       "views_per_hour": 0.35,
-      "engagement_rate": 0.5
+      "engagement_rate": 0.4286
     },
     {
       "video_id": "l5n5au_PKxg",
       "title": "The 20% Co-Payment Clause: How Insurers Cut Big Claim Payouts #Shorts",
       "format": "SHORT",
       "published_at": "2026-10-31T04:12:13Z",
-      "hours_live": 31.7,
-      "view_count": 7,
+      "hours_live": 34.7,
+      "view_count": 8,
       "like_count": 1,
       "comment_count": 0,
-      "views_per_hour": 0.22,
-      "engagement_rate": 0.1429
+      "views_per_hour": 0.23,
+      "engagement_rate": 0.125
     },
     {
       "video_id": "n-TH4OtdE2I",
       "title": "Order-Flow Footprints: How Institutions Absorb Liquidity #Shorts (Institutional Breakdown)",
       "format": "SHORT",
       "published_at": "2026-10-30T22:12:15Z",
-      "hours_live": 37.7,
+      "hours_live": 40.7,
       "view_count": 8,
       "like_count": 0,
       "comment_count": 0,
-      "views_per_hour": 0.21,
+      "views_per_hour": 0.2,
       "engagement_rate": 0.0
     }
   ],
   "bottom_underperformers": [
     {
+      "video_id": "AaxLhQApyIc",
+      "title": "Don't Fall for the 24500 Trap: Why 90% of Everyday Buyers Lose Money (Institutional Breakdown)",
+      "format": "SHORT",
+      "published_at": "2026-10-31T11:38:24Z",
+      "hours_live": 27.2,
+      "view_count": 0,
+      "like_count": 0,
+      "comment_count": 0,
+      "views_per_hour": 0.0,
+      "engagement_rate": 0.0
+    },
+    {
       "video_id": "tKyx6pRGfQE",
       "title": "Block Deals Decoded: Tracking FII Institutional Accumulation #Shorts (Institutional Breakdown)",
       "format": "SHORT",
       "published_at": "2026-10-31T10:12:12Z",
-      "hours_live": 25.7,
+      "hours_live": 28.7,
       "view_count": 0,
       "like_count": 0,
       "comment_count": 0,
@@ -57,19 +69,7 @@
       "title": "Don't Fall for the 24500 Trap: Why 90% of Everyday Buyers Lose Money (Institutional Breakdown)",
       "format": "SHORT",
       "published_at": "2026-10-30T19:42:02Z",
-      "hours_live": 40.2,
-      "view_count": 0,
-      "like_count": 0,
-      "comment_count": 0,
-      "views_per_hour": 0.0,
-      "engagement_rate": 0.0
-    },
-    {
-      "video_id": "jELN8ankNvE",
-      "title": "Don't Fall for the 24500 Trap: Why 90% of Everyday Buyers Lose Money",
-      "format": "SHORT",
-      "published_at": "2026-10-30T19:23:02Z",
-      "hours_live": 40.6,
+      "hours_live": 43.2,
       "view_count": 0,
       "like_count": 0,
       "comment_count": 0,
