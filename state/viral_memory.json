@@ -1,29 +1,17 @@
 {
-  "updated_at": "2026-11-01T16:49:15Z",
-  "channel_median_vph": 0.05,
+  "updated_at": "2026-11-01T18:11:42Z",
+  "channel_median_vph": 0.04,
   "top_outperformers": [
-    {
-      "video_id": "vFj_1fJ-3EM",
-      "title": "The AYUSH Sub-Limit Trap: Ayurveda Hospital Bill Reductions #Shorts",
-      "format": "SHORT",
-      "published_at": "2026-11-01T16:12:02Z",
-      "hours_live": 0.6,
-      "view_count": 5,
-      "like_count": 0,
-      "comment_count": 0,
-      "views_per_hour": 8.06,
-      "engagement_rate": 0.0
-    },
     {
       "video_id": "qHk7dPmZ-tM",
       "title": "Why 90% of Traders Lose in Crypto Derivatives! | The Math That Settles It #Shorts",
       "format": "SHORT",
       "published_at": "2026-10-31T18:41:54Z",
-      "hours_live": 22.1,
+      "hours_live": 23.5,
       "view_count": 7,
       "like_count": 0,
       "comment_count": 1,
-      "views_per_hour": 0.32,
+      "views_per_hour": 0.3,
       "engagement_rate": 0.4286
     },
     {
@@ -31,12 +19,24 @@
       "title": "The 20% Co-Payment Clause: How Insurers Cut Big Claim Payouts #Shorts",
       "format": "SHORT",
       "published_at": "2026-10-31T04:12:13Z",
-      "hours_live": 36.6,
+      "hours_live": 38.0,
       "view_count": 8,
       "like_count": 1,
       "comment_count": 0,
-      "views_per_hour": 0.22,
+      "views_per_hour": 0.21,
       "engagement_rate": 0.125
+    },
+    {
+      "video_id": "G_Xwi3mVyIA",
+      "title": "The IV Crush Trap: Why Options Lose Value Even When You Are Right #Shorts",
+      "format": "SHORT",
+      "published_at": "2026-11-01T13:12:21Z",
+      "hours_live": 5.0,
+      "view_count": 1,
+      "like_count": 0,
+      "comment_count": 0,
+      "views_per_hour": 0.2,
+      "engagement_rate": 0.0
     }
   ],
   "bottom_underperformers": [
@@ -45,7 +45,7 @@
       "title": "The Consumables Trap: Why Cashless Policies Leave You Paying 15% #Shorts (Institutional Breakdo",
       "format": "SHORT",
       "published_at": "2026-10-31T13:11:54Z",
-      "hours_live": 27.6,
+      "hours_live": 29.0,
       "view_count": 0,
       "like_count": 0,
       "comment_count": 0,
@@ -57,7 +57,7 @@
       "title": "Don't Fall for the 24500 Trap: Why 90% of Everyday Buyers Lose Money (Institutional Breakdown)",
       "format": "SHORT",
       "published_at": "2026-10-31T11:38:24Z",
-      "hours_live": 29.2,
+      "hours_live": 30.6,
       "view_count": 0,
       "like_count": 0,
       "comment_count": 0,
@@ -69,7 +69,7 @@
       "title": "Block Deals Decoded: Tracking FII Institutional Accumulation #Shorts (Institutional Breakdown)",
       "format": "SHORT",
       "published_at": "2026-10-31T10:12:12Z",
-      "hours_live": 30.6,
+      "hours_live": 32.0,
       "view_count": 0,
       "like_count": 0,
       "comment_count": 0,
