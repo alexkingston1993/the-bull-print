@@ -184,6 +184,11 @@
       "ts": "16:57:34",
       "level": "INFO",
       "msg": "[KAGGLE_GPU]: \ud83d\udd25 Waking Dual-T4 GPU Kernel... | "
+    },
+    {
+      "ts": "16:58:03",
+      "level": "INFO",
+      "msg": "[KAGGLE_GPU]: \u26a1 Kaggle Glitch \u2014 CPU Fallback Engaged | "
     }
   ]
 }
