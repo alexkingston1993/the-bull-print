@@ -96,7 +96,13 @@
       "pct": 100,
       "started_at": "2026-11-01T20:08:27Z",
       "completed_at": null,
-      "metrics": {}
+      "metrics": {
+        "yt_long_id": "ttU4H-Sajeg",
+        "yt_short_ids": [],
+        "oauth_slot_used": 1,
+        "article_url": "https://the-bull-print.vercel.app/article.html?slug=INS-2024-CSR-ICR-06",
+        "x_thread_url": "Skipped (X keys not set)"
+      }
     }
   ],
   "live_logs": [
