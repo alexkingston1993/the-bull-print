@@ -1,5 +1,19 @@
 [
   {
+    "title": "Sebi f&o rules",
+    "slug": "TBP-SEBI-FO-04",
+    "description": "Breakdown of Sebi f&o rules",
+    "date": "2026-11-01 12:15:35",
+    "vertical": "stock_market",
+    "category": "Stock Market",
+    "format": "LONG",
+    "youtube_video_id": "8BbbiKjf0y0",
+    "youtube_id": "8BbbiKjf0y0",
+    "youtubeUrl": "https://www.youtube.com/watch?v=8BbbiKjf0y0",
+    "dossier_url": "/article.html?slug=TBP-SEBI-FO-04",
+    "compliance_notes": "SEBI/IRDAI Zero-violation feedback verified"
+  },
+  {
     "title": "How Room-Rent Sub-Limits Devour Health Insurance Claims Proportionally (Short #1) #Shorts",
     "slug": "INS-RRSL-06-short-1",
     "description": "Institutional analysis of How Room-Rent Sub-Limits Devour Health Insurance Claims Proportionally for everyday investors.",
@@ -683,20 +697,6 @@
     "youtube_id": "WSTQuqSd_p4",
     "youtubeUrl": "https://www.youtube.com/watch?v=WSTQuqSd_p4",
     "dossier_url": "/article.html?slug=crypto_tax_audit_115bbh_194s",
-    "compliance_notes": "SEBI/IRDAI Zero-violation feedback verified"
-  },
-  {
-    "title": "Usdt dominance today (Short #2) #Shorts",
-    "slug": "bitcoin-liquidation-heatmap-funding-rate-delt-1793029206-short-2",
-    "description": "Institutional analysis of Usdt dominance today for everyday investors.",
-    "date": "2026-10-26 15:42:03",
-    "vertical": "crypto",
-    "category": "Crypto",
-    "format": "SHORT",
-    "youtube_video_id": "OtQ5ttfyt3U",
-    "youtube_id": "OtQ5ttfyt3U",
-    "youtubeUrl": "https://www.youtube.com/shorts/OtQ5ttfyt3U",
-    "dossier_url": "/article.html?slug=bitcoin-liquidation-heatmap-funding-rate-delt-1793029206",
     "compliance_notes": "SEBI/IRDAI Zero-violation feedback verified"
   }
 ]
