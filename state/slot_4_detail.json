@@ -179,6 +179,11 @@
       "ts": "12:03:23",
       "level": "INFO",
       "msg": "[KAGGLE_GPU]: \u2601\ufe0f Pushing Dataset to Kaggle... | "
+    },
+    {
+      "ts": "12:04:39",
+      "level": "INFO",
+      "msg": "[KAGGLE_GPU]: \ud83d\udd25 Waking Dual-T4 GPU Kernel... | "
     }
   ]
 }
