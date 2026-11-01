@@ -88,6 +88,11 @@
       "ts": "19:49:53",
       "level": "INFO",
       "msg": "[GEMINI]: \ud83d\udd0d Harvesting live search intent... | open-seo dark-query loop \u00b7 slot 6"
+    },
+    {
+      "ts": "19:50:00",
+      "level": "INFO",
+      "msg": "[GEMINI]: \ud83d\udd0d Harvested `Why Claim Settlement Ratio Marketing Hides Incur` | source: registry_fallback \u00b7 cluster: term insurance claim rejection, health insurance room rent limit, irdai new rules"
     }
   ]
 }
