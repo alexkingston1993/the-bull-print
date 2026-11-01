@@ -11,7 +11,7 @@
   "current_stage_name": "Chart & High-CTR Thumbnail Studio",
   "current_subtask_label": "Capturing market charts / infographics",
   "started_at": "2026-11-01T11:56:30Z",
-  "updated_at": "2026-11-01T11:56:43Z",
+  "updated_at": "2026-11-01T11:56:50Z",
   "eta_seconds": 0,
   "stages": [
     {
@@ -93,6 +93,11 @@
       "ts": "11:56:41",
       "level": "INFO",
       "msg": "[GEMINI]: \ud83d\udd0d Harvested `Sebi f&o rules` | source: autocomplete \u00b7 cluster: sebi f&o rules"
+    },
+    {
+      "ts": "11:56:45",
+      "level": "INFO",
+      "msg": "[PLAYWRIGHT]: \ud83d\udd04 Capturing 3 charts... | "
     }
   ]
 }
