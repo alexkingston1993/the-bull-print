@@ -1,5 +1,31 @@
 [
   {
+    "title": "Why Claim Settlement Ratio Marketing Hides Incurred Claim Ratio Reality",
+    "slug": "INS-2024-CSR-ICR-06",
+    "description": "Discover why insurance CSR marketing hides Incurred Claim Ratio reality. Learn IRDAI annual-report math, claim rejection traps & policy wording forensics.",
+    "date": "2026-10-24",
+    "author": "Alex from Chennai",
+    "reading_time": "5 min read",
+    "word_count": 1191,
+    "categories": [
+      "Market Education",
+      "Institutional Flow",
+      "Risk Management"
+    ],
+    "tags": [
+      "Nifty",
+      "Bitcoin",
+      "Order Flow",
+      "Beginner Guide"
+    ],
+    "youtube_video_id": "ttU4H-Sajeg",
+    "charts": [
+      "ins_claim_vs_deduction_matrix.png",
+      "ins_compounding_protection_curve.png"
+    ],
+    "content_path": "content/posts/INS-CSR-ICR-06.md"
+  },
+  {
     "title": "Why Claim Settlement Ratio Marketing Hides Incurred Claim Ratio Reality | The Bull Print",
     "slug": "INS-CSR-ICR-006",
     "description": "Discover why high claim settlement ratios can be misleading. Explore incurred claim ratios, IRDAI master circular rules, and hidden policy clauses.",
