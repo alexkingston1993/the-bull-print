@@ -1,5 +1,31 @@
 [
   {
+    "title": "Why Claim Settlement Ratio Marketing Hides Incurred Claim Ratio Reality | The Bull Print",
+    "slug": "INS-CSR-ICR-006",
+    "description": "Discover why high claim settlement ratios can be misleading. Explore incurred claim ratios, IRDAI master circular rules, and hidden policy clauses.",
+    "date": "2026-10-24",
+    "author": "Alex from Chennai",
+    "reading_time": "6 min read",
+    "word_count": 1295,
+    "categories": [
+      "Market Education",
+      "Institutional Flow",
+      "Risk Management"
+    ],
+    "tags": [
+      "Nifty",
+      "Bitcoin",
+      "Order Flow",
+      "Beginner Guide"
+    ],
+    "youtube_video_id": "RkUYc7UA6oY",
+    "charts": [
+      "ins_claim_vs_deduction_matrix.png",
+      "ins_compounding_protection_curve.png"
+    ],
+    "content_path": "content/posts/INS-CSR-ICR-06.md"
+  },
+  {
     "title": "Sebi F&O Rules: Institutional Order Flow & Trading Mechanics",
     "slug": "TBP-SEBI-FO-04",
     "description": "Master sebi f&o rules, institutional order flow, volume profiles, and risk management with this comprehensive educational guide from The Bull Print.",
@@ -92,32 +118,6 @@
     "youtube_video_id": "TBP_CRYPTO_TETHER_12M",
     "youtubeUrl": "https://youtu.be/TBP_CRYPTO_TETHER_12M",
     "content_path": "content/posts/the-110-billion-tether-shadow-engine-crypto-liquidity-audit-2026.md"
-  },
-  {
-    "title": "Why Claim Settlement Ratio Marketing Hides Incurred Claim Ratio Reality",
-    "slug": "INS-CSR-ICR-006",
-    "description": "Discover why Claim Settlement Ratio marketing hides Incurred Claim Ratio reality. Learn IRDAI rules, room rent sub-limits, and term insurance claim rejection math.",
-    "date": "2026-10-24",
-    "author": "Alex from Chennai",
-    "reading_time": "2 min read",
-    "word_count": 424,
-    "categories": [
-      "Market Education",
-      "Institutional Flow",
-      "Risk Management"
-    ],
-    "tags": [
-      "Nifty",
-      "Bitcoin",
-      "Order Flow",
-      "Beginner Guide"
-    ],
-    "youtube_video_id": "aRoSn4Ttn7s",
-    "charts": [
-      "ins_claim_vs_deduction_matrix.png",
-      "ins_compounding_protection_curve.png"
-    ],
-    "content_path": "content/posts/INS-2024-CSR-ICR-06.md"
   },
   {
     "title": "Why Claim Settlement Ratio Marketing Hides Incurred Claim Ratio Reality (Short #1) #Shorts",
