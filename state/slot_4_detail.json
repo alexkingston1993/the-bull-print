@@ -96,7 +96,13 @@
       "pct": 100,
       "started_at": "2026-11-01T12:15:38Z",
       "completed_at": null,
-      "metrics": {}
+      "metrics": {
+        "yt_long_id": "8BbbiKjf0y0",
+        "yt_short_ids": [],
+        "oauth_slot_used": 1,
+        "article_url": "https://the-bull-print.vercel.app/article.html?slug=TBP-SEBI-FO-04",
+        "x_thread_url": "Skipped (X keys not set)"
+      }
     }
   ],
   "live_logs": [
@@ -214,6 +220,11 @@
       "ts": "12:15:39",
       "level": "INFO",
       "msg": "[VERCEL]: \ud83d\udcdd Compiling MDX & IndexNow Ping... | "
+    },
+    {
+      "ts": "12:15:42",
+      "level": "INFO",
+      "msg": "[VERCEL]: \u2705 Live & Indexed (`https://the-bull-print.vercel.app/article.html?slug=TBP-SEBI-FO-04`) | \ud83d\udc26 X Thread: Skipped (X keys not set)"
     }
   ]
 }
