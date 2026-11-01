@@ -96,7 +96,13 @@
       "pct": 100,
       "started_at": "2026-11-01T17:09:56Z",
       "completed_at": null,
-      "metrics": {}
+      "metrics": {
+        "yt_long_id": "RkUYc7UA6oY",
+        "yt_short_ids": [],
+        "oauth_slot_used": 1,
+        "article_url": "https://the-bull-print.vercel.app/article.html?slug=INS-CSR-ICR-006",
+        "x_thread_url": "Skipped (X keys not set)"
+      }
     }
   ],
   "live_logs": [
