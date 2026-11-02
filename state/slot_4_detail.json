@@ -9,9 +9,9 @@
   "stage_pct": 100,
   "current_stage_index": 2,
   "current_stage_name": "Gemini Script & Dossier Synthesis",
-  "current_subtask_label": "open-seo dark-query loop \u00b7 slot 4",
+  "current_subtask_label": "source: autocomplete \u00b7 cluster: sebi f&o rules",
   "started_at": "2026-11-02T10:18:27Z",
-  "updated_at": "2026-11-02T10:18:34Z",
+  "updated_at": "2026-11-02T10:18:42Z",
   "eta_seconds": 0,
   "stages": [
     {
