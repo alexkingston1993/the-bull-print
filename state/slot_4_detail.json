@@ -9,9 +9,9 @@
   "stage_pct": 100,
   "current_stage_index": 2,
   "current_stage_name": "Gemini Script & Dossier Synthesis",
-  "current_subtask_label": "trigram dupe-check + domain vocabulary",
+  "current_subtask_label": "30-day overlap vs 'nifty-50-order-flow-absorption-institutional--1793038225' \u2192 title overlap ['2026', 'nifty', 'slot']",
   "started_at": "2026-11-02T10:18:27Z",
-  "updated_at": "2026-11-02T10:19:56Z",
+  "updated_at": "2026-11-02T10:20:01Z",
   "eta_seconds": 0,
   "stages": [
     {
