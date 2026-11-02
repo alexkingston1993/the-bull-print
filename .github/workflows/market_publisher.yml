@@ -65,6 +65,8 @@ on:
         description: 'Market slot name — run ARTICLE engine only (leave empty for video engine)'
         required: false
         default: ''
+  repository_dispatch:
+    types: [trigger_media_engine, trigger_parallel_video]
 
 permissions:
   contents: write
@@ -205,7 +207,8 @@ jobs:
         github.event.schedule == '0 13 * * *' ||
         github.event.schedule == '30 15 * * *'
       )) ||
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.article_slot == '')
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.article_slot == '') ||
+      (github.event_name == 'repository_dispatch')
     runs-on: ubuntu-latest
     timeout-minutes: 240
 
@@ -336,7 +339,7 @@ jobs:
           mkdir -p output/thumbnails content assets
           git add -f content/ assets/ output/thumbnails/ 2>/dev/null || git add content/ assets/
           if ! git diff --staged --quiet; then
-            git commit -m "Auto-publish new educational dossier & marketing assets [skip ci]" || true
+            git commit -m "Auto-publish new educational article & marketing assets [skip ci]" || true
           fi
           for retry in 1 2 3; do
             git fetch origin main

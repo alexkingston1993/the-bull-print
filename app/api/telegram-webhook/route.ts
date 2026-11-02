@@ -50,6 +50,155 @@ async function dispatchGitHubEvent(eventType: string, clientPayload: object = {}
 }
 
 // =====================================================================
+// 🧠 AGENT ARIA NATURAL LANGUAGE AI BRAIN (Zero Slash Commands Needed)
+// =====================================================================
+interface AriaParsedIntent {
+  intent: 'create_short' | 'create_video' | 'check_status' | 'check_revenue' | 'check_quota' | 'heal_pipeline' | 'chat';
+  topic: string;
+  vertical: 'stock_market' | 'crypto' | 'insurance';
+  duration: number; // 36|60 for shorts; 3|5|10 for standard videos
+  aria_reply: string;
+}
+
+const RAW_GEMINI_KEYS = (process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEYS || '')
+  .split(',')
+  .map((k) => k.trim())
+  .filter(Boolean);
+
+const CANDIDATE_GEMINI_MODELS = [
+  process.env.GEMINI_MODEL_NAME,
+  'gemini-flash-lite-latest',
+  'gemini-flash-latest',
+  'gemini-2.5-flash',
+].filter(Boolean);
+
+async function parseNaturalLanguageWithAriaBrain(userText: string): Promise<AriaParsedIntent> {
+  const lower = userText.toLowerCase().trim();
+
+  // Fast heuristic shortcuts for instant response when keywords match unequivocally
+  if (['/revenue', '/clicks', 'revenue', 'clicks', 'affiliate', 'how much revenue', 'revenue today'].includes(lower)) {
+    return { intent: 'check_revenue', topic: '', vertical: 'stock_market', duration: 0, aria_reply: 'Pulling the live affiliate & revenue ledger now! 💰' };
+  }
+  if (['/ytquota', '/quota', 'quota', 'yt quota', 'quota slots', 'how many uploads left'].includes(lower)) {
+    return { intent: 'check_quota', topic: '', vertical: 'stock_market', duration: 0, aria_reply: 'Auditing YouTube Quota Rotator pool capacity! 🔑' };
+  }
+  if (['/status', '/diagnose', '/health', 'status', 'diagnose', 'health', 'pipeline status', 'are runners working'].includes(lower)) {
+    return { intent: 'check_status', topic: '', vertical: 'stock_market', duration: 0, aria_reply: 'Scanning live GitHub Actions runner telemetry! 🛰️' };
+  }
+  if (['/heal', '/fix', 'heal', 'fix pipeline', 'unstick pipeline'].includes(lower)) {
+    return { intent: 'heal_pipeline', topic: '', vertical: 'stock_market', duration: 0, aria_reply: 'Autonomous doctor dispatched to inspect and heal cloud runners! 🩺' };
+  }
+
+  // LLM Intent Prompt
+  const prompt = `You are Agent Aria, Chief of Staff and Operations Lead for 'The Bull Print' media company.
+Alex (the creator and owner) communicates with you in natural English. No slash commands are ever required from him.
+
+ALEX'S MESSAGE: "${userText}"
+
+Analyze Alex's message and determine his objective. Return STRICT JSON with no markdown wrapping or extra keys:
+{
+  "intent": "create_short" | "create_video" | "check_status" | "check_revenue" | "check_quota" | "heal_pipeline" | "chat",
+  "topic": "<descriptive financial topic if creating video/short, else empty>",
+  "vertical": "stock_market" | "crypto" | "insurance",
+  "duration": <number: 36 or 60 for shorts, 3 or 5 or 10 for standard videos>,
+  "aria_reply": "<Aria's authentic response to Alex. In-character, sharp, witty, adjustments of dark sunglasses, coffee sip, professional. If dispatching video/short, mention that you're running it across our 20-runner parallel cloud matrix on GitHub Actions with zero load on his Mac.>"
+}
+
+Rules for Intent & Duration:
+- If he mentions "short", "60s", "36s", "reel", or quick video: intent="create_short". Duration=36 or 60 (default 60).
+- If he mentions "video", "masterclass", "long video", "deep dive", or minutes (3, 5, 10): intent="create_video". Duration=3, 5, or 10 (default 3).
+- If he asks about clicks, earnings, affiliates, revenue: intent="check_revenue".
+- If he asks about status, runs, health: intent="check_status".
+- If he asks about quotas or YouTube tokens: intent="check_quota".
+- If he asks to fix or heal: intent="heal_pipeline".
+- Otherwise: intent="chat".`;
+
+  // 1. Try Gemini API
+  for (const key of RAW_GEMINI_KEYS) {
+    for (const model of CANDIDATE_GEMINI_MODELS) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { responseMimeType: 'application/json' },
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const rawJson = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (rawJson) {
+            const parsed = JSON.parse(rawJson);
+            if (parsed.intent) return parsed;
+          }
+        }
+      } catch {
+        // Continue failover
+      }
+    }
+  }
+
+  // 2. Try Pollinations AI Failover
+  try {
+    const pollRes = await fetch('https://text.pollinations.ai/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: prompt }],
+        model: 'openai-fast',
+        jsonMode: true,
+      }),
+    });
+    if (pollRes.ok) {
+      const text = await pollRes.text();
+      const match = text.match(/\{[\s\S]*\}/);
+      if (match) {
+        const parsed = JSON.parse(match[0]);
+        if (parsed.intent) return parsed;
+      }
+    }
+  } catch {
+    // Continue fallback
+  }
+
+  // 3. Deterministic Heuristic Fallback
+  let intent: AriaParsedIntent['intent'] = 'chat';
+  let vertical: AriaParsedIntent['vertical'] = 'stock_market';
+  let duration = 60;
+  let topic = userText;
+
+  if (lower.includes('crypto') || lower.includes('solana') || lower.includes('bitcoin') || lower.includes('btc') || lower.includes('eth')) {
+    vertical = 'crypto';
+  } else if (lower.includes('insurance') || lower.includes('claim') || lower.includes('health') || lower.includes('irdai')) {
+    vertical = 'insurance';
+  }
+
+  if (lower.includes('short') || lower.includes('reel') || lower.includes('36s') || lower.includes('60s')) {
+    intent = 'create_short';
+    duration = lower.includes('36') ? 36 : 60;
+    topic = userText.replace(/\b(short|create|make|generate|a|60s|36s|video|please|for me)\b/gi, '').trim();
+  } else if (lower.includes('video') || lower.includes('masterclass') || lower.includes('deep dive') || lower.includes('min')) {
+    intent = 'create_video';
+    const minMatch = lower.match(/\b(3|5|10)\b/);
+    duration = minMatch ? parseInt(minMatch[1]) : 3;
+    topic = userText.replace(/\b(video|create|make|generate|masterclass|deep dive|min|minute|minutes|please)\b/gi, '').trim();
+  }
+
+  return {
+    intent,
+    topic: topic || (intent === 'create_short' ? 'Bitcoin Perpetual Squeeze' : 'Institutional Order Flow Footprint'),
+    vertical,
+    duration,
+    aria_reply:
+      intent === 'chat'
+        ? "*Adjusts dark sunglasses and sips double espresso* 🕶️☕ On station, Boss! All cloud systems are green and 100% cloud-hosted. What are we producing or analyzing next?"
+        : `Dispatched to cloud matrix! Zero load on your Mac. 🚀`,
+  };
+}
+
+// =====================================================================
 // 💰 AFFILIATE & REVENUE LEDGER HELPERS (Zero-DB GitHub Repo Variables)
 // =====================================================================
 interface TelemetryShape {
@@ -125,7 +274,7 @@ function buildRevenueLedgerCard(t: TelemetryShape, content: { total: number; las
     `₹ *Projected Monthly Recurring RevShare:* \`₹${projectedInr.toLocaleString('en-IN', { maximumFractionDigits: 0 })}\`\n` +
     `🕒 *Ledger Updated:* \`${updatedAt}\`\n` +
     `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-    `💡 *Verdict:* Every YouTube description fires \`/go/{broker}\` — keep publishing dossiers and the flywheel compounds! ☕🚀`
+    `💡 *Verdict:* Every YouTube description fires \`/go/{broker}\` — keep publishing articles and the flywheel compounds! ☕🚀`
   );
 }
 
@@ -317,35 +466,139 @@ export async function POST(req: NextRequest) {
             };
 
       await sendTelegram(chatId, report, inlineKeyboard);
-      return NextResponse.json({ ok: true });
+    // 3. NATURAL LANGUAGE AI BRAIN & AUTOMATED INTENT DISPATCH
+    // Alex speaks exclusively in natural English. Aria detects intent, extracts parameters,
+    // triggers parallel cloud matrix pipelines (zero local Mac compute), and replies conversationally.
+    const parsed = await parseNaturalLanguageWithAriaBrain(text);
+
+    if (parsed.intent === 'create_short') {
+      const topic = parsed.topic || 'Solana Memecoin Siphon & MEV Arbitrage Squeeze';
+      const duration = parsed.duration || 60;
+      const vertical = parsed.vertical || 'crypto';
+
+      const ghRes = await dispatchGitHubEvent('trigger_parallel_video', {
+        topic,
+        shorts_only: 'true',
+        shorts_count: '1',
+        duration_sec: String(duration),
+        vertical,
+        parallel_matrix: 'true',
+        max_parallel_runners: '20',
+        mode: 'aria_natural_language_dispatch',
+      });
+
+      // Also trigger legacy event name as backup
+      await dispatchGitHubEvent('trigger_media_engine', {
+        topic,
+        shorts_only: 'true',
+        shorts_count: '1',
+        duration_sec: String(duration),
+        vertical,
+        parallel_matrix: 'true',
+        max_parallel_runners: '20',
+        mode: 'aria_natural_language_dispatch',
+      });
+
+      const confirmation = parsed.aria_reply ||
+        `🕶️☕ *Agent Aria on Station:*\n\n` +
+        `Dispatched **${duration}s 9:16 Short** to our **20-Runner Parallel Cloud Matrix** on GitHub Actions!\n` +
+        `📌 *Topic:* \`${topic}\`\n` +
+        `🏛️ *Vertical:* \`${vertical}\`\n` +
+        `⚡ *Parallel Execution:* All 6-second segments rendering simultaneously across parallel Ubuntu cloud runners (+ Kaggle GPU overflow).\n` +
+        `🛡️ *Local Host:* Your Mac is 100% untouchable and untouched. All execution is cloud-native.\n\n` +
+        `I'll notify you the moment the assembled video, ducked audio bed, and web article go live! 🚀`;
+
+      await sendTelegram(chatId, confirmation);
+      return NextResponse.json({ ok: true, intent: 'create_short', topic, duration, vertical, dispatched: ghRes.ok });
     }
 
-    // Command: /run <topic>
-    if (lower.startsWith('/run')) {
-      const topic = text.replace(/^\/run/i, '').trim() || 'Institutional Order Flow & Macro Liquidity';
-      const ghRes = await dispatchGitHubEvent('trigger_media_engine', { topic });
+    if (parsed.intent === 'create_video') {
+      const topic = parsed.topic || 'Institutional Order Flow Absorption & Macro Liquidity';
+      const duration = parsed.duration || 3;
+      const vertical = parsed.vertical || 'stock_market';
+
+      const ghRes = await dispatchGitHubEvent('trigger_parallel_video', {
+        topic,
+        vertical,
+        duration_min: String(duration),
+        shorts_only: 'false',
+        parallel_matrix: 'true',
+        max_parallel_runners: '20',
+        mode: 'aria_natural_language_dispatch',
+      });
+
+      // Also trigger legacy event name as backup
+      await dispatchGitHubEvent('trigger_media_engine', {
+        topic,
+        vertical,
+        duration_min: String(duration),
+        shorts_only: 'false',
+        parallel_matrix: 'true',
+        max_parallel_runners: '20',
+        mode: 'aria_natural_language_dispatch',
+      });
+
+      const confirmation = parsed.aria_reply ||
+        `🕶️☕ *Agent Aria on Station:*\n\n` +
+        `Dispatched **${duration}-Minute 2K Masterclass** to our **20-Runner Parallel Cloud Matrix** on GitHub Actions!\n` +
+        `📌 *Topic:* \`${topic}\`\n` +
+        `🏛️ *Vertical:* \`${vertical}\`\n` +
+        `🎨 *Specs:* High-CTR Flow AI thumbnail frames, Method C Glass HUD callouts, and 2,500+ word WebP companion article.\n` +
+        `⚡ *Parallel Concurrency:* Segments rendered concurrently across up to 20 Ubuntu runners + Kaggle GPU.\n` +
+        `🛡️ *Local Host:* Zero load on your Mac; 100% cloud execution.\n\n` +
+        `Monitoring telemetry now, Captain! 🚀`;
+
+      await sendTelegram(chatId, confirmation);
+      return NextResponse.json({ ok: true, intent: 'create_video', topic, duration, vertical, dispatched: ghRes.ok });
+    }
+
+    if (parsed.intent === 'check_revenue') {
+      await handleRevenueCommand(chatId);
+      return NextResponse.json({ ok: true, intent: 'check_revenue' });
+    }
+
+    if (parsed.intent === 'check_quota') {
+      await sendTelegram(chatId, buildYtQuotaCard());
+      return NextResponse.json({ ok: true, intent: 'check_quota' });
+    }
+
+    if (parsed.intent === 'check_status') {
+      const runsRes = await fetch(`https://api.github.com/repos/${GH_REPO}/actions/runs?per_page=3`, {
+        headers: { Authorization: `Bearer ${GH_TOKEN}`, Accept: 'application/vnd.github.v3+json' },
+      });
+      if (runsRes.ok) {
+        const runsData = await runsRes.json();
+        const latest = runsData.workflow_runs?.[0];
+        const statusEmoji = latest?.conclusion === 'success' ? '✅' : latest?.conclusion === 'failure' ? '💥' : '⏳';
+        const report =
+          `🛰️ *AGENT ARIA — LIVE CLOUD TELEMETRY* 🕶️☕\n` +
+          `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+          `${statusEmoji} *Latest Workflow:* \`${latest?.name || 'Cloud Media Engine'}\`\n` +
+          `⚡ *Run ID:* \`#${latest?.id || 'N/A'}\` (\`${(latest?.conclusion || latest?.status || 'RUNNING').toUpperCase()}\`)\n` +
+          `📅 *Triggered:* \`${(latest?.updated_at || '').replace('T', ' ').replace('Z', ' UTC')}\`\n` +
+          `🌐 *Web Portal:* \`https://the-bull-print.vercel.app\`\n` +
+          `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+          (parsed.aria_reply || 'All cloud runners active and standing by.');
+        await sendTelegram(chatId, report);
+      } else {
+        await sendTelegram(chatId, parsed.aria_reply || 'Checking telemetry... all cloud runners standing by.');
+      }
+      return NextResponse.json({ ok: true, intent: 'check_status' });
+    }
+
+    if (parsed.intent === 'heal_pipeline') {
+      const ghRes = await dispatchGitHubEvent('heal_pipeline', { mode: 'watchdog_heal' });
       await sendTelegram(
         chatId,
-        ghRes.ok
-          ? `🚀 *Agent Aria:* Cloud media pipeline dispatched to GitHub Actions!\n📌 *Topic:* \`${topic}\`\n\nI will monitor the execution and update your mission card.`
-          : `⚠️ *Agent Aria:* Failed to dispatch GitHub Action (HTTP ${ghRes.status}). Verify \`GITHUB_PAT_TOKEN\`.`
+        parsed.aria_reply ||
+          `🩺 *Agent Aria:* Dispatched Autonomous Pipeline Healer to cloud runners! Diagnosing failed runs and clearing state. ☕🚀`
       );
-      return NextResponse.json({ ok: true, dispatched: ghRes.ok, topic });
+      return NextResponse.json({ ok: true, intent: 'heal_pipeline' });
     }
 
-    // Command: /revenue, /clicks, or /analytics — the 💰 Affiliate & Revenue Ledger
-    if (['/revenue', '/clicks', '/analytics', 'revenue', 'clicks'].includes(lower)) {
-      await handleRevenueCommand(chatId);
-      return NextResponse.json({ ok: true, handler: 'revenue_ledger' });
-    }
-
-    // Command: /ytquota or /quota — the 🔑 YouTube Quota Rotator capacity card
-    if (['/ytquota', '/quota', 'yt quota', 'quota slots'].includes(lower)) {
-      await sendTelegram(chatId, buildYtQuotaCard());
-      return NextResponse.json({ ok: true, handler: 'yt_quota' });
-    }
-
-    return NextResponse.json({ ok: true });
+    // Default: Conversational chat with Aria's persona
+    await sendTelegram(chatId, parsed.aria_reply);
+    return NextResponse.json({ ok: true, intent: 'chat' });
   } catch (err: any) {
     return NextResponse.json({ ok: false, error: err?.message || 'Unknown error' }, { status: 500 });
   }

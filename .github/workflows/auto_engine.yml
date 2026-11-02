@@ -44,7 +44,7 @@ on:
 
   # 3. External Webhook Trigger (From Telegram / Vercel / n8n / RSS)
   repository_dispatch:
-    types: [trigger_media_engine]
+    types: [trigger_media_engine, trigger_parallel_video]
 permissions:
   contents: write
 
@@ -173,7 +173,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "No new assets to commit."
           else
-            git commit -m "Auto-publish new educational dossier & marketing assets [skip ci]" || true
+            git commit -m "Auto-publish new educational article & marketing assets [skip ci]" || true
             for retry in 1 2 3; do
               git fetch origin main
               git rebase -X ours origin/main || { git rebase --abort; git merge -X ours origin/main -m "merge: resolve content sync" || true; }

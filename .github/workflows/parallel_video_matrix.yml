@@ -1,0 +1,274 @@
+name: 20-Runner Parallel Cloud Video Matrix (The Bull Print)
+
+on:
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'Financial Topic'
+        required: false
+        default: 'Solana Memecoin Siphon: How MEV Bots Frontrun Retail'
+      vertical:
+        description: 'Vertical: crypto | stock_market | insurance'
+        required: false
+        default: 'crypto'
+      duration_sec:
+        description: 'Duration in seconds for Shorts (36 or 60)'
+        required: false
+        default: '60'
+      duration_min:
+        description: 'Duration in minutes for Standard Video (3, 5, or 10)'
+        required: false
+        default: '3'
+      shorts_only:
+        description: 'Render as 9:16 Short (true/false)'
+        required: false
+        default: 'true'
+
+  repository_dispatch:
+    types: [trigger_parallel_video, trigger_media_engine]
+
+permissions:
+  contents: write
+
+jobs:
+  # ─────────────────────────────────────────────────────────────
+  # JOB 1: SESSION PREPARATION & DYNAMIC MATRIX PARTITIONING
+  # ─────────────────────────────────────────────────────────────
+  prepare_session:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      matrix: ${{ steps.prep.outputs.matrix }}
+      total_segments: ${{ steps.prep.outputs.total_segments }}
+      has_overflow: ${{ steps.prep.outputs.has_overflow }}
+      is_short: ${{ steps.prep.outputs.is_short }}
+      topic: ${{ steps.prep.outputs.topic }}
+      slug: ${{ steps.prep.outputs.slug }}
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🐍 Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Install Synthesis Dependencies (100% Offline Cloned Christopher Voice)
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core
+          pip install --no-cache-dir Pillow soundfile soxr faster-whisper requests google-genai loguru toml
+
+      - name: 🚀 Prepare Session & Compute Parallel Matrix
+        id: prep
+        env:
+          INPUT_TOPIC: "${{ github.event.inputs.topic || github.event.client_payload.topic || 'Solana Memecoin Siphon MEV Arbitrage' }}"
+          INPUT_VERTICAL: ${{ github.event.inputs.vertical || github.event.client_payload.vertical || 'crypto' }}
+          INPUT_DURATION_SEC: ${{ github.event.inputs.duration_sec || github.event.client_payload.duration_sec || '60' }}
+          INPUT_DURATION_MIN: ${{ github.event.inputs.duration_min || github.event.client_payload.duration_min || '3' }}
+          INPUT_SHORTS_ONLY: ${{ github.event.inputs.shorts_only || github.event.client_payload.shorts_only || 'true' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          SHORT_FLAG=""
+          if [ "$INPUT_SHORTS_ONLY" = "true" ]; then
+            SHORT_FLAG="--is-short"
+          fi
+          python scripts/cloud_parallel_video_engine.py \
+            --mode prepare \
+            --topic "$INPUT_TOPIC" \
+            --vertical "$INPUT_VERTICAL" \
+            --duration-sec "$INPUT_DURATION_SEC" \
+            --duration-min "$INPUT_DURATION_MIN" \
+            $SHORT_FLAG \
+            --bundle-dir output/session_bundle
+
+      - name: 📤 Upload Session Bundle Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: session-bundle
+          path: output/session_bundle/
+          retention-days: 1
+
+  # ─────────────────────────────────────────────────────────────
+  # JOB 2: PARALLEL SEGMENT RENDERING (Up to 20 Ubuntu Runners)
+  # ─────────────────────────────────────────────────────────────
+  render_segment_matrix:
+    needs: prepare_session
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix: ${{ fromJson(needs.prepare_session.outputs.matrix) }}
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🎥 Install FFmpeg & Fonts
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core
+
+      - name: 🐍 Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Install Lightweight Render Libs
+        run: pip install --no-cache-dir Pillow loguru
+
+      - name: 📥 Download Session Bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: session-bundle
+          path: output/session_bundle/
+
+      - name: ⚡ Render Discrete Segment ${{ matrix.index }}
+        run: |
+          python scripts/cloud_parallel_video_engine.py \
+            --mode render_segment \
+            --segment-index ${{ matrix.index }} \
+            --bundle-dir output/session_bundle \
+            --output-dir output/rendered_segments
+
+      - name: 📤 Upload Rendered Segment Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: segment-${{ matrix.index }}
+          path: output/rendered_segments/segment_${{ matrix.index }}.mp4
+          retention-days: 1
+
+  # ─────────────────────────────────────────────────────────────
+  # JOB 2-OVERFLOW: KAGGLE DUAL-T4 GPU OVERFLOW WORKER (>20 segments)
+  # ─────────────────────────────────────────────────────────────
+  kaggle_gpu_overflow:
+    needs: prepare_session
+    if: needs.prepare_session.outputs.has_overflow == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Install Kaggle CLI
+        run: pip install --no-cache-dir kaggle loguru requests
+
+      - name: 📥 Download Session Bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: session-bundle
+          path: output/session_bundle/
+
+      - name: ⚡ Dispatch Kaggle GPU Kernel for Overflow Segments
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          mkdir -p ~/.kaggle
+          echo "{\"username\":\"$KAGGLE_USERNAME\",\"key\":\"$KAGGLE_KEY\"}" > ~/.kaggle/kaggle.json
+          chmod 600 ~/.kaggle/kaggle.json
+          python scripts/cloud_parallel_video_engine.py \
+            --mode dispatch_kaggle_overflow \
+            --bundle-dir output/session_bundle
+
+  # ─────────────────────────────────────────────────────────────
+  # JOB 3: TERMINAL AGGREGATION, AUDIO DUCKING & YOUTUBE PUBLISH
+  # ─────────────────────────────────────────────────────────────
+  aggregate_and_publish:
+    needs: [prepare_session, render_segment_matrix]
+    if: always() && needs.prepare_session.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🎥 Install FFmpeg & Audio Libs
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core
+
+      - name: 🐍 Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Install Publishing & YouTube Dependencies
+        run: |
+          pip install --no-cache-dir Pillow google-api-python-client google-auth google-auth-oauthlib google-auth-httplib2 requests loguru numpy scipy toml
+
+      - name: 📥 Download Session Bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: session-bundle
+          path: output/session_bundle/
+
+      - name: 📥 Download All Rendered Segment Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: segment-*
+          path: output/downloaded_segments/
+          merge-multiple: true
+
+      - name: 🔑 Materialize YouTube Quota Pool & Tokens
+        env:
+          YOUTUBE_TOKEN_EN: ${{ secrets.YOUTUBE_TOKEN_EN }}
+          YT_OAUTH_POOL_JSON: ${{ secrets.YT_OAUTH_POOL_JSON }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          YT_CLIENT_ID_1: ${{ secrets.YT_CLIENT_ID_1 }}
+          YT_CLIENT_SECRET_1: ${{ secrets.YT_CLIENT_SECRET_1 }}
+          YT_REFRESH_TOKEN_1: ${{ secrets.YT_REFRESH_TOKEN_1 }}
+          YT_CLIENT_ID_2: ${{ secrets.YT_CLIENT_ID_2 }}
+          YT_CLIENT_SECRET_2: ${{ secrets.YT_CLIENT_SECRET_2 }}
+          YT_REFRESH_TOKEN_2: ${{ secrets.YT_REFRESH_TOKEN_2 }}
+        run: |
+          mkdir -p data/youtube_tokens
+          if [ -n "$YOUTUBE_TOKEN_EN" ]; then
+            echo "$YOUTUBE_TOKEN_EN" | base64 -d > data/youtube_tokens/youtube_token_en.pickle
+            echo "✓ Restored primary YouTube OAuth token"
+          fi
+
+      - name: 🚀 Concatenate, Mix Ducked BGM, Upload to YouTube & Publish Article
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python scripts/cloud_parallel_video_engine.py \
+            --mode aggregate_and_publish \
+            --bundle-dir output/session_bundle \
+            --segments-dir output/downloaded_segments \
+            --output-dir output/final_broadcast
+
+      - name: 💾 Commit & Push New Articles, Visual Frames & Manifest to GitHub
+        run: |
+          git config --global user.name "The Bull Print Autonomous Bot"
+          git config --global user.email "bot@thebullprint.media"
+          mkdir -p content assets output/thumbnails
+          git add content/ assets/ output/thumbnails/ 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo "No new assets to commit."
+          else
+            git commit -m "feat(media): parallel cloud video & article release [skip ci]" || true
+            for retry in 1 2 3; do
+              git fetch origin main
+              git rebase -X ours origin/main || { git rebase --abort; git merge -X ours origin/main -m "merge: resolve content sync" || true; }
+              if git push origin HEAD:main; then
+                echo "✓ Changes committed and pushed to GitHub. Vercel deployment triggered automatically."
+                break
+              fi
+              sleep 5
+            done
+          fi
