@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-02T13:45:55Z",
+  "updated_at": "2026-11-02T14:06:26Z",
   "videos": {
     "slot_1_long": {
       "slot": 1,
@@ -56,14 +56,16 @@
       "title": "[LONG-FORM] Usdt dominance coinmarketcap",
       "format": "16:9 LONG",
       "vertical": "CRYPTO",
-      "current_stage": "Stage 5/7: Kaggle T4 GPU \u2014 NVENC Encoding",
-      "stage_pct": 50,
-      "completion_pct": 65,
-      "eta_seconds": 220,
+      "current_stage": "Stage 7/7: Uploaded & Distributed",
+      "stage_pct": 100,
+      "completion_pct": 100,
+      "eta_seconds": 0,
       "compliance_status": "\ud83d\udee1\ufe0f Feedback Healed & Verified",
-      "status": "IN_PROGRESS",
-      "updated_at": "2026-11-02T13:45:55Z",
-      "started_at": "2026-10-27T14:17:29Z"
+      "status": "COMPLETED",
+      "updated_at": "2026-11-02T14:06:26Z",
+      "started_at": "2026-10-27T14:17:29Z",
+      "youtube_id": "CAAWeig8x9k",
+      "youtube_url": "https://www.youtube.com/watch?v=CAAWeig8x9k"
     },
     "slot_2_long": {
       "video_id": "slot_2_long",
