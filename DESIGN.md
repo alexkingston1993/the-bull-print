@@ -10,7 +10,7 @@
 - **Metaphor**: A Bloomberg Terminal stripped of noise — high signal-to-noise ratio, pure readability, dark mode precision with live ticks.
 - **Signature Interactions**:
   1. **Top Live Index Constituent Drawer**: Real-time tick bar across benchmark Indian indices (`NIFTY 50`, `SENSEX`, `BANK NIFTY`, `MIDCAP SELECT`, `FINNIFTY`) with an instant `Split ↗` constituent drawer displaying stock weights, live prices, 1D % changes, and 52W high/lows.
-  2. **Groww-Style Tabbed Explorer**: Seamless toggle between Market Movers (Gainers / Losers / Volume Shockers with mini sparklines), Sectors Trending (with visual gainers-to-losers ratio bars), Stock Screener, and Research Dossiers.
+  2. **Groww-Style Tabbed Explorer**: Seamless toggle between Market Movers (Gainers / Losers / Volume Shockers with mini sparklines), Sectors Trending (with visual gainers-to-losers ratio bars), Stock Screener, and Research Articles.
   3. **Dedicated Standalone Article Pages**: Zero popup/modal traps. Each article is a dedicated, fully scrollable URL (`/article?slug=...` / `/article/:slug`) featuring reading progress telemetry, 16:9 YouTube video embeds, and valuation breakdown tables.
   4. **Screener.in Fundamental Financial Suite**: Comprehensive 9-ratio matrix (M.Cap, CMP, 52W High/Low, P/E, Book Value, Div Yield, ROCE, ROE, Debt/Equity), Pros & Cons cards, Sector Peer Comparison, 10-Year Compounding Scorecard, and Shareholding distribution.
   5. **Direct Technical Analysis Terminal**: Embedded 1080p TradingView real-time candlestick chart engine for institutional order-flow analysis.
@@ -52,3 +52,134 @@
 2. **Accessible Native Scrolling**: No `document.body.style.overflow = "hidden"` traps on article content.
 3. **Responsive Viewport Support**: Fluid breakpoint scaling across mobile (375px+), tablet (768px+), and ultra-wide desktop monitors (1440px+).
 4. **Vercel Edge Clean Routing**: Clean rewrites for `/article/:slug` and `/stocks/:symbol` configured in `vercel.json`.
+
+---
+
+## 5. YouTube Shorts High-CTR Frame Standard (Google Flow AI 2K Benchmark)
+
+To guarantee that any random frame auto-selected by YouTube's algorithm serves as a viral, high-CTR thumbnail, all Shorts are constructed from 10 distinct split-section background frames (switching every 6 seconds):
+
+- **Master Reference Bank**: `assets/flow_ai_masters/`
+  - `crypto_mev/`: 10 pristine 2K master frames (`frame_00.jpg` – `frame_09.jpg`).
+- **Required Visual Anatomy**:
+  1. **Physical 3D Graphic Anchor**: Concrete, mechanical, or tangible objects (e.g. industrial hazard bear traps crushing tokens with sparks, liquid cyber-vortex funnels, glowing terminator skulls with network wiring, shattering laser trendline arrows). Flat vector clip-art or simple 2D shapes are strictly prohibited.
+  2. **Multi-Stop Incandescent 3D Typography**: Chiseled brushed-chrome / silver primary hook + molten gold / fiery red sub-hook with incandescent inner glow and drop shadow.
+  3. **Dual-Tone Floating Neon Badges**: Glass/plasma rounded capsules with neon edge borders (e.g., `MEV TRAP [!]`, `BOT EXPOSED`, `92,000 WALLETS`).
+  4. **Volumetric Atmosphere**: Glowing candlestick lightning, depth-of-field blur, dark obsidian vignette, falling embers, and laser grid floor.
+- **Section Pacing**:
+  - 60s Short: 10 sections $\times$ 6.0s = 60s total duration.
+  - 36s Short: 6 sections $\times$ 6.0s = 36s total duration.
+
+### 5.1 Google Flow AI Systematic Prompt Blueprint
+
+Every frame prompt generated for Shorts must strictly follow the 5-part blueprint:
+
+```
+[Format & Aspect Ratio] + [Core Subject & Metaphor] + [Lighting & Color Strategy] + [Typography & Text Overlay] + [Composition & Finish]
+```
+
+- **Format**: `A high CTR viral vertical 9:16 YouTube Short thumbnail...`
+- **Subject**: One primary, clear visual subject (single focal point, tangible 3D physical metaphor).
+- **Lighting**: Dark obsidian background with vivid, high-saturation accents (neon cyan/mint `#14F195`, electric purple `#9945FF`, molten gold `#FACC15`, volumetric glow, rim lights).
+- **Typography**: Specific 3D text styling instructions (e.g. bold 3D chiseled typography reading 2–4 high-impact words).
+- **Finish**: `hyper-detailed, clean compositing, high contrast, cinematic depth of field, 8k render.`
+
+### 5.2 High-CTR Rules for AI Models
+
+1. **Single Focal Point**: Mobile feeds require immediate readability (< 1 second). Every frame must center on exactly ONE dramatic concept.
+2. **Extreme Contrast**: Pair deep obsidian/black moody backdrops with bright neon glows or rim lighting to make elements pop off the mobile OLED screen.
+3. **Concise Text Hooks (2–4 Words)**: Never render long sentences. Use short, high-impact punchy hooks (`MEV BOT TRAP`, `LIQUIDITY DRAIN`, `SLIPPAGE EXPOSED`).
+4. **Image-to-Image Refinement (`:base`)**: When iterating or redesigning visual assets, supply the base reference frame so the model preserves spatial structure while elevating visual fidelity.
+5. **Strict Non-Reuse Mandate**: **NEVER re-use the same images for any future Shorts or standard videos**. Each new video must generate bespoke, fresh frames customized specifically to that production's unique script.
+
+---
+
+## 6. Unified Viral Video Engine (`app/services/viral_video_engine.py`)
+
+A modular, CPU-compatible rendering component for GitHub Actions, Kaggle workers, and local execution.
+
+### 6.1 Strict Segmentation Standards
+
+| Video Type | Target Aspect Ratio | Resolution | Segmentation Rule | Total Frames |
+|---|---|---|---|---|
+| **Short (36s)** | 9:16 Vertical | 1080 $\times$ 1920 | 1 bespoke high-CTR frame every **6 seconds** | **6 frames** |
+| **Short (60s)** | 9:16 Vertical | 1080 $\times$ 1920 | 1 bespoke high-CTR frame every **10 seconds** | **6 frames** *(or 10 frames @ 6s)* |
+| **Standard (< 5 min)** | 16:9 Widescreen | 2560 $\times$ 1440 (2K Master) | 1 bespoke high-CTR frame every **15 seconds** | **12 frames** *(e.g. 3 min / 180s)* |
+| **Standard ($\ge$ 5 min)** | 16:9 Widescreen | 2560 $\times$ 1440 (2K Master) | 1 bespoke high-CTR frame every **20 seconds** | **36 frames** *(e.g. 12 min / 720s)* |
+
+### 6.2 Word-Level Dynamic Captioning Engine
+
+- **Audio Timestamp Extraction**: Millisecond-accurate word boundaries extracted via `faster-whisper` (`base.en`, `word_timestamps=True`).
+- **Active Spoken Pop-On**: Only the word **actively pronounced by the voice** appears on screen. No trailing or pre-rendered words.
+- **Strict Pause Blanking**: During natural pauses, breaths, or transitions between sentences, **zero words appear on screen** to keep the visual composition uncluttered.
+- **Mute-Legible Aesthetics**:
+  - High-contrast typography (80–92pt Impact / Bold) inside a floating obsidian glass pill (`rgba(5, 8, 15, 0.86)`).
+  - Dual glowing neon borders (`#14F195` mint green for standard words, `#FACC15` molten gold for high-impact financial keywords).
+  - Vertical positioning: Lower third ($y \approx 1530$ for 9:16 Shorts; $y \approx 1180$ for 16:9 Standard), positioned safely above platform UI controls and below central 3D visual anchors.
+- **CPU Native Streaming**: Renders frame-by-frame via Pillow and pipes raw RGB24 frames directly into `ffmpeg -f rawvideo -pix_fmt yuv420p` for universal mobile/desktop hardware playback.
+
+### 6.3 Production Deliverables Registry
+
+1. **YouTube Shorts Upload**:
+   - **Video Title**: `Solana Memecoin MEV Trap: How Bots Siphon 90% of Retail! 🚨 #shorts`
+   - **Live YouTube URL**: [https://youtu.be/9oB6Fg-XpJQ](https://youtu.be/9oB6Fg-XpJQ)
+   - **Video ID**: `9oB6Fg-XpJQ`
+   - **Custom Thumbnail**: Flow AI 2K Master (`output/solana_mev_short/frames/revamped frames/frame_00.jpg_fb35175f_2K.jpg`)
+   - **Original Video Preserved**: `output/solana_mev_short/solana-mev-bot-siphon_60s.mp4` & `solana-mev-bot-siphon_60s_raw.mp4`
+
+2. **Published Website Article**:
+   - **Slug**: `solana-mev-bot-siphon`
+   - **Word Count**: **2,696 words** (Markdown in `content/posts/solana-mev-bot-siphon.md` & HTML in `content/posts.json`).
+   - **Embedded Video**: Linked to live YouTube ID `9oB6Fg-XpJQ`.
+
+3. **Standard 3-Minute 16:9 Widescreen Masterclass**:
+   - **Rendered Output**: `output/solana_mev_masterclass_3m/solana-mev-masterclass_3m.mp4`
+   - **Duration**: **179.52 seconds** (3.0 minutes)
+   - **Resolution**: **2560 $\times$ 1440 (2K Master)** @ 25.0 fps, H.264 `yuv420p`, AAC stereo.
+   - **Visual Segments**: **12 bespoke 2560x1440 frames** switching every 15.0 seconds (`output/solana_mev_masterclass_3m/frames/frame_00.jpg` – `frame_11.jpg`).
+   - **Captions**: 383 millisecond-accurate dynamic spoken-word pop-on overlays.
+
+---
+
+## 7. Multi-Pacing A/B Test Suite & Audio Pool Architecture
+
+To eliminate static hold fatigue on 10s (or 6s/15s/20s) slots without amateurish center crop-zooms or doubling image API costs, each frame slot splits cleanly at the halfway mark (`t = frame_hold / 2.0`).
+
+### 7.1 The 3 Pacing Test Videos
+
+- **Method A (Forensic X-Ray Shift)**: `output/test_pacing/test_method_A_forensic_lut.mp4` (5.46 MB)
+  - `0.0s–5.0s`: Clean full-color visual plate with continuous ease-out pan.
+  - `5.0s–10.0s`: High-contrast Forensic LUT state shift (cyan/crimson tint + dark telemetry horizontal grid lines) synced with terminal click SFX.
+- **Method B (Widescreen Split-Pan)**: `output/test_pacing/test_method_B_whip_pan.mp4` (7.50 MB)
+  - `0.0s–5.0s`: Left 9:16 crop of 16:9 cinematic master (Retail Perspective).
+  - at `t=5.0s`: Swift motion-blurred whip-pan to the right.
+  - `5.0s–10.0s`: Right 9:16 crop of 16:9 cinematic master (Institutional Perspective).
+- **Method C (Glass Data Callout)**: `output/test_pacing/test_method_C_glass_hud.mp4` (4.95 MB)
+  - `0.0s–5.0s`: Clean visual plate.
+  - `5.0s–10.0s`: Background dims/blurs slightly, and a sleek translucent glass metric HUD strip slides in from top displaying key script data.
+
+### 7.2 Royalty-Free / Zero-Attribution Audio Pool
+
+- **BGM Beds** (`assets/audio/bgm_pool/`, 60s seamless stereo loops):
+  - `bed_01_subterranean_pulse.wav`: 65 BPM Moog sub-bass pulse + airy shimmer.
+  - `bed_02_quant_clockwork.wav`: 120 BPM clockwork ticking + D-minor analog pad drone.
+  - `bed_03_offshore_noir.wav`: Atmospheric dark low string drone with harmonic filter sweeps.
+  - `bed_04_cyber_forensic.wav`: 16th-note analog arpeggio low-pass filtered below 900Hz.
+  - `bed_05_wall_street_afterhours.wav`: Moody Rhodes electric piano chords + warm vinyl dust.
+  - `bed_06_systemic_collapse.wav`: Rising Shepard-tone dread with industrial resonance.
+- **Transition SFX** (`assets/audio/sfx_pool/`):
+  - `sfx_01_low_air_whoosh.wav`: 180ms deep aerodynamic swipe for scene cuts.
+  - `sfx_02_sub_thud_drop.wav`: 250ms tight 60Hz sub-bass impact for heavy reveals.
+  - `sfx_03_leica_shutter_snap.wav`: 120ms mechanical camera shutter click.
+  - `sfx_04_terminal_data_chirp.wav`: 90ms institutional matrix double-beep for halfway splits.
+  - `sfx_05_magnetic_tape_stop.wav`: 150ms pitch-down micro-glitch.
+  - `sfx_06_glass_resonator_hit.wav`: 300ms crystalline harmonic resonator ping.
+
+### 7.3 Local Christopher Phonetics (`app/utils/phonetics.py`)
+
+- Normalizes crypto compounds (`memecoin` $\to$ `meem coin`, `Jito` $\to$ `Jee-toh`, `MEV` $\to$ `M E V`, `thebullprint.in` $\to$ `the bull print dot I N`, `$42M` $\to$ `42 million dollars`).
+- Pre-processed strictly before voice synthesis; on-screen captions retain clean orthographic spelling.
+
+
+
+

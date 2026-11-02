@@ -715,7 +715,7 @@ class AriaCommandToolkit:
 
     @classmethod
     def fetch_post_stats(cls) -> Dict[str, int]:
-        """Counts published research dossiers from the live posts.json manifest (+ last-7-day growth)."""
+        """Counts published research articles from the live posts.json manifest (+ last-7-day growth)."""
         stats = {"total": 0, "last_7_days": 0}
         try:
             res = requests.get(f"{cls.SITE_BASE}/content/posts.json", timeout=15)
@@ -767,7 +767,7 @@ class AriaCommandToolkit:
             f"🖱️ *Total Affiliate Clicks:* `{total_clicks}`",
             f"📊 *Breakdown by Broker:* {breakdown}",
             f"📣 *Top Campaigns:* {top_campaigns_str}",
-            f"🎓 *Published Research Dossiers:* `{content['total']}` (+{content['last_7_days']} this week)",
+            f"🎓 *Published Research Articles:* `{content['total']}` (+{content['last_7_days']} this week)",
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
             f"📈 *Est. Active Referrals* (4% CVR): `{estimated_referrals:.1f}`",
             f"₹ *Projected Monthly Recurring RevShare:* `₹{projected_monthly_inr:,.0f}`",
@@ -781,7 +781,7 @@ class AriaCommandToolkit:
         """The /revenue & /clicks command — full ledger card + Kickback KPI verdict."""
         card = cls.format_revenue_card()
         verdict = (
-            "💡 *Verdict:* Ledger is live and compounding! Publish fresh dossiers daily — "
+            "💡 *Verdict:* Ledger is live and compounding! Publish fresh articles daily — "
             "every YouTube description link fires the `/go/{broker}` tracker automatically. ☕🚀"
         )
         return f"{card}\n{verdict}"
@@ -794,7 +794,7 @@ class AriaCommandToolkit:
         header = (
             "🌅 *THE BULL PRINT — SUNDAY EXECUTIVE REPORT* ☕🕶️\n"
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"📚 *This Week's Publishing Cadence:* `{content['last_7_days']} new dossiers` "
+            f"📚 *This Week's Publishing Cadence:* `{content['last_7_days']} new articles` "
             f"(library total: `{content['total']}`)\n"
         )
         body = cls.format_revenue_card(telemetry)

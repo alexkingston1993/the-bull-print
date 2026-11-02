@@ -532,7 +532,7 @@ INSTRUCTIONS:
         # 30-Archetype 3D Visual Matrix
         ARCHETYPES_MATRIX = [
             {"archetype": "hydraulic_press", "name": "Hydraulic Press", "metaphor": "Industrial hydraulic press crushing contract with sparks and high pressure dials"},
-            {"archetype": "xray_scanner", "name": "Airport X-Ray Scanner", "metaphor": "Airport security X-ray scanner exposing hidden fine print in policy dossier"},
+            {"archetype": "xray_scanner", "name": "Airport X-Ray Scanner", "metaphor": "Airport security X-ray scanner exposing hidden fine print in policy article"},
             {"archetype": "iceberg_split", "name": "Iceberg Split", "metaphor": "Massive deep-blue iceberg splitting with submerged 90 percent mass illuminated by caustic cyan beams"},
             {"archetype": "hourglass", "name": "Glowing Hourglass", "metaphor": "Brass and crystal hourglass with luminous gold liquid sand draining through a tight vortex"},
             {"archetype": "transformer", "name": "High-Voltage Transformer", "metaphor": "Industrial high-voltage electrical transformer arcing gold and blue lightning"},

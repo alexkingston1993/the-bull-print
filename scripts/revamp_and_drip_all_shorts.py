@@ -45,7 +45,7 @@ ALL_27_CANDIDATES = [
             "If an insurer's ICR is below sixty-five percent, they are aggressively rejecting high-value claims to protect underwriting profit. "
             "Never buy health insurance based on claim settlement ratio alone. Always demand the three-year average incurred claim ratio from the public IRDAI disclosures."
         ),
-        "cta_to_long_video": "Read the full Claim Audit Dossier at thebullprint.in. Follow for daily edge."
+        "cta_to_long_video": "Read the full Claim Audit Article at thebullprint.in. Follow for daily edge."
     },
     # 2. Crypto: Perpetual Funding Rate Bleed
     {
@@ -65,7 +65,7 @@ ALL_27_CANDIDATES = [
             "Institutional market makers hedge spot against perps, pocketing your funding fee completely risk-free. "
             "Before holding leveraged perps overnight, check the predicted funding rate on CoinGlass."
         ),
-        "cta_to_long_video": "Full On-Chain CVD Dossier at thebullprint.in. Follow for daily institutional signals."
+        "cta_to_long_video": "Full On-Chain CVD Article at thebullprint.in. Follow for daily institutional signals."
     },
     # 3. Stock Market: SEBI F&O Lot Size & Margin Rules
     {
@@ -101,7 +101,7 @@ ALL_27_CANDIDATES = [
             "If your base sum insured is five lakhs and you choose a ten-thousand-rupee room instead of five thousand, every single associated medical cost is multiplied by zero point five. "
             "You end up paying two lakhs out of pocket despite having cashless insurance. Always buy a policy with zero room rent capping."
         ),
-        "cta_to_long_video": "Full IRDAI Policy Dossier at thebullprint.in. Follow for daily edge."
+        "cta_to_long_video": "Full IRDAI Policy Article at thebullprint.in. Follow for daily edge."
     },
     # 5. Crypto: Section 115BBH & Tax Audits
     {
@@ -154,7 +154,7 @@ ALL_27_CANDIDATES = [
             "When twenty thousand Bitcoin suddenly moves from an unlabelled whale wallet onto Binance or Coinbase, that is not an investment—that is collateral positioning for a spot market dump. "
             "By monitoring mempool transactions and exchange reserve balances on Glassnode, proprietary desks exit longs before retail order books get slammed. Always monitor exchange net flows."
         ),
-        "cta_to_long_video": "Full On-Chain Whale Dossier at thebullprint.in. Follow for daily edge."
+        "cta_to_long_video": "Full On-Chain Whale Article at thebullprint.in. Follow for daily edge."
     },
     # 8. Insurance: Cashless Rejections & Network Hospital Rules
     {
@@ -173,7 +173,7 @@ ALL_27_CANDIDATES = [
             "A cashless denial is not a claim repudiation; it simply converts your claim into reimbursement mode. "
             "Always retain every single pharmacy bill, diagnostic film, and discharge summary to ensure total reimbursement recovery from the insurer."
         ),
-        "cta_to_long_video": "Read the Hospital TPA Audit Dossier at thebullprint.in. Follow for daily edge."
+        "cta_to_long_video": "Read the Hospital TPA Audit Article at thebullprint.in. Follow for daily edge."
     },
     # 9. Stock Market: Naked Short Strangles & Margin Spikes
     {
@@ -229,7 +229,7 @@ ALL_27_CANDIDATES = [
             "If your insurer attempts to cite five-year-old medical history that was never disclosed, quote the revised IRDAI Master Circular on health insurance underwriting. "
             "Always verify your waiting period transition schedule."
         ),
-        "cta_to_long_video": "Read the Full IRDAI Policy Dossier at thebullprint.in. Follow for daily edge."
+        "cta_to_long_video": "Read the Full IRDAI Policy Article at thebullprint.in. Follow for daily edge."
     },
     # 12. Stock Market: Smart Money Order Flow & Delta Absorption
     {
@@ -285,7 +285,7 @@ ALL_27_CANDIDATES = [
             "Worse, co-pay applies after non-payable medical deductions and room rent prorations are already slashed from your claim. "
             "Never compromise on lifetime savings just to save five thousand rupees on annual premium. Always demand zero co-pay policies."
         ),
-        "cta_to_long_video": "Full Policy Forensic Dossier at thebullprint.in. Follow for daily edge."
+        "cta_to_long_video": "Full Policy Forensic Article at thebullprint.in. Follow for daily edge."
     },
     # 15. Crypto: Liquidation Heatmap Clusters
     {
@@ -322,7 +322,7 @@ ALL_27_CANDIDATES = [
             "When Foreign Institutional Investors execute substantial block purchases in frontline banking or IT stocks, it indicates multi-quarter structural accumulation. "
             "Tracking end-of-day block deal disclosures reveals where smart money is deploying institutional capital long before retail breakout patterns form."
         ),
-        "cta_to_long_video": "Full Institutional Flow Dossier at thebullprint.in. Follow for daily edge."
+        "cta_to_long_video": "Full Institutional Flow Article at thebullprint.in. Follow for daily edge."
     },
     # 17. Insurance: Consumables & Non-Payable Hospital Deductions
     {
@@ -358,7 +358,7 @@ ALL_27_CANDIDATES = [
             "Historically, over eighty percent of these CME gaps eventually fill as institutional market makers arbitrage spot basis against futures contracts during regular Chicago trading hours. "
             "Never assume weekend pumps are definitive without monitoring Sunday night CME gap fills."
         ),
-        "cta_to_long_video": "Full CME Basis Dossier at thebullprint.in. Follow for daily edge."
+        "cta_to_long_video": "Full CME Basis Article at thebullprint.in. Follow for daily edge."
     },
     # 19. Stock Market: Expiry Day Zero-Hero Option Decay
     {
@@ -470,7 +470,7 @@ ALL_27_CANDIDATES = [
             "Unless an exchange provides a comprehensive liabilities audit conducted by an independent forensic accounting firm, your funds are exposed to institutional counterparty risk. "
             "Not your keys, not your crypto."
         ),
-        "cta_to_long_video": "Full Exchange Solvency Dossier at thebullprint.in. Follow for daily edge."
+        "cta_to_long_video": "Full Exchange Solvency Article at thebullprint.in. Follow for daily edge."
     },
     # 25. Stock Market: Implied Volatility Crush
     {

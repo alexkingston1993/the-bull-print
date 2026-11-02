@@ -21,8 +21,6 @@ from typing import List, Optional
 from pydantic import BaseModel
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 
-# Import custom core modules
-from chart_fetcher import capture_batch_charts
 from thumbnail_generator import create_marketing_images
 from publisher import publish_and_index_article
 from engine import (
@@ -64,18 +62,8 @@ async def run_master_pipeline(payload_json_path: Path, upload_live: bool = False
     # Pre-flight SEBI Compliance Check
     verify_compliance(payload)
     
-    # 2. STEP 1: CAPTURE FRESH CHARTS WITH PLAYWRIGHT
-    print("\n--- STEP 1: CAPTURING CHART VISUALS ---")
-    chart_jobs = [
-        {"platform": "tradingview", "symbol": "BINANCE:BTCUSDT", "interval": "60", "filename": "btc_hourly_structure.png"},
-        {"platform": "gocharting", "symbol": "BINANCE:BTCUSDT", "filename": "btc_footprint_absorption.png"},
-        {"platform": "tradingview", "symbol": "TVC:DXY", "interval": "D", "filename": "dxy_macro_liquidity.png"}
-    ]
-    captured_charts = await capture_batch_charts(chart_jobs, headless=True)
-    
-    # 3. STEP 2: GENERATE HIGH-CTR THUMBNAIL & DISCOVER IMAGE
-    print("\n--- STEP 2: GENERATING MARKETING IMAGES ---")
-    primary_chart = BASE_DIR / "assets" / "charts" / (captured_charts[0] if captured_charts else "default.png")
+    # 2. STEP 1: INITIALIZE HIGH-CTR THUMBNAIL STUDIO
+    print("\n--- STEP 1: HIGH-CTR THUMBNAIL STUDIO ---")
     studio_avatar = BASE_DIR / "assets" / "avatars" / "avatar_1.png"
     headline_words = payload.get("youtube_payload", {}).get("metadata", {}).get("thumbnail_top_text", "INSTITUTIONAL DELTA TRAP").split()[:3]
     

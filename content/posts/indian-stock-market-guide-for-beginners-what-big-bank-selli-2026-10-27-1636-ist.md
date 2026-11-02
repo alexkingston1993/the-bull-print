@@ -186,7 +186,7 @@ youtubeUrl: "https://youtu.be/xf3Eu4aJXxs"
  <div id="sebi-disclaimer" class="disclaimer-box" style="margin-top:44px; padding:22px; background:rgba(15,23,42,0.92); border:1px solid rgba(255,255,255,0.1); border-left:4px solid #ef4444; font-size:12.5px; color:#94a3b8; border-radius:10px; line-height:1.65;">
  <strong style="color:#f8fafc; font-size:13.5px;">⚖️ Mandatory Regulatory Disclosure (SEBI & ASCI Compliance):</strong><br>
  The Bull Print is strictly an educational financial market research desk. The author and publishers are NOT registered with the Securities and Exchange Board of India (SEBI) as Investment Advisers (IA) or Research Analysts (RA). 
- All market data, company observations, and historical case studies referenced in this dossier are provided strictly for educational study and informational purposes. 
+ All market data, company observations, and historical case studies referenced in this article are provided strictly for educational study and informational purposes. 
  <br><br>
  <strong>Zero Advisory Guarantee:</strong> Nothing in this report constitutes financial advice, investment recommendations, or an offer to buy or sell securities. No future price targets or guaranteed returns are ever provided. Under SEBI educational guidelines, all Indian equity case studies reflect historical data points older than 30 days.
  <br><br>

@@ -14,7 +14,7 @@ Each slot:
 3. Passes SEBI/IRDAI Zero-Quota Compliance Gate
 4. Dispatches to Kaggle Dual-T4 GPU (Faster-Whisper + NVENC FFmpeg)
 5. Uploads 1080p Masterclass directly to YouTube Data API
-6. Generates companion research dossier on the website
+6. Generates companion research article on the website
 """
 
 import sys
@@ -56,7 +56,7 @@ def main():
             successful_slots += 1
             elapsed_m = int((time.time() - slot_start) // 60)
             elapsed_s = int((time.time() - slot_start) % 60)
-            logger.info(f"✅ Slot #{slot_num} finished successfully in {elapsed_m}m {elapsed_s}s! (Long-form video live on YouTube & dossier published)")
+            logger.info(f"✅ Slot #{slot_num} finished successfully in {elapsed_m}m {elapsed_s}s! (Long-form video live on YouTube & article published)")
         except subprocess.CalledProcessError as err:
             logger.error(f"⚠️ Slot #{slot_num} encountered an issue (exit code {err.returncode}) — continuing next slot in sequence...")
         except Exception as e:

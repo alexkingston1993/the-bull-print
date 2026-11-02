@@ -7,7 +7,7 @@
     <!-- Primary SEO Meta Tags -->
     <title>The Bull Print — Institutional Indian Equity Intelligence & Screener</title>
     <meta name="title" content="The Bull Print — Institutional Indian Equity Intelligence & Screener">
-    <meta name="description" content="Simple, buttery smooth Indian equity intelligence platform. Live index constituent weights, top market movers, fundamental screener, and institutional research dossiers.">
+    <meta name="description" content="Simple, buttery smooth Indian equity intelligence platform. Live index constituent weights, top market movers, fundamental screener, and institutional research articles.">
     <meta name="keywords" content="Nifty 50 live constituents, Bank Nifty stock weights, Indian stock market dashboard, Screener in alternative, stock fundamentals, FII DII data, The Bull Print">
     <meta name="author" content="The Bull Print Research Desk">
     <meta name="robots" content="index, follow">
@@ -16,7 +16,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://the-bull-print.vercel.app">
     <meta property="og:title" content="The Bull Print — Institutional Indian Equity Intelligence">
-    <meta property="og:description" content="Live index constituent weights, top market movers, fundamental screener, and institutional research dossiers.">
+    <meta property="og:description" content="Live index constituent weights, top market movers, fundamental screener, and institutional research articles.">
     <meta property="og:image" content="brand_assets/opengraph_social_card_1200x630.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="brand_assets/opengraph_social_card_1200x630.png">
@@ -1855,7 +1855,7 @@
             <nav class="header-nav-links">
                 <a href="#movers-section" class="nav-link-item" onclick="switchDashboardTab('movers')">Movers</a>
                 <a href="/screener.html" class="nav-link-item">Screener</a>
-                <a href="/articles.html" class="nav-link-item nav-articles-pill" id="nav-articles-btn" title="Institutional Equity Research Dossiers & Market Intelligence">
+                <a href="/articles.html" class="nav-link-item nav-articles-pill" id="nav-articles-btn" title="Institutional Equity Research Articles & Market Intelligence">
                     <span class="nav-articles-icon">📰</span>
                     <span class="nav-articles-text">Articles</span>
                     <span class="nav-articles-badge">GEO</span>
@@ -2002,7 +2002,7 @@
                 <span>📊</span> Sectors &amp; Heatmap
             </button>
             <button class="seg-tab-btn" id="btn-tab-research" onclick="switchDashboardTab('research')">
-                <span>📖</span> Research Dossiers
+                <span>📖</span> Research Articles
             </button>
         </div>
 
@@ -2112,10 +2112,10 @@
             </div>
         </div>
 
-        <!-- Tab 5: Research Dossiers -->
+        <!-- Tab 5: Research Articles -->
         <div id="view-research" class="tab-panel" style="display: none;">
             <div class="panel-header-row">
-                <h3 class="panel-title"><span>📖</span> Institutional Research Dossiers & Video Library</h3>
+                <h3 class="panel-title"><span>📖</span> Institutional Research Articles & Video Library</h3>
                 <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">Dedicated Standalone Pages</span>
             </div>
         <!-- Section 6A: Indian IPO Radar Preview Section -->
@@ -2234,7 +2234,7 @@
             </div>
         </section>
 
-        <!-- 5. Latest Market Research & Educational Dossiers (GEO + SEO Engine) -->
+        <!-- 5. Latest Market Research & Educational Articles (GEO + SEO Engine) -->
         <section class="home-market-section" id="recent-articles-section" style="margin-top: 28px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 28px; box-shadow: var(--card-shadow);">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:24px; border-bottom:1px solid var(--border-subtle); padding-bottom:16px;">
                 <div>
@@ -2246,7 +2246,7 @@
                         <span>1,200–1,800 WORDS</span>
                     </div>
                     <h3 style="font-family:var(--font-display); font-size:22px; font-weight:800; color:var(--text-primary); margin:0;">
-                        Latest Research Dossiers & Educational Articles
+                        Latest Research Articles & Educational Articles
                     </h3>
                     <p style="font-size:13.5px; color:var(--text-secondary); margin:6px 0 0 0;">
                         In-depth equity breakdowns, synchronized 1080p video explainers, and everyday investor guides written by Alex from Chennai.
@@ -2272,7 +2272,7 @@
                     </div>
                     <div class="report-footer">
                         <span>📅 By Alex · 9 min read (1,942 words)</span>
-                        <span class="report-link-btn">Read Dossier →</span>
+                        <span class="report-link-btn">Read Article →</span>
                     </div>
                 </div>
                 <div class="report-card" style="opacity:0.9;">
@@ -2287,7 +2287,7 @@
                     </div>
                     <div class="report-footer">
                         <span>📅 By Alex · 8 min read (1,750 words)</span>
-                        <span class="report-link-btn">Read Dossier →</span>
+                        <span class="report-link-btn">Read Article →</span>
                     </div>
                 </div>
                 <div class="report-card" style="opacity:0.9;">
@@ -2302,7 +2302,7 @@
                     </div>
                     <div class="report-footer">
                         <span>📅 By Alex · 7 min read (1,620 words)</span>
-                        <span class="report-link-btn">Read Dossier →</span>
+                        <span class="report-link-btn">Read Article →</span>
                     </div>
                 </div>
             </div>
@@ -3362,14 +3362,14 @@
                     </div>
                     <p style="font-size:12.5px; color:var(--text-secondary); line-height:1.5; margin-bottom:12px;">${e.desc}</p>
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:var(--groww-mint); font-weight:700;">
-                        <span>View Corporate Action Dossier</span>
+                        <span>View Corporate Action Article</span>
                         <span>→</span>
                     </div>
                 </div>
             `).join('');
         }
 
-        // Research Dossiers Loading
+        // Research Articles Loading
         async function loadResearchReports() {
             try {
                 const res = await fetch('/content/posts.json');
@@ -3400,13 +3400,13 @@
                             </div>
                             <div class="report-footer">
                                 <span>📅 By ${authorName} · ${readingTime} ${wordsBadge}</span>
-                                <span class="report-link-btn">Read Dossier →</span>
+                                <span class="report-link-btn">Read Article →</span>
                             </div>
                         </a>
                     `;
                 }).join('');
             } catch (err) {
-                console.error("Error loading research dossiers:", err);
+                console.error("Error loading research articles:", err);
             }
         }
 

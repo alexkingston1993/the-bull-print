@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page-title">Market Research Dossier | The Bull Print</title>
+    <title id="page-title">Market Research Article | The Bull Print</title>
     <meta name="description" id="page-desc" content="Comprehensive institutional fundamental breakdown, valuation tables, and technical setups for Indian equities.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" id="canonical-url" href="https://the-bull-print.vercel.app/article">
 
     <!-- Open Graph -->
-    <meta property="og:title" id="og-title" content="Market Research Dossier | The Bull Print">
+    <meta property="og:title" id="og-title" content="Market Research Article | The Bull Print">
     <meta property="og:description" id="og-desc" content="Institutional fundamental breakdown, valuation models, and video analysis for Indian equities.">
     <meta property="og:type" content="article">
     <meta property="og:image" content="https://the-bull-print.vercel.app/brand_assets/opengraph_social_card_1200x630.png">
@@ -429,7 +429,7 @@
             text-decoration: underline;
         }
 
-        /* Related Dossiers Grid */
+        /* Related Articles Grid */
         .related-section {
             margin-top: 64px;
             padding-top: 40px;
@@ -547,7 +547,7 @@
             <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
                 <a href="/" class="nav-link-item">Market Explorer</a>
                 <a href="/screener.html" class="nav-link-item">Screener</a>
-                <a href="/articles.html" class="nav-link-item nav-articles-pill active" title="Institutional Equity Research Dossiers & Market Intelligence">
+                <a href="/articles.html" class="nav-link-item nav-articles-pill active" title="Institutional Equity Research Articles & Market Intelligence">
                     <span class="nav-articles-icon">📰</span>
                     <span class="nav-articles-text">Articles</span>
                     <span class="nav-articles-badge">GEO</span>
@@ -578,7 +578,7 @@
         <div class="article-breadcrumb">
             <a href="/">Home</a>
             <span>/</span>
-            <a href="/articles.html">Research Dossiers</a>
+            <a href="/articles.html">Research Articles</a>
             <span>/</span>
             <span id="breadcrumb-title" style="color: var(--text-secondary);">Loading Analysis...</span>
         </div>
@@ -586,7 +586,7 @@
         <!-- Article Header -->
         <header class="article-header">
             <span class="article-category-badge" id="article-category">EQUITIES RESEARCH</span>
-            <h1 class="article-headline" id="article-title">Loading Market Research Dossier...</h1>
+            <h1 class="article-headline" id="article-title">Loading Market Research Article...</h1>
             <div class="article-meta-row">
                 <span class="meta-pill">📅 <span id="article-date">October 20, 2026</span></span>
                 <span class="meta-pill">⏱️ <span id="article-read-time">8 min read</span></span>
@@ -598,7 +598,7 @@
         <!-- Video Embed Showcase -->
         <div class="video-showcase-box" id="video-container">
             <div class="video-showcase-bar">
-                <span>📹 INSTITUTIONAL VIDEO DOSSIER</span>
+                <span>📹 INSTITUTIONAL VIDEO ARTICLE</span>
                 <span style="color: var(--accent-mint);">● 1080P HD STREAM</span>
             </div>
             <div class="video-player-wrapper">
@@ -624,7 +624,7 @@
 
         <!-- Related Research Reports -->
         <section class="related-section">
-            <h3 class="related-title">More Research Dossiers</h3>
+            <h3 class="related-title">More Research Articles</h3>
             <div class="related-grid" id="related-posts-grid">
                 <!-- Dynamically populated -->
             </div>
@@ -736,7 +736,7 @@
                 if (!bodyHtml.includes("Institutional Quality Checklist") && !bodyHtml.includes("8-Point")) {
                     const sym = (post.tags && post.tags[0]) || "EQUITY";
                     const enrichmentHtml = `
-                        <div class="institutional-dossier-enrichment" style="margin: 36px 0; padding-top: 24px; border-top: 1px solid var(--border-card);">
+                        <div class="institutional-article-enrichment" style="margin: 36px 0; padding-top: 24px; border-top: 1px solid var(--border-card);">
                             <h2 style="font-family:var(--font-display); font-size:22px; margin-bottom:12px;">📊 1. The 8-Point Institutional Quality Checklist</h2>
                             <p style="color:var(--text-secondary); font-size:14.5px; margin-bottom:18px;">
                                 Why should an institutional or retail investor consider this stock? We evaluate every equity against our proprietary 8-point fundamental and forensic filter:
@@ -866,7 +866,7 @@
                             <h4 class="related-card-title">${rp.title}</h4>
                         </div>
                         <div class="related-card-meta">
-                            Read Full Dossier →
+                            Read Full Article →
                         </div>
                     </a>
                 `).join('');
@@ -876,7 +876,7 @@
                 document.getElementById('article-title').textContent = "Error Loading Article";
                 document.getElementById('article-body').innerHTML = `
                     <div style="text-align:center; padding:40px; color:#f43f5e;">
-                        <p>Unable to load the requested research dossier. Please try again or return to the home page.</p>
+                        <p>Unable to load the requested research article. Please try again or return to the home page.</p>
                         <a href="/" class="nav-back-btn" style="margin-top:20px;">Return to Home</a>
                     </div>
                 `;

@@ -13,6 +13,7 @@ import os
 import re
 import json
 import time
+import random
 import shutil
 import argparse
 import asyncio
@@ -23,11 +24,12 @@ from typing import List, Dict, Tuple, Optional
 import requests
 from loguru import logger
 
-from chart_fetcher import capture_batch_charts
+from app.services.high_ctr_frame_studio import generate_short_section_frames, generate_high_ctr_section_frame
 from thumbnail_generator import create_marketing_images, create_short_thumbnail
 from engine import generate_website_article_file
 from publisher import publish_and_index_article
 from app.services.content_authenticity_engine import infer_vertical
+from app.services.aria_enhancements import AriaPipelineCard, AriaCheckpointResume
 
 BASE_DIR = Path(__file__).parent
 KAGGLE_STAGE_DIR = BASE_DIR / "kaggle_stage"
@@ -104,7 +106,7 @@ class AriaMissionControl:
             f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
             f"📌 *Topic:* `{self.topic}`\n"
             f"⏱️ *Elapsed Time:* `{self._elapsed()}`\n\n"
-            f"1️⃣ *Playwright Charts:* {self.stages['playwright']}\n"
+            f"1️⃣ *High-CTR Frame Studio:* {self.stages['playwright']}\n"
             f"2️⃣ *Gemini 2.5 JSON:* {self.stages['gemini']}\n"
             f"3️⃣ *Pillow Thumbnail:* {self.stages['thumbnail']}\n"
             f"4️⃣ *Kaggle Dual-T4 GPU:* {self.stages['kaggle_gpu']}\n"
@@ -140,7 +142,7 @@ class AriaMissionControl:
         # Map orchestrator stages to 7-Stage Mission Control Pipeline
         stage_map = {
             "playwright": (30, 90, 4, "Chart & High-CTR Thumbnail Studio", "Capturing market charts / infographics"),
-            "gemini": (25, 100, 2, "Gemini Script & Dossier Synthesis", "Synthesizing script & SEO dossier"),
+            "gemini": (25, 100, 2, "Gemini Script & Article Synthesis", "Synthesizing script & SEO article"),
             "thumbnail": (45, 70, 4, "Chart & High-CTR Thumbnail Studio", "Thumbnails rendered & staged"),
             "kaggle_gpu": (75, 80, 5, "Kaggle T4 GPU Render Farm", "Whisper alignment & NVENC rendering"),
             "vercel": (100, 100, 7, "Multi-Channel Distribution", "Published live & indexed"),
@@ -1216,6 +1218,13 @@ async def _async_main():
         run_id=os.getenv("GITHUB_RUN_ID")
     )
 
+    # 1x. Initialize Aria Pipeline Progress Card (secondary real-time view)
+    run_id = os.getenv("GITHUB_RUN_ID", "local")
+    slot_label = f"slot_{slot_index}_{vertical[:4]}"
+    slug = slot_label
+    _pipeline_card = AriaPipelineCard.new_card(slot_name=slot_label, run_id=run_id)
+    _card_msg_id = _pipeline_card.get("message_id")
+
     # 1a. 🧠 VIRAL GROWTH AGENT (closed-loop empirical feedback from live YouTube stats)
     try:
         from app.services.viral_growth_agent import ViralGrowthAgent
@@ -1246,23 +1255,27 @@ async def _async_main():
     else:
         logger.info(f"External override topic in command: executing '{topic}'")
 
-    # 2. Domain capture: Insurance → infographic engine, everything else → live Playwright
-    insurance_jobs = _vertical_chart_jobs(vertical)
-    if insurance_jobs is None:
-        mission.update_stage("playwright", f"📊 Rendering {vertical} infographics...")
-        try:
-            from chart_fetcher import generate_insurance_charts
-            chart_files = generate_insurance_charts(topic)
-        except Exception as i_err:
-            logger.warning(f"Insurance infographic engine failed, falling back to generic capture: {i_err}")
-            chart_files = await capture_batch_charts(_vertical_chart_jobs("stock_market"), headless=True)
-        mission.update_stage("playwright", f"✅ Rendered ({len(chart_files)} infographics)")
-    else:
-        mission.update_stage("playwright", f"🔄 Capturing {len(insurance_jobs)} charts...")
-        chart_files = await capture_batch_charts(insurance_jobs, headless=True)
-        mission.update_stage("playwright", f"✅ Captured ({len(chart_files)} charts)")
+    # 2. Automated High-CTR Thumbnail & Frame Studio (Replaces Playwright chart capture)
+    mission.update_stage("playwright", f"🎨 Generating 9:16 High-CTR Thumbnail frames ({vertical})...")
+    frames_dir = BASE_DIR / "output" / slug / "frames"
+    frames_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Generate initial high-CTR anchor frames
+    initial_sections = [
+        {"section_index": 0, "headline_top": topic.split()[0].upper() if topic else "MARKET", "headline_mid": "EXPOSED!", "badge_text": "INSTITUTIONAL TRAP ⚠️", "theme": "solana_purple" if "crypto" in vertical else "blood_red"},
+        {"section_index": 1, "headline_top": "99% LOSE", "headline_mid": "THE MATH TRUTH", "badge_text": "MATH AUDIT", "theme": "toxic_green"},
+        {"section_index": 2, "headline_top": "LIQUIDATION", "headline_mid": "CASCADE", "badge_text": "ORDER FLOW", "theme": "lightning_cyan"},
+    ]
+    generated_frames = generate_short_section_frames(initial_sections, vertical=vertical, output_dir=frames_dir, slug=slug)
+    chart_files = [str(f.name) for f in generated_frames]
+    mission.update_stage("playwright", f"✅ Rendered ({len(chart_files)} High-CTR Frames)")
     if not chart_files:
-        raise SystemExit("❌ No charts captured — aborting run.")
+        raise SystemExit("❌ No high-CTR frames generated — aborting run.")
+
+    # ✅ CHECKPOINT: charts done
+    AriaCheckpointResume.mark("charts", slug, {"count": len(chart_files), "vertical": vertical})
+    if _card_msg_id:
+        AriaPipelineCard.update_step(_card_msg_id, "charts", "done", f"{len(chart_files)} captured")
 
     # 3. Call Google AI Studio / Gemini
     mission.update_stage("gemini", "🧠 Synthesizing Dual Script + Article...")
@@ -1298,6 +1311,12 @@ async def _async_main():
     slug = payload.get("campaign_id") or f"slot-{slot_index}-{int(time.time())}"
     payload["campaign_id"] = slug
     mission.update_stage("gemini", f"✅ Generated + Healed (`{slug}`)", _vertical_badge(vertical))
+
+    # ✅ CHECKPOINT: gemini done
+    AriaCheckpointResume.mark("gemini", slug, {"vertical": vertical, "tokens": len(str(payload))})
+    if _card_msg_id:
+        AriaPipelineCard.update_step(_card_msg_id, "gemini", "done",
+                                      f"{len(str(payload)) // 1000}K tokens · {vertical}")
     mission.bridge.update_progress(35, 100, 3, "Virality & SEBI/IRDAI Compliance Gate", "Virality & SEBI compliance approved")
     mission.bridge.update_stage_metrics(3, {
         "compliance_pass": True,
@@ -1433,6 +1452,11 @@ async def _async_main():
 
     mission.bridge.update_progress(50, 60, 4, "Chart & High-CTR Thumbnail Studio", "Thumbnails & charts staged for approval")
 
+    # ✅ CHECKPOINT: thumbnail rendered (before gate)
+    AriaCheckpointResume.mark("thumbnail", slug, {"path": str(yt_thumb), "words": headline_words})
+    if _card_msg_id:
+        AriaPipelineCard.update_step(_card_msg_id, "thumbnail", "running", "⏳ Awaiting approval gate…")
+
     # Await approval or live 3-word edit from Alex via Telegram / Dashboard
     yt_thumb = mission.await_thumbnail_approval_or_edit(
         yt_thumb=yt_thumb,
@@ -1442,6 +1466,10 @@ async def _async_main():
         slug=slug,
         timeout_sec=int(os.getenv("THUMBNAIL_WAIT_TIMEOUT", "20"))
     )
+
+    if _card_msg_id:
+        AriaPipelineCard.update_step(_card_msg_id, "thumbnail", "done",
+                                      f"Approved · {''.join(headline_words[:2])}")
 
     # Per-Short 9:16 shelf covers & persistent hook headers
     short_thumb_paths: List[Path] = []
@@ -1547,7 +1575,7 @@ async def _async_main():
                 "youtube_video_id": sv_id,
                 "youtube_id": sv_id,
                 "youtubeUrl": f"https://www.youtube.com/shorts/{sv_id}",
-                "dossier_url": f"/article.html?slug={slug}",
+                "article_url": f"/article.html?slug={slug}",
                 "compliance_notes": "SEBI/IRDAI Zero-violation feedback verified",
             })
     else:
@@ -1557,6 +1585,8 @@ async def _async_main():
         if not force_cpu:
             try:
                 mission.update_stage("kaggle_gpu", "🚀 Dispatching to Kaggle Dual-T4 GPU...")
+                if _card_msg_id:
+                    AriaPipelineCard.update_step(_card_msg_id, "video", "running", "🔥 Kaggle Dual-T4 GPU spinning…")
                 yt_video_id, timestamps_log, short_video_ids, oauth_slot_used = run_kaggle_gpu_renderer(
                     payload, chart_files, yt_thumb, mission,
                     short_thumb_path=(short_thumb_paths[0] if short_thumb_paths else None),
@@ -1568,6 +1598,8 @@ async def _async_main():
                     yt_video_id = None
             except Exception as kaggle_err:
                 logger.warning(f"⚠️ Kaggle GPU run failed or timed out ({kaggle_err}). Triggering uncrashable CPU Fallback Engine...")
+                if _card_msg_id:
+                    AriaPipelineCard.update_step(_card_msg_id, "video", "warning", "Kaggle glitch → CPU fallback")
                 yt_video_id = None
 
         # 🛡️ UNCRASHABLE CPU FALLBACK: If Kaggle failed, timed out, or produced no video, render locally on GHA CPU
@@ -1583,7 +1615,20 @@ async def _async_main():
 
         if not yt_video_id:
             mission.update_stage("kaggle_gpu", "🛡️ Uploaded SKIPPED (QA gate)", "Fix render, rerun slot")
+            if _card_msg_id:
+                AriaPipelineCard.update_step(_card_msg_id, "video", "failed", "QA gate blocked upload")
+                AriaPipelineCard.finalize(_card_msg_id, success=False)
             raise SystemExit(1)
+
+        # ✅ CHECKPOINT: video rendered and uploaded to YouTube
+        AriaCheckpointResume.mark("video", slug, {"youtube_id": yt_video_id,
+                                                   "shorts": short_video_ids,
+                                                   "slot": oauth_slot_used})
+        if _card_msg_id:
+            AriaPipelineCard.update_step(_card_msg_id, "video", "done",
+                                          f"1080p · slot #{oauth_slot_used}")
+            AriaPipelineCard.update_step(_card_msg_id, "youtube", "done",
+                                          f"youtu.be/{yt_video_id}")
 
         now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
         mission.bridge.complete_active_video(f"slot_{slot_index}_long", youtube_id=yt_video_id)
@@ -1598,7 +1643,7 @@ async def _async_main():
             "youtube_video_id": yt_video_id,
             "youtube_id": yt_video_id,
             "youtubeUrl": f"https://www.youtube.com/watch?v={yt_video_id}",
-            "dossier_url": f"/article.html?slug={slug}",
+            "article_url": f"/article.html?slug={slug}",
             "compliance_notes": "SEBI/IRDAI Zero-violation feedback verified",
         })
         for s_idx, sv_id in enumerate(short_video_ids, 1):
@@ -1616,14 +1661,22 @@ async def _async_main():
                 "youtube_video_id": sv_id,
                 "youtube_id": sv_id,
                 "youtubeUrl": f"https://www.youtube.com/shorts/{sv_id}",
-                "dossier_url": f"/article.html?slug={slug}",
+                "article_url": f"/article.html?slug={slug}",
                 "compliance_notes": "SEBI/IRDAI Zero-violation feedback verified",
             })
 
     # 6. Generate MDX Article + Deploy to Vercel + Ping Search Indexers
     mission.update_stage("vercel", "📝 Compiling MDX & IndexNow Ping...")
+    if _card_msg_id:
+        AriaPipelineCard.update_step(_card_msg_id, "article", "running", "Compiling MDX…")
     mdx_path = generate_website_article_file(payload, yt_video_id, timestamps_log)
     live_url = publish_and_index_article(mdx_path, chart_files, slug)
+
+    # ✅ CHECKPOINT: article published
+    AriaCheckpointResume.mark("article", slug, {"url": live_url})
+    if _card_msg_id:
+        AriaPipelineCard.update_step(_card_msg_id, "article", "done",
+                                      live_url.replace("https://", "")[:45])
 
     # 7. Distribute the 3-tweet X/Twitter thread (graceful skip without X credentials)
     try:
@@ -1649,6 +1702,15 @@ async def _async_main():
         "x_thread_url": x_thread_status,
     })
     mission.bridge.set_status("COMPLETED", f"Live: {live_url}")
+
+    # ✅ CHECKPOINT: indexing done — full pipeline complete
+    AriaCheckpointResume.mark("indexing", slug, {"live_url": live_url,
+                                                   "x_thread": x_thread_status,
+                                                   "shorts": short_video_ids})
+    if _card_msg_id:
+        AriaPipelineCard.update_step(_card_msg_id, "indexing", "done",
+                                      f"IndexNow + Sitemap pinged")
+        AriaPipelineCard.finalize(_card_msg_id, success=True)
 
     # 8. Post-upload Algorithmic Debate Bait Comment & T+6h CTR Rescue check
     try:

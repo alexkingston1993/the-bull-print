@@ -43,7 +43,7 @@ REVAMP_CANDIDATES = [
             "If an insurer's ICR is below sixty-five percent, they are aggressively rejecting high-value claims to protect underwriting profit. "
             "Never buy health insurance based on claim settlement ratio alone. Always demand the three-year average incurred claim ratio from the public IRDAI disclosures."
         ),
-        "cta_to_long_video": "Read the full Claim Audit Dossier at thebullprint.in. Follow for daily edge."
+        "cta_to_long_video": "Read the full Claim Audit Article at thebullprint.in. Follow for daily edge."
     },
     {
         "index": 2,
@@ -62,7 +62,7 @@ REVAMP_CANDIDATES = [
             "Institutional market makers hedge spot against perps, pocketing your funding fee completely risk-free. "
             "Before holding leveraged perps overnight, check the predicted funding rate on CoinGlass."
         ),
-        "cta_to_long_video": "Full On-Chain CVD Dossier at thebullprint.in. Follow for daily institutional signals."
+        "cta_to_long_video": "Full On-Chain CVD Article at thebullprint.in. Follow for daily institutional signals."
     },
     {
         "index": 3,
@@ -96,7 +96,7 @@ REVAMP_CANDIDATES = [
             "If your base sum insured is five lakhs and you choose a ten-thousand-rupee room instead of five thousand, every single associated medical cost is multiplied by zero point five. "
             "You end up paying two lakhs out of pocket despite having cashless insurance. Always buy a policy with zero room rent capping."
         ),
-        "cta_to_long_video": "Full IRDAI Policy Dossier at thebullprint.in. Follow for daily edge."
+        "cta_to_long_video": "Full IRDAI Policy Article at thebullprint.in. Follow for daily edge."
     },
     {
         "index": 5,

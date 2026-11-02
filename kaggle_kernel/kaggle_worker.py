@@ -830,18 +830,18 @@ def format_vertical_description(short_data: dict, vertical: str, long_video_id: 
     vert = (vertical or "").lower()
     if vert == "insurance":
         disclaimer = "🛡️ IRDAI Educational Forensics: Policy terms, room-rent math & claim forensics only — check your policy schedule."
-        dossier_text = "🔍 Read the full Policy Forensic Dossier & Claim Audit: https://thebullprint.in"
+        article_text = "🔍 Read the full Policy Forensic Article & Claim Audit: https://thebullprint.in"
     elif "crypto" in vert:
         disclaimer = "⚡ VDA & On-Chain Educational Research: Market structure & liquidity risk analysis only — not financial advice."
-        dossier_text = "📊 Full On-Chain CVD & Tax Dossier: https://thebullprint.in"
+        article_text = "📊 Full On-Chain CVD & Tax Article: https://thebullprint.in"
     else:
         disclaimer = "📌 SEBI Educational Research: Market structure, order-flow & derivative dynamics only — not investment advice."
-        dossier_text = "📈 Full Institutional Order-Flow Dossier: https://thebullprint.in"
+        article_text = "📈 Full Institutional Order-Flow Article: https://thebullprint.in"
 
     parts = [hook_summary, ""]
     if long_video_id:
         parts.extend([f"▶️ Watch the FULL MASTERCLASS: https://youtu.be/{long_video_id}", ""])
-    parts.extend([dossier_text, "🛠️ Free Financial Tools & Calculators: https://thebullprint.in", "", disclaimer])
+    parts.extend([article_text, "🛠️ Free Financial Tools & Calculators: https://thebullprint.in", "", disclaimer])
     return "\n".join(parts)
 
 

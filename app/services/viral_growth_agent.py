@@ -278,17 +278,39 @@ class ViralGrowthAgent:
 
         return memory
 
+    @staticmethod
+    def validate_comment_relevance(comment: str, video_title: str) -> bool:
+        """Ensures pinned debate comment is strictly relevant to the specific video."""
+        if not comment or len(comment.strip()) < 10:
+            return False
+        c_words = set(re.sub(r"[^\w\s]+", " ", comment.lower()).split())
+        t_words = set(re.sub(r"[^\w\s]+", " ", video_title.lower()).split())
+        stopwords = {"the", "and", "for", "with", "this", "that", "what", "how", "your", "you", "are", "was", "not", "why"}
+        c_keywords = c_words - stopwords
+        t_keywords = t_words - stopwords
+        # Check direct keyword overlap or domain financial terms
+        overlap = c_keywords & t_keywords
+        domain_terms = {"market", "nifty", "trade", "bitcoin", "crypto", "mev", "solana", "loss", "profit", "retail", "trap", "whale", "fii", "insurance", "claim"}
+        has_domain = bool(c_keywords & domain_terms)
+        if not overlap and not has_domain:
+            logger.warning(f"⚠️ [ViralGrowthAgent] Comment failed relevance audit against title '{video_title[:40]}'")
+            return False
+        return True
+
     @classmethod
-    def post_debate_comment(cls, video_id: str, debate_comment: str, slot_index: int = 1) -> bool:
+    def post_debate_comment(cls, video_id: str, debate_comment: str, video_title: str = "", slot_index: int = 1) -> bool:
         """
         Auto-posts an algorithmic debate-bait question as the top comment on upload
-        with strict idempotency and duplicate elimination.
+        with strict relevance validation, idempotency, and duplicate elimination.
         """
         if not video_id or not debate_comment:
             return False
+        if video_title and not cls.validate_comment_relevance(debate_comment, video_title):
+            logger.warning(f"💬 [ViralGrowthAgent] Skipped irrelevant comment on {video_id}: '{debate_comment[:50]}...'")
+            return False
         yt = cls.get_youtube_service(slot_index=slot_index)
         if not yt:
-            logger.info(f"💬 [ViralGrowthAgent] Simulated pinned comment on {video_id}: {debate_comment[:60]}...")
+            logger.info(f"💬 [ViralGrowthAgent] Simulated relevant pinned comment on {video_id}: {debate_comment[:60]}...")
             return True
         try:
             # 1. Fetch our own channel ID
@@ -397,6 +419,19 @@ class ViralGrowthAgent:
 
                 if not variant_b_title:
                     variant_b_title = f"{r.get('title', '')} (Institutional Breakdown)"
+
+                # 🛡️ 30-Day Anti-Duplication Check on Variant B
+                try:
+                    from app.services.content_authenticity_engine import content_authenticity_engine
+                    dupe = content_authenticity_engine.find_dupe_offender(
+                        {"youtube_payload": {"metadata": {"title": variant_b_title}}},
+                        vertical="stock_market"
+                    )
+                    if dupe and dupe.get("offender") != vid:
+                        logger.warning(f"⚠️ [ViralGrowthAgent] Variant B title '{variant_b_title}' collided with 30-day post '{dupe['offender']}'. Adjusting title.")
+                        variant_b_title = f"{variant_b_title} [Institutional Forensic Audit]"
+                except Exception as comp_err:
+                    logger.debug(f"[ViralGrowthAgent] Compliance check note: {comp_err}")
 
                 if yt:
                     try:

@@ -21,7 +21,7 @@ def get_benchmark_payload(vertical: str, topic: str = "", slot_index: int = 1) -
         short1_title = "The 1% Room Rent Trap in Health Insurance #Shorts"
         short1_body = "Think your 5 Lakh health cover protects you? If your policy has a 1% room rent limit, taking a private room triggers proportional deduction. The hospital bills you 50% extra across doctor fees and surgeries! Check your policy tonight."
         short2_title = "CSR vs ICR: Why 98% is an Insurance Lie #Shorts"
-        short2_body = "Insurers advertise a 98% Claim Settlement Ratio, but IRDAI reports show Incurred Claim Ratio is what matters. If ICR is below 60%, the insurer is rejecting high-value claims to protect profits! Full forensic dossier on The Bull Print."
+        short2_body = "Insurers advertise a 98% Claim Settlement Ratio, but IRDAI reports show Incurred Claim Ratio is what matters. If ICR is below 60%, the insurer is rejecting high-value claims to protect profits! Full forensic article on The Bull Print."
         thumb_hook = {
             "line1_setup": "HOSPITAL BILL",
             "line2_power": "50% SLASHED!",

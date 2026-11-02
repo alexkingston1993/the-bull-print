@@ -1391,7 +1391,7 @@
     <!-- 30-DAY CONTENT ARCHIVE -->
     <section>
       <h3 class="section-title">
-        30-DAY DOSSIER & VIDEO ARCHIVE
+        30-DAY ARTICLE & VIDEO ARCHIVE
         <span>VERIFIED ON YOUTUBE & VERCEL CDN</span>
       </h3>
       <div class="archive-card">
@@ -1402,7 +1402,7 @@
               <th>Topic / Headline</th>
               <th>Vertical</th>
               <th>YouTube Video</th>
-              <th>Live Dossier</th>
+              <th>Live Article</th>
             </tr>
           </thead>
           <tbody id="archive-tbody">
@@ -1644,7 +1644,7 @@
 
       let stepperHtml = '';
       const stageTitles = [
-        'SEO Intent', 'Script & Dossier', 'SEBI Compliance',
+        'SEO Intent', 'Script & Article', 'SEBI Compliance',
         'Charts & Thumbs', 'Kaggle GPU', 'OpenMontage QA', 'Multi-Publish'
       ];
 
@@ -1820,7 +1820,7 @@
 
         const vidId = p.youtube_video_id || p.youtube_id || '';
         let ytLink = p.youtubeUrl || (vidId ? (isShort ? `https://www.youtube.com/shorts/${vidId}` : `https://www.youtube.com/watch?v=${vidId}`) : '#');
-        const dossierLink = p.dossier_url || (p.slug ? `/article.html?slug=${p.slug}` : '#');
+        const articleLink = p.article_url || p.dossier_url || (p.slug ? `/article.html?slug=${p.slug}` : '#');
 
         return `
           <tr>
@@ -1840,8 +1840,8 @@
               </a>
             </td>
             <td>
-              <a class="link-pill" href="${dossierLink}" target="_blank" rel="noopener noreferrer">
-                📄 Read Dossier ↗
+              <a class="link-pill" href="${articleLink}" target="_blank" rel="noopener noreferrer">
+                📄 Read Article ↗
               </a>
             </td>
           </tr>

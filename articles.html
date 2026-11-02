@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Institutional Equity Research Dossiers & Market Intelligence | The Bull Print</title>
+    <title>Institutional Equity Research Articles & Market Intelligence | The Bull Print</title>
     <meta name="description" content="In-depth fundamental research, 8-point institutional quality checklists, bull vs bear theses, and corporate event catalysts for Indian equities.">
     <link rel="canonical" href="https://the-bull-print.vercel.app/articles.html">
 
     <!-- Open Graph -->
-    <meta property="og:title" content="Institutional Equity Research Dossiers | The Bull Print">
+    <meta property="og:title" content="Institutional Equity Research Articles | The Bull Print">
     <meta property="og:description" content="Comprehensive fundamental breakdown, 8-point checklists, and actionable video analyses for Indian equities.">
     <meta property="og:image" content="brand_assets/opengraph_social_card_1200x630.png">
     <meta name="twitter:card" content="summary_large_image">
@@ -426,7 +426,7 @@
             <nav class="nav-links">
                 <a href="/" class="nav-link">Dashboard</a>
                 <a href="/screener.html" class="nav-link">Screener</a>
-                <a href="/articles.html" class="nav-link nav-articles-pill active" title="Institutional Equity Research Dossiers & Market Intelligence">
+                <a href="/articles.html" class="nav-link nav-articles-pill active" title="Institutional Equity Research Articles & Market Intelligence">
                     <span class="nav-articles-icon">📰</span>
                     <span class="nav-articles-text">Articles</span>
                     <span class="nav-articles-badge">GEO</span>
@@ -456,9 +456,9 @@
         <!-- Hero Banner -->
         <div class="articles-hero">
             <div class="articles-hero-badge">⚡ INSTITUTIONAL RESEARCH DESK</div>
-            <h1 class="articles-hero-title">Quantitative Research & Article Dossiers</h1>
+            <h1 class="articles-hero-title">Quantitative Research & Article Articles</h1>
             <p class="articles-hero-subtitle">
-                Beyond superficial news headlines. Every research dossier features an 8-point institutional quality checklist, transparent Bull vs Bear theses, full-scope capital efficiency metrics, and verified corporate action timelines.
+                Beyond superficial news headlines. Every research article features an 8-point institutional quality checklist, transparent Bull vs Bear theses, full-scope capital efficiency metrics, and verified corporate action timelines.
             </p>
         </div>
 
@@ -527,7 +527,7 @@
         function renderArticles(posts) {
             const grid = document.getElementById('articles-grid');
             if (!posts || posts.length === 0) {
-                grid.innerHTML = '<div style="grid-column:1/-1; padding:60px 20px; text-align:center; color:var(--text-muted);">No research dossiers found matching your criteria.</div>';
+                grid.innerHTML = '<div style="grid-column:1/-1; padding:60px 20px; text-align:center; color:var(--text-muted);">No research articles found matching your criteria.</div>';
                 return;
             }
 
@@ -544,7 +544,7 @@
                     <a href="/article.html?slug=${p.slug}" class="article-card">
                         <div class="article-card-header">
                             <span class="article-category-badge">${category}</span>
-                            ${hasVideo ? '<span class="article-video-badge">▶ Video Dossier</span>' : '<span style="font-size:11px; color:var(--text-muted);">📄 Deep Dive</span>'}
+                            ${hasVideo ? '<span class="article-video-badge">▶ Video Article</span>' : '<span style="font-size:11px; color:var(--text-muted);">📄 Deep Dive</span>'}
                         </div>
                         <div class="article-card-body">
                             <h2 class="article-card-title">${p.title}</h2>
@@ -563,7 +563,7 @@
                         </div>
                         <div class="article-card-footer">
                             <span>📅 By ${authorName} · ${readingTime} ${wordsBadge}</span>
-                            <span class="read-btn">Read Full Dossier ↗</span>
+                            <span class="read-btn">Read Full Article ↗</span>
                         </div>
                     </a>
                 `;

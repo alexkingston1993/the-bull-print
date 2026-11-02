@@ -9,7 +9,7 @@ Generates:
 5. 10-Yr Key Ratios (Debtor Days, Inventory Days, Days Payable, CCC, Working Capital, ROCE)
 6. Detailed Shareholding Pattern with Shareholder Counts
 7. Corporate Documents (Regulatory Announcements, Annual Reports PDFs, Credit Ratings)
-8. Executive Intelligence Dossier (Real-world moats, revenue engines, promoter integrity & pledge audit)
+8. Executive Intelligence Article (Real-world moats, revenue engines, promoter integrity & pledge audit)
 """
 
 import json

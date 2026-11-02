@@ -29,7 +29,10 @@ from app.config import config
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data")
 TOKEN_DIR = os.path.join(DATA_DIR, "youtube_tokens")
-SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
+SCOPES = [
+    "https://www.googleapis.com/auth/youtube.upload",
+    "https://www.googleapis.com/auth/youtube.force-ssl",
+]
 
 
 CHANNEL_LANGUAGES = {
@@ -199,6 +202,39 @@ class YouTubeUploader:
         if not creds or not creds.valid:
             creds = self._get_service_account_credentials(language)
 
+        # 6. Multi-Project Automatic Pool Fallback (Dual Quota: Primary + Songx = 20,000 units)
+        if not creds or not creds.valid:
+            logger.info(f"[{language}] Primary token unavailable/expired. Engaging multi-project credential pool...")
+            pool = self._load_credential_pool()
+            for slot in pool:
+                cid = slot.get("client_id")
+                cse = slot.get("client_secret")
+                rt = slot.get("refresh_token")
+                if cid and cse and rt:
+                    try:
+                        c = Credentials(
+                            token=None,
+                            refresh_token=rt,
+                            token_uri="https://oauth2.googleapis.com/token",
+                            client_id=cid,
+                            client_secret=cse,
+                            scopes=SCOPES,
+                        )
+                        c.refresh(Request())
+                        if c.valid:
+                            logger.success(f"✓ Authenticated via alternate pool slot: {slot.get('source')} (...{cid[-14:]})")
+                            creds = c
+                            # Persist valid token to language slot to self-heal
+                            try:
+                                with open(token_file, "wb") as f:
+                                    pickle.dump(c, f)
+                                logger.info(f"✓ Self-healed primary token file with pool slot credentials")
+                            except Exception:
+                                pass
+                            break
+                    except Exception as p_err:
+                        logger.debug(f"Pool slot {slot.get('source')} refresh failed: {p_err}")
+
         if not creds or not creds.valid:
             logger.warning(
                 f"no valid token for {language}. "
@@ -287,6 +323,14 @@ class YouTubeUploader:
         slots: List[Dict] = []
 
         pool_json = os.getenv("YT_OAUTH_POOL_JSON")
+        if not pool_json:
+            local_pool_file = Path(TOKEN_DIR) / "oauth_pool.json"
+            if local_pool_file.exists():
+                try:
+                    pool_json = local_pool_file.read_text(encoding="utf-8")
+                except Exception:
+                    pass
+
         if pool_json:
             try:
                 parsed = json.loads(pool_json)
@@ -295,7 +339,7 @@ class YouTubeUploader:
                 for s in parsed:
                     if s.get("client_id") and s.get("client_secret") and s.get("refresh_token"):
                         slots.append({"client_id": s["client_id"], "client_secret": s["client_secret"],
-                                      "refresh_token": s["refresh_token"], "source": "YT_OAUTH_POOL_JSON"})
+                                      "refresh_token": s["refresh_token"], "source": "oauth_pool.json"})
             except Exception as e:
                 logger.warning(f"YT_OAUTH_POOL_JSON unparsable: {e}")
 
@@ -319,8 +363,10 @@ class YouTubeUploader:
                     obj = pickle.loads(base64.b64decode(b64_env))
                     if isinstance(obj, dict) and "credentials" in obj:
                         obj = obj["credentials"]
-                    slot = {"client_id": obj.get("client_id"), "client_secret": obj.get("client_secret"),
-                            "refresh_token": obj.get("refresh_token"), "source": env_name}
+                    cid = getattr(obj, "client_id", None) or (obj.get("client_id") if isinstance(obj, dict) else None)
+                    cse = getattr(obj, "client_secret", None) or (obj.get("client_secret") if isinstance(obj, dict) else None)
+                    rt = getattr(obj, "refresh_token", None) or (obj.get("refresh_token") if isinstance(obj, dict) else None)
+                    slot = {"client_id": cid, "client_secret": cse, "refresh_token": rt, "source": env_name}
                     if all(slot.values()) and slot not in slots:
                         slots.append(slot)
                 except Exception as e:
@@ -331,11 +377,14 @@ class YouTubeUploader:
                 obj = pickle.loads(p.read_bytes())
                 if isinstance(obj, dict) and "credentials" in obj:
                     obj = obj["credentials"]
-                slot = {"client_id": obj.get("client_id"), "client_secret": obj.get("client_secret"),
-                        "refresh_token": obj.get("refresh_token"), "source": f"pickle:{p.name}"}
+                cid = getattr(obj, "client_id", None) or (obj.get("client_id") if isinstance(obj, dict) else None)
+                cse = getattr(obj, "client_secret", None) or (obj.get("client_secret") if isinstance(obj, dict) else None)
+                rt = getattr(obj, "refresh_token", None) or (obj.get("refresh_token") if isinstance(obj, dict) else None)
+                slot = {"client_id": cid, "client_secret": cse, "refresh_token": rt, "source": f"pickle:{p.name}"}
                 if all(slot.values()) and slot not in slots:
                     slots.append(slot)
-            except Exception:
+            except Exception as e:
+                logger.debug(f"Error parsing {p.name}: {e}")
                 continue
 
         seen, unique = set(), []
@@ -510,7 +559,7 @@ class YouTubeUploader:
         full_description = (
             f"{description}\n\n"
             f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"🌐 Official Portal & Research Dossiers:\n"
+            f"🌐 Official Portal & Research Articles:\n"
             f"https://thebullprint.in\n"
             f"(Data models, Actuarial/On-Chain/Order-flow matrices & Calculators)\n\n"
             f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"

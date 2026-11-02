@@ -229,7 +229,7 @@ module.exports = async function handler(req, res) {
         trigram_uniqueness_avg: 95.8,
         sebi_pass_rate: 100.0,
         qa_audio_pass_rate: 100.0,
-        total_dossiers_indexed: combinedPosts.length,
+        total_articles_indexed: combinedPosts.length,
       },
       affiliate_stats: {
         total_clicks_today: 47,

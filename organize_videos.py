@@ -16,37 +16,39 @@ TASK_MAP = {
     "5875e5da-457d-4cc3-ba62-d606701317a6": "Bharti_Airtel"
 }
 
-BASE_DIR = "/Users/apple/Documents/Antigravity/untitled folder/storage/tasks"
-OUTPUT_DIR = "/Users/apple/Documents/Antigravity/untitled folder/Final_Videos"
+BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "storage", "tasks")
+OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Final_Videos")
 
-if not os.path.exists(OUTPUT_DIR):
-    os.makedirs(OUTPUT_DIR)
+def main():
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
 
-print("Monitoring output directories for completed videos...")
+    print("Monitoring output directories for completed videos...")
 
-completed = set()
+    completed = set()
 
-while len(completed) < len(TASK_MAP):
-    for task_id, title in TASK_MAP.items():
-        if task_id in completed:
-            continue
-        
-        # Checking for final-1.mp4 (this is the completed file The Bull Print produces)
-        final_video_path = os.path.join(BASE_DIR, task_id, "final-1.mp4")
-        
-        if os.path.exists(final_video_path):
-            # We wait a couple of seconds to ensure ffmpeg has completely released the file lock
-            time.sleep(2)
+    while len(completed) < len(TASK_MAP):
+        for task_id, title in TASK_MAP.items():
+            if task_id in completed:
+                continue
             
-            clean_name = f"{title}.mp4"
-            dest_path = os.path.join(OUTPUT_DIR, clean_name)
+            # Checking for final-1.mp4 (this is the completed file The Bull Print produces)
+            final_video_path = os.path.join(BASE_DIR, task_id, "final-1.mp4")
             
-            # Copy instead of rename to prevent breaking any internal state of MPT
-            shutil.copy2(final_video_path, dest_path)
-            print(f"✅ Extracted and renamed: {clean_name}")
-            completed.add(task_id)
-            
-    if len(completed) < len(TASK_MAP):
-        time.sleep(10)
+            if os.path.exists(final_video_path):
+                time.sleep(2)
+                
+                clean_name = f"{title}.mp4"
+                dest_path = os.path.join(OUTPUT_DIR, clean_name)
+                
+                shutil.copy2(final_video_path, dest_path)
+                print(f"✅ Extracted and renamed: {clean_name}")
+                completed.add(task_id)
+                
+        if len(completed) < len(TASK_MAP):
+            time.sleep(10)
 
-print("\n🎉 All 10 videos have been successfully organized in the 'Final_Videos' folder!")
+    print("\n🎉 All 10 videos have been successfully organized in the 'Final_Videos' folder!")
+
+if __name__ == "__main__":
+    main()

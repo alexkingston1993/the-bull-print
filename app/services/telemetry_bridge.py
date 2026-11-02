@@ -14,7 +14,7 @@ import time
 import random
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 import subprocess
 import shutil
 import tempfile
@@ -75,7 +75,7 @@ class TelemetryBridge:
             "eta_seconds": 0,
             "stages": [
                 {"id": 1, "name": "SEO Topic Harvester (open-seo)", "status": "RUNNING", "pct": 0, "started_at": self._now_iso(), "completed_at": None, "metrics": {}},
-                {"id": 2, "name": "Gemini Script & Dossier Synthesis", "status": "PENDING", "pct": 0, "started_at": None, "completed_at": None, "metrics": {}},
+                {"id": 2, "name": "Gemini Script & Article Synthesis", "status": "PENDING", "pct": 0, "started_at": None, "completed_at": None, "metrics": {}},
                 {"id": 3, "name": "Authenticity & SEBI/IRDAI Compliance Gate", "status": "PENDING", "pct": 0, "started_at": None, "completed_at": None, "metrics": {}},
                 {"id": 4, "name": "Chart & High-CTR Thumbnail Studio", "status": "PENDING", "pct": 0, "started_at": None, "completed_at": None, "metrics": {}},
                 {"id": 5, "name": "Kaggle T4 GPU Render Farm", "status": "PENDING", "pct": 0, "started_at": None, "completed_at": None, "metrics": {}},

@@ -901,8 +901,8 @@
                     <button class="btn-secondary" style="font-size:12px; padding:6px 12px;" onclick="exportPortfolioCSV()" title="Export to Excel / CSV">
                         📥 Export CSV
                     </button>
-                    <button class="btn-secondary" style="font-size:12px; padding:6px 12px;" onclick="exportPortfolioPDF()" title="Print / Download PDF Dossier">
-                        📄 PDF Dossier
+                    <button class="btn-secondary" style="font-size:12px; padding:6px 12px;" onclick="exportPortfolioPDF()" title="Print / Download PDF Article">
+                        📄 PDF Article
                     </button>
                     <button class="btn-secondary" style="font-size:12px; padding:6px 12px;" onclick="openAlertsConfigModal()" title="Configure Telegram & WhatsApp Alerts">
                         📱 Event Alerts
@@ -1896,9 +1896,9 @@ Infosys,INFY,250,980.00,1131.00,282750`;
             showToast("📥 Exported consolidated holdings to Excel/CSV!");
         }
 
-        /* ── 1-Click Printable Institutional PDF Dossier ── */
+        /* ── 1-Click Printable Institutional PDF Article ── */
         function exportPortfolioPDF() {
-            showToast("Preparing Institutional PDF Dossier...");
+            showToast("Preparing Institutional PDF Article...");
             setTimeout(() => {
                 window.print();
             }, 300);

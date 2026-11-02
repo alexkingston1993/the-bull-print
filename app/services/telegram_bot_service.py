@@ -27,6 +27,10 @@ from loguru import logger
 from app.config import config
 from app.services.assistant_persona import aria
 from app.services.aria_healing import aria_healing, aria_tools, AriaSelfHealingEngine
+from app.services.aria_enhancements import (
+    AriaPipelineCard, AriaApprovalGate, AriaCheckpointResume,
+    AriaScheduleCard, AriaQuotaBurnRate, AriaShortsTracker,
+)
 
 
 SYSTEM_PERSONA_PROMPT = """
@@ -337,6 +341,19 @@ class TelegramBotDaemon:
             slot_arg = words[1].replace("/", "")
             return aria_tools.trigger_market_slot(slot_arg)
 
+        # 1B. New Enhancement Commands
+        if lower in ["/schedule", "/today", "schedule", "today's schedule", "what's today", "whats today"]:
+            return AriaScheduleCard.build_card_with_markup()
+
+        if lower in ["/burnrate", "/burn", "burnrate", "quota burn", "burn rate", "quota projection"]:
+            return AriaQuotaBurnRate.build_card()
+
+        if lower in ["/shorts", "shorts", "shorts tracker", "shorts count", "how many shorts", "shorts today"]:
+            return AriaShortsTracker.build_card_with_markup()
+
+        if lower in ["/checkpoint", "checkpoint", "last checkpoint", "where did it stop", "resume"]:
+            return AriaCheckpointResume.status_card_with_markup()
+
         # 2. Conversational & Technical Dialogue via LLM with Live Telemetry Context
         live_context = AriaEngineerTools.build_live_system_context()
         system_instruction = f"{SYSTEM_PERSONA_PROMPT}\n\n{live_context}"
@@ -482,6 +499,26 @@ class TelegramBotDaemon:
                         self.send_message(chat_id, AriaEngineerTools.generate_revenue_report())
                     elif data == "view_yt_quota":
                         self.send_message(chat_id, AriaEngineerTools.generate_yt_quota_report())
+                    # Enhancement callbacks
+                    elif data == "cb_status":
+                        reply, markup = AriaEngineerTools.diagnose_latest_issues(with_markup=True)
+                        self.send_message(chat_id, reply, reply_markup=markup)
+                    elif data.startswith("approve_thumb:"):
+                        slug = data.split(":", 1)[1]
+                        AriaApprovalGate.handle_callback(chat_id, slug, "approved")
+                    elif data.startswith("regen_thumb:"):
+                        slug = data.split(":", 1)[1]
+                        AriaApprovalGate.handle_callback(chat_id, slug, "regenerate")
+                    elif data.startswith("edit_title:"):
+                        slug = data.split(":", 1)[1]
+                        AriaApprovalGate.pending_title_edit[slug] = chat_id
+                        self.send_message(chat_id, "✏️ *Aria:* Go ahead Boss — type your new title now!")
+                    elif data.startswith("resume_from:"):
+                        parts = data.split(":")
+                        if len(parts) >= 3:
+                            resume_slug, resume_step = parts[1], parts[2]
+                            self.send_message(chat_id, f"▶️ *Aria:* Resuming pipeline `{resume_slug}` from `{resume_step.upper()}` — triggering cloud run now! 🚀")
+                            aria_tools.trigger_market_slot("pre_market")  # TODO: pass resume_step as env var
                     continue
 
                 msg = u.get("message", {})
@@ -492,6 +529,12 @@ class TelegramBotDaemon:
                 text = msg.get("text", "")
 
                 if not text or not chat_id:
+                    continue
+
+                # Check if this message is a title edit response for approval gate
+                active_slug = next((s for s, cid in AriaApprovalGate.pending_title_edit.items() if str(cid) == str(chat_id)), None)
+                if active_slug and not text.startswith("/"):
+                    AriaApprovalGate.handle_new_title_text(active_slug, text)
                     continue
 
                 logger.info(f"[Aria] Received message from {user_name} ({chat_id}): '{text}'")

@@ -1,9 +1,9 @@
 """
 X (Twitter) Thread Publisher (app/services/x_thread_publisher.py).
-Distributes each published research dossier as a 3-tweet thread:
+Distributes each published research article as a 3-tweet thread:
 1. Hook + first TL;DR insight + up to 2 dark-mode chart PNGs (v1.1 media_upload)
 2. Remaining TL;DR insight points
-3. Long video, 9:16 Short, full dossier, and /tools affiliate toolkit links with SEBI disclaimer
+3. Long video, 9:16 Short, full article, and /tools affiliate toolkit links with SEBI disclaimer
 Skips gracefully whenever X credentials, tweepy, or payload content are missing.
 """
 
@@ -92,7 +92,7 @@ def publish_x_thread(payload: dict, chart_paths: list, yt_video_id: str, short_v
         if short_video_id:
             links.append(f"🩳 9:16 Short: https://youtube.com/shorts/{short_video_id}")
         if article_url:
-            links.append(f"📄 Full Dossier: {article_url}")
+            links.append(f"📄 Full Article: {article_url}")
         links.append(f"🛠️ Free Toolkit: {TOOLS_URL}")
         tweet3_text = _clip("\n".join(links) + f"\n\n{DISCLAIMER}")
 
