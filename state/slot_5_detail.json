@@ -96,7 +96,13 @@
       "pct": 100,
       "started_at": "2026-11-02T14:06:30Z",
       "completed_at": null,
-      "metrics": {}
+      "metrics": {
+        "yt_long_id": "CAAWeig8x9k",
+        "yt_short_ids": [],
+        "oauth_slot_used": 1,
+        "article_url": "https://the-bull-print.vercel.app/article.html?slug=usdt_dom_cmc_005",
+        "x_thread_url": "Skipped (X keys not set)"
+      }
     }
   ],
   "live_logs": [
