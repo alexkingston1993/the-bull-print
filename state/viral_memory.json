@@ -1,51 +1,63 @@
 {
-  "updated_at": "2026-11-01T19:49:49Z",
-  "channel_median_vph": 0.04,
+  "updated_at": "2026-11-02T10:18:33Z",
+  "channel_median_vph": 0.03,
   "top_outperformers": [
     {
       "video_id": "vFj_1fJ-3EM",
       "title": "The AYUSH Sub-Limit Trap: Ayurveda Hospital Bill Reductions #Shorts",
       "format": "SHORT",
       "published_at": "2026-11-01T16:12:02Z",
-      "hours_live": 3.6,
-      "view_count": 25,
+      "hours_live": 18.1,
+      "view_count": 33,
       "like_count": 1,
       "comment_count": 0,
-      "views_per_hour": 6.89,
-      "engagement_rate": 0.04
+      "views_per_hour": 1.82,
+      "engagement_rate": 0.0303
+    },
+    {
+      "video_id": "d_sX2rK81Z0",
+      "title": "Point of Control: How Smart Money Uses Volume Profiles #Shorts",
+      "format": "SHORT",
+      "published_at": "2026-11-01T19:11:48Z",
+      "hours_live": 15.1,
+      "view_count": 5,
+      "like_count": 0,
+      "comment_count": 0,
+      "views_per_hour": 0.33,
+      "engagement_rate": 0.0
     },
     {
       "video_id": "qHk7dPmZ-tM",
       "title": "Why 90% of Traders Lose in Crypto Derivatives! | The Math That Settles It #Shorts",
       "format": "SHORT",
       "published_at": "2026-10-31T18:41:54Z",
-      "hours_live": 25.1,
-      "view_count": 7,
-      "like_count": 0,
-      "comment_count": 1,
-      "views_per_hour": 0.28,
-      "engagement_rate": 0.4286
-    },
-    {
-      "video_id": "l5n5au_PKxg",
-      "title": "The 20% Co-Payment Clause: How Insurers Cut Big Claim Payouts #Shorts",
-      "format": "SHORT",
-      "published_at": "2026-10-31T04:12:13Z",
       "hours_live": 39.6,
       "view_count": 8,
-      "like_count": 1,
-      "comment_count": 0,
+      "like_count": 0,
+      "comment_count": 1,
       "views_per_hour": 0.2,
-      "engagement_rate": 0.125
+      "engagement_rate": 0.375
     }
   ],
   "bottom_underperformers": [
+    {
+      "video_id": "NVLAgi9EISA",
+      "title": "The Hidden Room Rent Clause That Destroys Your Health Claim! | The Trap Nobody Talks About #Sho",
+      "format": "LONG",
+      "published_at": "2026-10-31T19:49:30Z",
+      "hours_live": 38.5,
+      "view_count": 0,
+      "like_count": 0,
+      "comment_count": 1,
+      "views_per_hour": 0.0,
+      "engagement_rate": 3.0
+    },
     {
       "video_id": "DXTsJzunjs8",
       "title": "The Consumables Trap: Why Cashless Policies Leave You Paying 15% #Shorts (Institutional Breakdo",
       "format": "SHORT",
       "published_at": "2026-10-31T13:11:54Z",
-      "hours_live": 30.6,
+      "hours_live": 45.1,
       "view_count": 0,
       "like_count": 0,
       "comment_count": 0,
@@ -57,19 +69,7 @@
       "title": "Don't Fall for the 24500 Trap: Why 90% of Everyday Buyers Lose Money (Institutional Breakdown)",
       "format": "SHORT",
       "published_at": "2026-10-31T11:38:24Z",
-      "hours_live": 32.2,
-      "view_count": 0,
-      "like_count": 0,
-      "comment_count": 0,
-      "views_per_hour": 0.0,
-      "engagement_rate": 0.0
-    },
-    {
-      "video_id": "tKyx6pRGfQE",
-      "title": "Block Deals Decoded: Tracking FII Institutional Accumulation #Shorts (Institutional Breakdown)",
-      "format": "SHORT",
-      "published_at": "2026-10-31T10:12:12Z",
-      "hours_live": 33.6,
+      "hours_live": 46.7,
       "view_count": 0,
       "like_count": 0,
       "comment_count": 0,
