@@ -1,42 +1,42 @@
 {
-  "updated_at": "2026-11-02T10:18:33Z",
-  "channel_median_vph": 0.03,
+  "updated_at": "2026-11-02T13:42:54Z",
+  "channel_median_vph": 0.04,
   "top_outperformers": [
+    {
+      "video_id": "9oB6Fg-XpJQ",
+      "title": "Solana Memecoin MEV Trap: How Bots Siphon 90% of Retail! \ud83d\udea8 #shorts",
+      "format": "SHORT",
+      "published_at": "2026-11-02T10:33:51Z",
+      "hours_live": 3.2,
+      "view_count": 6,
+      "like_count": 1,
+      "comment_count": 0,
+      "views_per_hour": 1.9,
+      "engagement_rate": 0.1667
+    },
     {
       "video_id": "vFj_1fJ-3EM",
       "title": "The AYUSH Sub-Limit Trap: Ayurveda Hospital Bill Reductions #Shorts",
       "format": "SHORT",
       "published_at": "2026-11-01T16:12:02Z",
-      "hours_live": 18.1,
-      "view_count": 33,
+      "hours_live": 21.5,
+      "view_count": 36,
       "like_count": 1,
       "comment_count": 0,
-      "views_per_hour": 1.82,
-      "engagement_rate": 0.0303
+      "views_per_hour": 1.67,
+      "engagement_rate": 0.0278
     },
     {
       "video_id": "d_sX2rK81Z0",
       "title": "Point of Control: How Smart Money Uses Volume Profiles #Shorts",
       "format": "SHORT",
       "published_at": "2026-11-01T19:11:48Z",
-      "hours_live": 15.1,
-      "view_count": 5,
-      "like_count": 0,
+      "hours_live": 18.5,
+      "view_count": 15,
+      "like_count": 1,
       "comment_count": 0,
-      "views_per_hour": 0.33,
-      "engagement_rate": 0.0
-    },
-    {
-      "video_id": "qHk7dPmZ-tM",
-      "title": "Why 90% of Traders Lose in Crypto Derivatives! | The Math That Settles It #Shorts",
-      "format": "SHORT",
-      "published_at": "2026-10-31T18:41:54Z",
-      "hours_live": 39.6,
-      "view_count": 8,
-      "like_count": 0,
-      "comment_count": 1,
-      "views_per_hour": 0.2,
-      "engagement_rate": 0.375
+      "views_per_hour": 0.81,
+      "engagement_rate": 0.0667
     }
   ],
   "bottom_underperformers": [
@@ -45,7 +45,7 @@
       "title": "The Hidden Room Rent Clause That Destroys Your Health Claim! | The Trap Nobody Talks About #Sho",
       "format": "LONG",
       "published_at": "2026-10-31T19:49:30Z",
-      "hours_live": 38.5,
+      "hours_live": 41.9,
       "view_count": 0,
       "like_count": 0,
       "comment_count": 1,
@@ -57,7 +57,7 @@
       "title": "The Consumables Trap: Why Cashless Policies Leave You Paying 15% #Shorts (Institutional Breakdo",
       "format": "SHORT",
       "published_at": "2026-10-31T13:11:54Z",
-      "hours_live": 45.1,
+      "hours_live": 48.5,
       "view_count": 0,
       "like_count": 0,
       "comment_count": 0,
@@ -69,7 +69,7 @@
       "title": "Don't Fall for the 24500 Trap: Why 90% of Everyday Buyers Lose Money (Institutional Breakdown)",
       "format": "SHORT",
       "published_at": "2026-10-31T11:38:24Z",
-      "hours_live": 46.7,
+      "hours_live": 50.1,
       "view_count": 0,
       "like_count": 0,
       "comment_count": 0,
