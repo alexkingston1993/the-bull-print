@@ -266,20 +266,27 @@ def fetch_failed_job_logs(run_id: int) -> str:
 
 
 def dispatch_slot_run(slot: int, force_cpu: bool = False, notes: str = "") -> bool:
-    """Dispatches market_publisher.yml for a specific slot immediately."""
-    url = f"https://api.github.com/repos/{GH_REPO}/actions/workflows/market_publisher.yml/dispatches"
+    """Dispatches parallel_video_matrix.yml (20-Runner Parallel Matrix) for a specific slot immediately."""
+    slot_info = SLOT_REGISTRY.get(slot, {})
+    topic = notes or slot_info.get("topic", "Institutional Order Flow Mechanics")
+    vertical = slot_info.get("vertical", "stock_market")
+
+    url = f"https://api.github.com/repos/{GH_REPO}/actions/workflows/parallel_video_matrix.yml/dispatches"
     body = {
         "ref": "main",
         "inputs": {
-            "slot": str(slot),
-            "force_cpu_fallback": "true" if force_cpu else "false",
-            "notes": notes,
+            "topic": topic,
+            "vertical": vertical,
+            "shorts_only": "false",
+            "duration_sec": "60",
+            "duration_min": "3",
+            "privacy_status": "unlisted"
         }
     }
     try:
         r = requests.post(url, headers=get_headers(), json=body, timeout=15)
         if r.status_code == 204:
-            logger.success(f"🚀 [Relentless Supervisor] Dispatched slot {slot} (force_cpu={force_cpu}) successfully!")
+            logger.success(f"🚀 [Relentless Supervisor] Dispatched slot {slot} ('{topic}') to Parallel Cloud Matrix!")
             return True
         logger.error(f"Dispatch failed for slot {slot}: HTTP {r.status_code} {r.text}")
     except Exception as e:
