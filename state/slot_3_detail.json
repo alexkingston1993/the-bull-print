@@ -93,6 +93,11 @@
       "ts": "10:13:06",
       "level": "INFO",
       "msg": "[GEMINI]: \ud83d\udd0d Harvested `Irdai new rules for claim settlement` | source: autocomplete \u00b7 cluster: irdai new rules for claim settlement, irdai new rules for life insurance, irdai new rules for policy surrender"
+    },
+    {
+      "ts": "10:13:17",
+      "level": "INFO",
+      "msg": "[PLAYWRIGHT]: \ud83c\udfa8 Generating 9:16 High-CTR Thumbnail frames (insurance)... | "
     }
   ]
 }
