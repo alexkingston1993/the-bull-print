@@ -59,7 +59,7 @@
       "started_at": "2026-11-04T11:51:15Z",
       "completed_at": null,
       "metrics": {
-        "approval_status": "WAITING_APPROVAL",
+        "approval_status": "AUTO_APPROVED",
         "approval_deadline_ts": 1793793196,
         "headline": "NIFTY EXPIRY 90% GET TRAPPED"
       }
