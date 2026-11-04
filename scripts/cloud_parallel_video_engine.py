@@ -466,7 +466,6 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
     # 3. Upload to YouTube with 20,000 quota pool
     yt_url = ""
     try:
-        from app.services.youtube_uploader import upload_video_with_pool
         title = f"{manifest['topic']} | The Bull Print"
         description = (
             f"Forensic breakdown of {manifest['topic']}.\n\n"
@@ -490,9 +489,12 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
             privacy_status="public",
             is_short=manifest.get("is_short", False),
         )
-        if res and isinstance(res, dict) and res.get("id"):
-            yt_url = f"https://youtu.be/{res['id']}"
+        vid_id = (res.get("video_id") or res.get("id")) if isinstance(res, dict) else None
+        if vid_id:
+            yt_url = res.get("url") or f"https://youtu.be/{vid_id}"
             logger.success(f"🚀 [YouTube Upload] Broadcast Live: {yt_url}")
+        elif res and isinstance(res, dict) and not res.get("success"):
+            logger.warning(f"YouTube upload returned error: {res.get('error')}")
     except Exception as yt_err:
         logger.warning(f"YouTube upload failed or skipped in this environment: {yt_err}")
 
@@ -518,7 +520,7 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
         timestamps = [f"{int(s['start_sec']//60):02d}:{int(s['start_sec']%60):02d} {s.get('section_name', '')}" for s in manifest.get("sections", [])]
         article_path = generate_website_article_file(
             payload=article_payload,
-            youtube_video_id=(res.get("id") if (res and isinstance(res, dict)) else "") or "",
+            youtube_video_id=vid_id or "",
             timestamps_log=timestamps
         )
         logger.success(f"📰 [Website Article] Published: {article_path}")
