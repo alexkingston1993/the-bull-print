@@ -5,13 +5,13 @@
   "vertical_label": "Slot #5",
   "shorts_count": 1,
   "status": "RUNNING",
-  "overall_pct": 30,
-  "stage_pct": 90,
-  "current_stage_index": 4,
-  "current_stage_name": "Chart & High-CTR Thumbnail Studio",
-  "current_subtask_label": "Capturing market charts / infographics",
+  "overall_pct": 25,
+  "stage_pct": 100,
+  "current_stage_index": 2,
+  "current_stage_name": "Gemini Script & Article Synthesis",
+  "current_subtask_label": "Synthesizing script & SEO article",
   "started_at": "2026-11-04T13:08:49Z",
-  "updated_at": "2026-11-04T13:09:12Z",
+  "updated_at": "2026-11-04T13:09:17Z",
   "eta_seconds": 0,
   "stages": [
     {
@@ -26,7 +26,7 @@
     {
       "id": 2,
       "name": "Gemini Script & Article Synthesis",
-      "status": "COMPLETED",
+      "status": "RUNNING",
       "pct": 100,
       "started_at": "2026-11-04T13:08:56Z",
       "completed_at": "2026-11-04T13:09:07Z",
@@ -35,8 +35,8 @@
     {
       "id": 3,
       "name": "Authenticity & SEBI/IRDAI Compliance Gate",
-      "status": "COMPLETED",
-      "pct": 100,
+      "status": "PENDING",
+      "pct": 0,
       "started_at": null,
       "completed_at": "2026-11-04T13:09:07Z",
       "metrics": {}
@@ -44,8 +44,8 @@
     {
       "id": 4,
       "name": "Chart & High-CTR Thumbnail Studio",
-      "status": "RUNNING",
-      "pct": 90,
+      "status": "PENDING",
+      "pct": 0,
       "started_at": "2026-11-04T13:09:07Z",
       "completed_at": null,
       "metrics": {}
