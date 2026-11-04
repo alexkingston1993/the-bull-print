@@ -1,5 +1,19 @@
 [
   {
+    "title": "Sebi new rules f&o lot size",
+    "slug": "sebi_fo_lot_size_04",
+    "description": "Breakdown of Sebi new rules f&o lot size",
+    "date": "2026-11-04 17:07:50",
+    "vertical": "stock_market",
+    "category": "Stock Market",
+    "format": "LONG",
+    "youtube_video_id": "BQbkW9VAXLk",
+    "youtube_id": "BQbkW9VAXLk",
+    "youtubeUrl": "https://www.youtube.com/watch?v=BQbkW9VAXLk",
+    "article_url": "/article.html?slug=sebi_fo_lot_size_04",
+    "compliance_notes": "SEBI/IRDAI Zero-violation feedback verified"
+  },
+  {
     "title": "Irdai new rules for claim settlement (Short #1) #Shorts",
     "slug": "CAMP_IRD_03-short-1",
     "description": "Institutional analysis of Irdai new rules for claim settlement for everyday investors.",
@@ -683,20 +697,6 @@
     "youtube_id": "DRY_RUN_KAGGLE_GPU_123",
     "youtubeUrl": "https://www.youtube.com/watch?v=DRY_RUN_KAGGLE_GPU_123",
     "dossier_url": "/article.html?slug=health-insurance-claim-settlement-ratio-vs-ic-1793219299",
-    "compliance_notes": "SEBI/IRDAI Zero-violation feedback verified"
-  },
-  {
-    "title": "Section 45 Insurance Act 1938 Case Studies: 3-Year Non-Repudiation Threshold & Pre-Existing Disclosure Protocol (Short #1) #Shorts",
-    "slug": "health-insurance-claim-settlement-ratio-vs-ic-1793212700-short-1",
-    "description": "Institutional analysis of Section 45 Insurance Act 1938 Case Studies: 3-Year Non-Repudiation Threshold & Pre-Existing Disclosure Protocol for everyday investors.",
-    "date": "2026-10-28 19:02:23",
-    "vertical": "insurance",
-    "category": "Insurance",
-    "format": "SHORT",
-    "youtube_video_id": "1zOAaq6LrEA",
-    "youtube_id": "1zOAaq6LrEA",
-    "youtubeUrl": "https://www.youtube.com/shorts/1zOAaq6LrEA",
-    "dossier_url": "/article.html?slug=health-insurance-claim-settlement-ratio-vs-ic-1793212700",
     "compliance_notes": "SEBI/IRDAI Zero-violation feedback verified"
   }
 ]
