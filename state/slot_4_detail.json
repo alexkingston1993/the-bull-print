@@ -58,7 +58,11 @@
       "pct": 60,
       "started_at": "2026-11-04T11:51:15Z",
       "completed_at": null,
-      "metrics": {}
+      "metrics": {
+        "approval_status": "WAITING_APPROVAL",
+        "approval_deadline_ts": 1793793196,
+        "headline": "NIFTY EXPIRY 90% GET TRAPPED"
+      }
     },
     {
       "id": 5,
