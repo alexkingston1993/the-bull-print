@@ -1,8 +1,8 @@
 {
   "version": "2.0.0",
   "engine_name": "Aria Cognitive Self-Healing & Continuous Learning Engine",
-  "last_synced": "2026-11-04T06:52:31Z",
-  "total_learned_rules": 32,
+  "last_synced": "2026-11-04T08:11:38Z",
+  "total_learned_rules": 33,
   "learned_rules": [
     {
       "rule_id": "BUG-01-RUNNER-DEP-REQUESTS",
@@ -355,6 +355,17 @@
       "action_plan": "fix(ci): robust git stash before rebase to prevent exit code 128",
       "auto_executable": "git stash && git pull --rebase origin main",
       "learned_from": "Git commit 97f2ae6f"
+    },
+    {
+      "rule_id": "LEARNED-889140",
+      "signature_pattern": "cannot import name 'upload_video_with_pool'|generate_website_article_file\\(\\) got an unexpected keyword",
+      "domain": "youtube_api",
+      "failed_component": "Pipeline Component",
+      "severity": "HIGH",
+      "root_cause": "Method signature mismatch in aggregate_and_publish",
+      "action_plan": "Call get_uploader().upload_video(language='en', video_path=...) and pass structured payload to generate_website_article_file",
+      "auto_executable": null,
+      "learned_from": "feed_healing_loop CLI"
     }
   ],
   "incident_history": [

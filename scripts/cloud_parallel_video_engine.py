@@ -477,17 +477,20 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
         tags = ["stock market", "crypto", "trading", "finance", "the bull print"]
         thumb_path = bundle_dir / "frames" / "frame_00.jpg"
 
-        res = upload_video_with_pool(
-            file_path=str(final_video_mp4),
+        from app.services.youtube_uploader import get_uploader
+        uploader = get_uploader()
+        res = uploader.upload_video(
+            language="en",
+            video_path=str(final_video_mp4),
             title=title[:95],
             description=description,
             tags=tags,
             thumbnail_path=str(thumb_path) if thumb_path.exists() else None,
             category_id="27",
             privacy_status="public",
-            contains_synthetic_media=True
+            is_short=manifest.get("is_short", False),
         )
-        if res and res.get("id"):
+        if res and isinstance(res, dict) and res.get("id"):
             yt_url = f"https://youtu.be/{res['id']}"
             logger.success(f"🚀 [YouTube Upload] Broadcast Live: {yt_url}")
     except Exception as yt_err:
@@ -496,12 +499,27 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
     # 4. Generate Companion Website Article & Alert Telegram
     try:
         from engine import generate_website_article_file
+        article_payload = {
+            "campaign_id": manifest["slug"],
+            "topic": manifest["topic"],
+            "vertical": manifest["vertical"],
+            "website_article_payload": {
+                "seo_title": f"{manifest['topic']}: Institutional Market Breakdown",
+                "meta_description": f"Comprehensive forensic analysis of {manifest['topic']} by The Bull Print.",
+                "article_sections": [
+                    {
+                        "h2": s.get("section_name", f"Section {i+1}"),
+                        "p": s.get("script", "")
+                    }
+                    for i, s in enumerate(manifest.get("sections", []))
+                ]
+            }
+        }
+        timestamps = [f"{int(s['start_sec']//60):02d}:{int(s['start_sec']%60):02d} {s.get('section_name', '')}" for s in manifest.get("sections", [])]
         article_path = generate_website_article_file(
-            topic=manifest["topic"],
-            vertical=manifest["vertical"],
-            visual_frames=[bundle_dir / "frames" / f"frame_{i:02d}.jpg" for i in range(total_segments)],
-            youtube_url=yt_url or "https://youtu.be/dQw4w9WgXcQ",
-            slug=manifest["slug"]
+            payload=article_payload,
+            youtube_video_id=(res.get("id") if (res and isinstance(res, dict)) else "") or "",
+            timestamps_log=timestamps
         )
         logger.success(f"📰 [Website Article] Published: {article_path}")
     except Exception as a_err:

@@ -239,12 +239,27 @@ jobs:
             echo "$YOUTUBE_TOKEN_EN" | base64 -d > data/youtube_tokens/youtube_token_en.pickle
             echo "✓ Restored primary YouTube OAuth token"
           fi
+          if [ -n "$YT_OAUTH_POOL_JSON" ]; then
+            echo "$YT_OAUTH_POOL_JSON" > data/youtube_tokens/oauth_pool.json
+            echo "✓ Restored OAuth pool JSON"
+          fi
 
       - name: 🚀 Concatenate, Mix Ducked BGM, Upload to YouTube & Publish Article
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          YOUTUBE_TOKEN_EN: ${{ secrets.YOUTUBE_TOKEN_EN }}
+          YT_OAUTH_POOL_JSON: ${{ secrets.YT_OAUTH_POOL_JSON }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          YT_CLIENT_ID_1: ${{ secrets.YT_CLIENT_ID_1 }}
+          YT_CLIENT_SECRET_1: ${{ secrets.YT_CLIENT_SECRET_1 }}
+          YT_REFRESH_TOKEN_1: ${{ secrets.YT_REFRESH_TOKEN_1 }}
+          YT_CLIENT_ID_2: ${{ secrets.YT_CLIENT_ID_2 }}
+          YT_CLIENT_SECRET_2: ${{ secrets.YT_CLIENT_SECRET_2 }}
+          YT_REFRESH_TOKEN_2: ${{ secrets.YT_REFRESH_TOKEN_2 }}
         run: |
           python scripts/cloud_parallel_video_engine.py \
             --mode aggregate_and_publish \
