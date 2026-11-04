@@ -5,13 +5,13 @@
   "vertical_label": "Slot #1",
   "shorts_count": 2,
   "status": "RUNNING",
-  "overall_pct": 25,
-  "stage_pct": 100,
-  "current_stage_index": 2,
-  "current_stage_name": "Gemini Script & Article Synthesis",
-  "current_subtask_label": "source: viral_horse_5.4x \u00b7 cluster: SEBI Study Quantitative Analysis: How Market Makers Harvest Gamma & Theta on Weekly Expiries",
+  "overall_pct": 30,
+  "stage_pct": 90,
+  "current_stage_index": 4,
+  "current_stage_name": "Chart & High-CTR Thumbnail Studio",
+  "current_subtask_label": "Capturing market charts / infographics",
   "started_at": "2026-11-04T11:27:58Z",
-  "updated_at": "2026-11-04T11:28:10Z",
+  "updated_at": "2026-11-04T11:28:25Z",
   "eta_seconds": 0,
   "stages": [
     {
@@ -26,27 +26,27 @@
     {
       "id": 2,
       "name": "Gemini Script & Article Synthesis",
-      "status": "RUNNING",
+      "status": "COMPLETED",
       "pct": 100,
       "started_at": "2026-11-04T11:28:04Z",
-      "completed_at": null,
+      "completed_at": "2026-11-04T11:28:25Z",
       "metrics": {}
     },
     {
       "id": 3,
       "name": "Authenticity & SEBI/IRDAI Compliance Gate",
-      "status": "PENDING",
-      "pct": 0,
+      "status": "COMPLETED",
+      "pct": 100,
       "started_at": null,
-      "completed_at": null,
+      "completed_at": "2026-11-04T11:28:25Z",
       "metrics": {}
     },
     {
       "id": 4,
       "name": "Chart & High-CTR Thumbnail Studio",
-      "status": "PENDING",
-      "pct": 0,
-      "started_at": null,
+      "status": "RUNNING",
+      "pct": 90,
+      "started_at": "2026-11-04T11:28:25Z",
       "completed_at": null,
       "metrics": {}
     },
@@ -93,6 +93,11 @@
       "ts": "11:28:15",
       "level": "INFO",
       "msg": "[GEMINI]: \ud83d\udd0d Harvested `SEBI Study Quantitative Analysis: How Market Mak` | source: viral_horse_5.4x \u00b7 cluster: SEBI Study Quantitative Analysis: How Market Makers Harvest Gamma & Theta on Weekly Expiries"
+    },
+    {
+      "ts": "11:28:38",
+      "level": "INFO",
+      "msg": "[PLAYWRIGHT]: \ud83c\udfa8 Generating 9:16 High-CTR Thumbnail frames (stock_market)... | "
     }
   ]
 }
