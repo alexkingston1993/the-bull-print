@@ -195,7 +195,7 @@ jobs:
   # ─────────────────── VIDEO ENGINE (The Bull Print — 16 videos/day) ───────────────────
   build_and_publish:
     concurrency:
-      group: bull-print-video-conveyor
+      group: bull-print-video-conveyor-${{ github.event.inputs.slot || github.event.client_payload.slot || github.run_id }}
       cancel-in-progress: false
     # Master video crons only, or manual dispatch WITHOUT article_slot
     if: >-
