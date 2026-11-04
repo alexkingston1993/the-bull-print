@@ -148,36 +148,128 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
     second_word = words_topic[1].upper() if len(words_topic) > 1 else "ANALYSIS"
 
     sections = []
+    gemini_sections = []
+    api_key = os.getenv("GEMINI_API_KEY")
+
+    if api_key:
+        try:
+            from google import genai
+            client = genai.Client(api_key=api_key)
+            prompt = f"""
+            You are the lead institutional investigative financial documentary writer for 'The Bull Print'.
+            Narrator Persona: Christopher (authoritative, forensic, sharp, documentary tone).
+            Topic: {topic_clean}
+            Vertical: {vertical}
+            Format: {'60-Second Short (9:16)' if is_short else f'{int(duration_sec // 60)}-Minute Deep Dive (16:9)'}
+            Number of discrete sections: {num_sections}
+
+            For each section 0 to {num_sections - 1}, provide:
+            - headline_top: (2-3 words uppercase punchy title, max 20 chars)
+            - headline_mid: (Key metric or forensic fact, max 22 chars)
+            - badge_text: (Tag or alert, max 16 chars)
+            - script: (1-2 sentences of spoken narration for this exact section. Total duration is {duration_sec} seconds across all sections. Cite real numbers, institutional order flows, regulatory traps, or forensic clauses. Zero filler.)
+
+            Respond ONLY with a valid JSON object matching this structure:
+            {{
+              "sections": [
+                {{
+                  "section_index": 0,
+                  "headline_top": "...",
+                  "headline_mid": "...",
+                  "badge_text": "...",
+                  "script": "..."
+                }}
+              ]
+            }}
+            """
+            for model_name in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
+                try:
+                    resp = client.models.generate_content(model=model_name, contents=prompt)
+                    raw_text = resp.text.strip()
+                    if "```json" in raw_text:
+                        raw_text = raw_text.split("```json")[1].split("```")[0].strip()
+                    elif "```" in raw_text:
+                        raw_text = raw_text.split("```")[1].split("```")[0].strip()
+                    data = json.loads(raw_text)
+                    g_secs = data.get("sections", [])
+                    if len(g_secs) == num_sections:
+                        gemini_sections = g_secs
+                        logger.success(f"✅ [Script Studio] Successfully generated {num_sections} investigative sections via {model_name}")
+                        break
+                except Exception as m_err:
+                    logger.debug(f"Gemini {model_name} attempt notice: {m_err}")
+        except Exception as e:
+            logger.warning(f"[Script Studio] Gemini generation fallback: {e}")
+
+    # Fallback narrative scripts if Gemini is unavailable
+    stock_scripts = [
+        f"Beneath the surface of {topic_clean}, institutional algorithms executed a coordinated liquidation sweep.",
+        "Smart money absorption triggered massive volume spikes right as retail traders chased the breakout.",
+        "Order book delta revealed aggressive market sell orders absorbing every limit bid in the book.",
+        "VWAP deviation reached extreme levels, trapping late participants into an irreversible liquidity pocket.",
+        "Foreign institutional desks offloaded risk across block windows while options implied volatility surged.",
+        "The mathematical reality is clear: without tracking order flow absorption, retail capital remains the exit liquidity.",
+    ]
+    crypto_scripts = [
+        f"In the high-frequency arena of {topic_clean}, on-chain telemetry caught anomalous whale positioning.",
+        "Perpetual futures funding rates pushed into severe divergence, creating a textbook liquidation cascade trap.",
+        "Cross-chain bridge flows accelerated as institutional custodians quietly moved collateral off exchanges.",
+        "Cumulative volume delta collapsed while open interest hit record highs, signaling imminent volatility.",
+        "MEV searchers and toxic order flow siphoned millions before the retail market could react.",
+        "Protecting capital in crypto requires reading on-chain footprint data, not chasing speculative hype.",
+    ]
+    insurance_scripts = [
+        f"When policyholders encounter {topic_clean}, the hidden fine print often dictates their financial fate.",
+        "Proportionate deduction clauses mean a higher room category can slash your entire claim settlement by forty percent.",
+        "Incurred Claim Ratios and Section 45 rules expose how insurers legally scrutinize historical disclosures.",
+        "Copayment penalties and sub-limits turn what looks like comprehensive coverage into massive out-of-pocket debt.",
+        "Forensic claims data reveals that institutional claim rejection rates peak during critical emergency care windows.",
+        "True financial protection comes from auditing policy wording before the medical crisis occurs.",
+    ]
+
     for i in range(num_sections):
         start_t = round(i * interval, 2)
         end_t = round((i + 1) * interval, 2)
-        
-        if i == 0:
-            top = f"{lead_word} {second_word}"
-            mid = "THE HIDDEN TRAP" if vertical == "stock_market" else "FORENSIC BREAKDOWN"
-            badge = "MARKET ALERT ⚠️"
-        elif i == 1:
-            top = "LIQUIDITY CASCADE" if vertical != "insurance" else "POLICY CLAUSE"
-            mid = "INSTITUTIONAL MOVE" if vertical != "insurance" else "CLAIM REJECTION"
-            badge = "ALGO TRACKER" if vertical != "insurance" else "LEGAL AUDIT"
-        elif i == 2:
-            top = "ORDER FLOW DRAIN" if vertical != "insurance" else "FINE PRINT HIDDEN"
-            mid = "SMART MONEY LEVEL" if vertical != "insurance" else "SECTION 45 EXPOSED"
-            badge = "DATA EVIDENCE [!]"
-        elif i == 3:
-            top = "RETAIL EXPOSURE"
-            mid = "MOMENTUM SQUEEZE" if vertical != "insurance" else "PREMIUM LOSS"
-            badge = "RISK WARNING"
-        elif i == 4:
-            top = "SMART MONEY EXIT"
-            mid = "EXECUTION MATH"
-            badge = "WHALE MOVEMENT"
-        else:
-            top = f"PHASE {i + 1} AUDIT"
-            mid = "INSTITUTIONAL PLAY"
-            badge = "VERIFIED DATA"
-
         has_hud = (i in (1, 3, 5))
+
+        if gemini_sections and i < len(gemini_sections):
+            g = gemini_sections[i]
+            top = str(g.get("headline_top", lead_word))[:24]
+            mid = str(g.get("headline_mid", second_word))[:24]
+            badge = str(g.get("badge_text", "VERIFIED DATA"))[:20]
+            script_text = str(g.get("script", "")).strip()
+        else:
+            if vertical == "stock_market":
+                script_text = stock_scripts[i % len(stock_scripts)]
+            elif vertical == "crypto":
+                script_text = crypto_scripts[i % len(crypto_scripts)]
+            else:
+                script_text = insurance_scripts[i % len(insurance_scripts)]
+
+            if i == 0:
+                top = f"{lead_word} {second_word}"
+                mid = "THE HIDDEN TRAP" if vertical == "stock_market" else "FORENSIC BREAKDOWN"
+                badge = "MARKET ALERT ⚠️"
+            elif i == 1:
+                top = "LIQUIDITY CASCADE" if vertical != "insurance" else "POLICY CLAUSE"
+                mid = "INSTITUTIONAL MOVE" if vertical != "insurance" else "CLAIM REJECTION"
+                badge = "ALGO TRACKER" if vertical != "insurance" else "LEGAL AUDIT"
+            elif i == 2:
+                top = "ORDER FLOW DRAIN" if vertical != "insurance" else "FINE PRINT HIDDEN"
+                mid = "SMART MONEY LEVEL" if vertical != "insurance" else "SECTION 45 EXPOSED"
+                badge = "DATA EVIDENCE [!]"
+            elif i == 3:
+                top = "RETAIL EXPOSURE"
+                mid = "MOMENTUM SQUEEZE" if vertical != "insurance" else "PREMIUM LOSS"
+                badge = "RISK WARNING"
+            elif i == 4:
+                top = "SMART MONEY EXIT"
+                mid = "EXECUTION MATH"
+                badge = "WHALE MOVEMENT"
+            else:
+                top = f"PHASE {i + 1} AUDIT"
+                mid = "INSTITUTIONAL PLAY"
+                badge = "VERIFIED DATA"
 
         sections.append({
             "section_index": i,
@@ -190,7 +282,7 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
             "theme": theme,
             "symbol_type": default_symbol,
             "method_c_hud": has_hud,
-            "script": f"Section {i + 1}: Breaking down {topic_clean}. Smart money order flows reveal critical data points.",
+            "script": script_text,
         })
     return sections
 
