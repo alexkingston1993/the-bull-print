@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-04T16:57:19Z",
+  "updated_at": "2026-11-04T16:57:37Z",
   "videos": {
     "slot_1_long": {
       "slot": 1,
@@ -53,16 +53,16 @@
     "slot_5_long": {
       "video_id": "slot_5_long",
       "slot": 5,
-      "title": "[LONG-FORM] Usdt dominance chart and ideas tradingview",
+      "title": "[LONG-FORM] usdt dominance chart and ideas \u2014 tradingview",
       "format": "16:9 LONG",
       "vertical": "CRYPTO",
-      "current_stage": "Stage 7/7: Uploaded & Distributed",
-      "stage_pct": 100,
-      "completion_pct": 100,
-      "eta_seconds": 0,
+      "current_stage": "Stage 4/7: Chart & High-CTR Thumbnail Studio",
+      "stage_pct": 20,
+      "completion_pct": 40,
+      "eta_seconds": 360,
       "compliance_status": "\ud83d\udee1\ufe0f Feedback Healed & Verified",
-      "status": "COMPLETED",
-      "updated_at": "2026-11-04T13:28:12Z",
+      "status": "IN_PROGRESS",
+      "updated_at": "2026-11-04T16:57:37Z",
       "started_at": "2026-10-27T14:17:29Z",
       "youtube_id": "a64QlR--L2Q",
       "youtube_url": "https://www.youtube.com/watch?v=a64QlR--L2Q"
