@@ -353,7 +353,7 @@ def main():
     # Dispatch pending items
     dispatched = 0
     for item in items_to_run:
-        if item.get("already_live_url") and not args.slot:
+        if item.get("already_live_url") and not getattr(args, "force", False):
             log_info(f"⏭ Skipping already verified live item: {item['id']} ({item.get('already_live_url')})")
             continue
 
