@@ -34,6 +34,7 @@ DAILY_16_SCHEDULE: List[Dict] = [
         "duration_min": "3",
         "duration_sec": "60",
         "is_short": False,
+        "already_live_url": "https://youtu.be/7-xTYDswMHk",
     },
     {
         "id": "s1_short1",
@@ -44,6 +45,7 @@ DAILY_16_SCHEDULE: List[Dict] = [
         "duration_min": "1",
         "duration_sec": "58",
         "is_short": True,
+        "already_live_url": "https://youtu.be/j3rbEsPZONk",
     },
     {
         "id": "s1_short2",
