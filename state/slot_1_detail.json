@@ -11,7 +11,7 @@
   "current_stage_name": "Chart & High-CTR Thumbnail Studio",
   "current_subtask_label": "Capturing market charts / infographics",
   "started_at": "2026-11-04T11:27:58Z",
-  "updated_at": "2026-11-04T11:28:25Z",
+  "updated_at": "2026-11-04T11:28:48Z",
   "eta_seconds": 0,
   "stages": [
     {
@@ -98,6 +98,11 @@
       "ts": "11:28:38",
       "level": "INFO",
       "msg": "[PLAYWRIGHT]: \ud83c\udfa8 Generating 9:16 High-CTR Thumbnail frames (stock_market)... | "
+    },
+    {
+      "ts": "11:28:59",
+      "level": "INFO",
+      "msg": "[PLAYWRIGHT]: \u2705 Rendered (3 High-CTR Frames) | "
     }
   ]
 }
