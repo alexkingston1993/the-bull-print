@@ -25,12 +25,16 @@ if Path("/kaggle").exists() or os.getenv("KAGGLE_KERNEL_RUN_TYPE"):
 
 try:
     from faster_whisper import WhisperModel
+except Exception as e:
+    WhisperModel = None
+
+try:
     from google.oauth2.credentials import Credentials
     from google.auth.transport.requests import Request
     from googleapiclient.discovery import build
     from googleapiclient.http import MediaFileUpload
 except Exception as e:
-    print(f"Warning on import: {e}")
+    print(f"Warning on Google API import: {e}")
 
 def get_payload_dir() -> Path:
     # 1. Check directory of current script (__file__.parent) when bundled directly in kernel push

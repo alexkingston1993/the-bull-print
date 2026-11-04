@@ -1,8 +1,8 @@
 {
   "version": "2.0.0",
   "engine_name": "Aria Cognitive Self-Healing & Continuous Learning Engine",
-  "last_synced": "2026-11-04T09:40:31Z",
-  "total_learned_rules": 34,
+  "last_synced": "2026-11-04T16:20:00Z",
+  "total_learned_rules": 36,
   "learned_rules": [
     {
       "rule_id": "BUG-01-RUNNER-DEP-REQUESTS",
@@ -377,6 +377,28 @@
       "action_plan": "1. Enforce strict 30-day YouTube channel upload deduplication before rendering any manifest. 2. Remove static hardcoded topic defaults in workflow dispatch. 3. Delete/privatize duplicate video via YouTube API immediately. 4. Require dynamic market topic harvesting from live NSE/macro feeds.",
       "auto_executable": null,
       "learned_from": "Live incident: user caught duplicate Solana frames re-upload 2cINkdat26s"
+    },
+    {
+      "rule_id": "BUG-35-KAGGLE-WORKER-CREDENTIALS-IMPORT-CRASH",
+      "signature_pattern": "(name 'Credentials' is not defined|Failed to render/upload CPU Short.*name 'Credentials'|No module named 'faster_whisper')",
+      "domain": "youtube_upload",
+      "failed_component": "Kaggle Worker & CPU Shorts Uploader",
+      "severity": "CRITICAL",
+      "root_cause": "kaggle_worker.py coupled optional faster_whisper import with google.oauth2.credentials.Credentials in a single try-except block, causing Credentials to be undefined on CPU runners and silently failing all companion Shorts uploads.",
+      "action_plan": "Decouple Google OAuth imports (Credentials, build, MediaFileUpload) into their own standalone try block so YouTube upload functions are always operational regardless of faster-whisper presence.",
+      "auto_executable": null,
+      "learned_from": "Live incident: Nov 4 Shorts zero-upload failure"
+    },
+    {
+      "rule_id": "BUG-36-SUPERVISOR-DELETED-VIDEO-FILTER",
+      "signature_pattern": "(Deleted video.*privacyStatusUnspecified|Supervisor Audit.*false positive live count)",
+      "domain": "supervisor_watchdog",
+      "failed_component": "Relentless Autonomous Supervisor YouTube Audit",
+      "severity": "HIGH",
+      "root_cause": "fetch_today_youtube_uploads counted 'Deleted video' playlist placeholder items as live uploads, masking zero-video state on the channel, while global in-progress run matching blocked overdue slot dispatches.",
+      "action_plan": "Filter out 'Deleted video' and 'Private video' placeholders from live YouTube audit, and scope active run matching strictly by slot ID and schedule window.",
+      "auto_executable": null,
+      "learned_from": "Live incident: Nov 4 supervisor falsely reported deleted uploads as live"
     }
   ],
   "incident_history": [
@@ -393,6 +415,13 @@
       "slot_name": "parallel_matrix",
       "attempt": 1,
       "error_snippet": "Duplicate Solana video 2cINkdat26s re-uploaded with identical frames and only audio changed. Permanently deleted via YouTube API."
+    },
+    {
+      "timestamp": "2026-11-04T16:15:00Z",
+      "rule_id": "BUG-35-KAGGLE-WORKER-CREDENTIALS-IMPORT-CRASH",
+      "slot_name": "market_publisher",
+      "attempt": 1,
+      "error_snippet": "Failed to render/upload CPU Short #1: name 'Credentials' is not defined"
     }
   ]
 }

@@ -25,10 +25,22 @@ from typing import Dict, List, Any, Optional, Tuple
 from loguru import logger
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
 TG_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN") or "8829963924:AAE7v_xEQXLmy3-YEx8kqMo2GRfnbnxf4GA"
 TG_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID") or "1126599043"
 GH_REPO = os.getenv("GITHUB_REPOSITORY") or "alexkingston1993/the-bull-print"
 GH_TOKEN = os.getenv("GITHUB_TOKEN") or os.getenv("GITHUB_PAT_TOKEN") or ""
+if not GH_TOKEN:
+    for gh_cmd in ("/usr/local/bin/gh", "gh"):
+        try:
+            res = subprocess.run([gh_cmd, "auth", "token"], capture_output=True, text=True, check=False)
+            if res.returncode == 0 and res.stdout.strip():
+                GH_TOKEN = res.stdout.strip()
+                break
+        except Exception:
+            pass
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or ""
 
 # ─────────────────────────────────────────────────────────────
@@ -197,13 +209,16 @@ def fetch_today_youtube_uploads() -> List[Dict[str, Any]]:
         today_uploads = []
         for itm in pl_res.get("items", []):
             snip = itm.get("snippet", {})
+            title = (snip.get("title") or "").strip()
+            if not title or title.lower() in ("deleted video", "private video"):
+                continue
             pub_at = snip.get("publishedAt", "")
             if not pub_at:
                 continue
             pub_dt = datetime.fromisoformat(pub_at.replace("Z", "+00:00"))
             if pub_dt.date() in (today_utc, today_ist):
                 today_uploads.append({
-                    "title": snip.get("title", ""),
+                    "title": title,
                     "published_at": pub_at,
                     "video_id": snip.get("resourceId", {}).get("videoId", ""),
                 })
@@ -331,12 +346,22 @@ def audit_and_enforce_daily_quota() -> Dict[str, Any]:
             continue
 
         # Slot is OVERDUE and not yet live on YouTube!
-        # Check if a run for this slot is currently in progress
         active_match = None
         for r in in_progress_runs:
-            # Check workflow run display title or inputs
-            active_match = r
-            break
+            r_title = (r.get("display_title") or r.get("name") or "").lower()
+            if f"slot {slot_id}" in r_title or f"slot_{slot_id}" in r_title:
+                active_match = r
+                break
+            if r.get("event") == "schedule":
+                try:
+                    c_dt = datetime.fromisoformat(r["created_at"].replace("Z", "+00:00"))
+                    c_ist = c_dt + timedelta(hours=5, minutes=30)
+                    c_mins = c_ist.hour * 60 + c_ist.minute
+                    if abs(c_mins - slot_cutoff_minutes) <= 45:
+                        active_match = r
+                        break
+                except Exception:
+                    pass
 
         if active_match:
             slot_statuses[slot_id] = {
