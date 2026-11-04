@@ -98,6 +98,11 @@
       "ts": "16:51:00",
       "level": "INFO",
       "msg": "[PLAYWRIGHT]: \ud83c\udfa8 Generating 9:16 High-CTR Thumbnail frames (stock_market)... | "
+    },
+    {
+      "ts": "16:51:11",
+      "level": "INFO",
+      "msg": "[PLAYWRIGHT]: \u2705 Rendered (3 High-CTR Frames) | "
     }
   ]
 }
