@@ -89,7 +89,16 @@
       "pct": 100,
       "started_at": "2026-11-04T17:08:01Z",
       "completed_at": null,
-      "metrics": {}
+      "metrics": {
+        "yt_long_id": "BQbkW9VAXLk",
+        "yt_short_ids": [
+          "cTcICZ59QZI",
+          "briLQCHx4jw"
+        ],
+        "oauth_slot_used": 1,
+        "article_url": "https://the-bull-print.vercel.app/article.html?slug=sebi_fo_lot_size_04",
+        "x_thread_url": "Skipped (X keys not set)"
+      }
     }
   ],
   "live_logs": [
