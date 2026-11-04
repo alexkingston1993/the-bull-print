@@ -88,6 +88,11 @@
       "ts": "17:59:59",
       "level": "INFO",
       "msg": "[GEMINI]: \ud83d\udd0d Harvesting live search intent... | open-seo dark-query loop \u00b7 slot 6"
+    },
+    {
+      "ts": "18:00:08",
+      "level": "INFO",
+      "msg": "[GEMINI]: \ud83d\udd0d Harvested `Insurance penetration reflects India's household` | source: google_news_rss_live \u00b7 cluster: term insurance claim rejection, health insurance room rent limit, irdai new rules"
     }
   ]
 }
