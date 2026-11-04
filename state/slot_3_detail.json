@@ -89,7 +89,15 @@
       "pct": 100,
       "started_at": "2026-11-04T17:07:03Z",
       "completed_at": null,
-      "metrics": {}
+      "metrics": {
+        "yt_long_id": "EP6XhwfZV2E",
+        "yt_short_ids": [
+          "UYbONxEe8Bo"
+        ],
+        "oauth_slot_used": 1,
+        "article_url": "https://the-bull-print.vercel.app/article.html?slug=CAMP_IRD_03",
+        "x_thread_url": "Skipped (X keys not set)"
+      }
     }
   ],
   "live_logs": [
@@ -187,6 +195,11 @@
       "ts": "17:07:10",
       "level": "INFO",
       "msg": "[VERCEL]: \ud83d\udcdd Compiling MDX & IndexNow Ping... | "
+    },
+    {
+      "ts": "17:07:16",
+      "level": "INFO",
+      "msg": "[VERCEL]: \u2705 Live & Indexed (`https://the-bull-print.vercel.app/article.html?slug=CAMP_IRD_03`) | \ud83c\udfac Shorts (1): UYbONxEe8Bo \u00b7 \ud83d\udc26 X Thread: Skipped (X keys not set)"
     }
   ]
 }
