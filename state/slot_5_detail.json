@@ -59,7 +59,7 @@
       "started_at": "2026-11-04T13:09:07Z",
       "completed_at": null,
       "metrics": {
-        "approval_status": "WAITING_APPROVAL",
+        "approval_status": "AUTO_APPROVED",
         "approval_deadline_ts": 1793797906,
         "headline": "ON-CHAIN ALPHA WHALE DUMP!"
       }
