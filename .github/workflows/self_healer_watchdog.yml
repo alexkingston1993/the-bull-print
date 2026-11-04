@@ -1,15 +1,14 @@
 name: Relentless Autonomous Supervisor (16 Videos Quota Enforcer)
 
 on:
-  schedule:
-    - cron: '*/30 * * * *'  # Relentless 30-minute quota audit 24/7
-  workflow_run:
-    workflows:
-      - "Master Autonomous Scheduler (Market Pulse + Bull Print Video Engine)"
-      - "Flipzon & The Bull Print 100% Cloud Media Engine"
-      - "20-Runner Parallel Cloud Video Matrix (The Bull Print)"
-    types:
-      - completed
+  # Automated schedule and workflow_run triggers disabled per emergency stop
+  # schedule:
+  #   - cron: '*/30 * * * *'
+  # workflow_run:
+  #   workflows:
+  #     - "Master Autonomous Scheduler (Market Pulse + Bull Print Video Engine)"
+  #   types:
+  #     - completed
   workflow_dispatch:
 
 permissions:
