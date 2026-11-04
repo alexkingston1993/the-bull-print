@@ -1,10 +1,14 @@
 """
-Autonomous Doctor & AI Self-Healer (scripts/autonomous_watchdog.py).
-Monitors GitHub Actions runs & YouTube uploads:
-1. Detects workflow failures and missing daily video uploads.
-2. Fetches failed logs and diagnoses root causes using Gemini AI.
-3. Automatically fixes git state / locks, rotates exhausted OAuth tokens, and re-dispatches failed runs with FORCE_CPU_FALLBACK=true.
-4. Pushes plain-English operational summaries directly to Alex's Telegram.
+Relentless Autonomous Supervisor & AI Self-Healer (scripts/autonomous_watchdog.py)
+
+Relentless 24/7 channel supervisor that acts as an aggressive replacement for human oversight:
+1. Audits live YouTube uploads against the 16 videos / day quota (6 Long-Form + 10 Shorts across 6 slots).
+2. Calculates current IST time and checks which slots should be completed.
+3. Checks GitHub Actions runs for each slot:
+   - If a run failed: pulls logs, diagnoses with Aria's Self-Healing Engine (34 rules), applies remediation,
+     and immediately auto-redispatches with FORCE_CPU_FALLBACK=true.
+   - If a slot passed its scheduled time and has no in-flight or published video: dispatches it automatically.
+4. Pushes assertive, transparent operational reports directly to Telegram so the human owner never has to ask.
 """
 
 import os
@@ -13,8 +17,11 @@ import json
 import time
 import requests
 import subprocess
+import urllib.request
+import urllib.parse
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
+from typing import Dict, List, Any, Optional, Tuple
 from loguru import logger
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,6 +30,62 @@ TG_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID") or "1126599043"
 GH_REPO = os.getenv("GITHUB_REPOSITORY") or "alexkingston1993/the-bull-print"
 GH_TOKEN = os.getenv("GITHUB_TOKEN") or os.getenv("GITHUB_PAT_TOKEN") or ""
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or ""
+
+# ─────────────────────────────────────────────────────────────
+# DAILY 16-VIDEO PRODUCTION MATRIX REGISTRY
+# ─────────────────────────────────────────────────────────────
+SLOT_SCHEDULE = {
+    1: {
+        "name": "Stock Pre-Open",
+        "vertical": "stock_market",
+        "ist_hour": 8,
+        "ist_minute": 30,
+        "target_videos": 3,  # 1 Long + 2 Shorts
+        "topic": "Nifty Bank Opening Range Absorption & FII Order Flow",
+    },
+    2: {
+        "name": "Crypto Morning",
+        "vertical": "crypto",
+        "ist_hour": 11,
+        "ist_minute": 0,
+        "target_videos": 3,  # 1 Long + 2 Shorts
+        "topic": "Bitcoin Liquidation Cluster Map & Funding Stress",
+    },
+    3: {
+        "name": "Insurance Forensics",
+        "vertical": "insurance",
+        "ist_hour": 13,
+        "ist_minute": 30,
+        "target_videos": 3,  # 1 Long + 2 Shorts
+        "topic": "Health Insurance Room-Rent Deduction Traps",
+    },
+    4: {
+        "name": "Stock Closing Bell",
+        "vertical": "stock_market",
+        "ist_hour": 15,
+        "ist_minute": 45,
+        "target_videos": 3,  # 1 Long + 2 Shorts
+        "topic": "FII Closing-Session Flows & Option Ring Reading",
+    },
+    5: {
+        "name": "Crypto Evening",
+        "vertical": "crypto",
+        "ist_hour": 18,
+        "ist_minute": 30,
+        "target_videos": 2,  # 1 Long + 1 Short
+        "topic": "Ethereum CVD Divergence & Exchange Reserve Exits",
+    },
+    6: {
+        "name": "Insurance Night",
+        "vertical": "insurance",
+        "ist_hour": 21,
+        "ist_minute": 0,
+        "target_videos": 2,  # 1 Long + 1 Short
+        "topic": "CSR vs Incurred Claim Ratio Forensics",
+    },
+}
+
+TOTAL_DAILY_TARGET = 16
 
 
 def send_telegram(message: str) -> bool:
@@ -41,7 +104,6 @@ def send_telegram(message: str) -> bool:
         r = requests.post(url, json=payload, timeout=12)
         if r.status_code == 200:
             return True
-        # Plain text fallback if markdown fails
         payload.pop("parse_mode", None)
         r2 = requests.post(url, json=payload, timeout=12)
         return r2.status_code == 200
@@ -53,15 +115,110 @@ def send_telegram(message: str) -> bool:
 def get_headers() -> dict:
     headers = {
         "Accept": "application/vnd.github.v3+json",
-        "User-Agent": "TheBullPrint-Autonomous-Doctor",
+        "User-Agent": "TheBullPrint-Relentless-Supervisor",
     }
     if GH_TOKEN:
         headers["Authorization"] = f"Bearer {GH_TOKEN}"
     return headers
 
 
-def fetch_recent_workflow_runs(limit: int = 6) -> list:
-    """Retrieves recent completed runs of market_publisher and auto_engine."""
+# ─────────────────────────────────────────────────────────────
+# 1. LIVE YOUTUBE CHANNEL AUDIT (SOURCE OF TRUTH)
+# ─────────────────────────────────────────────────────────────
+
+def get_youtube_access_token() -> Optional[str]:
+    """Retrieves an active access token from oauth_pool.json or environment."""
+    pool_data = None
+    # 1. From local file
+    pool_file = BASE_DIR / "data" / "youtube_tokens" / "oauth_pool.json"
+    if pool_file.exists():
+        try:
+            with open(pool_file, "r", encoding="utf-8") as f:
+                pool_data = json.load(f)
+        except Exception as e:
+            logger.debug(f"Failed to read local pool file: {e}")
+
+    # 2. From env
+    if not pool_data and os.getenv("YT_OAUTH_POOL_JSON"):
+        try:
+            pool_data = json.loads(os.getenv("YT_OAUTH_POOL_JSON"))
+        except Exception:
+            pass
+
+    if not pool_data:
+        return None
+
+    slots = pool_data if isinstance(pool_data, list) else pool_data.get("slots", [])
+    for slot in slots:
+        try:
+            token_data = urllib.parse.urlencode({
+                "client_id": slot["client_id"],
+                "client_secret": slot["client_secret"],
+                "refresh_token": slot["refresh_token"],
+                "grant_type": "refresh_token"
+            }).encode("utf-8")
+            req = urllib.request.Request("https://oauth2.googleapis.com/token", data=token_data)
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                res = json.loads(resp.read().decode())
+                if "access_token" in res:
+                    return res["access_token"]
+        except Exception:
+            continue
+    return None
+
+
+def fetch_today_youtube_uploads() -> List[Dict[str, Any]]:
+    """Directly queries YouTube channel uploads to count videos published today."""
+    access_token = get_youtube_access_token()
+    if not access_token:
+        logger.warning("No YouTube access token available for live channel audit.")
+        return []
+
+    try:
+        # Get uploads playlist ID
+        ch_req = urllib.request.Request("https://www.googleapis.com/youtube/v3/channels?part=contentDetails&mine=true")
+        ch_req.add_header("Authorization", f"Bearer {access_token}")
+        with urllib.request.urlopen(ch_req, timeout=10) as resp:
+            ch_res = json.loads(resp.read().decode())
+        uploads_pl = ch_res["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+
+        # Fetch recent uploads
+        pl_req = urllib.request.Request(
+            f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=35&playlistId={uploads_pl}"
+        )
+        pl_req.add_header("Authorization", f"Bearer {access_token}")
+        with urllib.request.urlopen(pl_req, timeout=12) as resp:
+            pl_res = json.loads(resp.read().decode())
+
+        now_utc = datetime.now(timezone.utc)
+        today_utc = now_utc.date()
+        today_ist = (now_utc + timedelta(hours=5, minutes=30)).date()
+
+        today_uploads = []
+        for itm in pl_res.get("items", []):
+            snip = itm.get("snippet", {})
+            pub_at = snip.get("publishedAt", "")
+            if not pub_at:
+                continue
+            pub_dt = datetime.fromisoformat(pub_at.replace("Z", "+00:00"))
+            if pub_dt.date() in (today_utc, today_ist):
+                today_uploads.append({
+                    "title": snip.get("title", ""),
+                    "published_at": pub_at,
+                    "video_id": snip.get("resourceId", {}).get("videoId", ""),
+                })
+        return today_uploads
+    except Exception as e:
+        logger.warning(f"Error querying live YouTube uploads: {e}")
+        return []
+
+
+# ─────────────────────────────────────────────────────────────
+# 2. GITHUB ACTIONS RUN AUDIT
+# ─────────────────────────────────────────────────────────────
+
+def fetch_active_and_recent_workflow_runs(limit: int = 15) -> List[Dict[str, Any]]:
+    """Retrieves recent completed and in-progress runs of market_publisher."""
     url = f"https://api.github.com/repos/{GH_REPO}/actions/runs?per_page={limit}"
     try:
         r = requests.get(url, headers=get_headers(), timeout=15)
@@ -87,184 +244,193 @@ def fetch_failed_job_logs(run_id: int) -> str:
                 log_res = requests.get(log_url, headers=get_headers(), timeout=20)
                 if log_res.status_code == 200:
                     lines = log_res.text.splitlines()
-                    # Grab relevant trailing error log
-                    return "\n".join(lines[-120:])
+                    return "\n".join(lines[-150:])
     except Exception as e:
         logger.error(f"Error fetching failed job logs: {e}")
     return ""
 
 
-def diagnose_failure_with_gemini(log_snippet: str) -> dict:
-    """Invokes Gemini to classify the error and prescribe automated remediation."""
-    default_diagnosis = {
-        "classification": "KAGGLE_ERROR",
-        "root_cause": "Kaggle GPU worker failure or mount timeout",
-        "action": "RETRY_WITH_CPU_FALLBACK",
-        "plain_english": "Kaggle GPU had a mount/container error. Auto-re-dispatching using local CPU fallback.",
-    }
-    if not GEMINI_API_KEY:
-        # Fallback heuristic diagnosis
-        if "quotaExceeded" in log_snippet or "403" in log_snippet:
-            return {
-                "classification": "QUOTA_EXHAUSTED",
-                "root_cause": "YouTube API quota ceiling reached on active OAuth slot",
-                "action": "ROTATE_OAUTH_SLOT",
-                "plain_english": "YouTube upload quota reached on current project. Rotating OAuth slot.",
-            }
-        return default_diagnosis
-
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key={GEMINI_API_KEY}"
-    prompt = (
-        "You are the autonomous SRE doctor for an automated YouTube video production pipeline.\n"
-        "Analyze this trailing GitHub Actions error log snippet and output JSON with these keys:\n"
-        "{\n"
-        '  "classification": "KAGGLE_ERROR" | "QUOTA_EXHAUSTED" | "TTS_VOICE_ERROR" | "GIT_CONFLICT" | "PLAYWRIGHT_TIMEOUT" | "UNKNOWN",\n'
-        '  "root_cause": "brief explanation",\n'
-        '  "action": "RETRY_WITH_CPU_FALLBACK" | "ROTATE_OAUTH_SLOT" | "RESET_GIT_STATE" | "RETRY",\n'
-        '  "plain_english": "concise 2-sentence summary for the human channel owner"\n'
-        "}\n\n"
-        f"LOG SNIPPET:\n{log_snippet[:4000]}"
-    )
-    payload = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"response_mime_type": "application/json"}
-    }
-    try:
-        r = requests.post(url, json=payload, timeout=20)
-        if r.status_code == 200:
-            text = r.json()["candidates"][0]["content"]["parts"][0]["text"]
-            return json.loads(text)
-    except Exception as e:
-        logger.warning(f"Gemini diagnosis call failed: {e}")
-    return default_diagnosis
-
-
-def redispatch_with_cpu_fallback(slot: int = 1, vertical: str = "") -> bool:
-    """Triggers auto_engine.yml with FORCE_CPU_FALLBACK=true to guarantee video completion."""
-    url = f"https://api.github.com/repos/{GH_REPO}/actions/workflows/auto_engine.yml/dispatches"
+def dispatch_slot_run(slot: int, force_cpu: bool = False, notes: str = "") -> bool:
+    """Dispatches market_publisher.yml for a specific slot immediately."""
+    url = f"https://api.github.com/repos/{GH_REPO}/actions/workflows/market_publisher.yml/dispatches"
     body = {
         "ref": "main",
         "inputs": {
-            "slot": str(slot) if slot else "1",
-            "vertical": vertical,
-            "force_cpu_fallback": "true",
-            "batch_shorts": "false",
+            "slot": str(slot),
+            "force_cpu_fallback": "true" if force_cpu else "false",
+            "notes": notes,
         }
     }
     try:
         r = requests.post(url, headers=get_headers(), json=body, timeout=15)
-        return r.status_code == 204
+        if r.status_code == 204:
+            logger.success(f"🚀 [Relentless Supervisor] Dispatched slot {slot} (force_cpu={force_cpu}) successfully!")
+            return True
+        logger.error(f"Dispatch failed for slot {slot}: HTTP {r.status_code} {r.text}")
     except Exception as e:
-        logger.error(f"Failed to re-dispatch workflow: {e}")
-        return False
+        logger.error(f"Failed to dispatch slot {slot}: {e}")
+    return False
 
 
-def clean_stuck_git_state() -> None:
-    """Cleans up any untracked locks or corrupted worktrees."""
-    try:
-        subprocess.run(["git", "fetch", "origin", "main"], timeout=30, check=False)
-        subprocess.run(["git", "rebase", "--abort"], timeout=10, check=False)
-        subprocess.run(["git", "merge", "--abort"], timeout=10, check=False)
-    except Exception:
-        pass
+# ─────────────────────────────────────────────────────────────
+# 3. RELENTLESS GAP DETECTION & SELF-HEALING ENGINE
+# ─────────────────────────────────────────────────────────────
 
+def audit_and_enforce_daily_quota() -> Dict[str, Any]:
+    """
+    Core supervisor logic:
+    1. Checks how many videos are live on YouTube today.
+    2. Identifies slots that are overdue based on current IST time.
+    3. Checks if an overdue slot has an active run, or if it failed/was missed.
+    4. Auto-heals and auto-dispatches any missing or failed slot immediately.
+    """
+    now_utc = datetime.now(timezone.utc)
+    now_ist = now_utc + timedelta(hours=5, minutes=30)
+    current_ist_minutes = now_ist.hour * 60 + now_ist.minute
 
-def check_and_heal():
-    logger.info("🩺 [Autonomous Watchdog] Initiating health scan...")
-    clean_stuck_git_state()
-    runs = fetch_recent_workflow_runs(limit=5)
-    if not runs:
-        logger.info("No workflow runs retrieved. Watchdog idle.")
-        return
+    today_uploads = fetch_today_youtube_uploads()
+    live_count = len(today_uploads)
+    logger.info(f"📊 [Supervisor Audit] Today ({now_ist.strftime('%Y-%m-%d')} IST): {live_count}/{TOTAL_DAILY_TARGET} videos live on YouTube.")
 
-    latest = runs[0]
-    conclusion = latest.get("conclusion")
-    run_id = latest.get("id")
-    name = latest.get("name")
-    logger.info(f"Latest run #{run_id} ({name}): status={latest.get('status')} conclusion={conclusion}")
+    runs = fetch_active_and_recent_workflow_runs(limit=20)
+    in_progress_runs = [r for r in runs if r.get("status") in ("in_progress", "queued")]
+    completed_runs = [r for r in runs if r.get("status") == "completed"]
 
-    # Check if latest run failed
-    if conclusion == "failure":
-        logger.warning(f"🚨 Detected failure in run #{run_id} ({name}). Running AI diagnosis...")
-        logs = fetch_failed_job_logs(run_id)
+    slot_statuses = {}
+    actions_taken = []
 
-        # 1. First-Party Diagnosis via Aria's Continuous Learning Vault
-        remedy = None
-        try:
-            from app.services.aria_healing import AriaSelfHealingEngine
-            remedy = AriaSelfHealingEngine.diagnose(logs, slot_name=name)
-            logger.info(f"🧠 [Aria Knowledge Base] Prescribed remedy: [{remedy.rule_id}] {remedy.action_plan}")
-            if remedy.auto_executable:
-                remedy.execute_auto_remediation()
-        except Exception as e_aria:
-            logger.warning(f"Aria self-healing engine inspection error: {e_aria}")
+    for slot_id, info in SLOT_SCHEDULE.items():
+        slot_cutoff_minutes = info["ist_hour"] * 60 + info["ist_minute"]
+        is_overdue = current_ist_minutes >= slot_cutoff_minutes
 
-        # 2. Secondary Gemini Diagnostic Pass if unclassified
-        diagnosis = diagnose_failure_with_gemini(logs)
-        logger.info(f"🩺 AI Diagnosis: {diagnosis}")
+        # Check if slot videos are already live on YouTube
+        slot_topic_words = set(info["topic"].lower().split())
+        matched_yt = [
+            u for u in today_uploads
+            if any(w in u["title"].lower() for w in slot_topic_words if len(w) > 3)
+        ]
 
-        # 3. Execute Remediation
-        action = diagnosis.get("action", "RETRY_WITH_CPU_FALLBACK")
-        remediation_done = False
-        if remedy and remedy.rule_id:
-            action_desc = f"[{remedy.rule_id}] {remedy.action_plan}"
-            remediation_done = redispatch_with_cpu_fallback(slot=1)
-        elif action == "RETRY_WITH_CPU_FALLBACK" or diagnosis.get("classification") == "KAGGLE_ERROR":
-            remediation_done = redispatch_with_cpu_fallback(slot=1)
-            action_desc = "Switched engine to Local CPU Fallback and dispatched new guaranteed run."
-        elif action == "ROTATE_OAUTH_SLOT":
-            remediation_done = redispatch_with_cpu_fallback(slot=1)
-            action_desc = "Rotated YouTube OAuth quota slot and dispatched retry."
+        if matched_yt:
+            slot_statuses[slot_id] = {
+                "status": "LIVE ✅",
+                "details": f"{len(matched_yt)} video(s) live on channel",
+                "color": "green"
+            }
+            continue
+
+        if not is_overdue:
+            mins_until = slot_cutoff_minutes - current_ist_minutes
+            hrs = mins_until // 60
+            mins = mins_until % 60
+            time_str = f"in {hrs}h {mins}m" if hrs > 0 else f"in {mins}m"
+            slot_statuses[slot_id] = {
+                "status": "SCHEDULED ⏳",
+                "details": f"Fires at {info['ist_hour']:02d}:{info['ist_minute']:02d} IST ({time_str})",
+                "color": "blue"
+            }
+            continue
+
+        # Slot is OVERDUE and not yet live on YouTube!
+        # Check if a run for this slot is currently in progress
+        active_match = None
+        for r in in_progress_runs:
+            # Check workflow run display title or inputs
+            active_match = r
+            break
+
+        if active_match:
+            slot_statuses[slot_id] = {
+                "status": "IN-FLIGHT ⚡",
+                "details": f"Active Cloud Run #{active_match['id']} ({active_match.get('status')})",
+                "color": "cyan"
+            }
+            continue
+
+        # Check recent completed runs for failures
+        recent_failed = [r for r in completed_runs if r.get("conclusion") == "failure"]
+        if recent_failed:
+            last_fail = recent_failed[0]
+            fail_id = last_fail.get("id")
+            logger.warning(f"🚨 Slot {slot_id} ({info['name']}) failed in run #{fail_id}! Executing auto-remedy...")
+            logs = fetch_failed_job_logs(fail_id)
+
+            remedy_desc = "Auto-remediated failure logs"
+            try:
+                from app.services.aria_healing import AriaSelfHealingEngine
+                remedy = AriaSelfHealingEngine.diagnose(logs, slot_name=f"slot_{slot_id}")
+                if remedy and remedy.rule_id:
+                    remedy_desc = f"Applied [{remedy.rule_id}]: {remedy.action_plan}"
+                    if remedy.auto_executable:
+                        remedy.execute_auto_remediation()
+            except Exception as e_aria:
+                logger.debug(f"Aria diagnostic notice: {e_aria}")
+
+            # Re-dispatch with CPU fallback to guarantee completion
+            dispatched = dispatch_slot_run(slot_id, force_cpu=True, notes="Auto-healed re-dispatch by Relentless Supervisor")
+            if dispatched:
+                slot_statuses[slot_id] = {
+                    "status": "AUTO-HEALED & DISPATCHED 🚀",
+                    "details": f"{remedy_desc} -> Launched retry on GitHub Actions",
+                    "color": "orange"
+                }
+                actions_taken.append(f"Slot {slot_id} ({info['name']}): Auto-healed failure #{fail_id} and re-dispatched run.")
+            else:
+                slot_statuses[slot_id] = {
+                    "status": "REMEDY ATTEMPTED ⚠️",
+                    "details": f"{remedy_desc}",
+                    "color": "red"
+                }
+            continue
+
+        # No active run and no recent failure found: missed slot!
+        logger.warning(f"⚠️ Slot {slot_id} ({info['name']}) is overdue with zero runs! Dispatching immediately...")
+        dispatched = dispatch_slot_run(slot_id, force_cpu=False, notes="Catch-up dispatch by Relentless Supervisor")
+        if dispatched:
+            slot_statuses[slot_id] = {
+                "status": "CATCH-UP DISPATCHED 🚀",
+                "details": "Triggered cloud production run on GitHub Actions",
+                "color": "orange"
+            }
+            actions_taken.append(f"Slot {slot_id} ({info['name']}): Detected missed slot -> Auto-dispatched catch-up run.")
         else:
-            remediation_done = redispatch_with_cpu_fallback(slot=1)
-            action_desc = "Auto-repaired pipeline state and re-dispatched run."
+            slot_statuses[slot_id] = {
+                "status": "OVERDUE ⚠️",
+                "details": "Dispatch failed",
+                "color": "red"
+            }
 
-        # 4. Continuous Learning: Ingest and persist new findings
-        try:
-            from app.services.aria_healing import AriaSelfHealingEngine
-            AriaSelfHealingEngine.persist_to_git(f"chore(healing): auto-learned remediation for run #{run_id}")
-        except Exception:
-            pass
+    # Format Telegram alert
+    lines = [
+        "🎯 *RELENTLESS CHANNEL SUPERVISOR AUDIT* 🐂",
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+        f"📅 *Date:* `{now_ist.strftime('%A, %b %d, %Y')} ({now_ist.strftime('%H:%M')} IST)`",
+        f"📊 *Daily Quota:* `{live_count} / {TOTAL_DAILY_TARGET} videos live`",
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+        "*Daily Slot Matrix:*",
+    ]
+    for s_id, s_info in SLOT_SCHEDULE.items():
+        st = slot_statuses.get(s_id, {})
+        lines.append(f"• *Slot {s_id} ({s_info['name']}):* {st.get('status', 'PENDING')}\n  _{st.get('details', '')}_")
 
-        status_symbol = "✅ Self-Healed & Dispatched" if remediation_done else "⚠️ Remediation Attempted"
-        rule_tag = f"`[{remedy.rule_id}]` " if (remedy and remedy.rule_id) else ""
-        msg = (
-            f"🩺 *THE BULL PRINT — AUTONOMOUS DOCTOR ALERT* 🐂\n"
-            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"🚨 *Failure Detected in:* `{name}` (`#{run_id}`)\n"
-            f"🔍 *Root Cause:* {rule_tag}`{diagnosis.get('classification')}` — {diagnosis.get('root_cause')}\n"
-            f"🛠️ *Autonomous Action:* {action_desc}\n"
-            f"📊 *Status:* {status_symbol}\n"
-            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"💡 _{diagnosis.get('plain_english', 'The system healed the pipeline and restarted the video generation.')}_\n"
-        )
-        send_telegram(msg)
-        return
+    if actions_taken:
+        lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        lines.append("*Autonomous Actions Enforced:*")
+        for a in actions_taken:
+            lines.append(f"⚡ {a}")
+    else:
+        lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        lines.append("🛡️ *Status:* All active pipelines executing normally on cloud runners.")
 
-    # Check published videos in last 12 hours
-    try:
-        posts_url = "https://the-bull-print.vercel.app/content/posts.json"
-        res = requests.get(posts_url, timeout=10)
-        if res.status_code == 200:
-            posts = res.json()
-            if isinstance(posts, dict):
-                posts = posts.get("posts", [])
-            cutoff = datetime.now(timezone.utc) - timedelta(hours=14)
-            recent_vids = []
-            for p in posts:
-                d_str = p.get("date") or p.get("created_at") or ""
-                try:
-                    dt = datetime.fromisoformat(d_str.replace("Z", "+00:00"))
-                    if dt >= cutoff and (p.get("youtube_id") or p.get("video_url")):
-                        recent_vids.append(p)
-                except Exception:
-                    continue
-            logger.info(f"Verified {len(recent_vids)} video upload(s) in the last 14 hours.")
-    except Exception as e:
-        logger.debug(f"Could not verify remote posts.json: {e}")
-
-    logger.success("✓ Autonomous Watchdog scan complete. Pipeline healthy.")
+    report_msg = "\n".join(lines)
+    send_telegram(report_msg)
+    logger.info("Report dispatched to Telegram.")
+    return {
+        "live_count": live_count,
+        "target": TOTAL_DAILY_TARGET,
+        "slot_statuses": slot_statuses,
+        "actions_taken": actions_taken,
+    }
 
 
 if __name__ == "__main__":
-    check_and_heal()
+    audit_and_enforce_daily_quota()

@@ -1,12 +1,13 @@
-name: Autonomous Doctor & AI Self-Healer Watchdog
+name: Relentless Autonomous Supervisor (16 Videos Quota Enforcer)
 
 on:
   schedule:
-    - cron: '0 */4 * * *'  # Health audit every 4 hours
+    - cron: '*/30 * * * *'  # Relentless 30-minute quota audit 24/7
   workflow_run:
     workflows:
       - "Master Autonomous Scheduler (Market Pulse + Bull Print Video Engine)"
       - "Flipzon & The Bull Print 100% Cloud Media Engine"
+      - "20-Runner Parallel Cloud Video Matrix (The Bull Print)"
     types:
       - completed
   workflow_dispatch:
@@ -16,7 +17,7 @@ permissions:
   actions: write
 
 jobs:
-  diagnose-and-heal:
+  audit-and-enforce:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -36,7 +37,14 @@ jobs:
         run: |
           pip install requests loguru
 
-      - name: 🩺 Execute Autonomous AI Self-Healer
+      - name: 🔑 Materialize Tokens for YouTube Channel Audit
+        run: |
+          mkdir -p data/youtube_tokens
+          if [ -n "${{ secrets.YT_OAUTH_POOL_JSON }}" ]; then
+            echo '${{ secrets.YT_OAUTH_POOL_JSON }}' > data/youtube_tokens/oauth_pool.json
+          fi
+
+      - name: 🎯 Execute Relentless Autonomous Supervisor
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_PAT_TOKEN: ${{ secrets.GITHUB_PAT_TOKEN || secrets.GITHUB_TOKEN }}
@@ -44,5 +52,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          YT_OAUTH_POOL_JSON: ${{ secrets.YT_OAUTH_POOL_JSON }}
+          YOUTUBE_TOKEN_EN: ${{ secrets.YOUTUBE_TOKEN_EN }}
         run: |
           python scripts/autonomous_watchdog.py
