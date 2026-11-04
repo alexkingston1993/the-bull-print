@@ -93,6 +93,11 @@
       "ts": "13:09:05",
       "level": "INFO",
       "msg": "[GEMINI]: \ud83d\udd0d Harvested `Usdt dominance chart and ideas tradingview` | source: autocomplete \u00b7 cluster: usdt dominance chart and ideas \u2014 tradingview"
+    },
+    {
+      "ts": "13:09:09",
+      "level": "INFO",
+      "msg": "[PLAYWRIGHT]: \ud83c\udfa8 Generating 9:16 High-CTR Thumbnail frames (crypto)... | "
     }
   ]
 }
