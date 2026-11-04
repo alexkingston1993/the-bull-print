@@ -11,7 +11,7 @@
   "current_stage_name": "Kaggle T4 GPU Render Farm",
   "current_subtask_label": "Whisper alignment & NVENC rendering",
   "started_at": "2026-11-04T16:06:45Z",
-  "updated_at": "2026-11-04T16:09:51Z",
+  "updated_at": "2026-11-04T16:12:21Z",
   "eta_seconds": 0,
   "stages": [
     {
