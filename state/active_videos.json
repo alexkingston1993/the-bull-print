@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-04T16:59:47Z",
+  "updated_at": "2026-11-04T17:06:59Z",
   "videos": {
     "slot_1_long": {
       "slot": 1,
@@ -90,16 +90,16 @@
       "title": "[LONG-FORM] Irdai new rules for claim settlement",
       "format": "16:9 LONG",
       "vertical": "INSURANCE",
-      "current_stage": "Stage 4/7: Chart & High-CTR Thumbnail Studio",
-      "stage_pct": 20,
-      "completion_pct": 40,
-      "eta_seconds": 360,
+      "current_stage": "Stage 7/7: Uploaded & Distributed",
+      "stage_pct": 100,
+      "completion_pct": 100,
+      "eta_seconds": 0,
       "compliance_status": "\ud83d\udee1\ufe0f Feedback Healed & Verified",
-      "status": "IN_PROGRESS",
-      "updated_at": "2026-11-04T16:53:18Z",
+      "status": "COMPLETED",
+      "updated_at": "2026-11-04T17:06:59Z",
       "started_at": "2026-10-27T20:23:01Z",
-      "youtube_id": "6HMZBx743is",
-      "youtube_url": "https://www.youtube.com/watch?v=6HMZBx743is"
+      "youtube_id": "EP6XhwfZV2E",
+      "youtube_url": "https://www.youtube.com/watch?v=EP6XhwfZV2E"
     },
     "slot_4_long": {
       "video_id": "slot_4_long",
