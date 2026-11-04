@@ -93,6 +93,11 @@
       "ts": "11:28:38",
       "level": "INFO",
       "msg": "[GEMINI]: \ud83d\udd0d Harvested `Crypto funding rate chart` | source: autocomplete \u00b7 cluster: crypto funding rate chart, crypto funding rate history, crypto funding rate meaning"
+    },
+    {
+      "ts": "11:28:45",
+      "level": "INFO",
+      "msg": "[PLAYWRIGHT]: \ud83c\udfa8 Generating 9:16 High-CTR Thumbnail frames (crypto)... | "
     }
   ]
 }
