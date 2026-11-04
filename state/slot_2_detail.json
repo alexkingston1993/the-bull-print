@@ -58,7 +58,11 @@
       "pct": 60,
       "started_at": "2026-11-04T16:51:22Z",
       "completed_at": null,
-      "metrics": {}
+      "metrics": {
+        "approval_status": "AUTO_APPROVED",
+        "approval_deadline_ts": 1793811356,
+        "headline": "LIQUIDATIONS $40M RECKED!"
+      }
     },
     {
       "id": 5,
