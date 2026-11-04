@@ -209,6 +209,11 @@
       "ts": "11:51:38",
       "level": "INFO",
       "msg": "[VERCEL]: \ud83d\udcdd Compiling MDX & IndexNow Ping... | "
+    },
+    {
+      "ts": "11:51:52",
+      "level": "INFO",
+      "msg": "[VERCEL]: \u2705 Live & Indexed (`https://the-bull-print.vercel.app/article.html?slug=irdai_claim_settlement_rules_03`) | \ud83d\udc26 X Thread: Skipped (X keys not set)"
     }
   ]
 }
