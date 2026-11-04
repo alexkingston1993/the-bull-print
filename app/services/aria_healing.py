@@ -13,17 +13,30 @@ Core Capabilities:
 """
 
 import os
+import re
 import sys
 import time
 import glob
 import json
 import shutil
 import random
-import requests
 import subprocess
 from enum import Enum
-from typing import Dict, List, Optional, Any, Tuple
-from loguru import logger
+from pathlib import Path
+from typing import Dict, List, Optional, Any, Tuple, Union
+
+try:
+    import requests
+except ImportError:
+    requests = None
+
+try:
+    from loguru import logger
+except ImportError:
+    import logging
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+    logger = logging.getLogger("AriaHealing")
+    logger.success = logger.info
 
 from app.config import config
 from app.services.assistant_persona import aria
@@ -40,11 +53,15 @@ class FailureDomain(str, Enum):
     SYSTEM_RESOURCE = "system_resource"
     KAGGLE_GPU = "kaggle_gpu"
     PLAYWRIGHT_SCRAPER = "playwright_scraper"
+    RUNNER_DEPENDENCIES = "runner_dependencies"
+    PARALLEL_MATRIX = "parallel_matrix"
+    DUPLICATE_GUARD = "duplicate_guard"
+    COMPLIANCE_SEO = "compliance_seo"
     UNKNOWN = "unknown"
 
 
 class AriaRemedy:
-    """Encapsulates a targeted healing strategy formulated by Aria."""
+    """Encapsulates a targeted healing strategy formulated by Aria, backed by continuous learning."""
 
     def __init__(
         self,
@@ -56,6 +73,9 @@ class AriaRemedy:
         short_desc: str,
         params: Dict[str, Any],
         backoff_seconds: int = 5,
+        rule_id: Optional[str] = None,
+        auto_executable: Optional[str] = None,
+        learned_from: Optional[str] = None,
     ):
         self.domain = domain
         self.failed_component = failed_component
@@ -65,6 +85,32 @@ class AriaRemedy:
         self.short_desc = short_desc
         self.params = params
         self.backoff_seconds = backoff_seconds
+        self.rule_id = rule_id
+        self.auto_executable = auto_executable
+        self.learned_from = learned_from
+
+    def execute_auto_remediation(self) -> Tuple[bool, str]:
+        """Executes the automated remediation script if defined (e.g. dynamic pip install, git repair, etc.)."""
+        if not self.auto_executable:
+            return False, "No automated script configured."
+        try:
+            logger.info(f"⚡ [Aria Auto-Heal] Executing automated recovery script: '{self.auto_executable}'...")
+            res = subprocess.run(
+                self.auto_executable,
+                shell=True,
+                capture_output=True,
+                text=True,
+                timeout=120
+            )
+            if res.returncode == 0:
+                logger.success(f"✅ [Aria Auto-Heal] Recovery command succeeded: {self.auto_executable}")
+                return True, res.stdout.strip()
+            else:
+                logger.warning(f"⚠️ [Aria Auto-Heal] Recovery command exited {res.returncode}: {res.stderr.strip()}")
+                return False, res.stderr.strip()
+        except Exception as e:
+            logger.error(f"❌ [Aria Auto-Heal] Execution error ({self.auto_executable}): {e}")
+            return False, str(e)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -76,6 +122,9 @@ class AriaRemedy:
             "desc": self.short_desc,
             "params": self.params,
             "backoff_seconds": self.backoff_seconds,
+            "rule_id": self.rule_id,
+            "auto_executable": self.auto_executable,
+            "learned_from": self.learned_from,
             "voice_name": self.params.get("voice_name"),
             "terms": self.params.get("terms"),
             "clip_duration": self.params.get("clip_duration"),
@@ -84,8 +133,14 @@ class AriaRemedy:
 
 class AriaSelfHealingEngine:
     """
-    Intelligent self-healing engine powering Aria's autonomous remediation loop.
+    Intelligent self-healing & continuous learning engine powering Aria's autonomous remediation loop.
+    Maintains a persistent knowledge base of all historical bugs, dynamic learned rules, and executes
+    targeted remediation scripts across all operational domains.
     """
+
+    VAULT_FILE = Path(__file__).resolve().parent.parent / "config" / "healing_vault.json"
+    STATE_VAULT_FILE = Path(__file__).resolve().parent.parent.parent / "state" / "healing_vault.json"
+    _cached_vault: Optional[Dict[str, Any]] = None
 
     AZURE_VOICE_ROTATION_POOL = [
         "xtts:prabhat",
@@ -104,22 +159,374 @@ class AriaSelfHealingEngine:
     ]
 
     @classmethod
+    def load_vault(cls) -> Dict[str, Any]:
+        """Loads the persistent knowledge vault containing all historical bug fixes and learned rules."""
+        if cls._cached_vault is not None:
+            return cls._cached_vault
+        candidates = [cls.VAULT_FILE, cls.STATE_VAULT_FILE]
+        for p in candidates:
+            if p.exists():
+                try:
+                    with open(p, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                    cls._cached_vault = data
+                    logger.info(f"🧠 [Aria Knowledge Base] Loaded {len(data.get('learned_rules', []))} rules from {p.name}")
+                    return cls._cached_vault
+                except Exception as e:
+                    logger.warning(f"Failed to load healing vault from {p}: {e}")
+        cls._cached_vault = {"version": "2.0.0", "learned_rules": [], "incident_history": []}
+        return cls._cached_vault
+
+    @classmethod
+    def save_vault(cls, vault_data: Dict[str, Any]) -> bool:
+        """Saves the updated knowledge vault to disk for continuous learning persistence."""
+        cls._cached_vault = vault_data
+        success = False
+        for p in [cls.VAULT_FILE, cls.STATE_VAULT_FILE]:
+            try:
+                p.parent.mkdir(parents=True, exist_ok=True)
+                with open(p, "w", encoding="utf-8") as f:
+                    json.dump(vault_data, f, indent=2)
+                success = True
+            except Exception as e:
+                logger.warning(f"Failed to save healing vault to {p}: {e}")
+        return success
+
+    @classmethod
+    def feed_bug_fix(
+        cls,
+        signature_pattern: str,
+        action_plan: str,
+        domain: str = "unknown",
+        root_cause: str = "Learned operational issue",
+        failed_component: str = "Pipeline Component",
+        auto_executable: Optional[str] = None,
+        learned_from: Optional[str] = "Manual Feedback Loop",
+        severity: str = "HIGH",
+    ) -> Dict[str, Any]:
+        """
+        CONTINUOUS LEARNING FEEDBACK HOOK:
+        Feeds any bug fix directly into Aria's cognitive memory.
+        Aria will automatically match this signature pattern next time and execute this remediation.
+        """
+        vault = cls.load_vault()
+        rules = vault.setdefault("learned_rules", [])
+
+        # Check if rule already exists for this pattern
+        rule_id = f"LEARNED-{abs(hash(signature_pattern)) % 1000000:06d}"
+        for existing in rules:
+            if existing.get("signature_pattern") == signature_pattern:
+                existing.update({
+                    "action_plan": action_plan,
+                    "domain": domain,
+                    "root_cause": root_cause,
+                    "failed_component": failed_component,
+                    "auto_executable": auto_executable,
+                    "learned_from": learned_from,
+                    "severity": severity,
+                })
+                cls.save_vault(vault)
+                logger.success(f"🔄 [Aria Learning Loop] Updated existing rule {existing['rule_id']} for pattern '{signature_pattern}'")
+                return existing
+
+        new_rule = {
+            "rule_id": rule_id,
+            "signature_pattern": signature_pattern,
+            "domain": domain,
+            "failed_component": failed_component,
+            "severity": severity,
+            "root_cause": root_cause,
+            "action_plan": action_plan,
+            "auto_executable": auto_executable,
+            "learned_from": learned_from,
+        }
+        rules.append(new_rule)
+        vault["total_learned_rules"] = len(rules)
+        vault["last_synced"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        cls.save_vault(vault)
+        logger.success(f"🎓 [Aria Learning Loop] Successfully learned new rule {rule_id}: '{signature_pattern[:40]}...'")
+
+        # Notify Telegram of newly learned operational fix
+        try:
+            from telegram_bot import send_telegram_alert
+            alert = (
+                f"🧠 *ARIA HEALER: NEW OPERATIONAL REMEDY LEARNED* 🎓\n"
+                f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                f"📌 *Pattern:* `{signature_pattern}`\n"
+                f"🏷️ *Domain:* `{domain}`\n"
+                f"🔧 *Remedy Action:* {action_plan}\n"
+                f"⚡ *Auto-Exec Script:* `{auto_executable or 'None'}`\n"
+                f"📚 *Total Knowledge Base:* `{len(rules)} learned rules` active"
+            )
+            send_telegram_alert(alert)
+        except Exception:
+            pass
+
+        return new_rule
+
+    @classmethod
+    def sync_from_git_commits(cls, limit: int = 100) -> List[Dict[str, Any]]:
+        """
+        CONTINUOUS GIT COMMIT INGESTION:
+        Scans git commit history for bug fixes, patches, and hotfixes.
+        Extracts commit subjects, affected domains, and resolutions,
+        and registers any new bug fixes into the learning vault.
+        """
+        vault = cls.load_vault()
+        learned_rules = vault.setdefault("learned_rules", [])
+        existing_signatures = {r.get("signature_pattern") for r in learned_rules}
+        newly_learned = []
+
+        try:
+            cmd = ["git", "log", f"-n", str(limit), "--grep=fix", "--grep=bug", "--grep=hotfix", "--grep=patch", "-i", "--format=%H|||%s|||%b"]
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+            if res.returncode != 0:
+                return newly_learned
+
+            entries = res.stdout.strip().split("\n")
+            for entry in entries:
+                if not entry.strip() or "|||" not in entry:
+                    continue
+                parts = entry.split("|||")
+                commit_sha = parts[0].strip()
+                subject = parts[1].strip() if len(parts) > 1 else ""
+
+                lower_sub = subject.lower()
+                domain = "unknown"
+                pattern = None
+                auto_exec = None
+
+                if any(w in lower_sub for w in ["dep", "module", "request", "soundfile", "soxr", "pillow"]):
+                    domain = "runner_dependencies"
+                elif any(w in lower_sub for w in ["audio", "tts", "voice", "speech", "edge-tts", "xtts"]):
+                    domain = "voice_tts"
+                elif any(w in lower_sub for w in ["duplicate", "dedup", "title", "channel"]):
+                    domain = "duplicate_guard"
+                elif any(w in lower_sub for w in ["segment", "matrix", "parallel", "concat", "bundle"]):
+                    domain = "parallel_matrix"
+                elif any(w in lower_sub for w in ["kaggle", "gpu", "kernel"]):
+                    domain = "kaggle_gpu"
+                elif any(w in lower_sub for w in ["sync", "git", "stash", "rebase", "branch"]):
+                    domain = "git_workspace"
+                elif any(w in lower_sub for w in ["thumbnail", "cover", "typography", "pill"]):
+                    domain = "compliance_seo"
+
+                if "requests" in lower_sub:
+                    pattern = r"No module named ['\"]requests['\"]"
+                    auto_exec = "pip install requests"
+                elif "soundfile" in lower_sub:
+                    pattern = r"No module named ['\"]soundfile['\"]|libsndfile"
+                    auto_exec = "pip install soundfile"
+                elif "moviepy" in lower_sub:
+                    pattern = r"No module named ['\"]moviepy['\"]|moviepy.*AttributeError"
+                    auto_exec = "pip install moviepy"
+                elif "git stash" in lower_sub or "rebase" in lower_sub:
+                    pattern = r"cannot rebase.*uncommitted changes|refusing to merge unrelated histories"
+                    auto_exec = "git stash && git pull --rebase origin main"
+                elif "segment_index" in lower_sub and "keyerror" in lower_sub:
+                    pattern = r"KeyError: ['\"]segment_index['\"]"
+                elif "missing rendered segment" in lower_sub or "pad" in lower_sub or "matrix" in lower_sub:
+                    pattern = r"Missing rendered segment artifact:.*segment_.*\.mp4"
+                elif "duplicate" in lower_sub:
+                    pattern = r"Video with title .* already published|Duplicate long-form upload"
+
+                if pattern and pattern not in existing_signatures:
+                    rule = cls.feed_bug_fix(
+                        signature_pattern=pattern,
+                        action_plan=subject,
+                        domain=domain,
+                        root_cause=f"Git commit {commit_sha[:8]}: {subject}",
+                        failed_component=f"Repository Commit {commit_sha[:8]}",
+                        auto_executable=auto_exec,
+                        learned_from=f"Git commit {commit_sha[:8]}",
+                        severity="HIGH"
+                    )
+                    existing_signatures.add(pattern)
+                    newly_learned.append(rule)
+
+        except Exception as e:
+            logger.warning(f"Error during git commit sync: {e}")
+
+        return newly_learned
+
+    @classmethod
+    def persist_to_git(cls, commit_msg: str = "chore(healing): update cognitive knowledge vault") -> bool:
+        """Commits and pushes updated healing_vault.json to origin main."""
+        try:
+            vault_path = str(cls.VAULT_FILE.relative_to(BASE_DIR))
+            subprocess.run(["git", "add", vault_path], check=True, timeout=10)
+            status = subprocess.run(["git", "status", "--porcelain", vault_path], capture_output=True, text=True, timeout=10)
+            if not status.stdout.strip():
+                return True
+            subprocess.run(["git", "commit", "-m", commit_msg], check=True, timeout=10)
+            subprocess.run(["git", "push", "origin", "main"], check=True, timeout=20)
+            logger.success(f"🚀 [Aria Healing] Persisted cognitive vault to origin/main: {commit_msg}")
+            return True
+        except Exception as e:
+            logger.warning(f"Failed to persist healing vault to git: {e}")
+            return False
+
+    @classmethod
+    def _record_incident(cls, rule_id: Optional[str], err_str: str, slot_name: str, attempt: int):
+        """Appends incident occurrence to the persistent ledger for pattern tracking."""
+        try:
+            vault = cls.load_vault()
+            history = vault.setdefault("incident_history", [])
+            history.append({
+                "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "rule_id": rule_id or "UNCLASSIFIED",
+                "slot_name": slot_name,
+                "attempt": attempt,
+                "error_snippet": err_str[:160],
+            })
+            if len(history) > 100:
+                history.pop(0)
+            cls.save_vault(vault)
+        except Exception as e:
+            logger.debug(f"Incident record notice: {e}")
+
+    @classmethod
+    def _auto_learn_unclassified_incident(
+        cls,
+        err_str: str,
+        err_type: str,
+        slot_name: str,
+        attempt: int,
+        context: Dict[str, Any]
+    ) -> AriaRemedy:
+        """
+        Dynamically learns from an unclassified operational failure:
+        1. Formulates regex signature pattern from exception.
+        2. Derives intelligent root cause and recovery plan.
+        3. Persists to healing_vault.json so Aria never misses this bug again!
+        """
+        cls.purge_scratch_artifacts()
+        
+        # Clean up error text to extract core signature tokens
+        clean_tokens = [w for w in err_str.replace(":", " ").replace("'", " ").replace('"', ' ').split() if len(w) > 3][:6]
+        pattern_str = ".*".join(clean_tokens) if clean_tokens else err_str[:40]
+
+        inferred_domain = FailureDomain.UNKNOWN
+        if any(k in err_str for k in ["import", "module", "not found"]):
+            inferred_domain = FailureDomain.RUNNER_DEPENDENCIES
+        elif any(k in err_str for k in ["gpu", "cuda", "nvenc", "kaggle"]):
+            inferred_domain = FailureDomain.KAGGLE_GPU
+        elif any(k in err_str for k in ["segment", "concat", "manifest", "bundle"]):
+            inferred_domain = FailureDomain.PARALLEL_MATRIX
+        elif any(k in err_str for k in ["duplicate", "title", "published", "409"]):
+            inferred_domain = FailureDomain.DUPLICATE_GUARD
+
+        action = f"Purging workspace scratch buffers, engaging safe-mode CPU fallback, and recording signature to continuous learning vault."
+        
+        # Register in vault
+        learned_rule = cls.feed_bug_fix(
+            signature_pattern=pattern_str,
+            action_plan=action,
+            domain=inferred_domain.value,
+            root_cause=f"Autonomous runtime discovery: {err_type} in slot '{slot_name}'",
+            failed_component="Autonomous Media Engine",
+            learned_from="Autonomous Cognitive Learning Loop",
+            severity="MEDIUM"
+        )
+
+        return AriaRemedy(
+            domain=inferred_domain,
+            failed_component="Autonomous Media Engine (Auto-Learned)",
+            root_cause=f"Runtime discovered: {err_type} ({err_str[:120]})",
+            severity="MEDIUM",
+            action_plan=action,
+            short_desc=f"Auto-Learned Fallback Pass {attempt + 1}",
+            params={"generic_retry": True},
+            backoff_seconds=min(15, 4 * attempt),
+            rule_id=learned_rule.get("rule_id"),
+            learned_from="Autonomous Cognitive Learning Loop"
+        )
+
+    @classmethod
+    def get_learning_report(cls) -> str:
+        """Returns a formatted Markdown summary of Aria's learned bug fixes and self-healing memory."""
+        vault = cls.load_vault()
+        rules = vault.get("learned_rules", [])
+        incidents = vault.get("incident_history", [])
+
+        lines = [
+            "🧠 *AGENT ARIA: COGNITIVE SELF-HEALING KNOWLEDGE VAULT* 🛡️",
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+            f"📚 *Total Learned Bug Remedies:* `{len(rules)} active rules`",
+            f"⚡ *Total Resolved Incidents:* `{len(incidents)} logged events`",
+            f"🕒 *Last Knowledge Sync:* `{vault.get('last_synced', 'live')}`",
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+            "📋 *Core Historical Bug Domains Covered:*",
+            "• `runner_dependencies`: requests, soundfile, soxr, moviepy, openai, toml",
+            "• `voice_tts`: XTTS GHA fallback to Christopher golden master audio loop",
+            "• `duplicate_guard`: title lab pre/post optimization bypass & deep scan",
+            "• `parallel_matrix`: missing segment synthesis & artifact download guard",
+            "• `git_workspace`: stash/rebase collision retry with exponential jitter",
+            "• `kaggle_gpu`: segment_index KeyError, ASS header, 2400s timeout",
+            "• `youtube_api`: multi-project OAuth pool hot-swap & quota failover",
+            "• `playwright_scraper`: TradingView block bypass to mplfinance charts",
+            "• `llm_research`: Gemini model deprecation failover cascade",
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+            "💡 *Feedback Loop:* When any new failure occurs, Aria registers the regex signature and remedy into `healing_vault.json` permanently."
+        ]
+        return "\n".join(lines)
+
+    @classmethod
     def diagnose(
         cls,
-        exc: Exception,
-        attempt: int,
-        slot_name: str,
+        exc: Union[Exception, str],
+        attempt: int = 0,
+        slot_name: str = "pipeline",
         context: Optional[Dict[str, Any]] = None,
     ) -> AriaRemedy:
         """
         Classifies an operational failure into its precise failure domain and
-        constructs an adaptive, multi-tier remedy.
+        constructs an adaptive, multi-tier remedy using the Continuous Learning Vault.
         """
         err_str = str(exc).lower()
-        err_type = type(exc).__name__
+        err_type = type(exc).__name__ if isinstance(exc, Exception) else "OperationalLogFailure"
         context = context or {}
 
-        # 1. Voice & TTS Synthesis Domain
+        # ── Step 0: Check Persistent Continuous Learning Knowledge Vault ──
+        vault = cls.load_vault()
+        for rule in vault.get("learned_rules", []):
+            pat = rule.get("signature_pattern", "")
+            if pat:
+                try:
+                    if re.search(pat, err_str, re.IGNORECASE) or pat.lower() in err_str:
+                        dom_str = rule.get("domain", "unknown")
+                        try:
+                            dom_enum = FailureDomain(dom_str)
+                        except Exception:
+                            dom_enum = FailureDomain.UNKNOWN
+
+                        logger.info(f"🧠 [Aria Knowledge Base] Matched learned rule {rule.get('rule_id')} ({dom_str})!")
+                        
+                        remedy = AriaRemedy(
+                            domain=dom_enum,
+                            failed_component=rule.get("failed_component", "Operational Component"),
+                            root_cause=rule.get("root_cause", err_str),
+                            severity=rule.get("severity", "HIGH"),
+                            action_plan=rule.get("action_plan", "Automated learned remediation"),
+                            short_desc=f"{rule.get('rule_id')}: {rule.get('failed_component')}",
+                            params=context,
+                            backoff_seconds=min(15, 3 * attempt),
+                            rule_id=rule.get("rule_id"),
+                            auto_executable=rule.get("auto_executable"),
+                            learned_from=rule.get("learned_from"),
+                        )
+
+                        # Auto-execute remediation script if defined
+                        if remedy.auto_executable:
+                            remedy.execute_auto_remediation()
+
+                        # Record incident telemetry
+                        cls._record_incident(rule.get("rule_id"), err_str, slot_name, attempt)
+                        return remedy
+                except Exception as rex:
+                    logger.debug(f"Regex match notice for {pat}: {rex}")
+
+        # ── Step 1: Voice & TTS Synthesis Domain ──
         if any(k in err_str for k in [
             "noaudioreceived", "tts", "voice", "audio",
             "websocket", "brokenpipe", "streamtimeout", "timeout waiting for audio",
@@ -144,14 +551,13 @@ class AriaSelfHealingEngine:
                 backoff_seconds=backoff,
             )
 
-        # 2. Stock Media & B-Roll Retrieval Domain
+        # ── Step 2: Stock Media & B-Roll Retrieval Domain ──
         if any(k in err_str for k in [
             "pexels", "pixabay", "material", "downloaded_videos", "video_clip",
             "novalidmaterials", "videofileclip", "corrupt", "429", "ratelimit",
             "search videos failed", "zero videos"
         ]):
             backoff = 5 * attempt
-            # Broaden terms to high-liquidity financial keywords
             terms = cls.UNIVERSAL_INSTITUTIONAL_KEYWORDS
             random.shuffle(terms)
             selected_terms = terms[:5]
@@ -171,7 +577,7 @@ class AriaSelfHealingEngine:
                 backoff_seconds=backoff,
             )
 
-        # 3. Video Rendering & FFmpeg Engine Domain
+        # ── Step 3: Video Rendering & FFmpeg Engine Domain ──
         if any(k in err_str for k in [
             "moviepy", "ffmpeg", "write_videofile", "encode", "memoryerror",
             "oom", "killed", "exit code 137", "textclip", "imagemagick", "font",
@@ -196,7 +602,7 @@ class AriaSelfHealingEngine:
                 backoff_seconds=backoff,
             )
 
-        # 3.5 Upstream Pipeline Premature Termination (res=None before YouTube)
+        # ── Step 4: Upstream Pipeline Premature Termination ──
         if "without youtube_upload result" in err_str or "res=none" in err_str:
             backoff = 6 * attempt
             cls.purge_scratch_artifacts()
@@ -219,7 +625,7 @@ class AriaSelfHealingEngine:
                 backoff_seconds=backoff,
             )
 
-        # 3.8 Kaggle Remote GPU Domain
+        # ── Step 5: Kaggle Remote GPU Domain ──
         if any(k in err_str for k in ["kaggle", "cuda out of memory", "nvenc", "kernel failed"]):
             backoff = 10 * attempt
             is_oom = "cuda out of memory" in err_str or "oom" in err_str
@@ -235,7 +641,7 @@ class AriaSelfHealingEngine:
                 backoff_seconds=backoff,
             )
 
-        # 3.9 Playwright Visual Scraper Domain
+        # ── Step 6: Playwright Visual Scraper Domain ──
         if any(k in err_str for k in ["playwright", "cloudflare", "screenshot too small", "networkidle"]):
             backoff = 4 * attempt
             return AriaRemedy(
@@ -249,7 +655,7 @@ class AriaSelfHealingEngine:
                 backoff_seconds=backoff,
             )
 
-        # 4. YouTube API & Publishing Domain
+        # ── Step 7: YouTube API & Publishing Domain ──
         if any(k in err_str for k in [
             "youtube", "uploadlimitexceeded", "quotaexceeded", "403", "pickle",
             "token", "credentials", "refreshed token", "authentication", "upload", "invalid_grant"
@@ -295,7 +701,7 @@ class AriaSelfHealingEngine:
                     backoff_seconds=backoff,
                 )
 
-        # 5. Git Workspace & Synchronization Domain
+        # ── Step 8: Git Workspace & Synchronization Domain ──
         if any(k in err_str for k in ["index.lock", "merge conflict", "non-fast-forward", "git push"]):
             cls.repair_git_workspace()
             return AriaRemedy(
@@ -309,19 +715,8 @@ class AriaSelfHealingEngine:
                 backoff_seconds=3,
             )
 
-        # 6. Default Adaptive Fallback
-        backoff = 5 * attempt
-        cls.purge_scratch_artifacts()
-        return AriaRemedy(
-            domain=FailureDomain.UNKNOWN,
-            failed_component="Autonomous Market Engine",
-            root_cause=f"Unclassified pipeline hiccup ({err_type}: {exc})",
-            severity="MEDIUM",
-            action_plan=f"Purging workspace scratch buffers, resetting thread state, and executing adaptive retry pass {attempt + 1}.",
-            short_desc=f"Workspace Buffer Purge & Adaptive Retry (Pass {attempt + 1})",
-            params={"generic_retry": True},
-            backoff_seconds=backoff,
-        )
+        # ── Step 9: Autonomous Cognitive Learning Loop (Unknown Incident) ──
+        return cls._auto_learn_unclassified_incident(err_str, err_type, slot_name, attempt, context)
 
     @classmethod
     def purge_scratch_artifacts(cls):
@@ -830,3 +1225,59 @@ class AriaCommandToolkit:
 # Singletons for effortless import
 aria_healing = AriaSelfHealingEngine()
 aria_tools = AriaCommandToolkit()
+
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Aria Autonomous Self-Healing & Continuous Learning Engine")
+    parser.add_argument("--feed-bug", type=str, help="Signature regex pattern of the bug to learn")
+    parser.add_argument("--action", type=str, help="Remediation action plan")
+    parser.add_argument("--domain", type=str, default="runner_dependencies", help="Failure domain (runner_dependencies, voice_tts, parallel_matrix, etc.)")
+    parser.add_argument("--exec", type=str, dest="auto_exec", help="Optional auto-executable shell recovery script (e.g., pip install requests)")
+    parser.add_argument("--component", type=str, default="Pipeline Component", help="Failed component name")
+    parser.add_argument("--cause", type=str, default="Discovered operational defect", help="Root cause explanation")
+    parser.add_argument("--sync-git", action="store_true", help="Ingest bug fixes from repository git commit history")
+    parser.add_argument("--report", action="store_true", help="Print learning vault telemetry report")
+    parser.add_argument("--diagnose", type=str, help="Test diagnose an error string against all learned rules")
+    parser.add_argument("--persist-git", action="store_true", help="Commit and push updated knowledge vault to origin main")
+
+    args = parser.parse_args()
+
+    if args.feed_bug and args.action:
+        rule = AriaSelfHealingEngine.feed_bug_fix(
+            signature_pattern=args.feed_bug,
+            action_plan=args.action,
+            domain=args.domain,
+            root_cause=args.cause,
+            failed_component=args.component,
+            auto_executable=args.auto_exec,
+            learned_from="CLI Continuous Learning Tool",
+            severity="HIGH"
+        )
+        print(f"\n✅ Learned New Bug Fix Rule: {rule.get('rule_id')}")
+        print(json.dumps(rule, indent=2))
+        if args.persist_git:
+            AriaSelfHealingEngine.persist_to_git(f"chore(healing): learn bug fix {rule.get('rule_id')}")
+
+    elif args.sync_git:
+        new_rules = AriaSelfHealingEngine.sync_from_git_commits(limit=100)
+        print(f"\n🔄 Git Sync Complete: Learned {len(new_rules)} new rules from git commits.")
+        for r in new_rules:
+            print(f" • [{r.get('rule_id')}] {r.get('domain')}: {r.get('action_plan')}")
+        if args.persist_git and new_rules:
+            AriaSelfHealingEngine.persist_to_git(f"chore(healing): ingest {len(new_rules)} fixes from git history")
+
+    elif args.diagnose:
+        remedy = AriaSelfHealingEngine.diagnose(args.diagnose)
+        print(f"\n🩺 Diagnosis Result:")
+        print(f" • Domain: {remedy.domain.value}")
+        print(f" • Rule ID: {remedy.rule_id or 'Auto-Learned'}")
+        print(f" • Root Cause: {remedy.root_cause}")
+        print(f" • Action: {remedy.action_plan}")
+        print(f" • Auto-Executable: {remedy.auto_executable}")
+
+    elif args.report:
+        print("\n" + AriaSelfHealingEngine.get_learning_report())
+
+    else:
+        parser.print_help()

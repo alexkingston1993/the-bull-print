@@ -137,7 +137,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: segment-${{ matrix.index }}
-          path: output/rendered_segments/segment_${{ matrix.index }}.mp4
+          path: output/rendered_segments/segment_*.mp4
           retention-days: 1
 
   # ─────────────────────────────────────────────────────────────

@@ -187,25 +187,10 @@ class AriaEngineerTools:
                 pass
 
             # Detect root cause across 7 operational domains
-            root_cause = "Transient step interruption"
-            if "no space left on device" in full_log.lower() or "errno 28" in full_log.lower():
-                root_cause = "GitHub runner disk exhausted by heavy packages (Purged Kokoro/Torch from requirements.txt)."
-            elif "cuda out of memory" in full_log.lower() or "oom" in full_log.lower():
-                root_cause = "Kaggle GPU CUDA out-of-memory error during video encoding or model loading."
-            elif "kaggle" in full_log.lower() and ("queue" in full_log.lower() or "timeout" in full_log.lower()):
-                root_cause = "Kaggle GPU runner queue delay during peak US hours (exceeded wait budget)."
-            elif any(k in full_log.lower() for k in ["cloudflare", "screenshot too small", "playwright", "networkidle"]):
-                root_cause = "TradingView/GoCharting canvas blocked by Cloudflare challenge or network stall (Triggered mplfinance institutional fallback)."
-            elif "invalid_grant" in full_log.lower() or "token_expired" in full_log.lower():
-                root_cause = "YouTube OAuth refresh token expired or revoked (invalid_grant). Needs one-click re-authorization."
-            elif "remedy" in full_log:
-                root_cause = "Function signature parameter mismatch in self-healing retry loop (Resolved in commit bebf266)."
-            elif "NoAudioReceived" in full_log:
-                root_cause = "Audio synthesis timeout on generation endpoint."
-            elif "pexels" in full_log or "materials" in full_log:
-                root_cause = "Stock B-roll query yielded zero clips for narrow entity search."
-            elif "403" in full_log and "upload" in full_log:
-                root_cause = "YouTube Studio API upload quota or OAuth token scope restriction."
+            remedy = AriaSelfHealingEngine.diagnose(full_log, slot_name=str(event))
+            rule_prefix = f"[{remedy.rule_id}] " if remedy.rule_id else ""
+            root_cause = f"{rule_prefix}{remedy.root_cause}"
+            plan_desc = remedy.action_plan
 
             fail_report = (
                 f"⚠️ *AGENT ARIA: ROOT CAUSE INVESTIGATION* 🔍🛠️\n"
@@ -214,7 +199,7 @@ class AriaEngineerTools:
                 f"🔍 *Root Cause Identified:* {root_cause}\n"
                 f"📋 *Log Excerpt:* \n```\n{fail_log[-450:] if fail_log else 'Step failed during execution'}\n```\n"
                 f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-                f"💡 *My Remediation Plan:* Targeted remedies formulated. Tap an action button below or say *'Fix it, Aria'*! ☕⚡"
+                f"💡 *My Remediation Plan:* {plan_desc}\n\nTap an action button below or say *'Fix it, Aria'*! ☕⚡"
             )
             markup = {
                 "inline_keyboard": [
@@ -353,6 +338,37 @@ class TelegramBotDaemon:
 
         if lower in ["/checkpoint", "checkpoint", "last checkpoint", "where did it stop", "resume"]:
             return AriaCheckpointResume.status_card_with_markup()
+
+        # 1C. Continuous Learning Vault & Feedback Loop Commands
+        if lower.startswith("/feed ") or lower.startswith("feed "):
+            content = user_text[6:].strip() if user_text.lower().startswith("/feed ") else user_text[5:].strip()
+            parts = [p.strip() for p in content.split("|")]
+            if len(parts) >= 2:
+                pattern = parts[0]
+                action = parts[1]
+                auto_exec = parts[2] if len(parts) > 2 else None
+                rule = AriaSelfHealingEngine.feed_bug_fix(
+                    signature_pattern=pattern,
+                    action_plan=action,
+                    auto_executable=auto_exec,
+                    learned_from="Telegram Feed Command",
+                )
+                AriaSelfHealingEngine.persist_to_git(f"chore(healing): ingest bug fix {rule.get('rule_id')} via telegram")
+                return (
+                    f"🎓 *ARIA LEARNING LOOP: OPERATIONAL FIX INGESTED* 🧠\n"
+                    f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                    f"📌 *Rule ID:* `{rule.get('rule_id')}`\n"
+                    f"🔍 *Pattern:* `{pattern}`\n"
+                    f"🛠️ *Action:* {action}\n"
+                    f"⚡ *Auto-Exec Script:* `{auto_exec or 'None'}`\n"
+                    f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                    f"Aria has permanently saved this to her memory vault. Any recurring instance will be auto-remediated immediately! ☕🚀"
+                )
+            else:
+                return "💡 *Usage:* `/feed <error_pattern> | <remedy_action> [| auto_executable_script]`"
+
+        if lower in ["/memory", "/vault", "/healer", "/learned", "memory", "vault", "healer", "learned"]:
+            return AriaSelfHealingEngine.get_learning_report()
 
         # 2. Conversational & Technical Dialogue via LLM with Live Telemetry Context
         live_context = AriaEngineerTools.build_live_system_context()

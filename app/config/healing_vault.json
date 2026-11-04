@@ -1,0 +1,369 @@
+{
+  "version": "2.0.0",
+  "engine_name": "Aria Cognitive Self-Healing & Continuous Learning Engine",
+  "last_synced": "2026-11-04T06:52:31Z",
+  "total_learned_rules": 32,
+  "learned_rules": [
+    {
+      "rule_id": "BUG-01-RUNNER-DEP-REQUESTS",
+      "signature_pattern": "(modulenotfounderror: no module named 'requests'|cannot import name 'requests')",
+      "domain": "runner_dependencies",
+      "failed_component": "Isolated Segment Runner Python Environment",
+      "severity": "CRITICAL",
+      "root_cause": "Top-level module import of telegram_bot required 'requests' on minimal Ubuntu matrix runners.",
+      "action_plan": "Decouple telegram import lazily, and run pip install --no-cache-dir requests dynamically.",
+      "auto_executable": "pip install --no-cache-dir requests",
+      "learned_from": "Commit df69415 (20-Runner Parallel Matrix crash)"
+    },
+    {
+      "rule_id": "BUG-02-VOICE-XTTS-GHA-FALLBACK",
+      "signature_pattern": "(modulenotfounderror: no module named 'tts'|tts.api|xtts_v2|missing master golden reference audio)",
+      "domain": "voice_tts",
+      "failed_component": "100% Offline Cloned Christopher Voice Engine",
+      "severity": "HIGH",
+      "root_cause": "Coqui XTTS compiler or heavy weights not pre-cached on plain GHA Ubuntu runner.",
+      "action_plan": "Engage resilient golden master audio fallback: loop assets/voice_model/christopher_ref/christopher_master_24k.wav with broadcast EQ (-16 LUFS, 70Hz highpass, 135Hz resonance) and procedural word timings.",
+      "auto_executable": null,
+      "learned_from": "Commit eec0973 (Cloud Parallel Christopher engine hardening)"
+    },
+    {
+      "rule_id": "BUG-03-DEDUP-TITLE-OPTIMIZATION-BYPASS",
+      "signature_pattern": "(why 90% lose money|truth about 24500|duplicate video upload|title_lab.*get_best_title)",
+      "domain": "duplicate_guard",
+      "failed_component": "Duplicate Detection & Title Lab Optimization Pipeline",
+      "severity": "CRITICAL",
+      "root_cause": "_check_video_already_published checked the raw subject BEFORE title_lab optimized it, making YouTube query return False and uploading duplicates.",
+      "action_plan": "Check published status post-optimization, sever legacy video generation from article cron, and query channel upload playlist up to 50 items.",
+      "auto_executable": "python scripts/privatize_duplicate_videos.py",
+      "learned_from": "Commit eec0973 (Channel duplicate cleanup and legacy loop severing)"
+    },
+    {
+      "rule_id": "BUG-04-GHOST-PEXELS-ENGINE",
+      "signature_pattern": "(video_source.*pexels|task\\.start.*res=none|options_trap.*warning for beginners)",
+      "domain": "duplicate_guard",
+      "failed_component": "Legacy MoneyPrinter Pexels Stock Video Generator",
+      "severity": "CRITICAL",
+      "root_cause": "Article conveyor cron in market_publisher.yml was invoking _generate_and_upload_video_with_healing, producing legacy Pexels stock videos.",
+      "action_plan": "Enforce strict decoupling: article cron generates only articles, while all video is routed exclusively through 20-runner parallel matrix.",
+      "auto_executable": null,
+      "learned_from": "Commit eec0973 (Legacy pipeline decoupling)"
+    },
+    {
+      "rule_id": "BUG-05-MISSING-SEGMENT-ARTIFACT",
+      "signature_pattern": "(filenotfounderror: missing rendered segment artifact|output/downloaded_segments/segment_\\d+\\.mp4)",
+      "domain": "parallel_matrix",
+      "failed_component": "Matrix Segment Aggregation Demuxer",
+      "severity": "HIGH",
+      "root_cause": "An individual matrix runner failed to upload its artifact, leaving aggregate_and_publish with missing segments.",
+      "action_plan": "Detect missing segment index, synthesize emergency procedural replacement from base frame with FFmpeg pipe, and proceed with concat.",
+      "auto_executable": null,
+      "learned_from": "Commit df69415 (Cloud Parallel Aggregation error)"
+    },
+    {
+      "rule_id": "BUG-06-SOUNDFILE-TORCHAUDIO-CRASH",
+      "signature_pattern": "(modulenotfounderror: no module named 'soundfile'|torchaudio.*backend|sox.*backend)",
+      "domain": "runner_dependencies",
+      "failed_component": "Audio Processing & Resampling Pipeline",
+      "severity": "HIGH",
+      "root_cause": "Torchaudio default backend failed without soundfile or soxr installed.",
+      "action_plan": "Install soundfile and soxr via pip, and monkeypatch torchaudio.load and save with soundfile.",
+      "auto_executable": "pip install --no-cache-dir soundfile soxr",
+      "learned_from": "Commits b884a70 & 329ccf1 (Torchaudio soundfile monkeypatch)"
+    },
+    {
+      "rule_id": "BUG-07-MOVIEPY-RAWVIDEO-PIPE",
+      "signature_pattern": "(modulenotfounderror: no module named 'moviepy'|moviepy.*imagedisplay|write_videofile.*killed)",
+      "domain": "render_ffmpeg",
+      "failed_component": "Video Compositor Engine",
+      "severity": "MEDIUM",
+      "root_cause": "MoviePy memory leaks and CPU thread lockups during 1080x1920 / 2K video rendering.",
+      "action_plan": "Bypass MoviePy entirely: stream PIL Image frames directly into FFmpeg stdin via rawvideo pipe with ultrafast preset.",
+      "auto_executable": null,
+      "learned_from": "Commits 8bd8d2e & 841b263 (Rawvideo pipe streaming)"
+    },
+    {
+      "rule_id": "BUG-08-RUNNER-DATA-PACKAGES",
+      "signature_pattern": "(modulenotfounderror: no module named '(openai|numpy|matplotlib|toml|tomllib)')",
+      "domain": "runner_dependencies",
+      "failed_component": "GHA Runner Core Python Environment",
+      "severity": "HIGH",
+      "root_cause": "Missing essential packages in minimal runner environment.",
+      "action_plan": "Dynamically pip install missing modules with --no-cache-dir.",
+      "auto_executable": "pip install --no-cache-dir numpy matplotlib toml openai",
+      "learned_from": "Commits 0d58e44, 6a9bffc, 5822eb7, 141aa45"
+    },
+    {
+      "rule_id": "BUG-09-NAME-ERROR-PUBLISH-AT",
+      "signature_pattern": "(nameerror: name 'publish_at' is not defined)",
+      "domain": "youtube_api",
+      "failed_component": "YouTube Upload Task Parameters",
+      "severity": "MEDIUM",
+      "root_cause": "publish_at variable passed into upload routine before being initialized.",
+      "action_plan": "Initialize publish_at = None by default before task invocation.",
+      "auto_executable": null,
+      "learned_from": "Commit 34d6d6a (publish_at NameError fix)"
+    },
+    {
+      "rule_id": "BUG-10-MISSING-IMPORTS-DATETIME-BASE64",
+      "signature_pattern": "(nameerror: name '(datetime|base64)' is not defined)",
+      "domain": "runner_dependencies",
+      "failed_component": "Pipeline Orchestrator Utility Imports",
+      "severity": "MEDIUM",
+      "root_cause": "Utility modules used in sub-methods without global top-level imports.",
+      "action_plan": "Dynamically import missing modules into builtins / globals namespace.",
+      "auto_executable": null,
+      "learned_from": "Commits 20b252f & f515608"
+    },
+    {
+      "rule_id": "BUG-11-PILLOW-FONT-DISCOVERY",
+      "signature_pattern": "(cannot open resource|dejavusans.*not found|arial.*not found|oserror: cannot open resource)",
+      "domain": "render_ffmpeg",
+      "failed_component": "PIL ImageFont Typography Engine",
+      "severity": "MEDIUM",
+      "root_cause": "Hardcoded macOS font paths failed on Ubuntu runners.",
+      "action_plan": "Multi-tier font candidate discovery: /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf -> LiberationSans -> ImageFont.load_default().",
+      "auto_executable": "sudo apt-get install -y fonts-dejavu-core",
+      "learned_from": "Commit c9e67c0 (Font discovery fallback)"
+    },
+    {
+      "rule_id": "BUG-12-GIT-PUSH-REBASE-COLLISION",
+      "signature_pattern": "(error: failed to push some refs|rejected.*fetch first|non-fast-forward)",
+      "domain": "git_workspace",
+      "failed_component": "Git Content Synchronizer",
+      "severity": "HIGH",
+      "root_cause": "Autonomous article cron pushed new posts to origin/main while a local or runner process was committing.",
+      "action_plan": "git stash --include-untracked, git fetch origin main, git rebase -X ours origin/main, git stash pop, retry push up to 3 times with 5s exponential jitter.",
+      "auto_executable": "git fetch origin main && git rebase -X ours origin/main && git push origin HEAD:main",
+      "learned_from": "Commits 1a204ba, 97f2ae6, 23a103e, 992b324"
+    },
+    {
+      "rule_id": "BUG-13-GIT-LOCKFILE-STALL",
+      "signature_pattern": "(fatal: unable to create '.*index\\.lock': file exists|index\\.lock)",
+      "domain": "git_workspace",
+      "failed_component": "Git Local Workspace Lock Gate",
+      "severity": "MEDIUM",
+      "root_cause": "Stale .git/index.lock left behind after runner abort or concurrent git execution.",
+      "action_plan": "Neutralize lockfile: rm -f .git/index.lock and verify workspace cleanliness.",
+      "auto_executable": "rm -f .git/index.lock",
+      "learned_from": "Commits cb6920a & f0d972c"
+    },
+    {
+      "rule_id": "BUG-14-KAGGLE-SEGMENT-KEY-ERROR",
+      "signature_pattern": "(keyerror: 'segment_index'|keyerror: 'slot_index')",
+      "domain": "kaggle_gpu",
+      "failed_component": "Kaggle Dual-T4 Remote Kernel Orchestrator",
+      "severity": "HIGH",
+      "root_cause": "Payload dictionary structure changed without updating Kaggle remote kernel reader.",
+      "action_plan": "Default segment_index = payload.get('segment_index', 0) and safe access fallback.",
+      "auto_executable": null,
+      "learned_from": "Commit b884a70 (Kaggle segment_index fix)"
+    },
+    {
+      "rule_id": "BUG-15-KAGGLE-ASS-HEADER-MISSING",
+      "signature_pattern": "(nameerror: name 'ass_header' is not defined|missing subtitle style header)",
+      "domain": "kaggle_gpu",
+      "failed_component": "Kaggle NVENC Subtitle Burning Engine",
+      "severity": "MEDIUM",
+      "root_cause": "ASS subtitle formatting header string missing in kernel script.",
+      "action_plan": "Inject authoritative SSA/ASS v4+ style template with bold yellow stroke text.",
+      "auto_executable": null,
+      "learned_from": "Commit 9ffab7b"
+    },
+    {
+      "rule_id": "BUG-16-KAGGLE-GPU-KERNEL-TIMEOUT",
+      "signature_pattern": "(kaggle.*timeout|kernel execution exceeded.*seconds|gpu worker timeout)",
+      "domain": "kaggle_gpu",
+      "failed_component": "Kaggle Worker Remote Execution Watchdog",
+      "severity": "HIGH",
+      "root_cause": "Masterclass long-format video render exceeded default 1200s (20 min) timeout.",
+      "action_plan": "Expand KaggleWorker timeout to 2400s (40 min) and split masterclass chapters if necessary.",
+      "auto_executable": null,
+      "learned_from": "Commit 2d9916b"
+    },
+    {
+      "rule_id": "BUG-17-KAGGLE-DATASET-409-CONFLICT",
+      "signature_pattern": "(409 conflict|dataset version creation in progress|dataset push failed)",
+      "domain": "kaggle_gpu",
+      "failed_component": "Kaggle API Dataset Publisher",
+      "severity": "MEDIUM",
+      "root_cause": "Concurrent dataset version pushes triggered HTTP 409 Conflict on Kaggle API.",
+      "action_plan": "Wait 15s backoff, append random hexadecimal nonce to dataset version metadata, and retry.",
+      "auto_executable": null,
+      "learned_from": "Commits c32f105, bc553d1, a1b5cce"
+    },
+    {
+      "rule_id": "BUG-18-XTTS-VERSION-MISMATCH",
+      "signature_pattern": "(transformers.*tokenizer.*error|numpy.*ndarray.*size changed|xtts.*attributeerror)",
+      "domain": "runner_dependencies",
+      "failed_component": "Coqui XTTS Neural Model Environment",
+      "severity": "CRITICAL",
+      "root_cause": "Transformers > 4.37 and NumPy > 1.26 breaking internal C extensions of Coqui XTTS.",
+      "action_plan": "Pin exact compatible dependencies: pip install transformers==4.37.2 numpy==1.26.4.",
+      "auto_executable": "pip install --no-cache-dir transformers==4.37.2 numpy==1.26.4",
+      "learned_from": "Commit 8959e2d"
+    },
+    {
+      "rule_id": "BUG-19-YOUTUBE-INVALID-GRANT",
+      "signature_pattern": "(invalid_grant|token_expired|token has been expired or revoked)",
+      "domain": "youtube_api",
+      "failed_component": "YouTube OAuth Refresh Token Validator",
+      "severity": "CRITICAL",
+      "root_cause": "Google Cloud OAuth refresh token expired after 7 days (Testing mode) or was revoked.",
+      "action_plan": "Engage multi-project OAuth pool: hot-swap credentials across Slot 1, Slot 2, SongX Slot 2, or pool JSON, and alert Boss on Telegram.",
+      "auto_executable": null,
+      "learned_from": "Commits 2fc2e1d, f840168, 84a7eea, f2705e2"
+    },
+    {
+      "rule_id": "BUG-20-YOUTUBE-QUOTA-EXCEEDED",
+      "signature_pattern": "(uploadlimitexceeded|quotaexceeded|daily upload limit reached|403.*quota)",
+      "domain": "youtube_api",
+      "failed_component": "YouTube Data API v3 Quota Ceiling",
+      "severity": "MEDIUM",
+      "root_cause": "10,000 units/day quota ceiling reached on primary GCP project.",
+      "action_plan": "Switch client_id to secondary GCP project from oauth_pool.json. If all projects exhausted, safe-vault video to output/ and schedule release.",
+      "auto_executable": null,
+      "learned_from": "Commits f2705e2 & 84a7eea"
+    },
+    {
+      "rule_id": "BUG-21-YOUTUBE-DEEP-SCAN-DUPLICATES",
+      "signature_pattern": "(video already published|duplicate video on channel|playlist items duplicate)",
+      "domain": "duplicate_guard",
+      "failed_component": "Channel Deep Upload Scanner",
+      "severity": "HIGH",
+      "root_cause": "Default maxResults=10 only scanned recent uploads; older duplicate titles remained undetected.",
+      "action_plan": "Expand scan depth to 50-100 playlist items and apply tokenized text similarity score >= 0.85.",
+      "auto_executable": null,
+      "learned_from": "Commit 687d773"
+    },
+    {
+      "rule_id": "BUG-22-EDGE-TTS-SOCKET-BREAK",
+      "signature_pattern": "(noaudioreceived|connectionreseterror|brokenpipeerror|websocket.*closed)",
+      "domain": "voice_tts",
+      "failed_component": "Cloud TTS WebSocket Client",
+      "severity": "HIGH",
+      "root_cause": "External edge-tts servers rate-limited or closed WebSocket during batch synthesis.",
+      "action_plan": "Purge edge-tts dependency: route 100% of speech narration through local offline Christopher voice clone with pitch/formant mastering.",
+      "auto_executable": null,
+      "learned_from": "Commit 66a6834"
+    },
+    {
+      "rule_id": "BUG-23-THUMBNAIL-TOP-TEXT-KEY-ERROR",
+      "signature_pattern": "(keyerror: 'top_text'|thumbnail_generator.*keyerror)",
+      "domain": "render_ffmpeg",
+      "failed_component": "3D High-CTR Thumbnail Designer",
+      "severity": "MEDIUM",
+      "root_cause": "Dictionary payload missing 'top_text' key when passed from custom topic generator.",
+      "action_plan": "Apply safe dictionary access with contextual financial fallback: payload.get('top_text', 'MARKET ALERT').",
+      "auto_executable": null,
+      "learned_from": "Commit 5f7591b"
+    },
+    {
+      "rule_id": "BUG-24-PLAYWRIGHT-CHART-STALL",
+      "signature_pattern": "(playwright.*timeout|cloudflare.*challenge|screenshot too small|net::err_connection_timed_out)",
+      "domain": "playwright_scraper",
+      "failed_component": "Headless Browser Chart Capture",
+      "severity": "MEDIUM",
+      "root_cause": "Third-party chart platform blocked headless Chromium or timed out on canvas webgl rendering.",
+      "action_plan": "Bypass browser entirely: synthesize high-resolution dark-mode institutional candlestick charts using mplfinance and SVG renderer.",
+      "auto_executable": null,
+      "learned_from": "Commit 20b2de8"
+    },
+    {
+      "rule_id": "BUG-25-GEMINI-MODEL-DEPRECATION",
+      "signature_pattern": "(models/gemini.*is not found|404.*not found|model not supported|resource_exhausted.*429)",
+      "domain": "llm_research",
+      "failed_component": "Google AI Studio Gemini Gateway",
+      "severity": "HIGH",
+      "root_cause": "Old model endpoint retired or daily free RPM quota hit.",
+      "action_plan": "Execute automatic failover cascade: gemini-2.0-flash-lite -> gemini-2.0-flash -> gemini-1.5-flash -> gemini-1.5-pro.",
+      "auto_executable": null,
+      "learned_from": "Commits 33d1691, 748efe7, c8edcdb"
+    },
+    {
+      "rule_id": "BUG-26-MASTERCLASS-DURATION-QUARANTINE",
+      "signature_pattern": "(masterclass.*duration < 480|quarantine gate|premature video end)",
+      "domain": "compliance_seo",
+      "failed_component": "Quality Assurance Quarantine Gate",
+      "severity": "HIGH",
+      "root_cause": "Incomplete video assembly published a partial clip (< 8 minutes) as a Masterclass.",
+      "action_plan": "Quarantine gate halts publication if masterclass duration < 480s, alerts Telegram, and re-triggers full chapter rendering pass.",
+      "auto_executable": null,
+      "learned_from": "Commit 8170c42"
+    },
+    {
+      "rule_id": "LEARNED-534883",
+      "signature_pattern": "Missing rendered segment artifact: output/downloaded_segments/segment_\\d+\\.mp4",
+      "domain": "parallel_matrix",
+      "failed_component": "Parallel Cloud Video Matrix",
+      "severity": "HIGH",
+      "root_cause": "Matrix runner upload-artifact evaluated to unpadded segment_0.mp4 while renderer produced segment_00.mp4.",
+      "action_plan": "Dual-save non-padded and 2-digit padded segment filenames, accept wildcard segment_*.mp4 in actions/upload-artifact, and recursive glob in aggregate_and_publish.",
+      "auto_executable": null,
+      "learned_from": "CLI Continuous Learning Tool"
+    },
+    {
+      "rule_id": "LEARNED-802122",
+      "signature_pattern": "No module named ['\\\"]requests['\\\"]",
+      "domain": "runner_dependencies",
+      "failed_component": "Repository Commit df694150",
+      "severity": "HIGH",
+      "root_cause": "Git commit df694150: fix(runner): decouple telegram requests import from isolated segment workers and add requests to runner env",
+      "action_plan": "fix(runner): decouple telegram requests import from isolated segment workers and add requests to runner env",
+      "auto_executable": "pip install requests",
+      "learned_from": "Git commit df694150"
+    },
+    {
+      "rule_id": "LEARNED-625906",
+      "signature_pattern": "Video with title .* already published|Duplicate long-form upload",
+      "domain": "duplicate_guard",
+      "failed_component": "Repository Commit eec09735",
+      "severity": "HIGH",
+      "root_cause": "Git commit eec09735: fix(pipeline): sever legacy Pexels loop, privatize duplicate channel uploads, and harden 20-runner parallel engine",
+      "action_plan": "fix(pipeline): sever legacy Pexels loop, privatize duplicate channel uploads, and harden 20-runner parallel engine",
+      "auto_executable": null,
+      "learned_from": "Git commit eec09735"
+    },
+    {
+      "rule_id": "LEARNED-127141",
+      "signature_pattern": "No module named ['\\\"]moviepy['\\\"]|moviepy.*AttributeError",
+      "domain": "runner_dependencies",
+      "failed_component": "Repository Commit 8bd8d2e4",
+      "severity": "HIGH",
+      "root_cause": "Git commit 8bd8d2e4: fix(deps): guard moviepy import in voice.py, add moviepy to workflow, and isolate edge-tts in Kaggle worker",
+      "action_plan": "fix(deps): guard moviepy import in voice.py, add moviepy to workflow, and isolate edge-tts in Kaggle worker",
+      "auto_executable": "pip install moviepy",
+      "learned_from": "Git commit 8bd8d2e4"
+    },
+    {
+      "rule_id": "LEARNED-471035",
+      "signature_pattern": "No module named ['\\\"]soundfile['\\\"]|libsndfile",
+      "domain": "runner_dependencies",
+      "failed_component": "Repository Commit b884a707",
+      "severity": "HIGH",
+      "root_cause": "Git commit b884a707: fix(pipeline): resolve soundfile dependency, Kaggle segment_index KeyError, and add channel shorts cleanup script",
+      "action_plan": "fix(pipeline): resolve soundfile dependency, Kaggle segment_index KeyError, and add channel shorts cleanup script",
+      "auto_executable": "pip install soundfile",
+      "learned_from": "Git commit b884a707"
+    },
+    {
+      "rule_id": "LEARNED-923372",
+      "signature_pattern": "cannot rebase.*uncommitted changes|refusing to merge unrelated histories",
+      "domain": "git_workspace",
+      "failed_component": "Repository Commit 97f2ae6f",
+      "severity": "HIGH",
+      "root_cause": "Git commit 97f2ae6f: fix(ci): robust git stash before rebase to prevent exit code 128",
+      "action_plan": "fix(ci): robust git stash before rebase to prevent exit code 128",
+      "auto_executable": "git stash && git pull --rebase origin main",
+      "learned_from": "Git commit 97f2ae6f"
+    }
+  ],
+  "incident_history": [
+    {
+      "timestamp": "2026-11-04T06:52:16Z",
+      "rule_id": "BUG-05-MISSING-SEGMENT-ARTIFACT",
+      "slot_name": "pipeline",
+      "attempt": 0,
+      "error_snippet": "filenotfounderror: missing rendered segment artifact: output/downloaded_segments/segment_00.mp4"
+    }
+  ]
+}

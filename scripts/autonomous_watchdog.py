@@ -187,13 +187,29 @@ def check_and_heal():
     if conclusion == "failure":
         logger.warning(f"🚨 Detected failure in run #{run_id} ({name}). Running AI diagnosis...")
         logs = fetch_failed_job_logs(run_id)
+
+        # 1. First-Party Diagnosis via Aria's Continuous Learning Vault
+        remedy = None
+        try:
+            from app.services.aria_healing import AriaSelfHealingEngine
+            remedy = AriaSelfHealingEngine.diagnose(logs, slot_name=name)
+            logger.info(f"🧠 [Aria Knowledge Base] Prescribed remedy: [{remedy.rule_id}] {remedy.action_plan}")
+            if remedy.auto_executable:
+                remedy.execute_auto_remediation()
+        except Exception as e_aria:
+            logger.warning(f"Aria self-healing engine inspection error: {e_aria}")
+
+        # 2. Secondary Gemini Diagnostic Pass if unclassified
         diagnosis = diagnose_failure_with_gemini(logs)
         logger.info(f"🩺 AI Diagnosis: {diagnosis}")
 
-        # Execute remediation
+        # 3. Execute Remediation
         action = diagnosis.get("action", "RETRY_WITH_CPU_FALLBACK")
         remediation_done = False
-        if action == "RETRY_WITH_CPU_FALLBACK" or diagnosis.get("classification") == "KAGGLE_ERROR":
+        if remedy and remedy.rule_id:
+            action_desc = f"[{remedy.rule_id}] {remedy.action_plan}"
+            remediation_done = redispatch_with_cpu_fallback(slot=1)
+        elif action == "RETRY_WITH_CPU_FALLBACK" or diagnosis.get("classification") == "KAGGLE_ERROR":
             remediation_done = redispatch_with_cpu_fallback(slot=1)
             action_desc = "Switched engine to Local CPU Fallback and dispatched new guaranteed run."
         elif action == "ROTATE_OAUTH_SLOT":
@@ -203,12 +219,20 @@ def check_and_heal():
             remediation_done = redispatch_with_cpu_fallback(slot=1)
             action_desc = "Auto-repaired pipeline state and re-dispatched run."
 
+        # 4. Continuous Learning: Ingest and persist new findings
+        try:
+            from app.services.aria_healing import AriaSelfHealingEngine
+            AriaSelfHealingEngine.persist_to_git(f"chore(healing): auto-learned remediation for run #{run_id}")
+        except Exception:
+            pass
+
         status_symbol = "✅ Self-Healed & Dispatched" if remediation_done else "⚠️ Remediation Attempted"
+        rule_tag = f"`[{remedy.rule_id}]` " if (remedy and remedy.rule_id) else ""
         msg = (
             f"🩺 *THE BULL PRINT — AUTONOMOUS DOCTOR ALERT* 🐂\n"
             f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
             f"🚨 *Failure Detected in:* `{name}` (`#{run_id}`)\n"
-            f"🔍 *Root Cause:* `{diagnosis.get('classification')}` — {diagnosis.get('root_cause')}\n"
+            f"🔍 *Root Cause:* {rule_tag}`{diagnosis.get('classification')}` — {diagnosis.get('root_cause')}\n"
             f"🛠️ *Autonomous Action:* {action_desc}\n"
             f"📊 *Status:* {status_symbol}\n"
             f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"

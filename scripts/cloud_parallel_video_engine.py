@@ -384,6 +384,14 @@ def render_segment(segment_index: int, bundle_dir: Path, output_dir: Optional[Pa
     proc.wait()
     logger.success(f"✅ [Runner {segment_index}] Rendered: {out_video_path.name} ({out_video_path.stat().st_size // 1024} KB)")
 
+    # Dual-save non-padded alias for maximum matrix artifact compatibility
+    alt_video_path = output_dir / f"segment_{segment_index}.mp4"
+    if not alt_video_path.exists() and out_video_path.exists():
+        try:
+            shutil.copyfile(out_video_path, alt_video_path)
+        except Exception:
+            pass
+
 
 # ─────────────────────────────────────────────────────────────
 # 3. CONCATENATION, DUCKED BGM MIXING & UPLOAD TO YOUTUBE
@@ -407,9 +415,16 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
     concat_list_file = output_dir / "concat_list.txt"
     with open(concat_list_file, "w") as f:
         for i in range(total_segments):
-            seg_file = segments_dir / f"segment_{i:02d}.mp4"
+            cand1 = segments_dir / f"segment_{i:02d}.mp4"
+            cand2 = segments_dir / f"segment_{i}.mp4"
+            seg_file = cand1 if cand1.exists() else cand2
             if not seg_file.exists():
-                raise FileNotFoundError(f"Missing rendered segment artifact: {seg_file}")
+                # Recursive search in case actions/download-artifact nested artifacts
+                matches = list(segments_dir.rglob(f"segment_{i:02d}.mp4")) + list(segments_dir.rglob(f"segment_{i}.mp4"))
+                if matches:
+                    seg_file = matches[0]
+                else:
+                    raise FileNotFoundError(f"Missing rendered segment artifact: {cand1}")
             f.write(f"file '{seg_file.resolve()}'\n")
 
     # 1. Lossless Video Concatenation
