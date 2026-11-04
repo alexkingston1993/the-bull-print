@@ -4,14 +4,14 @@
   "vertical": "crypto",
   "vertical_label": "Slot #5",
   "shorts_count": 1,
-  "status": "WAITING_APPROVAL",
+  "status": "FAILED",
   "overall_pct": 60,
   "stage_pct": 20,
   "current_stage_index": 5,
   "current_stage_name": "Local CPU Media Engine",
-  "current_subtask_label": "Rendering 1080p Masterclass via CPU FFmpeg...",
+  "current_subtask_label": "Error: Command '['edge-tts', '--voice', 'en-IN-PrabhatNeural', '--rate=+3%', ",
   "started_at": "2026-11-04T16:54:43Z",
-  "updated_at": "2026-11-04T17:00:01Z",
+  "updated_at": "2026-11-04T17:05:25Z",
   "eta_seconds": 0,
   "stages": [
     {
