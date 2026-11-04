@@ -9,9 +9,9 @@
   "stage_pct": 100,
   "current_stage_index": 2,
   "current_stage_name": "Gemini Script & Article Synthesis",
-  "current_subtask_label": "open-seo dark-query loop \u00b7 slot 6",
+  "current_subtask_label": "source: google_news_rss_live \u00b7 cluster: term insurance claim rejection, health insurance room rent limit, irdai new rules",
   "started_at": "2026-11-04T17:59:47Z",
-  "updated_at": "2026-11-04T17:59:57Z",
+  "updated_at": "2026-11-04T18:00:05Z",
   "eta_seconds": 0,
   "stages": [
     {
