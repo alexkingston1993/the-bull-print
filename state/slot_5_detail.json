@@ -1,225 +1,88 @@
 {
   "slot": 5,
-  "run_id": "41455169568",
+  "run_id": "41835268282",
   "vertical": "crypto",
   "vertical_label": "Slot #5",
   "shorts_count": 1,
-  "status": "COMPLETED",
-  "overall_pct": 100,
-  "stage_pct": 100,
-  "current_stage_index": 7,
-  "current_stage_name": "Multi-Channel Distribution",
-  "current_subtask_label": "Live: https://the-bull-print.vercel.app/article.html?slug=usdt_dom_cmc_005",
-  "started_at": "2026-11-02T13:42:46Z",
-  "updated_at": "2026-11-02T14:06:47Z",
+  "status": "RUNNING",
+  "overall_pct": 2,
+  "stage_pct": 10,
+  "current_stage_index": 1,
+  "current_stage_name": "SEO Topic Harvester (open-seo)",
+  "current_subtask_label": "Harvesting search intent & clusters",
+  "started_at": "2026-11-04T13:08:49Z",
+  "updated_at": "2026-11-04T13:08:49Z",
   "eta_seconds": 0,
   "stages": [
     {
       "id": 1,
       "name": "SEO Topic Harvester (open-seo)",
-      "status": "COMPLETED",
-      "pct": 100,
-      "started_at": "2026-11-02T13:42:46Z",
-      "completed_at": "2026-11-02T13:42:55Z",
+      "status": "RUNNING",
+      "pct": 0,
+      "started_at": "2026-11-04T13:08:49Z",
+      "completed_at": null,
       "metrics": {}
     },
     {
       "id": 2,
-      "name": "Gemini Script & Dossier Synthesis",
-      "status": "COMPLETED",
-      "pct": 100,
-      "started_at": "2026-11-02T13:42:55Z",
-      "completed_at": "2026-11-02T13:43:09Z",
+      "name": "Gemini Script & Article Synthesis",
+      "status": "PENDING",
+      "pct": 0,
+      "started_at": null,
+      "completed_at": null,
       "metrics": {}
     },
     {
       "id": 3,
       "name": "Authenticity & SEBI/IRDAI Compliance Gate",
-      "status": "COMPLETED",
-      "pct": 100,
-      "started_at": "2026-11-02T13:44:27Z",
-      "completed_at": "2026-11-02T13:43:09Z",
-      "metrics": {
-        "audit_attempts": 1,
-        "compliance_status": "PASS_1",
-        "audit_notes": "Virality dopamine pacing and SEBI/IRDAI compliance healed & verified",
-        "compliance_pass": true,
-        "compliance_verdict": "PASSED_AFTER_FEEDBACK",
-        "virality_score": 92,
-        "authenticity_pass": true,
-        "trigram_similarity_pct": 8.4,
-        "regex_violations": 0
-      }
+      "status": "PENDING",
+      "pct": 0,
+      "started_at": null,
+      "completed_at": null,
+      "metrics": {}
     },
     {
       "id": 4,
       "name": "Chart & High-CTR Thumbnail Studio",
-      "status": "COMPLETED",
-      "pct": 100,
-      "started_at": "2026-11-02T13:43:09Z",
-      "completed_at": "2026-11-02T13:45:56Z",
-      "metrics": {
-        "approval_status": "AUTO_APPROVED",
-        "approval_deadline_ts": 1793627131,
-        "headline": "ON-CHAIN ALPHA WHALE DUMP!"
-      }
+      "status": "PENDING",
+      "pct": 0,
+      "started_at": null,
+      "completed_at": null,
+      "metrics": {}
     },
     {
       "id": 5,
       "name": "Kaggle T4 GPU Render Farm",
-      "status": "COMPLETED",
-      "pct": 100,
-      "started_at": "2026-11-02T13:45:56Z",
-      "completed_at": "2026-11-02T14:06:30Z",
-      "metrics": {
-        "voice_persona": "Arjun \u2014 Signature Cloned Voice",
-        "kaggle_kernel_status": "STARTING",
-        "long_render_pct": 0,
-        "short_1_render_pct": 0,
-        "short_2_render_pct": 0,
-        "gpu_elapsed_sec": 0
-      }
+      "status": "PENDING",
+      "pct": 0,
+      "started_at": null,
+      "completed_at": null,
+      "metrics": {}
     },
     {
       "id": 6,
       "name": "OpenMontage Post-Render QA Gate",
-      "status": "COMPLETED",
-      "pct": 100,
+      "status": "PENDING",
+      "pct": 0,
       "started_at": null,
-      "completed_at": "2026-11-02T14:06:30Z",
+      "completed_at": null,
       "metrics": {}
     },
     {
       "id": 7,
       "name": "Multi-Channel Distribution",
-      "status": "RUNNING",
-      "pct": 100,
-      "started_at": "2026-11-02T14:06:30Z",
+      "status": "PENDING",
+      "pct": 0,
+      "started_at": null,
       "completed_at": null,
-      "metrics": {
-        "yt_long_id": "CAAWeig8x9k",
-        "yt_short_ids": [],
-        "oauth_slot_used": 1,
-        "article_url": "https://the-bull-print.vercel.app/article.html?slug=usdt_dom_cmc_005",
-        "x_thread_url": "Skipped (X keys not set)"
-      }
+      "metrics": {}
     }
   ],
   "live_logs": [
     {
-      "ts": "13:42:46",
+      "ts": "13:08:49",
       "level": "INFO",
       "msg": "Slot #5 (crypto) initialized. Target: 1 Long + 1 Shorts."
-    },
-    {
-      "ts": "13:42:58",
-      "level": "INFO",
-      "msg": "[GEMINI]: \ud83d\udd0d Harvesting live search intent... | open-seo dark-query loop \u00b7 slot 5"
-    },
-    {
-      "ts": "13:43:06",
-      "level": "INFO",
-      "msg": "[GEMINI]: \ud83d\udd0d Harvested `Usdt dominance coinmarketcap` | source: autocomplete \u00b7 cluster: usdt dominance coinmarketcap, usdt dominance chart and ideas \u2014 tradingview, usdt dominance chart binance"
-    },
-    {
-      "ts": "13:43:12",
-      "level": "INFO",
-      "msg": "[PLAYWRIGHT]: \ud83d\udd04 Capturing 3 charts... | "
-    },
-    {
-      "ts": "13:43:32",
-      "level": "INFO",
-      "msg": "[PLAYWRIGHT]: \u2705 Captured (3 charts) | "
-    },
-    {
-      "ts": "13:43:37",
-      "level": "INFO",
-      "msg": "[GEMINI]: \ud83e\udde0 Synthesizing Dual Script + Article... | "
-    },
-    {
-      "ts": "13:43:59",
-      "level": "INFO",
-      "msg": "[GEMINI]: \ud83d\udee1\ufe0f Auditing Virality & Compliance... | Retention pacing + SEBI/IRDAI auditor"
-    },
-    {
-      "ts": "13:44:06",
-      "level": "INFO",
-      "msg": "[GEMINI]: \ud83d\udee1\ufe0f Virality & Compliance (Pass 1/3) | 100% Pass: Virality 90/100 + SEBI/IRDAI Approved"
-    },
-    {
-      "ts": "13:44:23",
-      "level": "INFO",
-      "msg": "[GEMINI]: \u2705 Generated + Healed (`usdt_dom_cmc_005`) | \ud83e\ude99 CRYPTO"
-    },
-    {
-      "ts": "13:44:37",
-      "level": "INFO",
-      "msg": "[GEMINI]: \ud83d\udd2c Auditing Authenticity Engine... | trigram dupe-check + domain vocabulary"
-    },
-    {
-      "ts": "13:44:43",
-      "level": "INFO",
-      "msg": "[GEMINI]: \u2705 Original (retail_myth_mathematical_deconstruction) | \ud83e\ude99 CRYPTO \u00b7 113 hits (liquidation, liquidation cluster, funding rate, open interest, perp, p"
-    },
-    {
-      "ts": "13:44:49",
-      "level": "INFO",
-      "msg": "[THUMBNAIL]: \ud83c\udfa8 Rendering Pillow Graphics... | "
-    },
-    {
-      "ts": "13:45:44",
-      "level": "INFO",
-      "msg": "[THUMBNAIL]: \u26a1 Auto-Approved (`ON-CHAIN ALPHA WHALE DUMP!`) | "
-    },
-    {
-      "ts": "13:45:51",
-      "level": "INFO",
-      "msg": "[THUMBNAIL]: \ud83c\udfa8 Rendering 1 9:16 Shelf Covers & Headers... | "
-    },
-    {
-      "ts": "13:45:59",
-      "level": "INFO",
-      "msg": "[KAGGLE_GPU]: \ud83d\ude80 Dispatching to Kaggle Dual-T4 GPU... | "
-    },
-    {
-      "ts": "13:49:33",
-      "level": "INFO",
-      "msg": "[KAGGLE_GPU]: \u2601\ufe0f Pushing Dataset to Kaggle... | "
-    },
-    {
-      "ts": "13:50:53",
-      "level": "INFO",
-      "msg": "[KAGGLE_GPU]: \ud83d\udd25 Waking Dual-T4 GPU Kernel... | "
-    },
-    {
-      "ts": "13:51:24",
-      "level": "INFO",
-      "msg": "[KAGGLE_GPU]: \u26a1 Kaggle Glitch \u2014 CPU Fallback Engaged | "
-    },
-    {
-      "ts": "13:51:31",
-      "level": "INFO",
-      "msg": "[KAGGLE_GPU]: \u26a1 CPU Fallback Engine Active (Kaggle Bypassed) | "
-    },
-    {
-      "ts": "14:04:49",
-      "level": "INFO",
-      "msg": "[KAGGLE_GPU]: \ud83d\ude80 Uploading Long Masterclass to YouTube... | "
-    },
-    {
-      "ts": "14:05:39",
-      "level": "INFO",
-      "msg": "[KAGGLE_GPU]: \ud83c\udfac Rendering CPU Short #1/1... | "
-    },
-    {
-      "ts": "14:06:33",
-      "level": "INFO",
-      "msg": "[VERCEL]: \ud83d\udcdd Compiling MDX & IndexNow Ping... | "
-    },
-    {
-      "ts": "14:06:39",
-      "level": "INFO",
-      "msg": "[VERCEL]: \u2705 Live & Indexed (`https://the-bull-print.vercel.app/article.html?slug=usdt_dom_cmc_005`) | \ud83d\udc26 X Thread: Skipped (X keys not set)"
     }
   ]
 }
