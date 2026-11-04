@@ -292,39 +292,80 @@ def generate_ai_scene_backdrop(
     from PIL import ImageOps
     stock_candidates = {
         "insurance": [
-            BASE_DIR / "output" / "thumbnails" / "master_nMfqeaCzuAg.jpg",
-            BASE_DIR / "output" / "thumbnails" / "master_GgFmjQY9IMo.jpg",
-            BASE_DIR / "output" / "images" / "proof_insurance_yt_thumb.jpg",
+            BASE_DIR / "assets" / "flow_ai_masters" / "sebi_rule_exposed.jpg",
+            BASE_DIR / "assets" / "charts" / "ins_claim_vs_deduction_matrix.png",
+            BASE_DIR / "assets" / "flow_ai_masters" / "90_percent_lose.jpg",
         ],
         "crypto": [
-            BASE_DIR / "output" / "thumbnails" / "master_WG-9Tv5Jt-k.jpg",
-            BASE_DIR / "output" / "thumbnails" / "master_gEkRKqYhCN4.jpg",
-            BASE_DIR / "output" / "images" / "proof_crypto_yt_thumb.jpg",
+            BASE_DIR / "assets" / "flow_ai_masters" / "crypto_mev" / "frame_00.jpg",
+            BASE_DIR / "assets" / "flow_ai_masters" / "crypto_mev" / "frame_01.jpg",
+            BASE_DIR / "assets" / "charts" / "btc_hourly_structure.png",
         ],
         "stock_market": [
-            BASE_DIR / "output" / "thumbnails" / "master_-2K3qWYq6y8.jpg",
-            BASE_DIR / "output" / "thumbnails" / "master_t05-xVABLaE.jpg",
-            BASE_DIR / "output" / "thumbnails" / "master_T69-BM1mgjc.jpg",
-            BASE_DIR / "output" / "thumbnails" / "master_dxhUWlm3DUQ.jpg",
-            BASE_DIR / "output" / "images" / "proof_stock_market_yt_thumb.jpg",
+            BASE_DIR / "assets" / "flow_ai_masters" / "fii_dump_3200cr.jpg",
+            BASE_DIR / "assets" / "flow_ai_masters" / "3pm_trap.jpg",
+            BASE_DIR / "assets" / "flow_ai_masters" / "90_percent_lose.jpg",
+            BASE_DIR / "assets" / "charts" / "nifty_opening_range.png",
         ]
     }
     vert_key = (vertical or "stock_market").lower()
     pool = stock_candidates.get(vert_key) or stock_candidates["stock_market"]
     available = [p for p in pool if p.exists()]
     if not available:
-        all_thumbs = list((BASE_DIR / "output" / "thumbnails").glob("master_*.jpg"))
-        available = all_thumbs if all_thumbs else list((BASE_DIR / "output" / "images").glob("*.jpg"))
+        available = list((BASE_DIR / "assets" / "flow_ai_masters").glob("*.jpg"))
 
     if available:
         chosen_path = available[abs(seed) % len(available)]
         logger.info(f"[Thumbs] Using high-fidelity 3D Cinematic Asset: {chosen_path.name}")
         raw = Image.open(chosen_path).convert("RGB")
         fit_img = ImageOps.fit(raw, (width, height), method=Image.Resampling.LANCZOS).convert("RGBA")
-        validate_thumbnail_richness(fit_img, name=f"Stock 3D Scene ({chosen_path.name})")
-        return fit_img
+        try:
+            validate_thumbnail_richness(fit_img, name=f"Stock 3D Scene ({chosen_path.name})")
+            return fit_img
+        except Exception as v_err:
+            logger.warning(f"[Thumbs] Stock asset validation note: {v_err}. Engaging procedural generator.")
 
-    raise RuntimeError(f"CRITICAL: Failed to generate or load 3D scene. All remote and local assets unavailable.")
+    # 🛡️ 4. Ultimate Procedural Visual Generator (Zero Failure Guarantee)
+    logger.info("[Thumbs] Generating procedural 3D market scene backdrop (guaranteed high-contrast & rich)...")
+    import random
+    random.seed(seed)
+    proc_img = Image.new("RGBA", (width, height), (10, 14, 26, 255))
+    pdraw = ImageDraw.Draw(proc_img)
+
+    top_c = (25, 8, 15) if vert_key == "stock_market" else ((12, 6, 28) if vert_key == "crypto" else (6, 20, 35))
+    bot_c = (6, 8, 14)
+    for y in range(height):
+        t = y / height
+        r = int(top_c[0] * (1 - t) + bot_c[0] * t)
+        g = int(top_c[1] * (1 - t) + bot_c[1] * t)
+        b = int(top_c[2] * (1 - t) + bot_c[2] * t)
+        pdraw.line([(0, y), (width, y)], fill=(r, g, b, 255))
+
+    grid_c = (255, 40, 40, 40) if vert_key == "stock_market" else ((150, 70, 255, 40) if vert_key == "crypto" else (20, 180, 255, 40))
+    for x in range(0, width, 60):
+        pdraw.line([(x, 0), (x, height)], fill=grid_c, width=1)
+    for y in range(0, height, 60):
+        pdraw.line([(0, y), (width, y)], fill=grid_c, width=1)
+
+    glow = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    gdraw = ImageDraw.Draw(glow)
+    glow_c = (255, 60, 60, 180) if vert_key == "stock_market" else ((180, 80, 255, 180) if vert_key == "crypto" else (0, 200, 255, 180))
+    gdraw.ellipse([width - 550, 80, width - 20, 520], fill=glow_c)
+    glow = glow.filter(ImageFilter.GaussianBlur(60))
+    proc_img.alpha_composite(glow)
+
+    pdraw = ImageDraw.Draw(proc_img)
+    for i in range(16):
+        cx = width - 40 - (i * 40)
+        ch_h = random.randint(100, 300)
+        ch_y = random.randint(180, 450)
+        is_green = random.random() > 0.4
+        c_fill = (34, 197, 94, 255) if is_green else (239, 68, 68, 255)
+        pdraw.line([(cx, ch_y - 30), (cx, ch_y + ch_h + 30)], fill=c_fill, width=3)
+        pdraw.rectangle([cx - 12, ch_y, cx + 12, ch_y + ch_h], fill=c_fill)
+
+    validate_thumbnail_richness(proc_img, name="Procedural 3D Scene")
+    return proc_img
 
 
 
