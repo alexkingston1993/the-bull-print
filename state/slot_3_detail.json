@@ -96,7 +96,13 @@
       "pct": 100,
       "started_at": "2026-11-04T11:51:35Z",
       "completed_at": null,
-      "metrics": {}
+      "metrics": {
+        "yt_long_id": "6HMZBx743is",
+        "yt_short_ids": [],
+        "oauth_slot_used": 1,
+        "article_url": "https://the-bull-print.vercel.app/article.html?slug=irdai_claim_settlement_rules_03",
+        "x_thread_url": "Skipped (X keys not set)"
+      }
     }
   ],
   "live_logs": [
