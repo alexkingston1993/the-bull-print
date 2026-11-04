@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-04T11:51:31Z",
+  "updated_at": "2026-11-04T11:51:39Z",
   "videos": {
     "slot_1_long": {
       "slot": 1,
@@ -73,16 +73,16 @@
       "title": "[LONG-FORM] Crypto funding rate chart",
       "format": "16:9 LONG",
       "vertical": "CRYPTO",
-      "current_stage": "Stage 5/7: Kaggle T4 GPU \u2014 NVENC Encoding",
-      "stage_pct": 50,
-      "completion_pct": 65,
-      "eta_seconds": 220,
+      "current_stage": "Stage 7/7: Uploaded & Distributed",
+      "stage_pct": 100,
+      "completion_pct": 100,
+      "eta_seconds": 0,
       "compliance_status": "\ud83d\udee1\ufe0f Feedback Healed & Verified",
-      "status": "IN_PROGRESS",
-      "updated_at": "2026-11-04T11:32:16Z",
+      "status": "COMPLETED",
+      "updated_at": "2026-11-04T11:51:39Z",
       "started_at": "2026-10-27T20:13:00Z",
-      "youtube_id": "WG-9Tv5Jt-k",
-      "youtube_url": "https://www.youtube.com/watch?v=WG-9Tv5Jt-k"
+      "youtube_id": "Imj8dtquytU",
+      "youtube_url": "https://www.youtube.com/watch?v=Imj8dtquytU"
     },
     "slot_3_long": {
       "video_id": "slot_3_long",
