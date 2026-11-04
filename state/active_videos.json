@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-04T11:53:32Z",
+  "updated_at": "2026-11-04T12:13:09Z",
   "videos": {
     "slot_1_long": {
       "slot": 1,
@@ -107,16 +107,16 @@
       "title": "[LONG-FORM] Sebi f&o rules",
       "format": "16:9 LONG",
       "vertical": "STOCK_MARKET",
-      "current_stage": "Stage 5/7: Kaggle T4 GPU \u2014 NVENC Encoding",
-      "stage_pct": 50,
-      "completion_pct": 65,
-      "eta_seconds": 220,
+      "current_stage": "Stage 7/7: Uploaded & Distributed",
+      "stage_pct": 100,
+      "completion_pct": 100,
+      "eta_seconds": 0,
       "compliance_status": "\ud83d\udee1\ufe0f Feedback Healed & Verified",
-      "status": "IN_PROGRESS",
-      "updated_at": "2026-11-04T11:53:32Z",
+      "status": "COMPLETED",
+      "updated_at": "2026-11-04T12:13:09Z",
       "started_at": "2026-10-27T20:31:29Z",
-      "youtube_id": "8BbbiKjf0y0",
-      "youtube_url": "https://www.youtube.com/watch?v=8BbbiKjf0y0"
+      "youtube_id": "V0M7FKKH9Ig",
+      "youtube_url": "https://www.youtube.com/watch?v=V0M7FKKH9Ig"
     }
   }
 }
