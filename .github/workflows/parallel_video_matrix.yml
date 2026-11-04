@@ -62,7 +62,7 @@ jobs:
       - name: 📦 Install Synthesis Dependencies (100% Offline Cloned Christopher Voice)
         run: |
           sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core
-          pip install --no-cache-dir Pillow soundfile soxr faster-whisper requests google-genai loguru toml
+          pip install --no-cache-dir Pillow soundfile soxr faster-whisper requests google-genai loguru toml edge-tts
 
       - name: 🚀 Prepare Session & Compute Parallel Matrix
         id: prep

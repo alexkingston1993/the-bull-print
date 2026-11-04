@@ -107,19 +107,19 @@ def synthesize_audio_prabhat(text: str, output_path: str) -> Tuple[float, List[T
         pass
 
     chunks = _split_into_sentence_chunks(text, max_chars=320)
-    _log(f"[TTS] Synthesizing {len(text)} chars across {len(chunks)} chunks with Arjun cloned voice...")
+    _log(f"[TTS] Synthesizing {len(text)} chars across {len(chunks)} chunks with Christopher cloned voice...")
 
     combined_audio = bytearray()
     subtitle_entries: List[Tuple[float, float, str]] = []
     current_time_offset = 0.0
 
-    from app.services.cloned_prabhat_tts import synthesize_arjun_voice
+    from app.services.local_christopher_tts import synthesize_christopher_voice
 
     async def _synth_chunk(c_text: str) -> bytes:
-        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+        with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as tmp:
             tmp_path = tmp.name
         try:
-            synthesize_arjun_voice(c_text, tmp_path)
+            synthesize_christopher_voice(c_text, Path(tmp_path))
             with open(tmp_path, "rb") as f:
                 return f.read()
         finally:

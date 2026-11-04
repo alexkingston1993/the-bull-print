@@ -236,15 +236,12 @@ print(f"DURATION={{__import__('soundfile').info('{output_path}').duration}}", fl
 
     @staticmethod
     def step_tts_fallback(text: str, output_path: str) -> Tuple[str, float]:
-        """Synthesizes speech strictly using cloned Arjun voice."""
-        from app.services.cloned_prabhat_tts import synthesize_arjun_voice
-        import soundfile as sf
+        """Synthesizes speech strictly using signature Christopher cloned voice."""
+        from app.services.local_christopher_tts import synthesize_christopher_voice
         t0 = time.time()
-        synthesize_arjun_voice(text, output_path)
+        duration = synthesize_christopher_voice(text, Path(output_path))
         elapsed = time.time() - t0
-        data, sr = sf.read(output_path)
-        duration = len(data) / sr
-        logger.info(f"Arjun TTS: {duration:.0f}s in {elapsed:.1f}s")
+        logger.info(f"Christopher TTS: {duration:.0f}s in {elapsed:.1f}s")
         return output_path, duration
 
     @staticmethod

@@ -197,66 +197,37 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
 
 def _synthesize_local_christopher_audio(script_text: str, audio_path: Path, words_path: Path, total_duration_sec: float = 60.0) -> List[Dict[str, Any]]:
     """
-    100% OFFLINE LOCAL CLONED TTS ENGINE (Christopher Voice)
-    - Zero outside dependencies, zero edge-tts, zero external network calls.
-    - Reference audio: assets/voice_model/christopher_ref/christopher_master_24k.wav
+    OFFICIAL SIGNATURE CHRISTOPHER CLONED VOICE ENGINE
+    - Synthesizes 100% authentic Christopher narration for the given script.
     - Mastering: Highpass 70Hz + 135Hz chest resonance EQ + optical compression + -16 LUFS.
-    - Word Alignment: 100% offline Faster-Whisper base.en from local cache.
+    - Word Alignment: Millisecond-accurate word timestamps for kinetic typography.
     """
     audio_path.parent.mkdir(parents=True, exist_ok=True)
     words_path.parent.mkdir(parents=True, exist_ok=True)
     
-    try:
-        from app.services.local_christopher_tts import synthesize_chapter_offline
-        logger.info("🎙️ [Voice Engine] Invoking 100% local cloned Christopher voice (zero external APIs)...")
-        res = synthesize_chapter_offline(
-            script_text=script_text,
-            out_mp3_path=str(audio_path),
-            out_timestamps_json=str(words_path)
-        )
-        with open(words_path, "r", encoding="utf-8") as f:
-            words_data = json.load(f)
-        
-        # Format normalization for renderer
-        normalized_words = []
-        for w in words_data:
-            normalized_words.append({
-                "word": w.get("word", "").strip().upper(),
-                "start": float(w.get("startSec", w.get("start", 0.0))),
-                "end": float(w.get("endSec", w.get("end", 0.0))),
-            })
-        with open(words_path, "w", encoding="utf-8") as f:
-            json.dump(normalized_words, f, indent=2)
+    from app.services.local_christopher_tts import synthesize_chapter_offline
+    logger.info("🎙️ [Voice Engine] Invoking signature Christopher voice narration...")
+    res = synthesize_chapter_offline(
+        script_text=script_text,
+        out_mp3_path=str(audio_path),
+        out_timestamps_json=str(words_path)
+    )
+    with open(words_path, "r", encoding="utf-8") as f:
+        words_data = json.load(f)
+    
+    # Format normalization for renderer
+    normalized_words = []
+    for w in words_data:
+        normalized_words.append({
+            "word": w.get("word", "").strip().upper(),
+            "start": float(w.get("startSec", w.get("start", 0.0))),
+            "end": float(w.get("endSec", w.get("end", 0.0))),
+        })
+    with open(words_path, "w", encoding="utf-8") as f:
+        json.dump(normalized_words, f, indent=2)
 
-        logger.success(f"✅ [Voice Engine] Cloned Christopher narration mastered: {audio_path.name} ({res['durationSec']:.1f}s, {len(normalized_words)} words)")
-        return normalized_words
-    except Exception as e:
-        logger.warning(f"Local Christopher synthesizer fallback ({e}). Using golden master voice mastering pipeline.")
-        ref_wav = BASE_DIR / "assets" / "voice_model" / "christopher_ref" / "christopher_master_24k.wav"
-        if ref_wav.exists():
-            subprocess.run([
-                "ffmpeg", "-y", "-stream_loop", "-1", "-i", str(ref_wav),
-                "-t", str(total_duration_sec),
-                "-af", "highpass=f=70,equalizer=f=135:t=q:w=1.2:g=2.5,loudnorm=I=-16:TP=-1.5:LRA=11",
-                "-acodec", "libmp3lame", "-b:a", "192k", str(audio_path)
-            ], capture_output=True, check=True)
-        else:
-            subprocess.run([
-                "ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
-                "-t", str(total_duration_sec), "-q:a", "9", "-acodec", "libmp3lame", str(audio_path)
-            ], capture_output=True, check=True)
-        
-        words = []
-        script_words = [w.strip().upper() for w in script_text.split() if w.strip()]
-        if script_words:
-            step = max(0.3, (total_duration_sec - 1.0) / len(script_words))
-            for i, w in enumerate(script_words):
-                w_start = round(0.5 + i * step, 2)
-                w_end = round(w_start + min(0.35, step * 0.85), 2)
-                words.append({"word": w, "start": w_start, "end": w_end})
-        with open(words_path, "w", encoding="utf-8") as f:
-            json.dump(words, f, indent=2)
-        return words
+    logger.success(f"✅ [Voice Engine] Christopher narration mastered: {audio_path.name} ({res['durationSec']:.1f}s, {len(normalized_words)} words)")
+    return normalized_words
 
 
 def prepare_session(

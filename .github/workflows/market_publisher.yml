@@ -1,91 +1,31 @@
-name: Master Autonomous Scheduler (Market Pulse + Bull Print Video Engine)
+name: Market Pulse Educational Article Engine
 
 on:
-  # ── MASTER DAILY SCHEDULE — paused while video engine is being refactored ──
-  # schedule:
-  #   - cron: '0 3 * * *'      # 08:30 AM IST  — video: Slot 1 Stock pre-open (2 Shorts)
-  #   - cron: '33 3 * * 1-5'   # 09:03 AM IST  — article: Pre-Market / Open Brief
-  #   - cron: '30 5 * * *'     # 11:00 AM IST  — video: Slot 2 Crypto morning (2 Shorts)
-  #   - cron: '33 5 * * 1-5'   # 11:03 AM IST  — article: Morning Momentum & Sector Rotation
-  #   - cron: '0 8 * * *'      # 13:30 PM IST  — video: Slot 3 Insurance lunch (2 Shorts)
-  #   - cron: '03 8 * * 1-5'   # 13:33 PM IST  — article: Mid-Day / European Cues
-  #   - cron: '33 10 * * 1-5'  # 16:03 PM IST  — article: Closing Bell Wrap & Top Movers
-  #   - cron: '15 10 * * *'    # 15:45 PM IST  — video: Slot 4 Stock closing (2 Shorts)
-  #   - cron: '0 13 * * *'     # 18:30 PM IST  — video: Slot 5 Crypto evening (1 Short)
-  #   - cron: '03 14 * * 1-5'  # 19:33 PM IST  — article: Evening FII/DII Deep Dive
-  #   - cron: '30 15 * * *'    # 21:00 PM IST  — video: Slot 6 Insurance night (1 Short)
-  #   - cron: '33 5 * * 6'     # 11:03 AM IST Saturday — article: Weekend Masterclass
+  schedule:
+    - cron: '33 3 * * 1-5'   # 09:03 AM IST  — article: Pre-Market / Open Brief
+    - cron: '33 5 * * 1-5'   # 11:03 AM IST  — article: Morning Momentum & Sector Rotation
+    - cron: '03 8 * * 1-5'   # 13:33 PM IST  — article: Mid-Day / European Cues
+    - cron: '33 10 * * 1-5'  # 16:03 PM IST  — article: Closing Bell Wrap & Top Movers
+    - cron: '03 14 * * 1-5'  # 19:33 PM IST  — article: Evening FII/DII Deep Dive
+    - cron: '33 5 * * 6'     # 11:03 AM IST Saturday — article: Weekend Masterclass
   workflow_dispatch:
     inputs:
-      slot:
-        description: 'Daily video slot 1-6 (empty slot = harvest topic automatically)'
-        required: false
-        default: ''
-      topic:
-        description: 'Video topic override (optional)'
-        required: false
-        default: ''
-      notes:
-        description: 'Research Notes / Context (optional)'
-        required: false
-        default: ''
-      vertical:
-        description: 'Vertical override: stock_market | crypto | insurance'
-        required: false
-        default: ''
-      shorts_count:
-        description: '9:16 Shorts to render from this session (1 or 2)'
-        required: false
-        default: ''
-      shorts_only:
-        description: 'Render ONLY 9:16 Shorts (skip longform video)'
-        required: false
-        default: 'false'
-      batch_shorts:
-        description: 'Sequentially produce 10 Shorts across 5 slots (100% GHA local CPU)'
-        required: false
-        default: 'false'
-      batch_longform:
-        description: 'Sequentially produce all 6 Long-Format Masterclass videos on Kaggle Dual-T4 GPU'
-        required: false
-        default: 'false'
-      batch_all_12:
-        description: 'Sequentially produce all 12 videos (4 Long-Form + 8 Shorts across 4 slots) with guaranteed CPU fallback'
-        required: false
-        default: 'false'
-      force_cpu_fallback:
-        description: 'Bypass Kaggle GPU and render directly on local GHA CPU runner'
-        required: false
-        default: 'false'
       article_slot:
-        description: 'Market slot name — run ARTICLE engine only (leave empty for video engine)'
+        description: 'Market slot name — e.g. pre_market, mid_day, closing_bell'
         required: false
-        default: ''
-  repository_dispatch:
-    types: [trigger_media_engine, trigger_parallel_video]
+        default: 'pre_market'
 
 permissions:
   contents: write
 
 jobs:
   # ─────────────────────────── ARTICLE ENGINE (Market Pulse) ───────────────────────────
-  run-pipeline:
+  publish_article:
     concurrency:
-      group: bull-print-article-conveyor
+      group: market-pulse-article-conveyor
       cancel-in-progress: false
-    # Legacy news crons only, or explicit manual article dispatch (article_slot filled)
-    if: >-
-      (github.event_name == 'schedule' && (
-        github.event.schedule == '33 3 * * 1-5' ||
-        github.event.schedule == '33 5 * * 1-5' ||
-        github.event.schedule == '03 8 * * 1-5' ||
-        github.event.schedule == '33 10 * * 1-5' ||
-        github.event.schedule == '03 14 * * 1-5' ||
-        github.event.schedule == '33 5 * * 6'
-      )) ||
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.article_slot != '')
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 60
 
     steps:
       - name: Checkout Repository
@@ -99,73 +39,25 @@ jobs:
         with:
           python-version: '3.11'
 
-
-      - name: Verify FFmpeg and Audio Libraries
-        run: |
-          sudo apt-get update -y && sudo apt-get install -y ffmpeg libsndfile1 espeak-ng
-          echo "✓ FFmpeg & audio libs installed: $(ffmpeg -version | head -n 1)"
-
-      - name: Free Disk Space
-        run: |
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/boost 2>/dev/null || true
-          df -h
-
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-
-      - name: Restore YouTube Token
-        env:
-          YOUTUBE_TOKEN_EN: ${{ secrets.YOUTUBE_TOKEN_EN }}
-        run: |
-          if [ -n "$YOUTUBE_TOKEN_EN" ]; then
-            mkdir -p data/youtube_tokens
-            echo "$YOUTUBE_TOKEN_EN" | base64 -d > data/youtube_tokens/youtube_token_en.pickle
-            echo "✓ YouTube OAuth token restored for autonomous cloud upload"
-          fi
-
-      - name: Execute Autonomous Market Cycle
+      - name: Execute Autonomous Market Article Cycle
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           LLM_PROVIDER: "gemini"
           GEMINI_MODEL_NAME: "gemini-flash-latest"
-          VOICE_NAME: "xtts:prabhat"
+          VOICE_NAME: "christopher"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPO: ${{ github.repository }}
-          WHATSAPP_PHONE: ${{ secrets.WHATSAPP_PHONE }}
-          WHATSAPP_APIKEY: ${{ secrets.WHATSAPP_APIKEY }}
-          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
-          TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
-          TWILIO_TO_PHONE: ${{ secrets.TWILIO_TO_PHONE }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
-          MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
-          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
-          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
-          YOUTUBE_TOKEN_EN: ${{ secrets.YOUTUBE_TOKEN_EN }}
-          YT_OAUTH_POOL_JSON: ${{ secrets.YT_OAUTH_POOL_JSON }}
-          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
-          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
-          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
-          YT_CLIENT_ID_1: ${{ secrets.YT_CLIENT_ID_1 }}
-          YT_CLIENT_SECRET_1: ${{ secrets.YT_CLIENT_SECRET_1 }}
-          YT_REFRESH_TOKEN_1: ${{ secrets.YT_REFRESH_TOKEN_1 }}
-          YT_CLIENT_ID_2: ${{ secrets.YT_CLIENT_ID_2 }}
-          YT_CLIENT_SECRET_2: ${{ secrets.YT_CLIENT_SECRET_2 }}
-          YT_REFRESH_TOKEN_2: ${{ secrets.YT_REFRESH_TOKEN_2 }}
-          YT_CLIENT_ID_3: ${{ secrets.YT_CLIENT_ID_3 }}
-          YT_CLIENT_SECRET_3: ${{ secrets.YT_CLIENT_SECRET_3 }}
-          YT_REFRESH_TOKEN_3: ${{ secrets.YT_REFRESH_TOKEN_3 }}
-          YT_CLIENT_ID_4: ${{ secrets.YT_CLIENT_ID_4 }}
-          YT_CLIENT_SECRET_4: ${{ secrets.YT_CLIENT_SECRET_4 }}
-          YT_REFRESH_TOKEN_4: ${{ secrets.YT_REFRESH_TOKEN_4 }}
         run: |
           SLOT="${{ github.event.inputs.article_slot || 'scheduled_cron' }}"
-          echo "🚀 Running autonomous market cycle for slot: $SLOT"
+          echo "🚀 Running autonomous market article cycle for slot: $SLOT"
           python -m app.services.autonomous_scheduler --now "$SLOT"
 
       - name: Commit and Push New Articles to GitHub
@@ -187,169 +79,3 @@ jobs:
               sleep 5
             done
           fi
-
-  # ─────────────────── VIDEO ENGINE (The Bull Print — 16 videos/day) ───────────────────
-  build_and_publish:
-    concurrency:
-      group: bull-print-video-conveyor-${{ github.event.inputs.slot || github.event.client_payload.slot || github.run_id }}
-      cancel-in-progress: false
-    # Master video crons only, or manual dispatch WITHOUT article_slot
-    if: >-
-      (github.event_name == 'schedule' && (
-        github.event.schedule == '0 3 * * *' ||
-        github.event.schedule == '30 5 * * *' ||
-        github.event.schedule == '0 8 * * *' ||
-        github.event.schedule == '15 10 * * *' ||
-        github.event.schedule == '0 13 * * *' ||
-        github.event.schedule == '30 15 * * *'
-      )) ||
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.article_slot == '') ||
-      (github.event_name == 'repository_dispatch')
-    runs-on: ubuntu-latest
-    timeout-minutes: 240
-
-    steps:
-      - name: 📥 Checkout Website & Engine Repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: 🐍 Setup Python 3.11 & FFmpeg
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: 📦 Install Cloud Dependencies & Headless Chromium
-        run: |
-          if ! command -v ffmpeg &> /dev/null; then
-            sudo apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout="15" && sudo apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core libsndfile1
-          else
-            sudo apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout="15" && sudo apt-get install -y --no-install-recommends libsndfile1 || true
-          fi
-          pip install --no-cache-dir google-genai playwright Pillow kaggle requests google-api-python-client google-auth google-auth-oauthlib google-auth-httplib2 edge-tts loguru numpy matplotlib toml openai soundfile scipy moviepy
-          playwright install chromium
-
-
-
-      - name: 🔑 Materialize Cloud Credentials from GitHub Secrets
-        env:
-          YOUTUBE_TOKEN_EN: ${{ secrets.YOUTUBE_TOKEN_EN }}
-          YT_OAUTH_POOL_JSON: ${{ secrets.YT_OAUTH_POOL_JSON }}
-        run: |
-          mkdir -p credentials ~/.kaggle data/youtube_tokens
-          if [ -n "$YT_OAUTH_POOL_JSON" ]; then
-            echo "$YT_OAUTH_POOL_JSON" > data/youtube_tokens/oauth_pool.json
-            echo "✓ Restored active YouTube OAuth pool to data/youtube_tokens/oauth_pool.json"
-          fi
-          if [ -n "$YOUTUBE_TOKEN_EN" ]; then
-            echo "$YOUTUBE_TOKEN_EN" | base64 -d > data/youtube_tokens/youtube_token_en.pickle
-            echo "✓ Restored YouTube OAuth token to data/youtube_tokens/youtube_token_en.pickle"
-          fi
-          if [ -n "${{ secrets.GCP_SA_JSON }}" ]; then
-            echo '${{ secrets.GCP_SA_JSON }}' > credentials/service_account.json
-          fi
-          if [ -n "${{ secrets.KAGGLE_USERNAME }}" ] && [ -n "${{ secrets.KAGGLE_KEY }}" ]; then
-            echo '{"username":"${{ secrets.KAGGLE_USERNAME }}","key":"${{ secrets.KAGGLE_KEY }}"}' > ~/.kaggle/kaggle.json
-            chmod 600 ~/.kaggle/kaggle.json
-          fi
-
-      - name: 🧭 Resolve Daily Slot (vertical cadence + Shorts count)
-        env:
-          MANUAL_SLOT: ${{ github.event.inputs.slot || github.event.client_payload.slot || '' }}
-          MANUAL_VERTICAL: ${{ github.event.inputs.vertical || github.event.client_payload.vertical || '' }}
-          MANUAL_SHORTS: ${{ github.event.inputs.shorts_count || github.event.client_payload.shorts_count || '' }}
-        run: |
-          if [ -n "$MANUAL_SLOT" ]; then
-            RESOLVED_SLOT="$MANUAL_SLOT"
-          else
-            RESOLVED_SLOT=$(python3 - <<'PY'
-          from datetime import datetime, timezone
-          now = datetime.now(timezone.utc)
-          mins = now.hour * 60 + now.minute
-          if mins >= 15 * 60 + 30: print(6)
-          elif mins >= 13 * 60: print(5)
-          elif mins >= 10 * 60 + 15: print(4)
-          elif mins >= 8 * 60: print(3)
-          elif mins >= 5 * 60 + 30: print(2)
-          elif mins >= 3 * 60: print(1)
-          else: print(1)
-          PY
-          )
-          fi
-          {
-            echo "INPUT_SLOT=$RESOLVED_SLOT"
-            echo "INPUT_VERTICAL=$MANUAL_VERTICAL"
-            echo "INPUT_SHORTS_COUNT=$MANUAL_SHORTS"
-          } >> "$GITHUB_ENV"
-          echo "🧭 Resolved slot=$RESOLVED_SLOT vertical=${MANUAL_VERTICAL:-<registry>} shorts=${MANUAL_SHORTS:-<registry>}"
-
-      - name: 🚀 Run Cloud Orchestrator (Harvest -> Playwright -> AI Studio -> Kaggle GPU -> Vercel)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
-          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
-          INPUT_TOPIC: ${{ github.event.inputs.topic || github.event.client_payload.topic || '' }}
-          INPUT_NOTES: ${{ github.event.inputs.notes || github.event.client_payload.notes || '' }}
-          INPUT_SLOT: ${{ env.INPUT_SLOT }}
-          INPUT_VERTICAL: ${{ env.INPUT_VERTICAL }}
-          INPUT_SHORTS_COUNT: ${{ env.INPUT_SHORTS_COUNT }}
-          INPUT_SHORTS_ONLY: ${{ github.event.inputs.shorts_only || 'false' }}
-          INPUT_BATCH_SHORTS: ${{ github.event.inputs.batch_shorts || 'false' }}
-          INPUT_BATCH_LONGFORM: ${{ github.event.inputs.batch_longform || 'false' }}
-          INPUT_BATCH_ALL_12: ${{ github.event.inputs.batch_all_12 || 'false' }}
-          FORCE_CPU_FALLBACK: ${{ github.event.inputs.force_cpu_fallback || github.event.client_payload.force_cpu_fallback || 'false' }}
-          YOUTUBE_TOKEN_EN: ${{ secrets.YOUTUBE_TOKEN_EN }}
-          YT_OAUTH_POOL_JSON: ${{ secrets.YT_OAUTH_POOL_JSON }}
-          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
-          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
-          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
-          YT_CLIENT_ID_1: ${{ secrets.YT_CLIENT_ID_1 }}
-          YT_CLIENT_SECRET_1: ${{ secrets.YT_CLIENT_SECRET_1 }}
-          YT_REFRESH_TOKEN_1: ${{ secrets.YT_REFRESH_TOKEN_1 }}
-          YT_CLIENT_ID_2: ${{ secrets.YT_CLIENT_ID_2 }}
-          YT_CLIENT_SECRET_2: ${{ secrets.YT_CLIENT_SECRET_2 }}
-          YT_REFRESH_TOKEN_2: ${{ secrets.YT_REFRESH_TOKEN_2 }}
-          YT_CLIENT_ID_3: ${{ secrets.YT_CLIENT_ID_3 }}
-          YT_CLIENT_SECRET_3: ${{ secrets.YT_CLIENT_SECRET_3 }}
-          YT_REFRESH_TOKEN_3: ${{ secrets.YT_REFRESH_TOKEN_3 }}
-          YT_CLIENT_ID_4: ${{ secrets.YT_CLIENT_ID_4 }}
-          YT_CLIENT_SECRET_4: ${{ secrets.YT_CLIENT_SECRET_4 }}
-          YT_REFRESH_TOKEN_4: ${{ secrets.YT_REFRESH_TOKEN_4 }}
-        run: |
-          if [ "${{ github.event.inputs.batch_all_12 }}" = "true" ] || [ "${{ env.INPUT_BATCH_ALL_12 }}" = "true" ]; then
-            echo "🚀 Launching Master 12-Video Sequential Production Run (4 Slots x 3 Videos = 12 Videos)..."
-            python scripts/publish_all_12_videos.py
-          elif [ "${{ github.event.inputs.batch_shorts }}" = "true" ] || [ "${{ env.INPUT_BATCH_SHORTS }}" = "true" ]; then
-            echo "🚀 Launching Master 10-Shorts Sequential Production Run on GHA (CPU FFmpeg)..."
-            python run_batch_shorts.py
-          elif [ "${{ github.event.inputs.batch_longform }}" = "true" ] || [ "${{ env.INPUT_BATCH_LONGFORM }}" = "true" ]; then
-            echo "🚀 Launching Master 6-Slot Long-Format Sequential Run on Kaggle Dual-T4 GPU..."
-            python run_batch_longform.py
-          else
-            python cloud_orchestrator.py
-          fi
-
-      - name: 💾 Commit & Push Generated Articles, Thumbnails and Posts Manifest
-        run: |
-          git config --global user.name "The Bull Print Autonomous Bot"
-          git config --global user.email "bot@thebullprint.media"
-          mkdir -p output/thumbnails content assets
-          git add -f content/ assets/ output/thumbnails/ 2>/dev/null || git add content/ assets/
-          if ! git diff --staged --quiet; then
-            git commit -m "Auto-publish new educational article & marketing assets [skip ci]" || true
-          fi
-          for retry in 1 2 3; do
-            git fetch origin main
-            git stash --include-untracked 2>/dev/null || true
-            git rebase -X ours origin/main || { git rebase --abort; git merge -X ours origin/main -m "merge: resolve content sync" || true; }
-            git stash pop 2>/dev/null || true
-            if git push origin HEAD:main; then
-              echo "✓ Changes committed and pushed to GitHub. Vercel deployment triggered automatically."
-              break
-            fi
-            sleep 5
-          done

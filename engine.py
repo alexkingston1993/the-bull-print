@@ -52,13 +52,13 @@ def verify_compliance(payload: Dict[str, Any]):
 
 async def generate_tts_audio(text: str, mp3_path: Path) -> float:
     """
-    Generates speech strictly and exclusively using the cloned Arjun voice engine.
+    Generates speech strictly and exclusively using signature Christopher cloned voice engine.
     """
     humanized_text = humanizer.apply_human_touch(text, context_type="script")
     mp3_path.parent.mkdir(parents=True, exist_ok=True)
 
-    from app.services.cloned_prabhat_tts import synthesize_arjun_voice
-    synthesize_arjun_voice(humanized_text, mp3_path)
+    from app.services.local_christopher_tts import synthesize_christopher_voice
+    synthesize_christopher_voice(humanized_text, mp3_path)
 
     res_probe = subprocess.run(
         ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(mp3_path)],

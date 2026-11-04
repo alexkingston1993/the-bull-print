@@ -902,13 +902,13 @@ class AriaCommandToolkit:
         """Executes a 6-point operational diagnostic sweep."""
         results = []
 
-        # 1. Arjun Offline Cloned Voice Engine Test
+        # 1. Christopher Cloned Voice Engine Test
         try:
-            from app.services.cloned_prabhat_tts import LATENTS_PATH
-            if os.path.exists(LATENTS_PATH):
-                results.append("✅ *Arjun Offline Cloned Voice Engine:* Latents Active & Certified")
+            from app.services.local_christopher_tts import DEFAULT_REF_WAV
+            if os.path.exists(DEFAULT_REF_WAV):
+                results.append("✅ *Christopher Cloned Voice Engine:* Reference Master Active & Certified")
             else:
-                results.append("⚠️ *Arjun Voice Engine:* Latents missing")
+                results.append("⚠️ *Christopher Voice Engine:* Reference Master missing")
         except Exception as e:
             results.append(f"⚠️ *Voice Service:* Warning ({e})")
 

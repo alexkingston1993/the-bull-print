@@ -1232,8 +1232,8 @@ def select_voice_for_language(language: str, default_voice: str = "") -> str:
         logger.info(f"using language-specific voice: {voice_key}={configured_voice}")
         return configured_voice
     
-    # Channel signature voice: Arjun (100% offline cloned voice)
-    return config.ui.get("voice_name") or "xtts:prabhat"
+    # Channel signature voice: Christopher (100% signature cloned documentary voice)
+    return config.ui.get("voice_name") or "christopher"
 
 
 def get_edge_voice_for_language(language: str) -> str:
@@ -1265,12 +1265,13 @@ def tts(
         from app.services.kokoro_voice import kokoro_tts
         return kokoro_tts(text, voice_name, voice_rate, voice_file, voice_volume)
     elif voice_name and (
-        voice_name.lower() in ["xtts:prabhat", "prabhat_local", "prabhat_offline"]
+        "christopher" in voice_name.lower()
+        or voice_name.lower() in ["christopher_local", "christopher_offline"]
         or "prabhat" in voice_name.lower()
         or "arjun" in voice_name.lower()
     ):
-        from app.services.cloned_prabhat_tts import cloned_prabhat_tts
-        return cloned_prabhat_tts(text, voice_file, voice_rate, voice_volume)
+        from app.services.local_christopher_tts import cloned_christopher_tts
+        return cloned_christopher_tts(text, voice_file, voice_rate, voice_volume)
     elif is_azure_v2_voice(voice_name):
         return azure_tts_v2(text, voice_name, voice_file)
     elif is_siliconflow_voice(voice_name):
@@ -1344,12 +1345,12 @@ def tts(
                     res = azure_tts_v1(text, alt_voice, voice_rate, voice_file)
                     if res:
                         return res
-            logger.warning(f"[Voice] Azure Neural TTS blocked by cloud provider. Falling back to 100% local offline cloned Prabhat engine...")
+            logger.warning(f"[Voice] Azure Neural TTS blocked by cloud provider. Falling back to 100% signature Christopher cloned voice engine...")
             try:
-                from app.services.cloned_prabhat_tts import cloned_prabhat_tts
-                return cloned_prabhat_tts(text, voice_file, voice_rate, voice_volume)
+                from app.services.local_christopher_tts import cloned_christopher_tts
+                return cloned_christopher_tts(text, voice_file, voice_rate, voice_volume)
             except Exception as clone_err:
-                logger.error(f"[Voice] Offline cloned Prabhat fallback failed: {clone_err}")
+                logger.error(f"[Voice] Christopher voice fallback failed: {clone_err}")
                 return None
         logger.warning(
             f"[Voice] Cloud TTS failed for '{voice_name}'."
