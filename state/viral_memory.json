@@ -1,12 +1,12 @@
 {
-  "updated_at": "2026-11-02T18:04:35Z",
+  "updated_at": "2026-11-04T10:12:45Z",
   "channel_median_vph": 62.0,
   "top_outperformers": [
     {
       "video_id": "sim_0",
-      "title": "Indian Stock Market Guide for Beginners: What Big Bank Selling Means for Your Family Savings",
+      "title": "Big Foreign Banks Sell \u20b93,200 Cr Before the Bell: The Ultimate Beginner Market Guide",
       "format": "LONG",
-      "published_at": "2026-11-02 13:56:56",
+      "published_at": "2026-11-03 20:52:05",
       "hours_live": 24.0,
       "view_count": 2200,
       "like_count": 155,
@@ -16,9 +16,9 @@
     },
     {
       "video_id": "sim_1",
-      "title": "Why 93% of Everyday People Lose Money in Quick Market Bets: The SEBI Report Explained Simply",
+      "title": "Indian Stock Market Guide for Beginners: What Big Bank Selling Means for Your Family Savings",
       "format": "LONG",
-      "published_at": "2026-11-02 12:06:35",
+      "published_at": "2026-11-03 18:18:17",
       "hours_live": 30.0,
       "view_count": 2155,
       "like_count": 152,
@@ -27,10 +27,10 @@
       "engagement_rate": 0.082
     },
     {
-      "video_id": "ttU4H-Sajeg",
-      "title": "Why Claim Settlement Ratio Marketing Hides Incurred Claim Ratio Reality",
+      "video_id": "sim_2",
+      "title": "Indian Stock Market Guide for Beginners: What Big Bank Selling Means for Your Family Savings",
       "format": "LONG",
-      "published_at": "2026-10-24",
+      "published_at": "2026-11-03 16:14:20",
       "hours_live": 36.0,
       "view_count": 2110,
       "like_count": 149,
@@ -41,10 +41,10 @@
   ],
   "bottom_underperformers": [
     {
-      "video_id": "Oun_zJVPCAo",
-      "title": "Sebi f&o rules (Short #2) #Shorts",
+      "video_id": "BGQG71kmUMI",
+      "title": "Crypto funding rates explained (Short #2) #Shorts",
       "format": "SHORT",
-      "published_at": "2026-10-29 05:11:52",
+      "published_at": "2026-10-29 07:44:19",
       "hours_live": 156.0,
       "view_count": 1210,
       "like_count": 89,
@@ -53,10 +53,10 @@
       "engagement_rate": 0.082
     },
     {
-      "video_id": "PjMgEUhamIM",
-      "title": "Sebi f&o rules (Short #1) #Shorts",
+      "video_id": "ILk_hqAJD_8",
+      "title": "Crypto funding rates explained (Short #1) #Shorts",
       "format": "SHORT",
-      "published_at": "2026-10-29 05:11:52",
+      "published_at": "2026-10-29 07:44:19",
       "hours_live": 162.0,
       "view_count": 1165,
       "like_count": 86,
@@ -65,10 +65,10 @@
       "engagement_rate": 0.082
     },
     {
-      "video_id": "nMfqeaCzuAg",
-      "title": "IRDAI Proportionate Deduction Math: Room Caps & Claim Cuts",
-      "format": "LONG",
-      "published_at": "2026-10-24",
+      "video_id": "Oun_zJVPCAo",
+      "title": "Sebi f&o rules (Short #2) #Shorts",
+      "format": "SHORT",
+      "published_at": "2026-10-29 05:11:52",
       "hours_live": 168.0,
       "view_count": 1120,
       "like_count": 83,
