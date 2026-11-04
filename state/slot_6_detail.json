@@ -93,6 +93,11 @@
       "ts": "16:07:04",
       "level": "INFO",
       "msg": "[GEMINI]: \ud83d\udd0d Harvested `Insurance penetration reflects India's household` | source: google_news_rss_live \u00b7 cluster: term insurance claim rejection, health insurance room rent limit, irdai new rules"
+    },
+    {
+      "ts": "16:07:09",
+      "level": "INFO",
+      "msg": "[PLAYWRIGHT]: \ud83c\udfa8 Generating 9:16 High-CTR Thumbnail frames (insurance)... | "
     }
   ]
 }
