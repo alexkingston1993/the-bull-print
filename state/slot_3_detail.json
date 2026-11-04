@@ -98,6 +98,11 @@
       "ts": "10:13:17",
       "level": "INFO",
       "msg": "[PLAYWRIGHT]: \ud83c\udfa8 Generating 9:16 High-CTR Thumbnail frames (insurance)... | "
+    },
+    {
+      "ts": "10:13:24",
+      "level": "INFO",
+      "msg": "[PLAYWRIGHT]: \u2705 Rendered (3 High-CTR Frames) | "
     }
   ]
 }
