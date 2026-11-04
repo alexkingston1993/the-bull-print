@@ -2,7 +2,7 @@
 title: "Nifty 50 Liquidity Sweep Rules & Institutional Stop Hunts: Institutional Market Breakdown"
 slug: "nifty-50-liquidity-sweep-rules-&-institutional-s"
 description: "Comprehensive forensic analysis of Nifty 50 Liquidity Sweep Rules & Institutional Stop Hunts by The Bull Print."
-youtube_video_id: "OuXUihrw6JI"
+youtube_video_id: "HU0TRUAnzKw"
 date: "2026-10-24"
 author: "Alex from Chennai"
 reading_time: "8 min read"
@@ -10,7 +10,7 @@ reading_time: "8 min read"
 
 
 <div class="video-embed-container" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; margin:28px 0; border:1px solid rgba(255,255,255,0.1); box-shadow:0 8px 30px rgba(0,0,0,0.5);">
- <iframe src="https://www.youtube.com/embed/OuXUihrw6JI" title="Nifty 50 Liquidity Sweep Rules & Institutional Stop Hunts: Institutional Market Breakdown" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen></iframe>
+ <iframe src="https://www.youtube.com/embed/HU0TRUAnzKw" title="Nifty 50 Liquidity Sweep Rules & Institutional Stop Hunts: Institutional Market Breakdown" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen></iframe>
 </div>
 
 
