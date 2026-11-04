@@ -9,9 +9,9 @@
   "stage_pct": 100,
   "current_stage_index": 2,
   "current_stage_name": "Gemini Script & Article Synthesis",
-  "current_subtask_label": "open-seo dark-query loop \u00b7 slot 1",
+  "current_subtask_label": "source: viral_horse_5.4x \u00b7 cluster: SEBI Study Quantitative Analysis: How Market Makers Harvest Gamma & Theta on Weekly Expiries",
   "started_at": "2026-11-04T16:50:30Z",
-  "updated_at": "2026-11-04T16:50:46Z",
+  "updated_at": "2026-11-04T16:50:52Z",
   "eta_seconds": 0,
   "stages": [
     {
