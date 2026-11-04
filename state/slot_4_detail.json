@@ -88,6 +88,11 @@
       "ts": "16:52:07",
       "level": "INFO",
       "msg": "[GEMINI]: \ud83d\udd0d Harvesting live search intent... | open-seo dark-query loop \u00b7 slot 4"
+    },
+    {
+      "ts": "16:52:24",
+      "level": "INFO",
+      "msg": "[GEMINI]: \ud83d\udd0d Harvested `Sebi new rules f&o lot size` | source: autocomplete \u00b7 cluster: sebi new rules f&o lot size"
     }
   ]
 }
