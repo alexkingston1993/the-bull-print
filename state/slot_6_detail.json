@@ -1,75 +1,61 @@
 {
   "slot": 6,
-  "run_id": "41871582443",
+  "run_id": "41882269917",
   "vertical": "insurance",
   "vertical_label": "Slot #6",
   "shorts_count": 1,
-  "status": "WAITING_APPROVAL",
-  "overall_pct": 60,
-  "stage_pct": 20,
-  "current_stage_index": 5,
-  "current_stage_name": "Local CPU Media Engine",
-  "current_subtask_label": "Rendering 1080p Masterclass via CPU FFmpeg...",
-  "started_at": "2026-11-04T16:54:20Z",
-  "updated_at": "2026-11-04T16:59:38Z",
+  "status": "RUNNING",
+  "overall_pct": 2,
+  "stage_pct": 10,
+  "current_stage_index": 1,
+  "current_stage_name": "SEO Topic Harvester (open-seo)",
+  "current_subtask_label": "Harvesting search intent & clusters",
+  "started_at": "2026-11-04T17:59:47Z",
+  "updated_at": "2026-11-04T17:59:47Z",
   "eta_seconds": 0,
   "stages": [
     {
       "id": 1,
       "name": "SEO Topic Harvester (open-seo)",
-      "status": "COMPLETED",
-      "pct": 100,
-      "started_at": "2026-11-04T16:54:19Z",
-      "completed_at": "2026-11-04T16:54:30Z",
+      "status": "RUNNING",
+      "pct": 0,
+      "started_at": "2026-11-04T17:59:46Z",
+      "completed_at": null,
       "metrics": {}
     },
     {
       "id": 2,
       "name": "Gemini Script & Article Synthesis",
-      "status": "COMPLETED",
-      "pct": 100,
-      "started_at": "2026-11-04T16:54:30Z",
-      "completed_at": "2026-11-04T16:54:49Z",
+      "status": "PENDING",
+      "pct": 0,
+      "started_at": null,
+      "completed_at": null,
       "metrics": {}
     },
     {
       "id": 3,
       "name": "Authenticity & SEBI/IRDAI Compliance Gate",
-      "status": "COMPLETED",
-      "pct": 100,
-      "started_at": "2026-11-04T16:56:58Z",
-      "completed_at": "2026-11-04T16:54:49Z",
-      "metrics": {
-        "audit_attempts": 1,
-        "compliance_status": "PASS_1",
-        "audit_notes": "Virality dopamine pacing and SEBI/IRDAI compliance healed & verified",
-        "compliance_pass": true,
-        "compliance_verdict": "PASSED_AFTER_FEEDBACK",
-        "virality_score": 92,
-        "authenticity_pass": true,
-        "trigram_similarity_pct": 8.4,
-        "regex_violations": 0
-      }
+      "status": "PENDING",
+      "pct": 0,
+      "started_at": null,
+      "completed_at": null,
+      "metrics": {}
     },
     {
       "id": 4,
       "name": "Chart & High-CTR Thumbnail Studio",
-      "status": "COMPLETED",
-      "pct": 100,
-      "started_at": "2026-11-04T16:54:49Z",
-      "completed_at": "2026-11-04T16:59:21Z",
-      "metrics": {
-        "approval_status": "AUTO_APPROVED",
-        "approval_deadline_ts": 1793811533,
-        "headline": "HOSPITAL BILL 50% SLASHED!"
-      }
+      "status": "PENDING",
+      "pct": 0,
+      "started_at": null,
+      "completed_at": null,
+      "metrics": {}
     },
     {
       "id": 5,
       "name": "Kaggle T4 GPU Render Farm",
-      "status": "RUNNING",
-      "pct": 20,
-      "started_at": "2026-11-04T16:59:21Z",
+      "status": "PENDING",
+      "pct": 0,
+      "started_at": null,
       "completed_at": null,
       "metrics": {}
     },
@@ -94,79 +80,9 @@
   ],
   "live_logs": [
     {
-      "ts": "16:54:20",
+      "ts": "17:59:47",
       "level": "INFO",
       "msg": "Slot #6 (insurance) initialized. Target: 1 Long + 1 Shorts."
-    },
-    {
-      "ts": "16:54:33",
-      "level": "INFO",
-      "msg": "[GEMINI]: \ud83d\udd0d Harvesting live search intent... | open-seo dark-query loop \u00b7 slot 6"
-    },
-    {
-      "ts": "16:54:46",
-      "level": "INFO",
-      "msg": "[GEMINI]: \ud83d\udd0d Harvested `Insurance penetration reflects India's household` | source: google_news_rss_live \u00b7 cluster: term insurance claim rejection, health insurance room rent limit, irdai new rules"
-    },
-    {
-      "ts": "16:54:51",
-      "level": "INFO",
-      "msg": "[PLAYWRIGHT]: \ud83c\udfa8 Generating 9:16 High-CTR Thumbnail frames (insurance)... | "
-    },
-    {
-      "ts": "16:55:05",
-      "level": "INFO",
-      "msg": "[PLAYWRIGHT]: \u2705 Rendered (3 High-CTR Frames) | "
-    },
-    {
-      "ts": "16:55:19",
-      "level": "INFO",
-      "msg": "[GEMINI]: \ud83e\udde0 Synthesizing Dual Script + Article... | "
-    },
-    {
-      "ts": "16:56:17",
-      "level": "INFO",
-      "msg": "[GEMINI]: \ud83d\udee1\ufe0f Auditing Virality & Compliance... | Retention pacing + SEBI/IRDAI auditor"
-    },
-    {
-      "ts": "16:56:21",
-      "level": "INFO",
-      "msg": "[GEMINI]: \ud83d\udee1\ufe0f Virality & Compliance (Pass 1/3) | 100% Pass: Virality 100/100 + SEBI/IRDAI Approved"
-    },
-    {
-      "ts": "16:56:45",
-      "level": "INFO",
-      "msg": "[GEMINI]: \u2705 Generated + Healed (`INS-2023-06`) | \ud83d\udee1\ufe0f INSURANCE"
-    },
-    {
-      "ts": "16:57:20",
-      "level": "INFO",
-      "msg": "[GEMINI]: \ud83d\udd2c Auditing Authenticity Engine... | trigram dupe-check + domain vocabulary"
-    },
-    {
-      "ts": "16:57:28",
-      "level": "INFO",
-      "msg": "[THUMBNAIL]: \ud83c\udfa8 Rendering Pillow Graphics... | "
-    },
-    {
-      "ts": "16:59:10",
-      "level": "INFO",
-      "msg": "[THUMBNAIL]: \u26a1 Auto-Approved (`HOSPITAL BILL 50% SLASHED!`) | "
-    },
-    {
-      "ts": "16:59:16",
-      "level": "INFO",
-      "msg": "[THUMBNAIL]: \ud83c\udfa8 Rendering 1 9:16 Shelf Covers & Headers... | "
-    },
-    {
-      "ts": "16:59:24",
-      "level": "INFO",
-      "msg": "[KAGGLE_GPU]: \u26a1 Kaggle Glitch \u2014 CPU Fallback Engaged | "
-    },
-    {
-      "ts": "16:59:32",
-      "level": "INFO",
-      "msg": "[KAGGLE_GPU]: \u26a1 CPU Fallback Engine Active (Kaggle Bypassed) | "
     }
   ]
 }
