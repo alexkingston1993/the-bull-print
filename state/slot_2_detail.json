@@ -187,6 +187,11 @@
       "ts": "17:11:28",
       "level": "INFO",
       "msg": "[VERCEL]: \ud83d\udcdd Compiling MDX & IndexNow Ping... | "
+    },
+    {
+      "ts": "17:11:36",
+      "level": "INFO",
+      "msg": "[VERCEL]: \u2705 Live & Indexed (`https://the-bull-print.vercel.app/article.html?slug=crypto_funding_rate_chart_01`) | \ud83c\udfac Shorts (2): 4mMHZlYSDn8 \u00b7 N45nBH4SAeA \u00b7 \ud83d\udc26 X Thread: Skipped (X keys not set)"
     }
   ]
 }
