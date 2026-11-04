@@ -167,6 +167,11 @@
       "ts": "16:59:58",
       "level": "INFO",
       "msg": "[KAGGLE_GPU]: \u26a1 CPU Fallback Engine Active (Kaggle Bypassed) | "
+    },
+    {
+      "ts": "17:05:30",
+      "level": "ERROR",
+      "msg": "Runner failed: Command '['edge-tts', '--voice', 'en-IN-PrabhatNeural', '--rate=+3%', '--pitch=-2Hz', '--text=Next, let us integrate Vol"
     }
   ]
 }
