@@ -88,6 +88,11 @@
       "ts": "11:28:28",
       "level": "INFO",
       "msg": "[GEMINI]: \ud83d\udd0d Harvesting live search intent... | open-seo dark-query loop \u00b7 slot 2"
+    },
+    {
+      "ts": "11:28:38",
+      "level": "INFO",
+      "msg": "[GEMINI]: \ud83d\udd0d Harvested `Crypto funding rate chart` | source: autocomplete \u00b7 cluster: crypto funding rate chart, crypto funding rate history, crypto funding rate meaning"
     }
   ]
 }
