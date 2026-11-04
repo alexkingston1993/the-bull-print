@@ -297,8 +297,6 @@ def generate_ai_scene_backdrop(
             BASE_DIR / "assets" / "flow_ai_masters" / "90_percent_lose.jpg",
         ],
         "crypto": [
-            BASE_DIR / "assets" / "flow_ai_masters" / "crypto_mev" / "frame_00.jpg",
-            BASE_DIR / "assets" / "flow_ai_masters" / "crypto_mev" / "frame_01.jpg",
             BASE_DIR / "assets" / "charts" / "btc_hourly_structure.png",
         ],
         "stock_market": [

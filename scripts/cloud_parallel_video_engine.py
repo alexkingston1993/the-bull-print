@@ -361,12 +361,16 @@ def prepare_session(
     words_file = audio_dir / "words.json"
     words = _synthesize_local_christopher_audio(full_script, audio_file, words_file, total_duration_sec=float(duration_sec))
 
-    # 2. Generate High-CTR Background Frames for each section
+    # 2. Generate High-CTR Background Frames for each section (Aspect-Ratio Aware)
+    rules = VideoFormatConfig.get_rules(float(duration_sec), is_short=is_short)
+    w_out, h_out = rules["width"], rules["height"]
     frame_files = []
     for s in sections:
         idx = s["section_index"]
         frame_path = frames_dir / f"frame_{idx:02d}.jpg"
-        generate_high_ctr_section_frame(s, vertical=vertical, output_path=frame_path)
+        generate_high_ctr_section_frame(
+            s, vertical=vertical, width=w_out, height=h_out, output_path=frame_path
+        )
         frame_files.append(str(frame_path.relative_to(output_dir)))
         s["frame_file"] = str(frame_path.relative_to(output_dir))
 
