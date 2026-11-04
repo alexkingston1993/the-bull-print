@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-11-04T16:28:09Z",
+  "updated_at": "2026-11-04T16:53:05Z",
   "videos": {
     "slot_1_long": {
       "slot": 1,
       "format": "16:9 LONG",
       "vertical": "STOCK_MARKET",
       "title": "[LONG-FORM] SEBI Study Quantitative Analysis: How Market Makers Harvest Gamma & Theta on Weekly Expiries",
-      "current_stage": "Stage 7/7: Uploaded & Distributed",
-      "stage_pct": 100,
-      "completion_pct": 100,
-      "eta_seconds": 0,
+      "current_stage": "Stage 4/7: Chart & High-CTR Thumbnail Studio",
+      "stage_pct": 20,
+      "completion_pct": 40,
+      "eta_seconds": 360,
       "compliance_status": "\ud83d\udee1\ufe0f Feedback Healed & Verified",
-      "updated_at": "2026-11-04T11:49:57Z",
+      "updated_at": "2026-11-04T16:53:05Z",
       "video_id": "slot_1_long",
-      "status": "COMPLETED",
+      "status": "IN_PROGRESS",
       "started_at": "2026-10-25T20:36:34Z",
       "youtube_id": "3HjFgVq4ubk",
       "youtube_url": "https://www.youtube.com/watch?v=3HjFgVq4ubk"
