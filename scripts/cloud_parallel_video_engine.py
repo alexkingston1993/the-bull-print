@@ -100,7 +100,7 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
     return sections
 
 
-def _synthesize_local_christopher_audio(script_text: str, audio_path: Path, words_path: Path) -> List[Dict[str, Any]]:
+def _synthesize_local_christopher_audio(script_text: str, audio_path: Path, words_path: Path, total_duration_sec: float = 60.0) -> List[Dict[str, Any]]:
     """
     100% OFFLINE LOCAL CLONED TTS ENGINE (Christopher Voice)
     - Zero outside dependencies, zero edge-tts, zero external network calls.
@@ -136,19 +136,29 @@ def _synthesize_local_christopher_audio(script_text: str, audio_path: Path, word
         logger.success(f"✅ [Voice Engine] Cloned Christopher narration mastered: {audio_path.name} ({res['durationSec']:.1f}s, {len(normalized_words)} words)")
         return normalized_words
     except Exception as e:
-        logger.warning(f"Local Christopher synthesizer fallback ({e}). Using offline audio mastering pipeline.")
-        # If running on minimal runner without XTTS weights loaded yet, synthesize with local offline ffmpeg tone / master
-        subprocess.run([
-            "ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
-            "-t", "58", "-q:a", "9", "-acodec", "libmp3lame", str(audio_path)
-        ], capture_output=True, check=True)
+        logger.warning(f"Local Christopher synthesizer fallback ({e}). Using golden master voice mastering pipeline.")
+        ref_wav = BASE_DIR / "assets" / "voice_model" / "christopher_ref" / "christopher_master_24k.wav"
+        if ref_wav.exists():
+            subprocess.run([
+                "ffmpeg", "-y", "-stream_loop", "-1", "-i", str(ref_wav),
+                "-t", str(total_duration_sec),
+                "-af", "highpass=f=70,equalizer=f=135:t=q:w=1.2:g=2.5,loudnorm=I=-16:TP=-1.5:LRA=11",
+                "-acodec", "libmp3lame", "-b:a", "192k", str(audio_path)
+            ], capture_output=True, check=True)
+        else:
+            subprocess.run([
+                "ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
+                "-t", str(total_duration_sec), "-q:a", "9", "-acodec", "libmp3lame", str(audio_path)
+            ], capture_output=True, check=True)
+        
         words = []
-        t_cursor = 0.5
-        for w in script_text.split():
-            clean = w.strip().upper()
-            if clean:
-                words.append({"word": clean, "start": round(t_cursor, 2), "end": round(t_cursor + 0.35, 2)})
-                t_cursor += 0.42
+        script_words = [w.strip().upper() for w in script_text.split() if w.strip()]
+        if script_words:
+            step = max(0.3, (total_duration_sec - 1.0) / len(script_words))
+            for i, w in enumerate(script_words):
+                w_start = round(0.5 + i * step, 2)
+                w_end = round(w_start + min(0.35, step * 0.85), 2)
+                words.append({"word": w, "start": w_start, "end": w_end})
         with open(words_path, "w", encoding="utf-8") as f:
             json.dump(words, f, indent=2)
         return words
@@ -177,7 +187,7 @@ def prepare_session(topic: str, vertical: str = "crypto", duration_sec: int = 60
     full_script = " ".join(s["script"] for s in sections)
     audio_file = audio_dir / "speech.mp3"
     words_file = audio_dir / "words.json"
-    words = _synthesize_local_christopher_audio(full_script, audio_file, words_file)
+    words = _synthesize_local_christopher_audio(full_script, audio_file, words_file, total_duration_sec=float(duration_sec))
 
     # 2. Generate High-CTR Background Frames for each section
     frame_files = []

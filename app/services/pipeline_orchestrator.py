@@ -59,18 +59,11 @@ class PipelineOrchestrator:
             f"sentiment={ctx.market_sentiment}, Nifty={ctx.nifty.value if ctx.nifty else 'N/A'}"
         )
 
-        # 2. Real Video Generation & Upload via Self-Healing Engine
-        youtube_url = mock_video_url
-        if not youtube_url:
-            try:
-                logger.info("[Orchestrator] Step 1.5: Triggering real autonomous video production with Self-Healing Loop...")
-                youtube_url = self._generate_and_upload_video_with_healing(ctx, slot_name, max_retries=3, publish_at=publish_at)
-            except Exception as e:
-                logger.error(f"[Orchestrator] Autonomous video generation exhausted retries: {e}")
-
-        # Fallback to the latest real video on the channel if generation skipped
-        if not youtube_url:
-            youtube_url = "https://www.youtube.com/watch?v=FfxHCzx7QhM"
+        # 2. Video reference for Article Embed
+        # Video production is completely decoupled from the article pipeline and handled
+        # exclusively by the 20-runner parallel cloud matrix (Method C + Flow AI frames + Christopher voice).
+        # We do NOT run legacy Pexels video generation here.
+        youtube_url = mock_video_url or "https://www.youtube.com/watch?v=FfxHCzx7QhM"
 
 
         # 3. Generate Humanized, GEO-Optimized Article (1,200 - 1,800 words modular GEO structure)

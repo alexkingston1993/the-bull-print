@@ -54,3 +54,4 @@ assets/broll_cache/
 session-s*.md
 data/youtube_tokens/oauth_pool.json
 /freebuff-sites-build/
+assets/voice_model/whisper_cache/
