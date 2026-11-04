@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-04T13:12:05Z",
+  "updated_at": "2026-11-04T13:28:12Z",
   "videos": {
     "slot_1_long": {
       "slot": 1,
@@ -56,16 +56,16 @@
       "title": "[LONG-FORM] Usdt dominance chart and ideas tradingview",
       "format": "16:9 LONG",
       "vertical": "CRYPTO",
-      "current_stage": "Stage 5/7: Kaggle T4 GPU \u2014 NVENC Encoding",
-      "stage_pct": 50,
-      "completion_pct": 65,
-      "eta_seconds": 220,
+      "current_stage": "Stage 7/7: Uploaded & Distributed",
+      "stage_pct": 100,
+      "completion_pct": 100,
+      "eta_seconds": 0,
       "compliance_status": "\ud83d\udee1\ufe0f Feedback Healed & Verified",
-      "status": "IN_PROGRESS",
-      "updated_at": "2026-11-04T13:12:05Z",
+      "status": "COMPLETED",
+      "updated_at": "2026-11-04T13:28:12Z",
       "started_at": "2026-10-27T14:17:29Z",
-      "youtube_id": "CAAWeig8x9k",
-      "youtube_url": "https://www.youtube.com/watch?v=CAAWeig8x9k"
+      "youtube_id": "a64QlR--L2Q",
+      "youtube_url": "https://www.youtube.com/watch?v=a64QlR--L2Q"
     },
     "slot_2_long": {
       "video_id": "slot_2_long",
