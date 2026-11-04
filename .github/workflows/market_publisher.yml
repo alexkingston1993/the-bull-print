@@ -238,8 +238,13 @@ jobs:
       - name: 🔑 Materialize Cloud Credentials from GitHub Secrets
         env:
           YOUTUBE_TOKEN_EN: ${{ secrets.YOUTUBE_TOKEN_EN }}
+          YT_OAUTH_POOL_JSON: ${{ secrets.YT_OAUTH_POOL_JSON }}
         run: |
           mkdir -p credentials ~/.kaggle data/youtube_tokens
+          if [ -n "$YT_OAUTH_POOL_JSON" ]; then
+            echo "$YT_OAUTH_POOL_JSON" > data/youtube_tokens/oauth_pool.json
+            echo "✓ Restored active YouTube OAuth pool to data/youtube_tokens/oauth_pool.json"
+          fi
           if [ -n "$YOUTUBE_TOKEN_EN" ]; then
             echo "$YOUTUBE_TOKEN_EN" | base64 -d > data/youtube_tokens/youtube_token_en.pickle
             echo "✓ Restored YouTube OAuth token to data/youtube_tokens/youtube_token_en.pickle"
