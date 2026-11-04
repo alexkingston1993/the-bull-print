@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-04T11:30:06Z",
+  "updated_at": "2026-11-04T11:30:37Z",
   "videos": {
     "slot_1_long": {
       "slot": 1,
@@ -70,16 +70,16 @@
     "slot_2_long": {
       "video_id": "slot_2_long",
       "slot": 2,
-      "title": "[LONG-FORM] Crypto funding rates explained",
+      "title": "[LONG-FORM] Crypto funding rate chart",
       "format": "16:9 LONG",
       "vertical": "CRYPTO",
-      "current_stage": "Stage 7/7: Uploaded & Distributed",
-      "stage_pct": 100,
-      "completion_pct": 100,
-      "eta_seconds": 0,
+      "current_stage": "Stage 4/7: Chart & High-CTR Thumbnail Studio",
+      "stage_pct": 20,
+      "completion_pct": 40,
+      "eta_seconds": 360,
       "compliance_status": "\ud83d\udee1\ufe0f Feedback Healed & Verified",
-      "status": "COMPLETED",
-      "updated_at": "2026-10-29T08:10:08Z",
+      "status": "IN_PROGRESS",
+      "updated_at": "2026-11-04T11:30:37Z",
       "started_at": "2026-10-27T20:13:00Z",
       "youtube_id": "WG-9Tv5Jt-k",
       "youtube_url": "https://www.youtube.com/watch?v=WG-9Tv5Jt-k"
