@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-04T12:13:09Z",
+  "updated_at": "2026-11-04T13:10:18Z",
   "videos": {
     "slot_1_long": {
       "slot": 1,
@@ -53,16 +53,16 @@
     "slot_5_long": {
       "video_id": "slot_5_long",
       "slot": 5,
-      "title": "[LONG-FORM] Usdt dominance coinmarketcap",
+      "title": "[LONG-FORM] Usdt dominance chart and ideas tradingview",
       "format": "16:9 LONG",
       "vertical": "CRYPTO",
-      "current_stage": "Stage 7/7: Uploaded & Distributed",
-      "stage_pct": 100,
-      "completion_pct": 100,
-      "eta_seconds": 0,
+      "current_stage": "Stage 4/7: Chart & High-CTR Thumbnail Studio",
+      "stage_pct": 20,
+      "completion_pct": 40,
+      "eta_seconds": 360,
       "compliance_status": "\ud83d\udee1\ufe0f Feedback Healed & Verified",
-      "status": "COMPLETED",
-      "updated_at": "2026-11-02T14:06:26Z",
+      "status": "IN_PROGRESS",
+      "updated_at": "2026-11-04T13:10:18Z",
       "started_at": "2026-10-27T14:17:29Z",
       "youtube_id": "CAAWeig8x9k",
       "youtube_url": "https://www.youtube.com/watch?v=CAAWeig8x9k"
