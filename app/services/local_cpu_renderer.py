@@ -225,8 +225,8 @@ def render_cpu_segment(seg: dict, mp3_path: Path, ass_path: Path, duration: floa
         "-filter_complex", filter_complex if not inputs[0].startswith("-f") else f"[0:v]{subs_tag}[v]",
         "-map", "[v]", "-map", audio_map,
         "-af", "silenceremove=stop_periods=-1:stop_duration=0.35:stop_threshold=-42dB,loudnorm=I=-14:TP=-1.5:LRA=11",
-        "-c:v", "libx264", "-preset", "ultrafast", "-crf", "24",
-        "-c:a", "aac", "-b:a", "192k",
+        "-c:v", "libx264", "-preset", "ultrafast", "-crf", "24", "-r", "25",
+        "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2",
         "-pix_fmt", "yuv420p", "-t", f"{duration:.2f}",
         str(out_mp4)
     ]
@@ -265,8 +265,9 @@ async def run_local_cpu_fallback_renderer(
         try:
             subprocess.run([
                 "ffmpeg", "-y", "-loop", "1", "-i", str(yt_thumb),
-                "-f", "lavfi", "-i", "anullsrc=channel_layout=stereo:sample_rate=44100",
-                "-c:v", "libx264", "-t", "0.5", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k",
+                "-f", "lavfi", "-i", "anullsrc=channel_layout=stereo:sample_rate=48000",
+                "-c:v", "libx264", "-preset", "ultrafast", "-r", "25", "-t", "0.5",
+                "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2",
                 str(cover_poster_mp4)
             ], check=True)
             if cover_poster_mp4.exists():
