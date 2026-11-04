@@ -91,6 +91,7 @@ jobs:
             --duration-sec "$INPUT_DURATION_SEC" \
             --duration-min "$INPUT_DURATION_MIN" \
             $SHORT_FLAG \
+            --skip-duplicate-check \
             --bundle-dir output/session_bundle
 
       - name: 📤 Upload Session Bundle Artifact
