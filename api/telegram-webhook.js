@@ -351,6 +351,36 @@ export default async function handler(req, res) {
         return res.status(200).json({ ok: true, action: 'view_quota' });
       }
 
+      if (data.startsWith('approve_frame_')) {
+        const frameIdx = data.replace('approve_frame_', '');
+        await answerCallbackQuery(cb.id, `✅ Frame ${parseInt(frameIdx) + 1} Approved!`);
+        await sendTelegram(
+          chatId,
+          `✅ *Decision Logged:* Frame ${parseInt(frameIdx) + 1} has been *APPROVED*.`
+        );
+        return res.status(200).json({ ok: true, action: 'frame_approved', frame: frameIdx });
+      }
+
+      if (data.startsWith('reject_frame_')) {
+        const frameIdx = data.replace('reject_frame_', '');
+        await answerCallbackQuery(cb.id, `❌ Frame ${parseInt(frameIdx) + 1} Disapproved`);
+        await sendTelegram(
+          chatId,
+          `❌ *Decision Logged:* Frame ${parseInt(frameIdx) + 1} has been *DISAPPROVED*.\n\nPlease reply with feedback or the exact visual changes you'd like.`
+        );
+        return res.status(200).json({ ok: true, action: 'frame_rejected', frame: frameIdx });
+      }
+
+      if (data.startsWith('feedback_frame_')) {
+        const frameIdx = data.replace('feedback_frame_', '');
+        await answerCallbackQuery(cb.id, `✍️ Feedback for Frame ${parseInt(frameIdx) + 1}`);
+        await sendTelegram(
+          chatId,
+          `✍️ *Feedback Mode Active:* Please reply with your feedback or revisions for Frame ${parseInt(frameIdx) + 1}.`
+        );
+        return res.status(200).json({ ok: true, action: 'frame_feedback_prompt', frame: frameIdx });
+      }
+
       await answerCallbackQuery(cb.id);
       return res.status(200).json({ ok: true });
     }
