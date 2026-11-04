@@ -33,7 +33,13 @@ sys.path.insert(0, str(BASE_DIR))
 
 from app.services.high_ctr_frame_studio import generate_high_ctr_section_frame
 from app.services.viral_video_engine import VideoFormatConfig, extract_word_timestamps
-from telegram_bot import send_telegram_alert
+
+def _send_telegram(msg: str):
+    try:
+        from telegram_bot import send_telegram_alert
+        send_telegram_alert(msg)
+    except Exception as e:
+        logger.debug(f"[Telegram Alert Notice]: {e}")
 
 
 # ─────────────────────────────────────────────────────────────
@@ -497,7 +503,7 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
         f"▶️ *YouTube:* {yt_url or '_Uploaded Headless_'}\n"
         f"🛡️ *Host Status:* 100% cloud-hosted; local Mac remained completely untouchable."
     )
-    send_telegram_alert(alert_msg)
+    _send_telegram(alert_msg)
 
 
 # ─────────────────────────────────────────────────────────────
