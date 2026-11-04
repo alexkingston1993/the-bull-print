@@ -422,6 +422,48 @@
       "slot_name": "market_publisher",
       "attempt": 1,
       "error_snippet": "Failed to render/upload CPU Short #1: name 'Credentials' is not defined"
+    },
+    {
+      "timestamp": "2026-11-04T16:48:51Z",
+      "rule_id": "BUG-19-YOUTUBE-INVALID-GRANT",
+      "slot_name": "slot_1",
+      "attempt": 0,
+      "error_snippet": "2026-11-04t10:12:24.7643077z   ld_library_path: /opt/hostedtoolcache/python/3.11.17/x64/lib\n2026-11-04t10:12:24.7643521z   manual_slot: \n2026-11-04t10:12:24.764"
+    },
+    {
+      "timestamp": "2026-11-04T16:49:06Z",
+      "rule_id": "BUG-19-YOUTUBE-INVALID-GRANT",
+      "slot_name": "slot_2",
+      "attempt": 0,
+      "error_snippet": "2026-11-04t10:12:24.7643077z   ld_library_path: /opt/hostedtoolcache/python/3.11.17/x64/lib\n2026-11-04t10:12:24.7643521z   manual_slot: \n2026-11-04t10:12:24.764"
+    },
+    {
+      "timestamp": "2026-11-04T16:49:30Z",
+      "rule_id": "BUG-19-YOUTUBE-INVALID-GRANT",
+      "slot_name": "slot_3",
+      "attempt": 0,
+      "error_snippet": "2026-11-04t10:12:24.7643077z   ld_library_path: /opt/hostedtoolcache/python/3.11.17/x64/lib\n2026-11-04t10:12:24.7643521z   manual_slot: \n2026-11-04t10:12:24.764"
+    },
+    {
+      "timestamp": "2026-11-04T16:49:49Z",
+      "rule_id": "BUG-19-YOUTUBE-INVALID-GRANT",
+      "slot_name": "slot_4",
+      "attempt": 0,
+      "error_snippet": "2026-11-04t10:12:24.7643077z   ld_library_path: /opt/hostedtoolcache/python/3.11.17/x64/lib\n2026-11-04t10:12:24.7643521z   manual_slot: \n2026-11-04t10:12:24.764"
+    },
+    {
+      "timestamp": "2026-11-04T16:50:13Z",
+      "rule_id": "BUG-19-YOUTUBE-INVALID-GRANT",
+      "slot_name": "slot_5",
+      "attempt": 0,
+      "error_snippet": "2026-11-04t10:12:24.7643077z   ld_library_path: /opt/hostedtoolcache/python/3.11.17/x64/lib\n2026-11-04t10:12:24.7643521z   manual_slot: \n2026-11-04t10:12:24.764"
+    },
+    {
+      "timestamp": "2026-11-04T16:50:45Z",
+      "rule_id": "BUG-19-YOUTUBE-INVALID-GRANT",
+      "slot_name": "slot_6",
+      "attempt": 0,
+      "error_snippet": "2026-11-04t10:12:24.7643077z   ld_library_path: /opt/hostedtoolcache/python/3.11.17/x64/lib\n2026-11-04t10:12:24.7643521z   manual_slot: \n2026-11-04t10:12:24.764"
     }
   ]
 }
