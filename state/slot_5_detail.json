@@ -88,6 +88,11 @@
       "ts": "16:55:07",
       "level": "INFO",
       "msg": "[GEMINI]: \ud83d\udd0d Harvesting live search intent... | open-seo dark-query loop \u00b7 slot 5"
+    },
+    {
+      "ts": "16:55:23",
+      "level": "INFO",
+      "msg": "[GEMINI]: \ud83d\udd0d Harvested `Usdt dominance chart and ideas tradingview` | source: autocomplete \u00b7 cluster: usdt dominance chart and ideas \u2014 tradingview"
     }
   ]
 }
