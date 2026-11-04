@@ -9,9 +9,9 @@
   "stage_pct": 100,
   "current_stage_index": 2,
   "current_stage_name": "Gemini Script & Article Synthesis",
-  "current_subtask_label": "Synthesizing script & SEO article",
+  "current_subtask_label": "Retention pacing + SEBI/IRDAI auditor",
   "started_at": "2026-11-04T16:54:20Z",
-  "updated_at": "2026-11-04T16:55:10Z",
+  "updated_at": "2026-11-04T16:56:13Z",
   "eta_seconds": 0,
   "stages": [
     {
@@ -103,6 +103,11 @@
       "ts": "16:55:05",
       "level": "INFO",
       "msg": "[PLAYWRIGHT]: \u2705 Rendered (3 High-CTR Frames) | "
+    },
+    {
+      "ts": "16:55:19",
+      "level": "INFO",
+      "msg": "[GEMINI]: \ud83e\udde0 Synthesizing Dual Script + Article... | "
     }
   ]
 }
