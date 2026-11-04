@@ -427,7 +427,7 @@ def generate_high_ctr_section_frame(
                 return output_path
 
     theme_key = section.get("theme") or PALETTE_KEYS[section.get("section_index", 0) % len(PALETTE_KEYS)]
-    theme = PALETTES.get(theme_key, PALETTES["solana_purple"])
+    theme = PALETTES.get(theme_key, PALETTES.get("blood_red", list(PALETTES.values())[0]))
     
     # 1. Base Gradient Canvas
     img = Image.new("RGBA", (width, height))
@@ -439,16 +439,16 @@ def generate_high_ctr_section_frame(
     img.alpha_composite(grid)
     
     # 3. Dramatic Central 3D Graphic Anchor
-    symbol = section.get("symbol_type", "solana_token")
+    symbol = section.get("symbol_type", "burning_chart")
     _draw_central_3d_anchor(img, symbol, theme, center_y=1120)
     
     # 4. Floating Warning Pill (Top Anchor)
-    badge_text = section.get("badge_text", "WARNING ⚠️")
+    badge_text = section.get("badge_text", "MARKET ALERT ⚠️")
     _draw_warning_pill(img, badge_text, pos_y=220, theme=theme)
     
     # 5. Bold 3D Metallic Hook Typography (Headline Line 1)
     top_font = _get_font(108, bold=True)
-    line1_text = section.get("headline_top", "SOLANA SIPHON").upper()
+    line1_text = section.get("headline_top", "MARKET CRASH").upper()
     next_y = _render_3d_metallic_line(
         img,
         line1_text,

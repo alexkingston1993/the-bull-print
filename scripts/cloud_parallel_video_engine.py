@@ -23,6 +23,7 @@ import time
 import argparse
 import asyncio
 import subprocess
+import re
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 from PIL import Image, ImageDraw, ImageFont
@@ -43,19 +44,108 @@ def _send_telegram(msg: str):
 
 
 # ─────────────────────────────────────────────────────────────
-# 1. SESSION PREPARATION & DYNAMIC MATRIX PARTITIONING
+# 1. DUPLICATE DETECTION & TOPIC INTEGRITY GUARD
+# ─────────────────────────────────────────────────────────────
+
+def check_duplicate_before_prep(topic: str) -> None:
+    """
+    STRICT DEDUPLICATION GUARD:
+    Prevents re-rendering identical visuals or re-uploading topics already published
+    in the last 30 days on YouTube or in local content/posts.
+    """
+    topic_clean = topic.strip().lower()
+    topic_words = set(re.sub(r"[^\w\s]", "", topic_clean).split())
+    stop_words = {"the", "a", "an", "and", "or", "how", "to", "in", "of", "for", "on", "with", "is", "at", "by", "what", "why"}
+    core_words = topic_words - stop_words
+
+    if not core_words:
+        raise ValueError(f"Topic '{topic}' does not contain sufficient meaningful keywords.")
+
+    logger.info(f"🔍 [Duplicate Guard] Checking topic integrity for: '{topic}' (core keywords: {core_words})")
+
+    # 1. Check local content/posts
+    posts_dir = BASE_DIR / "content" / "posts"
+    if posts_dir.exists():
+        for p in posts_dir.glob("*.md"):
+            name = p.stem.lower().replace("-", " ")
+            name_words = set(re.sub(r"[^\w\s]", "", name).split()) - stop_words
+            overlap = len(core_words & name_words)
+            if len(core_words) > 0 and (overlap / len(core_words)) >= 0.7:
+                logger.error(f"⛔ Topic matches published article: {p.name}")
+                raise RuntimeError(
+                    f"⛔ [Duplicate Guard Triggered] Topic '{topic}' matches already-published content in '{p.name}'. "
+                    f"Refusing to generate duplicate video or recycle old visual frames!"
+                )
+
+    # 2. Check live YouTube uploads via OAuth pool
+    try:
+        from app.services.youtube_uploader import get_uploader
+        uploader = get_uploader()
+        service = uploader._get_service("en")
+        if service:
+            channel_res = service.channels().list(mine=True, part="contentDetails").execute()
+            if channel_res and channel_res.get("items"):
+                uploads_pl = channel_res["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+                recent_items = service.playlistItems().list(
+                    playlistId=uploads_pl,
+                    part="snippet",
+                    maxResults=50,
+                ).execute().get("items", [])
+                for itm in recent_items:
+                    snip = itm.get("snippet", {})
+                    v_title = snip.get("title", "")
+                    v_words = set(re.sub(r"[^\w\s]", "", v_title.lower()).split()) - stop_words
+                    overlap = len(core_words & v_words)
+                    if len(core_words) > 0 and (overlap / len(core_words)) >= 0.65:
+                        v_id = snip.get("resourceId", {}).get("videoId")
+                        logger.error(f"⛔ Topic closely matches YouTube video: '{v_title}' ({v_id})")
+                        raise RuntimeError(
+                            f"⛔ [Duplicate Guard Triggered] Topic '{topic}' was already published on YouTube as: "
+                            f"'{v_title}' (https://youtu.be/{v_id}). "
+                            f"Refusing to upload duplicate video frames or recycle existing video!"
+                        )
+    except RuntimeError:
+        raise
+    except Exception as e:
+        logger.debug(f"[Duplicate Guard] Channel query notice: {e}")
+
+    logger.success(f"✅ [Duplicate Guard] Verified unique topic: '{topic}'")
+
+
+# ─────────────────────────────────────────────────────────────
+# 2. SESSION PREPARATION & DYNAMIC MATRIX PARTITIONING
 # ─────────────────────────────────────────────────────────────
 
 def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, is_short: bool) -> List[Dict[str, Any]]:
-    """Generates procedural section breakdown and visual prompts for any financial topic."""
+    """Generates procedural section breakdown and visual prompts dynamically tailored to topic."""
     rules = VideoFormatConfig.get_rules(duration_sec, is_short=is_short)
     interval = rules["frame_interval"]
     num_sections = rules["expected_frames"]
 
-    theme = "solana_purple" if vertical == "crypto" else ("blood_red" if vertical == "stock_market" else "lightning_cyan")
     topic_clean = topic.strip()
-    words_topic = topic_clean.split()
+    topic_lower = topic_clean.lower()
+    words_topic = [w for w in re.sub(r"[^\w\s]", "", topic_clean).split() if len(w) > 2]
+
+    # Auto-detect vertical if not explicit
+    if any(k in topic_lower for k in ["nifty", "sensex", "banknifty", "fii", "dii", "stock", "option", "calls", "puts"]):
+        vertical = "stock_market"
+        theme = "blood_red"
+        default_symbol = "burning_chart"
+    elif any(k in topic_lower for k in ["btc", "bitcoin", "eth", "solana", "crypto", "token", "mev", "siphon"]):
+        vertical = "crypto"
+        theme = "solana_purple" if "solana" in topic_lower else "lightning_cyan"
+        default_symbol = "crypto_orb"
+    elif any(k in topic_lower for k in ["insurance", "term", "claim", "irda", "policy"]):
+        vertical = "insurance"
+        theme = "lightning_cyan"
+        default_symbol = "shield_fail"
+    else:
+        vertical = "stock_market"
+        theme = "blood_red"
+        default_symbol = "burning_chart"
+
     lead_word = words_topic[0].upper() if words_topic else "MARKET"
+    second_word = words_topic[1].upper() if len(words_topic) > 1 else "ANALYSIS"
 
     sections = []
     for i in range(num_sections):
@@ -63,31 +153,30 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
         end_t = round((i + 1) * interval, 2)
         
         if i == 0:
-            top = f"{lead_word} SIPHON"
-            mid = "THE 99% TRAP"
-            badge = "FORENSIC AUDIT ⚠️"
+            top = f"{lead_word} {second_word}"
+            mid = "THE HIDDEN TRAP" if vertical == "stock_market" else "FORENSIC BREAKDOWN"
+            badge = "MARKET ALERT ⚠️"
         elif i == 1:
-            top = "LIQUIDITY CASCADE"
-            mid = "INSTITUTIONAL MOVE"
-            badge = "ALGO TRACKER"
+            top = "LIQUIDITY CASCADE" if vertical != "insurance" else "POLICY CLAUSE"
+            mid = "INSTITUTIONAL MOVE" if vertical != "insurance" else "CLAIM REJECTION"
+            badge = "ALGO TRACKER" if vertical != "insurance" else "LEGAL AUDIT"
         elif i == 2:
-            top = "ORDER FLOW DRAIN"
-            mid = "MOMENTUM SQUEEZE"
-            badge = "METHOD C HUD [!]"
+            top = "ORDER FLOW DRAIN" if vertical != "insurance" else "FINE PRINT HIDDEN"
+            mid = "SMART MONEY LEVEL" if vertical != "insurance" else "SECTION 45 EXPOSED"
+            badge = "DATA EVIDENCE [!]"
         elif i == 3:
-            top = "HIDDEN EXPENSES"
-            mid = "CLAUSE 4B EXPOSED"
-            badge = "LEGAL REJECTION"
+            top = "RETAIL EXPOSURE"
+            mid = "MOMENTUM SQUEEZE" if vertical != "insurance" else "PREMIUM LOSS"
+            badge = "RISK WARNING"
         elif i == 4:
             top = "SMART MONEY EXIT"
-            mid = "RETAIL BAGHOLDERS"
-            badge = "WHALE DUMP"
+            mid = "EXECUTION MATH"
+            badge = "WHALE MOVEMENT"
         else:
             top = f"PHASE {i + 1} AUDIT"
-            mid = "EXECUTION MATH"
-            badge = "PROVEN DATA"
+            mid = "INSTITUTIONAL PLAY"
+            badge = "VERIFIED DATA"
 
-        # Schedule Method C Glass HUD callout on highlight segments
         has_hud = (i in (1, 3, 5))
 
         sections.append({
@@ -95,13 +184,13 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
             "start_sec": start_t,
             "end_sec": end_t,
             "duration": round(end_t - start_t, 2),
-            "headline_top": top,
-            "headline_mid": mid,
-            "badge_text": badge,
+            "headline_top": top[:24],
+            "headline_mid": mid[:24],
+            "badge_text": badge[:20],
             "theme": theme,
-            "symbol_type": "solana_token" if vertical == "crypto" else ("burning_chart" if vertical == "stock_market" else "shield_fail"),
+            "symbol_type": default_symbol,
             "method_c_hud": has_hud,
-            "script": f"Section {i + 1}: Uncovering the hidden mechanics behind {topic_clean} and how smart money operates.",
+            "script": f"Section {i + 1}: Breaking down {topic_clean}. Smart money order flows reveal critical data points.",
         })
     return sections
 
@@ -170,11 +259,25 @@ def _synthesize_local_christopher_audio(script_text: str, audio_path: Path, word
         return words
 
 
-def prepare_session(topic: str, vertical: str = "crypto", duration_sec: int = 60, is_short: bool = True, output_dir: Optional[Path] = None):
+def prepare_session(
+    topic: str,
+    vertical: str = "stock_market",
+    duration_sec: int = 60,
+    is_short: bool = True,
+    output_dir: Optional[Path] = None,
+    privacy_status: str = "unlisted",
+    skip_duplicate_check: bool = False
+):
     """
     Job 1: Prepares the full video session in the cloud.
     Emits GitHub Actions matrix output for up to 20 parallel runner workers!
     """
+    if not topic or not topic.strip():
+        raise ValueError("A valid non-empty topic must be provided for video generation.")
+
+    if not skip_duplicate_check:
+        check_duplicate_before_prep(topic)
+
     if output_dir is None:
         output_dir = BASE_DIR / "output" / "session_bundle"
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -219,6 +322,7 @@ def prepare_session(topic: str, vertical: str = "crypto", duration_sec: int = 60
         "vertical": vertical,
         "is_short": is_short,
         "duration_sec": duration_sec,
+        "privacy_status": privacy_status,
         "slug": slug,
         "total_segments": total_segments,
         "gha_indices": gha_indices,
@@ -476,6 +580,8 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
         tags = ["stock market", "crypto", "trading", "finance", "the bull print"]
         thumb_path = bundle_dir / "frames" / "frame_00.jpg"
 
+        privacy_status = manifest.get("privacy_status") or os.getenv("YOUTUBE_PRIVACY", "unlisted")
+
         from app.services.youtube_uploader import get_uploader
         uploader = get_uploader()
         res = uploader.upload_video(
@@ -486,7 +592,7 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
             tags=tags,
             thumbnail_path=str(thumb_path) if thumb_path.exists() else None,
             category_id="27",
-            privacy_status="public",
+            privacy_status=privacy_status,
             is_short=manifest.get("is_short", False),
         )
         vid_id = (res.get("video_id") or res.get("id")) if isinstance(res, dict) else None
@@ -548,20 +654,32 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
 def main():
     parser = argparse.ArgumentParser(description="Cloud Parallel Video Engine")
     parser.add_argument("--mode", choices=["prepare", "render_segment", "aggregate_and_publish", "dispatch_kaggle_overflow"], required=True)
-    parser.add_argument("--topic", default="Solana Memecoin Siphon: MEV Arbitrage Trap")
-    parser.add_argument("--vertical", default="crypto", choices=["stock_market", "crypto", "insurance"])
+    parser.add_argument("--topic", default=None, help="Specific financial topic. Required for prepare mode.")
+    parser.add_argument("--vertical", default="stock_market", choices=["stock_market", "crypto", "insurance"])
     parser.add_argument("--duration-sec", type=int, default=60)
     parser.add_argument("--duration-min", type=int, default=3)
     parser.add_argument("--is-short", action="store_true", default=True)
     parser.add_argument("--segment-index", type=int, default=0)
+    parser.add_argument("--privacy-status", default=os.getenv("YOUTUBE_PRIVACY", "unlisted"), choices=["public", "unlisted", "private"])
+    parser.add_argument("--skip-duplicate-check", action="store_true", default=False)
     parser.add_argument("--bundle-dir", type=Path, default=BASE_DIR / "output" / "session_bundle")
     parser.add_argument("--segments-dir", type=Path, default=BASE_DIR / "output" / "rendered_segments")
     parser.add_argument("--output-dir", type=Path, default=None)
     args = parser.parse_args()
 
     if args.mode == "prepare":
+        if not args.topic:
+            raise ValueError("Error: --topic is required when running in 'prepare' mode. Hardcoded defaults are disabled.")
         dur = args.duration_sec if args.is_short else (args.duration_min * 60)
-        prepare_session(topic=args.topic, vertical=args.vertical, duration_sec=dur, is_short=args.is_short, output_dir=args.bundle_dir)
+        prepare_session(
+            topic=args.topic,
+            vertical=args.vertical,
+            duration_sec=dur,
+            is_short=args.is_short,
+            output_dir=args.bundle_dir,
+            privacy_status=args.privacy_status,
+            skip_duplicate_check=args.skip_duplicate_check
+        )
     elif args.mode == "render_segment":
         render_segment(segment_index=args.segment_index, bundle_dir=args.bundle_dir, output_dir=args.output_dir)
     elif args.mode == "aggregate_and_publish":

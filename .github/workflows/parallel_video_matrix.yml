@@ -4,13 +4,16 @@ on:
   workflow_dispatch:
     inputs:
       topic:
-        description: 'Financial Topic'
-        required: false
-        default: 'Solana Memecoin Siphon: How MEV Bots Frontrun Retail'
+        description: 'Financial Topic (Must be unique; duplicates will be rejected)'
+        required: true
       vertical:
-        description: 'Vertical: crypto | stock_market | insurance'
+        description: 'Vertical: stock_market | crypto | insurance'
         required: false
-        default: 'crypto'
+        default: 'stock_market'
+      privacy_status:
+        description: 'YouTube Privacy (unlisted | public | private)'
+        required: false
+        default: 'unlisted'
       duration_sec:
         description: 'Duration in seconds for Shorts (36 or 60)'
         required: false
@@ -64,13 +67,18 @@ jobs:
       - name: 🚀 Prepare Session & Compute Parallel Matrix
         id: prep
         env:
-          INPUT_TOPIC: "${{ github.event.inputs.topic || github.event.client_payload.topic || 'Solana Memecoin Siphon MEV Arbitrage' }}"
-          INPUT_VERTICAL: ${{ github.event.inputs.vertical || github.event.client_payload.vertical || 'crypto' }}
+          INPUT_TOPIC: "${{ github.event.inputs.topic || github.event.client_payload.topic }}"
+          INPUT_VERTICAL: ${{ github.event.inputs.vertical || github.event.client_payload.vertical || 'stock_market' }}
+          INPUT_PRIVACY: ${{ github.event.inputs.privacy_status || 'unlisted' }}
           INPUT_DURATION_SEC: ${{ github.event.inputs.duration_sec || github.event.client_payload.duration_sec || '60' }}
           INPUT_DURATION_MIN: ${{ github.event.inputs.duration_min || github.event.client_payload.duration_min || '3' }}
           INPUT_SHORTS_ONLY: ${{ github.event.inputs.shorts_only || github.event.client_payload.shorts_only || 'true' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
+          if [ -z "$INPUT_TOPIC" ]; then
+            echo "❌ [Error] No topic provided! Refusing to run with static default topics."
+            exit 1
+          fi
           SHORT_FLAG=""
           if [ "$INPUT_SHORTS_ONLY" = "true" ]; then
             SHORT_FLAG="--is-short"
@@ -79,6 +87,7 @@ jobs:
             --mode prepare \
             --topic "$INPUT_TOPIC" \
             --vertical "$INPUT_VERTICAL" \
+            --privacy-status "$INPUT_PRIVACY" \
             --duration-sec "$INPUT_DURATION_SEC" \
             --duration-min "$INPUT_DURATION_MIN" \
             $SHORT_FLAG \

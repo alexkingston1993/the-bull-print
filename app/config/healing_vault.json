@@ -1,8 +1,8 @@
 {
   "version": "2.0.0",
   "engine_name": "Aria Cognitive Self-Healing & Continuous Learning Engine",
-  "last_synced": "2026-11-04T08:11:38Z",
-  "total_learned_rules": 33,
+  "last_synced": "2026-11-04T09:40:31Z",
+  "total_learned_rules": 34,
   "learned_rules": [
     {
       "rule_id": "BUG-01-RUNNER-DEP-REQUESTS",
@@ -366,6 +366,17 @@
       "action_plan": "Call get_uploader().upload_video(language='en', video_path=...) and pass structured payload to generate_website_article_file",
       "auto_executable": null,
       "learned_from": "feed_healing_loop CLI"
+    },
+    {
+      "rule_id": "BUG-34-PARALLEL-DEDUP-FRAME-REUSE",
+      "signature_pattern": "(solana memecoin siphon|mev arbitrage trap|re-used the same exact video|changed only the audio|duplicate visual frames|duplicate video upload)",
+      "domain": "duplicate_guard",
+      "failed_component": "Cloud Parallel Video Matrix Topic & Frame Dispatcher",
+      "severity": "CRITICAL",
+      "root_cause": "parallel_video_matrix.yml and cloud_parallel_video_engine.py defaulted to static hardcoded topic Solana Memecoin Siphon MEV Arbitrage with hardcoded slide templates, and uploaded publicly without checking recently published videos.",
+      "action_plan": "1. Enforce strict 30-day YouTube channel upload deduplication before rendering any manifest. 2. Remove static hardcoded topic defaults in workflow dispatch. 3. Delete/privatize duplicate video via YouTube API immediately. 4. Require dynamic market topic harvesting from live NSE/macro feeds.",
+      "auto_executable": null,
+      "learned_from": "Live incident: user caught duplicate Solana frames re-upload 2cINkdat26s"
     }
   ],
   "incident_history": [
@@ -375,6 +386,13 @@
       "slot_name": "pipeline",
       "attempt": 0,
       "error_snippet": "filenotfounderror: missing rendered segment artifact: output/downloaded_segments/segment_00.mp4"
+    },
+    {
+      "timestamp": "2026-11-04T09:40:31Z",
+      "rule_id": "BUG-34-PARALLEL-DEDUP-FRAME-REUSE",
+      "slot_name": "parallel_matrix",
+      "attempt": 1,
+      "error_snippet": "Duplicate Solana video 2cINkdat26s re-uploaded with identical frames and only audio changed. Permanently deleted via YouTube API."
     }
   ]
 }
