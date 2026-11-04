@@ -107,7 +107,7 @@ jobs:
   render_segment_matrix:
     needs: prepare_session
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       max-parallel: 20
@@ -194,7 +194,6 @@ jobs:
   # ─────────────────────────────────────────────────────────────
   aggregate_and_publish:
     needs: [prepare_session, render_segment_matrix]
-    if: always() && needs.prepare_session.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
