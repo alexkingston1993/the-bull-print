@@ -614,16 +614,31 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
     ], check=True, capture_output=True)
 
     # 2. Select Music Bed from Pool & Apply Sidechain Ducking
-    vertical = manifest["vertical"]
-    mood_dir = BASE_DIR / "assets" / "audio" / "bgm_pool" / ("dark_investigative" if vertical == "crypto" else ("bullish_upbeat" if vertical == "stock_market" else "neutral_educational"))
-    bgm_candidates = list(mood_dir.glob("*.wav")) + list((BASE_DIR / "assets" / "audio" / "bgm_pool").glob("*.wav"))
-    bgm_file = bgm_candidates[0] if bgm_candidates else (BASE_DIR / "assets" / "audio" / "bgm_pool" / "bed_01_subterranean_pulse.wav")
+    # Strict rule: NEVER use synthetic bloop/arcade arpeggio tracks (emerald_breakout, etc.)
+    # Use sleek, low-profile cinematic ambient beds (subterranean pulse, wall street afterhours, etc.)
+    vertical = manifest.get("vertical", "stock_market")
+    topic_text = (manifest.get("topic") or "").lower()
+    is_dark_or_investigative = any(k in topic_text for k in ["trap", "crash", "liquidation", "manipulation", "stop hunt", "sweep", "fii", "exposed", "truth", "mev", "siphon", "dump"])
+    
+    preferred_category = "dark_investigative" if (is_dark_or_investigative or vertical in ["stock_market", "crypto"]) else "neutral_educational"
+    mood_dir = BASE_DIR / "assets" / "audio" / "bgm_pool" / preferred_category
+
+    # Gather candidates, strictly filtering out any blacklisted tracks
+    raw_candidates = list(mood_dir.glob("*.wav")) + list((BASE_DIR / "assets" / "audio" / "bgm_pool").glob("*.wav"))
+    bgm_candidates = [
+        f for f in raw_candidates 
+        if not any(banned in f.name.lower() for banned in ["emerald", "breakout", "bounce", "fomo", "arcade", "bloop"])
+    ]
+
+    default_cinematic_bed = BASE_DIR / "assets" / "audio" / "bgm_pool" / "bed_01_subterranean_pulse.wav"
+    bgm_file = bgm_candidates[0] if bgm_candidates else default_cinematic_bed
 
     speech_audio = bundle_dir / manifest["audio_file"]
     final_video_mp4 = output_dir / f"{manifest['slug']}_final.mp4"
 
-    logger.info(f"🎵 [Aggregator] Mixing sidechain ducked audio with bed: {bgm_file.name}")
-    filter_complex = "[1:a]volume=0.32[bg];[bg][0:a]sidechaincompress=threshold=0.08:ratio=6:attack=50:release=350[ducked];[0:a][ducked]amix=inputs=2:duration=first[aout]"
+    logger.info(f"🎵 [Aggregator] Mixing subtle cinematic ambient bed (no bloops): {bgm_file.name}")
+    # Subtle -16dB background bed with fast ducking underneath Christopher voice
+    filter_complex = "[1:a]volume=0.16[bg];[bg][0:a]sidechaincompress=threshold=0.06:ratio=8:attack=30:release=250[ducked];[0:a][ducked]amix=inputs=2:duration=first[aout]"
     subprocess.run([
         "ffmpeg", "-y",
         "-i", str(speech_audio),

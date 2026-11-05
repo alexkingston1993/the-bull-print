@@ -267,8 +267,6 @@ def build_full_audio_pool():
         ("dark_investigative/bed_02_quant_clockwork_180s.wav", gen_dark_quant_clockwork, 180.0), # Long format
         
         # Bullish & Upbeat
-        ("bullish_upbeat/bed_01_emerald_breakout.wav", gen_bullish_emerald_breakout, 60.0),
-        ("bullish_upbeat/bed_01_emerald_breakout_180s.wav", gen_bullish_emerald_breakout, 180.0),
         ("bullish_upbeat/bed_02_capital_compounder.wav", gen_bullish_capital_compounder, 60.0),
         
         # Witty & Satire
