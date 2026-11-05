@@ -23,6 +23,7 @@ import time
 import argparse
 import asyncio
 import subprocess
+import shutil
 import re
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
@@ -368,9 +369,15 @@ def prepare_session(
     for s in sections:
         idx = s["section_index"]
         frame_path = frames_dir / f"frame_{idx:02d}.jpg"
-        generate_high_ctr_section_frame(
-            s, vertical=vertical, width=w_out, height=h_out, output_path=frame_path
-        )
+        approved_dir = BASE_DIR / "assets" / "approved_bundles" / slug
+        approved_frame = approved_dir / f"frame_{idx:02d}.jpg"
+        if approved_frame.exists():
+            shutil.copy2(approved_frame, frame_path)
+            logger.success(f"🎯 [Session Prep] Using verified user-approved frame: {approved_frame.name}")
+        else:
+            generate_high_ctr_section_frame(
+                s, vertical=vertical, width=w_out, height=h_out, output_path=frame_path
+            )
         frame_files.append(str(frame_path.relative_to(output_dir)))
         s["frame_file"] = str(frame_path.relative_to(output_dir))
 
