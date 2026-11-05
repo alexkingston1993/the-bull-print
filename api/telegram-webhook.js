@@ -51,15 +51,36 @@ async function sendTelegram(chatId, text, replyMarkup) {
   }
 }
 
-async function answerCallbackQuery(callbackQueryId, text) {
+async function answerCallbackQuery(callbackQueryId, text, showAlert = false) {
   if (!TG_TOKEN) return;
   try {
     await fetch(`https://api.telegram.org/bot${TG_TOKEN}/answerCallbackQuery`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ callback_query_id: callbackQueryId, text: text || 'Acknowledged!' }),
+      body: JSON.stringify({
+        callback_query_id: callbackQueryId,
+        text: text || 'Acknowledged!',
+        show_alert: showAlert,
+      }),
     });
   } catch (err) {}
+}
+
+async function editMessageReplyMarkup(chatId, messageId, replyMarkup) {
+  if (!TG_TOKEN) return;
+  try {
+    await fetch(`https://api.telegram.org/bot${TG_TOKEN}/editMessageReplyMarkup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        message_id: messageId,
+        reply_markup: replyMarkup,
+      }),
+    });
+  } catch (err) {
+    console.error('Failed to editMessageReplyMarkup:', err);
+  }
 }
 
 async function dispatchGitHubWorkflow(workflowFile, inputs = {}) {
@@ -353,32 +374,93 @@ export default async function handler(req, res) {
 
       if (data.startsWith('approve_frame_')) {
         const frameIdx = data.replace('approve_frame_', '');
-        await answerCallbackQuery(cb.id, `✅ Frame ${parseInt(frameIdx) + 1} Approved!`);
+        const frameNum = parseInt(frameIdx) + 1;
+        const msgId = cb.message?.message_id;
+
+        // 1. Instant Modal Popup Alert on Alex's screen
+        await answerCallbackQuery(
+          cb.id,
+          `✅ Frame ${frameNum} APPROVED!\nServer has received and logged your decision.`,
+          true
+        );
+
+        // 2. Visually update the button on the photo itself to show locked status
+        if (chatId && msgId) {
+          await editMessageReplyMarkup(chatId, msgId, {
+            inline_keyboard: [
+              [{ text: `✅ Frame ${frameNum} Approved (Recorded)`, callback_data: `locked_approved_${frameIdx}` }],
+              [{ text: '🔄 Change Decision', callback_data: `reject_frame_${frameIdx}` }]
+            ],
+          });
+        }
+
+        // 3. Send detailed server acknowledgement message
         await sendTelegram(
           chatId,
-          `✅ *Decision Logged:* Frame ${parseInt(frameIdx) + 1} has been *APPROVED*.`
+          `📬 *SERVER ACKNOWLEDGEMENT (Cloud Engine)*\n\n` +
+          `✅ *Decision Recorded:* Frame ${frameNum} is *APPROVED*.\n` +
+          `⏱ *Timestamp:* \`${new Date().toISOString()}\`\n` +
+          `🔒 *Status:* Locked in. Zero regeneration needed for this section.`
         );
+
         return res.status(200).json({ ok: true, action: 'frame_approved', frame: frameIdx });
       }
 
       if (data.startsWith('reject_frame_')) {
         const frameIdx = data.replace('reject_frame_', '');
-        await answerCallbackQuery(cb.id, `❌ Frame ${parseInt(frameIdx) + 1} Disapproved`);
+        const frameNum = parseInt(frameIdx) + 1;
+        const msgId = cb.message?.message_id;
+
+        await answerCallbackQuery(
+          cb.id,
+          `❌ Frame ${frameNum} DISAPPROVED.\nServer received rejection. Please provide feedback.`,
+          true
+        );
+
+        if (chatId && msgId) {
+          await editMessageReplyMarkup(chatId, msgId, {
+            inline_keyboard: [
+              [{ text: `❌ Frame ${frameNum} Disapproved`, callback_data: `locked_rejected_${frameIdx}` }],
+              [{ text: '✍️ Send Feedback / Notes', callback_data: `feedback_frame_${frameIdx}` }],
+              [{ text: '🔄 Change to Approved', callback_data: `approve_frame_${frameIdx}` }]
+            ],
+          });
+        }
+
         await sendTelegram(
           chatId,
-          `❌ *Decision Logged:* Frame ${parseInt(frameIdx) + 1} has been *DISAPPROVED*.\n\nPlease reply with feedback or the exact visual changes you'd like.`
+          `📬 *SERVER ACKNOWLEDGEMENT (Cloud Engine)*\n\n` +
+          `❌ *Decision Recorded:* Frame ${frameNum} is *DISAPPROVED*.\n` +
+          `⏱ *Timestamp:* \`${new Date().toISOString()}\`\n\n` +
+          `👉 *Action Required:* Please reply to that frame with your feedback on what to change so we can regenerate.`
         );
+
         return res.status(200).json({ ok: true, action: 'frame_rejected', frame: frameIdx });
       }
 
       if (data.startsWith('feedback_frame_')) {
         const frameIdx = data.replace('feedback_frame_', '');
-        await answerCallbackQuery(cb.id, `✍️ Feedback for Frame ${parseInt(frameIdx) + 1}`);
+        const frameNum = parseInt(frameIdx) + 1;
+
+        await answerCallbackQuery(
+          cb.id,
+          `✍️ Feedback mode active for Frame ${frameNum}.\nPlease reply directly to that photo with your notes.`,
+          true
+        );
+
         await sendTelegram(
           chatId,
-          `✍️ *Feedback Mode Active:* Please reply with your feedback or revisions for Frame ${parseInt(frameIdx) + 1}.`
+          `📬 *SERVER ACKNOWLEDGEMENT (Cloud Engine)*\n\n` +
+          `✍️ *Feedback Mode Active for Frame ${frameNum}:*\n` +
+          `Please reply to that specific frame image with your exact instructions (e.g. *"make font bigger"*, *"add more lightning"*, *"change metric"*).`
         );
+
         return res.status(200).json({ ok: true, action: 'frame_feedback_prompt', frame: frameIdx });
+      }
+
+      if (data.startsWith('locked_')) {
+        await answerCallbackQuery(cb.id, '🔒 Decision is already recorded on the server.', true);
+        return res.status(200).json({ ok: true, status: 'already_locked' });
       }
 
       await answerCallbackQuery(cb.id);
