@@ -469,41 +469,97 @@ def render_segment(segment_index: int, bundle_dir: Path, output_dir: Optional[Pa
     if base_img.size != (w_out, h_out):
         base_img = base_img.resize((w_out, h_out), Image.Resampling.LANCZOS)
 
-    # Typography & Word Pill Caching
-    font_size = rules["caption_font_size"]
-    font = None
+    # -------------------------------------------------------------
+    # 4-WORD KINETIC TYPOGRAPHY CAPTION SYSTEM (MRBEAST / HORMOZI STYLE)
+    # Shows 4 words across the screen at any given time.
+    # The active spoken word scales up 1.22x and illuminates in vibrant gold,
+    # while inactive words in the cluster remain crisp white.
+    # -------------------------------------------------------------
+    words_list = sec.get("words", [])
+    chunk_size = 4
+    
+    # Locate best available bold font file
+    font_file = None
     for cand in [
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
         "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
         str(BASE_DIR / "assets" / "fonts" / "Inter-Bold.ttf"),
     ]:
         if os.path.exists(cand):
-            try:
-                font = ImageFont.truetype(cand, font_size)
-                break
-            except Exception:
-                pass
-    if font is None:
-        font = ImageFont.load_default()
+            font_file = cand
+            break
 
-    # Pre-render pills for words in this segment
-    cached_pills = {}
-    for item in sec["words"]:
-        raw_word = item["word"]
-        if raw_word in cached_pills:
-            continue
-        bbox = font.getbbox(raw_word)
-        tw = bbox[2] - bbox[0]
-        th = bbox[3] - bbox[1]
-        px = rules["pill_padding_x"]
-        py = rules["pill_padding_y"]
-        pw = tw + px * 2
-        ph = th + py * 2
+    # Pre-render 4-word composite states keyed by global word index
+    cached_chunk_pills = {}
+    total_words_count = len(words_list)
+    
+    for w_global_idx in range(total_words_count):
+        chunk_start_idx = (w_global_idx // chunk_size) * chunk_size
+        chunk_words_slice = words_list[chunk_start_idx : chunk_start_idx + chunk_size]
+        active_in_chunk = w_global_idx - chunk_start_idx
+        words_text_list = [item["word"] for item in chunk_words_slice]
+        
+        # Auto-fit base font size so the 4 words never exceed safe screen margins
+        max_allowed_w = int(w_out * 0.88)
+        base_size = int(rules.get("caption_font_size", 54) * 0.85)
+        
+        while base_size >= 24:
+            if font_file:
+                try:
+                    f_norm = ImageFont.truetype(font_file, base_size)
+                    f_act = ImageFont.truetype(font_file, int(base_size * 1.22))
+                except Exception:
+                    f_norm = ImageFont.load_default()
+                    f_act = f_norm
+            else:
+                f_norm = ImageFont.load_default()
+                f_act = f_norm
+                
+            wb_list = []
+            for i, w_txt in enumerate(words_text_list):
+                f_curr = f_act if i == active_in_chunk else f_norm
+                bbox = f_curr.getbbox(w_txt)
+                bw = bbox[2] - bbox[0]
+                bh = bbox[3] - bbox[1]
+                wb_list.append((w_txt, bw, bh, f_curr))
+                
+            spacing = int(base_size * 0.35)
+            row_w = sum(b[1] for b in wb_list) + spacing * max(len(wb_list) - 1, 0)
+            if row_w <= max_allowed_w or base_size <= 24:
+                break
+            base_size -= 2
+            
+        pad_x = 28
+        pad_y = 16
+        max_h = max(b[2] for b in wb_list) if wb_list else 40
+        pw = row_w + pad_x * 2
+        ph = max_h + pad_y * 2
+        
         pill = Image.new("RGBA", (pw, ph), (0, 0, 0, 0))
         pdraw = ImageDraw.Draw(pill)
-        pdraw.rounded_rectangle([0, 0, pw - 1, ph - 1], radius=rules["border_radius"], fill=(5, 8, 15, 220), outline=(20, 241, 149, 230), width=3)
-        pdraw.text((px - bbox[0], py - bbox[1]), raw_word, font=font, fill=(255, 255, 255, 255))
-        cached_pills[raw_word] = (pill, pw, ph)
+        # Sleek dark glass pill backdrop with vibrant border
+        pdraw.rounded_rectangle(
+            [0, 0, pw - 1, ph - 1],
+            radius=rules.get("border_radius", 20),
+            fill=(6, 10, 20, 235),
+            outline=(20, 241, 149, 210),
+            width=3
+        )
+        
+        cx = pad_x
+        for i, (w_txt, bw, bh, f_curr) in enumerate(wb_list):
+            y_off = (max_h - bh) // 2
+            if i == active_in_chunk:
+                # Active spoken word: drop shadow + vibrant energetic gold
+                pdraw.text((cx + 3, pad_y + y_off + 3), w_txt, font=f_curr, fill=(0, 0, 0, 255))
+                pdraw.text((cx, pad_y + y_off), w_txt, font=f_curr, fill=(250, 204, 21, 255))
+            else:
+                # Inactive words in the cluster: drop shadow + crisp white
+                pdraw.text((cx + 2, pad_y + y_off + 2), w_txt, font=f_curr, fill=(0, 0, 0, 230))
+                pdraw.text((cx, pad_y + y_off), w_txt, font=f_curr, fill=(245, 245, 250, 255))
+            cx += bw + spacing
+            
+        cached_chunk_pills[w_global_idx] = (pill, pw, ph)
 
     # Launch FFmpeg Rawvideo Pipe
     cmd = [
@@ -522,7 +578,7 @@ def render_segment(segment_index: int, bundle_dir: Path, output_dir: Optional[Pa
     ]
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=subprocess.DEVNULL)
 
-    # Render frame stream with Ken Burns + Spoken Caption pop-on
+    # Render frame stream with Ken Burns + 4-Word Kinetic Caption Pop-On
     seg_start = sec["start_sec"]
     for f_idx in range(total_frames):
         t_current = seg_start + (f_idx / fps)
@@ -535,15 +591,20 @@ def render_segment(segment_index: int, bundle_dir: Path, output_dir: Optional[Pa
         cx, cy = (zw - w_out) // 2, (zh - h_out) // 2
         frame_canvas = frame_canvas.crop((cx, cy, cx + w_out, cy + h_out))
 
-        # Check active spoken word
-        active_word = None
-        for w in sec["words"]:
+        # Check active spoken word in the 4-word cluster
+        active_w_idx = None
+        for idx, w in enumerate(words_list):
             if w["start"] <= t_current <= w["end"]:
-                active_word = w["word"]
+                active_w_idx = idx
+                break
+            elif w["start"] > t_current:
+                # Small pause smoothing: keep previous word highlighted if in same chunk
+                if idx > 0 and (t_current - words_list[idx - 1]["end"]) < 0.35:
+                    active_w_idx = idx - 1
                 break
 
-        if active_word and active_word in cached_pills:
-            pill_img, pw, ph = cached_pills[active_word]
+        if active_w_idx is not None and active_w_idx in cached_chunk_pills:
+            pill_img, pw, ph = cached_chunk_pills[active_w_idx]
             paste_x = (w_out - pw) // 2
             paste_y = rules["caption_y"]
             frame_canvas.paste(pill_img, (paste_x, paste_y), pill_img)
