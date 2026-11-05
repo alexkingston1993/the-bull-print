@@ -657,15 +657,21 @@ export default async function handler(req, res) {
       parsedIntent.vertical = 'insurance';
     }
 
-    if (lower.includes('short') || lower.includes('reel') || lower.includes('36s') || lower.includes('60s')) {
-      parsedIntent.intent = 'create_short';
-      parsedIntent.duration = lower.includes('36') ? 36 : 60;
-      parsedIntent.topic = text.replace(/\b(short|create|make|generate|a|60s|36s|video|please|for me)\b/gi, '').trim() || 'Solana Memecoin Siphon';
-    } else if (lower.includes('video') || lower.includes('masterclass') || lower.includes('deep dive') || lower.includes('min')) {
-      parsedIntent.intent = 'create_video';
-      const m = lower.match(/\b(3|5|10)\b/);
-      parsedIntent.duration = m ? parseInt(m[1]) : 3;
-      parsedIntent.topic = text.replace(/\b(video|create|make|generate|masterclass|deep dive|min|minute|minutes|please)\b/gi, '').trim() || 'Institutional Order Flow Footprint';
+    // Ignore questions, complaints, or feedback from being mistaken for video creation requests
+    const isQuestionOrFeedback = lower.includes('?') || lower.startsWith('why') || lower.startsWith('how') || lower.startsWith('what') || lower.includes('expecting') || lower.includes('feedback');
+    const isExplicitCreate = /\b(create|produce|generate|make)\b/i.test(lower) && /\b(short|video|reel)\b/i.test(lower);
+
+    if (!isQuestionOrFeedback && isExplicitCreate) {
+      if (lower.includes('short') || lower.includes('reel') || lower.includes('36s') || lower.includes('60s')) {
+        parsedIntent.intent = 'create_short';
+        parsedIntent.duration = lower.includes('36') ? 36 : 60;
+        parsedIntent.topic = text.replace(/[\r\n]+/g, ' ').replace(/\b(short|create|make|generate|a|60s|36s|video|please|for me)\b/gi, '').trim() || 'Institutional Order Flow Forensics';
+      } else if (lower.includes('video') || lower.includes('masterclass') || lower.includes('deep dive') || lower.includes('min')) {
+        parsedIntent.intent = 'create_video';
+        const m = lower.match(/\b(3|5|10)\b/);
+        parsedIntent.duration = m ? parseInt(m[1]) : 3;
+        parsedIntent.topic = text.replace(/[\r\n]+/g, ' ').replace(/\b(video|create|make|generate|masterclass|deep dive|min|minute|minutes|please)\b/gi, '').trim() || 'Institutional Order Flow Footprint';
+      }
     }
 
     if (parsedIntent.intent === 'create_short') {
