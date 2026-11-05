@@ -372,6 +372,29 @@ export default async function handler(req, res) {
         return res.status(200).json({ ok: true, action: 'view_quota' });
       }
 
+      if (data.startsWith('approve_all_bundle:') || data === 'approve_all') {
+        const topic = data.includes(':') ? data.split(':')[1] : 'Nifty 50 Liquidity Sweep Rules & Institutional Stop Hunts';
+        await answerCallbackQuery(
+          cb.id,
+          `🚀 ALL FRAMES APPROVED!\nDispatched to cloud matrix with Christopher cloned voice!`,
+          true
+        );
+        await sendTelegram(
+          chatId,
+          `📬 *SERVER ACKNOWLEDGEMENT (Cloud Engine)*\n\n` +
+          `🚀 *ALL FRAMES APPROVED!* 🎉\n\nFull video bundle for *"${topic}"* has been authorized by operator.\n\n⚡ Dispatched to 20-runner parallel cloud matrix with Christopher cloned voice!`
+        );
+        await dispatchGitHubWorkflow('parallel_video_matrix.yml', {
+          topic: topic,
+          vertical: 'stock_market',
+          shorts_only: 'true',
+          duration_sec: '60',
+          duration_min: '1',
+          privacy_status: 'unlisted',
+        });
+        return res.status(200).json({ ok: true, action: 'bundle_approved_and_dispatched', topic });
+      }
+
       if (data.startsWith('approve_frame_')) {
         const frameIdx = data.replace('approve_frame_', '');
         const frameNum = parseInt(frameIdx) + 1;
@@ -480,6 +503,25 @@ export default async function handler(req, res) {
     // Security check
     if (AUTH_CHAT_ID && String(chatId) !== String(AUTH_CHAT_ID)) {
       return res.status(200).json({ ok: true, status: 'unauthorized_ignored' });
+    }
+
+    // Standalone direct approval message (no reply-to needed)
+    if (/^(approve|approved|yes|ok|lgtm|proceed|go|accept|all approved)$/i.test(lower)) {
+      const topic = 'Nifty 50 Liquidity Sweep Rules & Institutional Stop Hunts';
+      await sendTelegram(
+        chatId,
+        `📬 *SERVER ACKNOWLEDGEMENT (Cloud Engine)*\n\n` +
+        `🚀 *ALL FRAMES APPROVED!* 🎉\n\nFull video bundle for *"${topic}"* has been authorized by operator.\n\n⚡ Dispatched to 20-runner parallel cloud matrix with Christopher cloned voice!`
+      );
+      await dispatchGitHubWorkflow('parallel_video_matrix.yml', {
+        topic: topic,
+        vertical: 'stock_market',
+        shorts_only: 'true',
+        duration_sec: '60',
+        duration_min: '1',
+        privacy_status: 'unlisted',
+      });
+      return res.status(200).json({ ok: true, action: 'standalone_approve_dispatched', topic });
     }
 
     // ─────────────────────────────────────────────────────────────
