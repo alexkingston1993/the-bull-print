@@ -400,6 +400,87 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true, status: 'unauthorized_ignored' });
     }
 
+    // ─────────────────────────────────────────────────────────────
+    // 3. REPLY-TO-MESSAGE APPROVALS & FRAME DECISIONS
+    // ─────────────────────────────────────────────────────────────
+    if (msg.reply_to_message) {
+      const replyTo = msg.reply_to_message;
+      const refText = (replyTo.text || replyTo.caption || '').trim();
+      const isHeaderMsg =
+        refText.includes('NEW VIDEO REVIEW BUNDLE') ||
+        refText.includes('REVIEW BUNDLE') ||
+        refText.includes('Total Section Splits') ||
+        refText.includes('Title:');
+      const isFrameMsg = /FRAME\s+(\d+)\s+OF\s+(\d+)/i.test(refText) || /FRAME\s+(\d+)/i.test(refText);
+
+      // CASE A: User replied to the Main Bundle / Header message
+      if (isHeaderMsg) {
+        const isApprove = /\b(approve|approved|yes|ok|lgtm|proceed|go|accept|all approved)\b/i.test(lower);
+        const isReject = /\b(reject|rejected|disapprove|disapproved|no|stop|cancel)\b/i.test(lower);
+
+        if (isApprove) {
+          const titleMatch = refText.match(/Title`?:\s*[`"]?([^`"\n]+)[`"]?/i);
+          const topic = titleMatch ? titleMatch[1].trim() : 'The 9:15 AM Institutional Opening Trap Exposed';
+
+          await sendTelegram(
+            chatId,
+            `🚀 *ALL FRAMES APPROVED!* 🎉\n\nFull video bundle for *"${topic}"* has been authorized by operator.\n\n⚡ Dispatched to 20-runner parallel cloud matrix with Christopher cloned voice!`
+          );
+
+          await dispatchGitHubWorkflow('parallel_video_matrix.yml', {
+            topic: topic,
+            vertical: 'stock_market',
+            shorts_only: 'true',
+            duration_sec: '60',
+            duration_min: '1',
+            privacy_status: 'unlisted',
+          });
+
+          return res.status(200).json({ ok: true, action: 'bundle_approved_and_dispatched', topic });
+        } else if (isReject) {
+          await sendTelegram(
+            chatId,
+            `❌ *Bundle Disapproved:*\n\nAll frames marked for review. Please reply with specific changes or feedback so we can regenerate.`
+          );
+          return res.status(200).json({ ok: true, action: 'bundle_disapproved' });
+        } else {
+          await sendTelegram(
+            chatId,
+            `📝 *Bundle Feedback Recorded:*\n\n"${text}"\n\nApplying revisions to the review bundle now.`
+          );
+          return res.status(200).json({ ok: true, action: 'bundle_feedback_recorded', feedback: text });
+        }
+      }
+
+      // CASE B: User replied to an Individual Frame message
+      if (isFrameMsg) {
+        const match = refText.match(/FRAME\s+(\d+)\s+OF\s+(\d+)/i) || refText.match(/FRAME\s+(\d+)/i);
+        const frameNum = match ? match[1] : '1';
+        const isApprove = /\b(approve|approved|yes|ok|lgtm|accept)\b/i.test(lower);
+        const isReject = /\b(reject|rejected|disapprove|disapproved|no)\b/i.test(lower);
+
+        if (isApprove) {
+          await sendTelegram(
+            chatId,
+            `✅ *Decision Logged:* Frame ${frameNum} has been *APPROVED*! 👍`
+          );
+          return res.status(200).json({ ok: true, action: 'frame_approved_via_reply', frame: frameNum });
+        } else if (isReject) {
+          await sendTelegram(
+            chatId,
+            `❌ *Decision Logged:* Frame ${frameNum} has been *DISAPPROVED*.\n\nPlease reply with the visual changes you'd like to see.`
+          );
+          return res.status(200).json({ ok: true, action: 'frame_rejected_via_reply', frame: frameNum });
+        } else {
+          await sendTelegram(
+            chatId,
+            `🎨 *Feedback Recorded for Frame ${frameNum}:*\n\n"${text}"\n\nRevising Frame ${frameNum} per your instructions.`
+          );
+          return res.status(200).json({ ok: true, action: 'frame_feedback_via_reply', frame: frameNum, feedback: text });
+        }
+      }
+    }
+
     // Fetch live system telemetry
     const telemetry = await fetchLivePipelineTelemetry();
 
