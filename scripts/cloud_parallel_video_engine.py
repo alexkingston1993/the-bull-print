@@ -668,6 +668,7 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
             category_id="27",
             privacy_status=privacy_status,
             is_short=manifest.get("is_short", False),
+            force_upload=True,
         )
         vid_id = (res.get("video_id") or res.get("id")) if isinstance(res, dict) else None
         if vid_id:

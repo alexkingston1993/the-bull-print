@@ -493,6 +493,7 @@ class YouTubeUploader:
         is_short: bool = False,
         thumbnail_path: Optional[str] = None,
         publish_at: Optional[str] = None,
+        force_upload: bool = False,
     ) -> Dict:
         """Upload a video to YouTube.
 
@@ -603,25 +604,26 @@ class YouTubeUploader:
 
 
         # Prevent duplicate uploads: same normalized title on the channel within 24h
-        try:
-            existing_video_id = self._find_recent_duplicate(language, title, window_hours=24)
-        except Exception as dup_err:
-            logger.debug(f"[{language}] Duplicate upload check notice: {dup_err}")
-            existing_video_id = None
+        if not force_upload:
+            try:
+                existing_video_id = self._find_recent_duplicate(language, title, window_hours=24)
+            except Exception as dup_err:
+                logger.debug(f"[{language}] Duplicate upload check notice: {dup_err}")
+                existing_video_id = None
 
-        if existing_video_id:
-            existing_url = f"https://youtu.be/{existing_video_id}"
-            logger.warning(
-                f"[{language}] Duplicate title detected on channel within 24h — SKIPPING upload, returning existing video: {existing_url}"
-            )
-            return {
-                "success": True,
-                "video_id": existing_video_id,
-                "url": existing_url,
-                "title": title[:100],
-                "language": language,
-                "already_existed": True,
-            }
+            if existing_video_id:
+                existing_url = f"https://youtu.be/{existing_video_id}"
+                logger.warning(
+                    f"[{language}] Duplicate title detected on channel within 24h — SKIPPING upload, returning existing video: {existing_url}"
+                )
+                return {
+                    "success": True,
+                    "video_id": existing_video_id,
+                    "url": existing_url,
+                    "title": title[:100],
+                    "language": language,
+                    "already_existed": True,
+                }
 
         # Multi-Project Quota Rotator: attempt the upload on each OAuth slot in turn.
         # Slot 1 re-uses the already-authenticated primary service; every further slot is a
