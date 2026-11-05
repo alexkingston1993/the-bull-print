@@ -501,7 +501,9 @@ export default async function handler(req, res) {
         const isReject = /\b(reject|rejected|disapprove|disapproved|no|stop|cancel)\b/i.test(lower);
 
         if (isApprove) {
-          const titleMatch = refText.match(/Title`?:\s*[`"]?([^`"\n]+)[`"]?/i);
+          const titleMatch =
+            refText.match(/Title[*_`\s]*:\s*[*_`]?([^\n`*]+)/i) ||
+            refText.match(/Title`?:\s*[`"]?([^`"\n]+)[`"]?/i);
           const topic = titleMatch ? titleMatch[1].trim() : 'The 9:15 AM Institutional Opening Trap Exposed';
 
           await sendTelegram(
