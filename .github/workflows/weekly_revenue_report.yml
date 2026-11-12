@@ -37,6 +37,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          SITE_BASE_URL: https://the-bull-print.vercel.app
+          SITE_BASE_URL: https://bullprintmedia.com
         run: |
           python3 -c "from app.services.aria_healing import AriaCommandToolkit as AriaEngineerTools; AriaEngineerTools.send_weekly_revenue_report()"

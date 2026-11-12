@@ -6,12 +6,20 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/.well-known/security.txt",
+      "destination": "/security.txt"
+    },
+    {
+      "source": "/security.txt",
+      "destination": "/security.txt"
+    },
+    {
       "source": "/mission-control",
-      "destination": "/mission-control.html"
+      "destination": "/mission-control"
     },
     {
       "source": "/admin",
-      "destination": "/mission-control.html"
+      "destination": "/mission-control"
     },
     {
       "source": "/api/mission-control/auth",
@@ -35,102 +43,118 @@
     },
     {
       "source": "/go",
-      "destination": "/tools.html"
+      "destination": "/tools"
     },
     {
       "source": "/stocks/:symbol",
-      "destination": "/stock.html"
+      "destination": "/stock"
     },
     {
       "source": "/stocks",
-      "destination": "/stock.html"
+      "destination": "/stock"
     },
     {
       "source": "/screens/:slug",
-      "destination": "/screener.html"
+      "destination": "/screener"
     },
     {
       "source": "/screens",
-      "destination": "/screener.html"
+      "destination": "/screener"
     },
     {
       "source": "/screener",
-      "destination": "/screener.html"
+      "destination": "/screener"
     },
     {
       "source": "/portfolio",
-      "destination": "/portfolio.html"
+      "destination": "/portfolio"
     },
     {
       "source": "/calculators",
-      "destination": "/calculators.html"
+      "destination": "/calculators"
     },
     {
       "source": "/article/:slug",
-      "destination": "/article.html"
+      "destination": "/article"
     },
     {
       "source": "/article",
-      "destination": "/article.html"
+      "destination": "/article"
     },
     {
       "source": "/events/:slug",
-      "destination": "/events.html"
+      "destination": "/events"
     },
     {
       "source": "/events",
-      "destination": "/events.html"
+      "destination": "/events"
     },
     {
       "source": "/ipo/:slug",
-      "destination": "/ipo.html"
+      "destination": "/ipo"
     },
     {
       "source": "/ipo",
-      "destination": "/ipo.html"
+      "destination": "/ipo"
     },
     {
       "source": "/unlisted/:slug",
-      "destination": "/unlisted.html"
+      "destination": "/unlisted"
     },
     {
       "source": "/unlisted",
-      "destination": "/unlisted.html"
+      "destination": "/unlisted"
     },
     {
       "source": "/fno",
-      "destination": "/fno.html"
+      "destination": "/fno"
     },
     {
       "source": "/insurance",
-      "destination": "/insurance.html"
+      "destination": "/insurance"
+    },
+    {
+      "source": "/crypto/:symbol",
+      "destination": "/crypto"
     },
     {
       "source": "/crypto",
-      "destination": "/crypto.html"
+      "destination": "/crypto"
     },
     {
       "source": "/articles",
-      "destination": "/articles.html"
+      "destination": "/articles"
     },
     {
       "source": "/schemes",
-      "destination": "/schemes.html"
+      "destination": "/schemes"
     }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
-        { "key": "X-XSS-Protection", "value": "1; mode=block" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
       ]
     },
     {
       "source": "/content/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=30, s-maxage=30" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=30, s-maxage=30"
+        }
       ]
     }
   ]

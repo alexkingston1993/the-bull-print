@@ -1,4 +1,32 @@
+# The Bull Print - Dalal Street Market Intelligence & Financial Research
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /mission-control
+Disallow: /api/mission-control/
 
-Sitemap: https://the-bull-print.vercel.app/sitemap.xml
+# AI Crawlers & LLM Indexers Explicitly Welcomed for GEO / Perplexity / Gemini
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Canonical Sitemaps
+Sitemap: https://bullprintmedia.com/sitemap.xml
+Sitemap: https://bullprintmedia.com/sitemap-core.xml
+Sitemap: https://bullprintmedia.com/sitemap-stocks.xml
+Sitemap: https://bullprintmedia.com/sitemap-crypto.xml
+Sitemap: https://bullprintmedia.com/sitemap-articles.xml

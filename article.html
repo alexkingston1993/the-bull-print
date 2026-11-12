@@ -1,19 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BULLPRINT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-BULLPRINT', { 'anonymize_ip': true });
+    </script>
+    <!-- Search Engine Verification -->
+    <meta name="google-site-verification" content="-Gacr-RDEHc0XD9m55DQuX24CsUhlQyEOXegq4Ia4xo">
+    <meta name="msvalidate.01" content="4f29a7d83e204c329b45667e8125ac89">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="page-title">Market Research Article | The Bull Print</title>
     <meta name="description" id="page-desc" content="Comprehensive institutional fundamental breakdown, valuation tables, and technical setups for Indian equities.">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" id="canonical-url" href="https://the-bull-print.vercel.app/article">
+    <link rel="canonical" id="canonical-url" href="https://bullprintmedia.com/article">
 
     <!-- Open Graph -->
     <meta property="og:title" id="og-title" content="Market Research Article | The Bull Print">
     <meta property="og:description" id="og-desc" content="Institutional fundamental breakdown, valuation models, and video analysis for Indian equities.">
     <meta property="og:type" content="article">
-    <meta property="og:image" content="https://the-bull-print.vercel.app/brand_assets/opengraph_social_card_1200x630.png">
+    <meta property="og:image" id="og-image" content="https://bullprintmedia.com/brand_assets/opengraph_social_card_1200x630.png">
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" id="twitter-image" content="https://bullprintmedia.com/brand_assets/opengraph_social_card_1200x630.png">
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="brand_assets/website_favicon_32x32.png">
@@ -595,6 +607,24 @@
             </div>
         </header>
 
+        <!-- Tailor-Made Hero Infographic Showcase Box -->
+        <figure class="infographic-showcase-box" id="infographic-container" style="display:none; margin: 28px 0; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+            <div class="infographic-top-bar" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: var(--bg-card-subtle); border-bottom: 1px solid var(--border-card); font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px;">
+                <span style="display: flex; align-items: center; gap: 8px;">
+                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-mint);"></span>
+                    📊 Tailor-Made Research Infographic & Forensics
+                </span>
+                <span style="color: var(--accent-mint); font-weight: 600;">1200×675 HD · E-E-A-T Verified</span>
+            </div>
+            <div class="infographic-img-wrapper" style="position: relative; width: 100%; background: #070B14; text-align: center;">
+                <img id="article-infographic-img" src="" alt="" style="width: 100%; max-height: 620px; object-fit: contain; display: block; margin: 0 auto; transition: transform 0.3s ease; cursor: zoom-in;" onclick="window.open(this.src, '_blank')">
+            </div>
+            <figcaption id="article-infographic-caption" style="padding: 14px 20px; font-size: 13.5px; line-height: 1.6; color: var(--text-secondary); background: var(--bg-card); border-top: 1px solid var(--border-card); display: flex; align-items: flex-start; gap: 10px;">
+                <span style="font-size: 16px;">💡</span>
+                <span id="article-infographic-caption-text">Detailed quantitative breakdown and institutional order flow framework for this study. Click image to expand in full HD.</span>
+            </figcaption>
+        </figure>
+
         <!-- Video Embed Showcase -->
         <div class="video-showcase-box" id="video-container">
             <div class="video-showcase-bar">
@@ -699,7 +729,40 @@
                 document.getElementById('page-desc').setAttribute('content', post.excerpt || '');
                 document.getElementById('og-title').setAttribute('content', post.title);
                 document.getElementById('og-desc').setAttribute('content', post.excerpt || '');
-                document.getElementById('canonical-url').setAttribute('href', `https://the-bull-print.vercel.app/article?slug=${post.slug}`);
+                document.getElementById('canonical-url').setAttribute('href', `https://bullprintmedia.com/article?slug=${post.slug}`);
+
+                // Update Infographic Showcase & Social Graph
+                const infoImg = document.getElementById('article-infographic-img');
+                const infoContainer = document.getElementById('infographic-container');
+                const infoCaption = document.getElementById('article-infographic-caption-text');
+                const ogImageTag = document.getElementById('og-image');
+                const twitterImageTag = document.getElementById('twitter-image');
+
+                const imageToUse = post.infographic || post.coverImage;
+                if (imageToUse) {
+                    infoImg.src = imageToUse;
+                    infoImg.alt = post.imageAlt || `${post.title} Tailor-Made Research Infographic | The Bull Print`;
+                    if (post.imageCaption) {
+                        infoCaption.textContent = post.imageCaption;
+                    }
+                    infoContainer.style.display = 'block';
+                    if (ogImageTag) ogImageTag.setAttribute('content', imageToUse);
+                    if (twitterImageTag) twitterImageTag.setAttribute('content', imageToUse);
+                } else {
+                    infoContainer.style.display = 'none';
+                }
+
+                // Update Dynamic JSON-LD Schema (Article + ImageObject + FAQPage + VideoObject)
+                let schemaScript = document.getElementById('article-json-ld');
+                if (!schemaScript) {
+                    schemaScript = document.createElement('script');
+                    schemaScript.id = 'article-json-ld';
+                    schemaScript.type = 'application/ld+json';
+                    document.head.appendChild(schemaScript);
+                }
+                if (post.schema) {
+                    schemaScript.textContent = JSON.stringify(post.schema);
+                }
 
                 // Update Header
                 document.getElementById('article-title').textContent = post.title;

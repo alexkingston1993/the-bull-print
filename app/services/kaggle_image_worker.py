@@ -79,21 +79,23 @@ from safetensors.torch import load_file
 
 base = "stabilityai/stable-diffusion-xl-base-1.0"
 repo = "ByteDance/SDXL-Lightning"
-ckpt = "sdxl_lightning_4step_unet.safetensors"
+ckpt = "sdxl_lightning_8step_unet.safetensors"
 
-print(f"[KaggleWorker] Loading SDXL-Lightning 4-step model from {{repo}}...", flush=True)
+print(f"[KaggleWorker] Loading SDXL-Lightning 8-step model from {{repo}} with strict negative prompt enforcement...", flush=True)
 config = UNet2DConditionModel.load_config(base, subfolder="unet")
 unet = UNet2DConditionModel.from_config(config).to("cuda", torch.float16)
 unet.load_state_dict(load_file(hf_hub_download(repo, ckpt), device="cuda"))
 pipe = StableDiffusionXLPipeline.from_pretrained(base, unet=unet, torch_dtype=torch.float16, variant="fp16").to("cuda")
 pipe.scheduler = EulerDiscreteScheduler.from_config(pipe.scheduler.config, timestep_spacing="trailing")
 
+NEGATIVE_PROMPT = "text, letters, words, numbers, digits, typography, watermark, logo, signage, banners, ticker symbols, displays with writing, labels, subtitles, signature, font, writing, cartoon, anime, 3d render, blurry, distorted, low quality"
+
 out_dir = "/kaggle/working/frames"
 os.makedirs(out_dir, exist_ok=True)
 
 PAYLOAD = {payload_json}
 
-print(f"[KaggleWorker] Starting batch generation for {{len(PAYLOAD)}} frames...", flush=True)
+print(f"[KaggleWorker] Starting batch generation for {{len(PAYLOAD)}} frames with zero-baked-text enforcement...", flush=True)
 for item in PAYLOAD:
     seg_id = item["id"]
     prompt = item["prompt"]
@@ -101,20 +103,21 @@ for item in PAYLOAD:
     print(f"--> Rendering Segment {{seg_id:02d}}: {{item['title']}}...", flush=True)
     t0 = time.time()
     
-    # 16:9 ratio (1024 x 576)
+    # 16:9 ratio (1024 x 576) with CFG & Negative Prompt Enforcement
     image = pipe(
         prompt=prompt,
-        num_inference_steps=4,
-        guidance_scale=0.0,
+        negative_prompt=NEGATIVE_PROMPT,
+        num_inference_steps=8,
+        guidance_scale=1.5,
         width=1024,
         height=576
     ).images[0]
     
     image.save(out_path, quality=95)
     elapsed = time.time() - t0
-    print(f"✓ Saved Segment {{seg_id:02d}} in {{elapsed:.2f}}s", flush=True)
+    print(f"✓ Saved Clean Segment {{seg_id:02d}} in {{elapsed:.2f}}s", flush=True)
 
-print("[KaggleWorker] All frames generated successfully!", flush=True)
+print("[KaggleWorker] All clean photographic frames generated successfully!", flush=True)
 '''
         return script
 

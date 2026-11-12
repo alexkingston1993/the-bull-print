@@ -1,4 +1,7 @@
 ---
+coverImage: "https://bullprintmedia.com/assets/editorial/sebi_options_trading_hero.jpg"
+infographic: "https://bullprintmedia.com/assets/infographics/infographic_sebi_93_percent_options_loss.png"
+imageAlt: "SEBI Study Infographic: Why 93% of Everyday Retail Traders Lose Money in Equity F&O Derivatives Due to Theta Time Decay"
 title: "Nifty Today: Bears Tighten Grip as Nifty Cracks Critical Support | Full Analysis & Derivative Setup. Please do your own due diligence and market research as I am not a SEBI-registered financial advisor. This analysis is strictly for educational purposes only."
 date: "2026-10-22 11:02:38"
 slug: "nifty-market-analysis-2026-10-22-1057-ist"
@@ -18,6 +21,14 @@ youtubeUrl: "https://youtu.be/weWATZnBFoU"
  Options chain open interest concentration outlines key technical inflexion zones heading into the upcoming sessions.
  </p>
  </div>
+
+<!-- Tailor-Made Research Infographic for SEO & AI Overviews -->
+<figure class="article-infographic-embed" style="margin:28px 0; background:rgba(11,19,36,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden;">
+  <img src="https://bullprintmedia.com/assets/infographics/infographic_sebi_93_percent_options_loss.png" alt="SEBI Study Infographic: Why 93% of Everyday Retail Traders Lose Money in Equity F&O Derivatives Due to Theta Time Decay" title="SEBI Study Infographic: Why 93% of Everyday Retail Traders Lose Money in Equity F&O Derivatives Due to Theta Time Decay" style="width:100%; height:auto; display:block; border-bottom:1px solid rgba(255,255,255,0.08);" loading="lazy" decoding="async">
+  <figcaption style="padding:12px 18px; font-size:13px; color:#94a3b8; font-family:var(--font-body); display:flex; align-items:center; gap:8px;">
+    <span>📊</span> <span><strong>Infographic:</strong> Official SEBI data telemetry: Retail option buyers lose an average of ₹1,25,000 as unrelenting Theta decay erodes contract value in the final 48 hours before weekly expiry.</span>
+  </figcaption>
+</figure>
 
  <!-- YouTube Video Strategic Embed -->
  <div class="video-embed-container" style="margin:28px 0; text-align:center;">

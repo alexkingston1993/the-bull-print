@@ -5,7 +5,7 @@
 
 ## 1. Concept Card
 
-- **Product Identity**: The Bull Print (`https://the-bull-print.vercel.app`)
+- **Product Identity**: The Bull Print (`https://bullprintmedia.com`)
 - **Idea**: An institutional-grade Indian market intelligence and exploration desk combining Groww's uncluttered consumer layout with Screener.in's deep fundamental financial metrics.
 - **Metaphor**: A Bloomberg Terminal stripped of noise — high signal-to-noise ratio, pure readability, dark mode precision with live ticks.
 - **Signature Interactions**:
@@ -98,14 +98,18 @@ Every frame prompt generated for Shorts must strictly follow the 5-part blueprin
 
 A modular, CPU-compatible rendering component for GitHub Actions, Kaggle workers, and local execution.
 
-### 6.1 Strict Segmentation Standards
+### 6.1 Strict Segmentation & High-CTR Frame Blueprint Standards
 
-| Video Type | Target Aspect Ratio | Resolution | Segmentation Rule | Total Frames |
-|---|---|---|---|---|
-| **Short (36s)** | 9:16 Vertical | 1080 $\times$ 1920 | 1 bespoke high-CTR frame every **6 seconds** | **6 frames** |
-| **Short (60s)** | 9:16 Vertical | 1080 $\times$ 1920 | 1 bespoke high-CTR frame every **10 seconds** | **6 frames** *(or 10 frames @ 6s)* |
-| **Standard (< 5 min)** | 16:9 Widescreen | 2560 $\times$ 1440 (2K Master) | 1 bespoke high-CTR frame every **15 seconds** | **12 frames** *(e.g. 3 min / 180s)* |
-| **Standard ($\ge$ 5 min)** | 16:9 Widescreen | 2560 $\times$ 1440 (2K Master) | 1 bespoke high-CTR frame every **20 seconds** | **36 frames** *(e.g. 12 min / 720s)* |
+| Video Type | Target Aspect Ratio | Resolution | Segmentation Rule | Pacing Frequency | Dynamic Typography Engine |
+|---|---|---|---|---|---|
+| **Shorts (Vertical)** | 9:16 Vertical | 1080 $\times$ 1920 | **1 frame every 3.0 seconds** | 10–20 frames (30s–60s) | Clean 35mm plate + Dynamic 3D Extruded Type & Badges |
+| **Standard YouTube Videos** | 16:9 Widescreen | 2560 $\times$ 1440 (2K Master) | **1 frame every 4.0 seconds** *(regardless of length)* | 180 frames (12-min doc) | Clean 35mm plate + Dynamic 3D Extruded Type & Badges |
+
+#### Mandatory Visual & Typography Architecture:
+1. **Clean Photographic Background Plates (Zero Baked-in Text)**: All AI image generation outputs completely clean 35mm cinematic plates with ZERO baked-in letters, numbers, or artificial watermark artifacts.
+2. **Dynamic 3D Extruded Typography Layer**: Giant stacked 3D perspective typography rendered dynamically via Python engine (forward shear angle `0.22`, 16px extrusion shadow, saturated gold/crimson).
+3. **Tactical Highlighter Badges**: Glowing alert badges placed above headlines (`'DALAL STREET BOMBSHELL'`, `'OCTOBER SURPRISE'`, `'FED TRAPPED'`).
+4. **Lower-Third Animated Word-Level Captions**: Positioned in safe zone (`Y = 1480` for Shorts) in high-contrast pill backdrop.
 
 ### 6.2 Word-Level Dynamic Captioning Engine
 
@@ -177,7 +181,7 @@ To eliminate static hold fatigue on 10s (or 6s/15s/20s) slots without amateurish
 
 ### 7.3 Local Christopher Phonetics (`app/utils/phonetics.py`)
 
-- Normalizes crypto compounds (`memecoin` $\to$ `meem coin`, `Jito` $\to$ `Jee-toh`, `MEV` $\to$ `M E V`, `thebullprint.in` $\to$ `the bull print dot I N`, `$42M` $\to$ `42 million dollars`).
+- Normalizes crypto compounds (`memecoin` $\to$ `meem coin`, `Jito` $\to$ `Jee-toh`, `MEV` $\to$ `M E V`, `bullprintmedia.com` $\to$ `the bull print dot I N`, `$42M` $\to$ `42 million dollars`).
 - Pre-processed strictly before voice synthesis; on-screen captions retain clean orthographic spelling.
 
 

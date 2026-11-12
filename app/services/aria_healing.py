@@ -865,7 +865,7 @@ class AriaCommandToolkit:
             f"📊 *Market Radar (Nifty 50):* `{market_summary}`",
             f"⚡ *Cloud Workflows:* {latest_run_summary}",
             "🎙️ *Voice Profile:* `Microsoft Azure Neural (en-IN-PrabhatNeural)`",
-            "🌐 *Web Portal:* `https://the-bull-print.vercel.app` (100% Operational)",
+            "🌐 *Web Portal:* `https://bullprintmedia.com` (100% Operational)",
             "🎬 *YouTube Channel:* `The Bull Print` (Autonomous Cloud Pipeline)",
             "🛡️ *Brand Standard:* 0% Dalal Street mentions | Zero leaked GitHub URLs",
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
@@ -1072,7 +1072,7 @@ class AriaCommandToolkit:
     # 💰 AFFILIATE & REVENUE LEDGER (Zero-DB — GitHub Actions Repo Variable)
     # -----------------------------------------------------------------
     GH_REPO = os.getenv("GITHUB_REPO", "alexkingston1993/the-bull-print")
-    SITE_BASE = os.getenv("SITE_BASE_URL", "https://the-bull-print.vercel.app")
+    SITE_BASE = os.getenv("SITE_BASE_URL", "https://bullprintmedia.com")
     BROKER_LABELS = {"zerodha": "Zerodha", "tradingview": "TradingView", "gocharting": "GoCharting", "delta": "Delta", "bybit": "Bybit"}
     EST_CVR = 0.04           # 4% refresh → funded-account conversion assumption
     EST_KICKBACK_INR = 500   # Blended ₹ CPAP kickback across Broker RevShare + SaaS panels

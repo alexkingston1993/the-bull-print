@@ -493,7 +493,7 @@ def render_masterclass_gpu(
             f"The Bull Print Masterclass: {subject}\n\n"
             f"In this high-conviction institutional study, we dissect order-book dynamics, "
             f"F&O mathematical asymmetry, and quantitative balance sheet moats.\n\n"
-            f"Official Portal: https://the-bull-print.vercel.app\n"
+            f"Official Portal: https://bullprintmedia.com\n"
             f"Telegram VIP: https://t.me/TheBullPrint\n\n"
             f"Strictly educational market study. Not financial advice."
         )

@@ -19,7 +19,7 @@ except ImportError:
     tweepy = None
     logger.warning("tweepy not installed — X thread publishing will be skipped.")
 
-TOOLS_URL = "https://the-bull-print.vercel.app/tools"
+TOOLS_URL = "https://bullprintmedia.com/tools"
 DISCLAIMER = "🎓 SEBI: Educational content only — not investment advice. Markets carry risk."
 TWEET_LIMIT = 275
 

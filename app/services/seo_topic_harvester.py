@@ -26,7 +26,7 @@ from loguru import logger
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 POSTS_MANIFEST = BASE_DIR / "content" / "posts.json"
-SITE_BASE = os.getenv("SITE_BASE_URL", "https://the-bull-print.vercel.app")
+SITE_BASE = os.getenv("SITE_BASE_URL", "https://bullprintmedia.com")
 
 AUTOCOMPLETE_URL = "https://suggestqueries.google.com/complete/search"
 TRENDS_RSS_URL = "https://trends.google.com/trending/rss?geo=IN"

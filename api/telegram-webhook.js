@@ -130,7 +130,7 @@ async function fetchLivePipelineTelemetry() {
 
   // 2. Fetch Latest Published Posts & Videos
   try {
-    const postRes = await fetch('https://the-bull-print.vercel.app/content/posts.json', { cache: 'no-store' });
+    const postRes = await fetch('https://bullprintmedia.com/content/posts.json', { cache: 'no-store' });
     if (postRes.ok) {
       const postsData = await postRes.json();
       const list = Array.isArray(postsData) ? postsData : postsData.posts || [];
@@ -172,7 +172,7 @@ LIVE TELEMETRY:
 - GitHub Actions Runs: ${JSON.stringify(telemetry.runs || [])}
 - Recent YouTube Uploads: ${JSON.stringify(telemetry.recentVideos || [])}
 - Total Published Articles: ${telemetry.totalDossiers}
-- Live Web Portal: https://thebullprint.in
+- Live Web Portal: https://bullprintmedia.com
 
 ALEX'S MESSAGE: "${userPrompt}"
 `;
@@ -274,7 +274,7 @@ function buildStatusCard(t) {
     `📺 *Recent Published YouTube Videos:*\n` +
     `${vidsList}\n` +
     `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-    `🌐 *Portal:* \`https://thebullprint.in\` | \`https://the-bull-print.vercel.app\``
+    `🌐 *Portal:* \`https://bullprintmedia.com\` | \`https://bullprintmedia.com\``
   );
 }
 
@@ -353,7 +353,7 @@ export default async function handler(req, res) {
           '📈 *Audience Pipeline:* High-intent Indian retail investors & F&O traders\n' +
           '🎯 *Dynamic Pinned Links:* Synced to latest Masterclass & Shorts descriptions\n' +
           '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' +
-          '🌐 *Live Portal:* `https://thebullprint.in/articles`';
+          '🌐 *Live Portal:* `https://bullprintmedia.com/articles`';
         await sendTelegram(chatId, card);
         return res.status(200).json({ ok: true, action: 'view_revenue' });
       }

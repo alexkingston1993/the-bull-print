@@ -1,11 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BULLPRINT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-BULLPRINT', { 'anonymize_ip': true });
+    </script>
+    <!-- Search Engine Verification -->
+    <meta name="google-site-verification" content="-Gacr-RDEHc0XD9m55DQuX24CsUhlQyEOXegq4Ia4xo">
+    <meta name="msvalidate.01" content="4f29a7d83e204c329b45667e8125ac89">
+
+    <!-- Structured JSON-LD Schema: Financial Calculators Suite -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "The Bull Print Financial Calculators Suite",
+      "url": "https://bullprintmedia.com/calculators",
+      "description": "Suite of free financial compounding calculators for Indian investors including SIP Step-Up, Compound Interest, CAGR, and Loan EMI.",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "INR"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "The Bull Print",
+        "url": "https://bullprintmedia.com/"
+      }
+    }
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Calculators & Wealth Compounding Suite | The Bull Print</title>
-    <meta name="description" content="Institutional financial calculators for Mutual Funds SIP compound interest, Stock CAGR estimations, Loan EMIs, Bond Yield to Maturity, and Lumpsum wealth projections.">
-    <link rel="canonical" href="https://the-bull-print.vercel.app/calculators">
+    <title>Free Financial Calculators — SIP, Step-Up, Compound Interest, CAGR & Loan EMI | The Bull Print</title>
+    <meta name="description" content="Institutional financial calculators for Mutual Funds SIP compound interest, Step-Up wealth planning, Car vs Wealth comparison, Loan EMIs, and Lumpsum investment projections.">
+    <link rel="canonical" href="https://bullprintmedia.com/calculators">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -403,9 +438,8 @@
                 <a href="/schemes.html" class="nav-link">Govt Schemes</a>
                 <a href="/unlisted.html" class="nav-link">Unlisted Shares</a>
                 <a href="/portfolio.html" class="nav-link">Multi-Broker Portfolio</a>
-                <a href="/insurance.html" class="nav-link">Insurance</a>
-                <a href="/crypto.html" class="nav-link">Crypto</a>
                 <a href="/calculators.html" class="nav-link active">Calculators</a>
+                <a href="/course.html" class="nav-link" style="color:var(--groww-mint); font-weight:700;">🎓 365 Masterclass</a>
             </div>
 
             <div style="display:flex; align-items:center; gap:10px;">
@@ -427,12 +461,18 @@
     </section>
 
     <!-- Calculator Switcher Tabs -->
+    <!-- Calculator Switcher Tabs -->
     <div class="calc-nav-tabs">
-        <button class="calc-tab-btn active" onclick="switchCalc('sip')">📈 Mutual Funds & SIP Compounder</button>
-        <button class="calc-tab-btn" onclick="switchCalc('cagr')">📊 Stock CAGR & Return Estimator</button>
-        <button class="calc-tab-btn" onclick="switchCalc('loan')">🏦 Loan EMI & Interest Calculator</button>
-        <button class="calc-tab-btn" onclick="switchCalc('bond')">📜 Bond & Debt Yield to Maturity</button>
-        <button class="calc-tab-btn" onclick="switchCalc('lumpsum')">💰 Lumpsum Wealth Compounder</button>
+        <button class="calc-tab-btn active" id="tab-sip" onclick="switchCalc('sip')">📈 Step-Up SIP Compounder</button>
+        <button class="calc-tab-btn" id="tab-runway" onclick="switchCalc('runway')">🚨 Emergency Runway Diagnostic</button>
+        <button class="calc-tab-btn" id="tab-rent-vs-buy" onclick="switchCalc('rent-vs-buy')">🏡 Rent vs. Buy 5% Matrix</button>
+        <button class="calc-tab-btn" id="tab-car-trap" onclick="switchCalc('car-trap')">🚗 Car Loan Depreciation Trap</button>
+        <button class="calc-tab-btn" id="tab-debt-destroyer" onclick="switchCalc('debt-destroyer')">⚡ Debt Snowball Destroyer</button>
+        <button class="calc-tab-btn" id="tab-dcf" onclick="switchCalc('dcf')">💎 Stock DCF Fair Value</button>
+        <button class="calc-tab-btn" id="tab-cagr" onclick="switchCalc('cagr')">📊 Stock CAGR Estimator</button>
+        <button class="calc-tab-btn" id="tab-loan" onclick="switchCalc('loan')">🏦 Loan EMI Schedule</button>
+        <button class="calc-tab-btn" id="tab-bond" onclick="switchCalc('bond')">📜 Bond Yield to Maturity</button>
+        <button class="calc-tab-btn" id="tab-lumpsum" onclick="switchCalc('lumpsum')">💰 Lumpsum Multiplier</button>
     </div>
 
     <!-- Main Container -->
@@ -747,6 +787,430 @@
             </div>
         </div>
 
+
+        <!-- 6. Emergency Runway Diagnostic -->
+        <div id="panel-runway" class="calc-panel">
+            <div class="calc-inputs-col">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                    <span style="background:rgba(239,68,68,0.15); color:#ef4444; font-size:11px; font-weight:800; padding:3px 8px; border-radius:6px; letter-spacing:0.5px; text-transform:uppercase;">Flagship Free Tool</span>
+                </div>
+                <h3 style="font-family:'Outfit'; font-size:22px; margin-bottom:6px;">Emergency Runway & Survival Diagnostic</h3>
+                <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Calculate exactly how many days you can survive if your primary income stops tomorrow.</p>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">Liquid Savings & Bank Balance (₹)</span>
+                        <span class="input-val-box" id="runway-liquid-val">₹3,50,000</span>
+                    </div>
+                    <input type="range" id="runway-liquid" min="10000" max="2500000" step="10000" value="350000" oninput="calculateRunway()">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">Fixed Deposits & Ultra-Liquid Funds (₹)</span>
+                        <span class="input-val-box" id="runway-fd-val">₹2,00,000</span>
+                    </div>
+                    <input type="range" id="runway-fd" min="0" max="5000000" step="25000" value="200000" oninput="calculateRunway()">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">Non-Negotiable Monthly Burn (Rent, Food, EMIs) (₹)</span>
+                        <span class="input-val-box" id="runway-burn-val">₹65,000</span>
+                    </div>
+                    <input type="range" id="runway-burn" min="15000" max="300000" step="5000" value="65000" oninput="calculateRunway()">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">Optional Discretionary Spend (OTT, Dining) (₹)</span>
+                        <span class="input-val-box" id="runway-discret-val">₹15,000</span>
+                    </div>
+                    <input type="range" id="runway-discret" min="0" max="100000" step="2000" value="15000" oninput="calculateRunway()">
+                </div>
+            </div>
+
+            <div class="calc-results-col">
+                <div>
+                    <h4 style="font-size:14px; text-transform:uppercase; color:var(--text-muted); font-family:'JetBrains Mono'; margin-bottom:12px;">FINANCIAL SURVIVAL RUNWAY</h4>
+                    <div class="res-metric highlight">
+                        <span class="res-label">Zero-Income Runway</span>
+                        <span class="res-val" id="runway-months-val" style="color:var(--groww-mint);">8.5 Months</span>
+                    </div>
+                    <div class="res-metric">
+                        <span class="res-label">Survival Days</span>
+                        <span class="res-val" id="runway-days-val" style="font-family:'JetBrains Mono';">255 Days</span>
+                    </div>
+                    <div class="res-metric">
+                        <span class="res-label">Total Liquid Capital Moat</span>
+                        <span class="res-val" id="runway-total-capital">₹5,50,000</span>
+                    </div>
+                    <div class="res-metric">
+                        <span class="res-label">Institutional Status</span>
+                        <span class="res-val" id="runway-status-badge" style="color:var(--groww-mint); font-weight:700;">FORTIFIED (6-12 MOS)</span>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="font-size:12px; color:var(--text-muted); margin-bottom:6px;">Safety Moat Progress (Ideal: 6 Months Minimum)</div>
+                    <div class="calc-bar-container">
+                        <div class="calc-bar-fill" id="runway-bar-fill" style="width: 100%; background: var(--groww-mint);"></div>
+                    </div>
+                    <div class="bar-legend">
+                        <span id="runway-deficit-text">● Safety Moat Achieved</span>
+                        <span style="color:var(--text-muted);">● Recommended Buffer: 6-12 Months</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. Rent vs Buy 5% Rule Decision Matrix -->
+        <div id="panel-rent-vs-buy" class="calc-panel">
+            <div class="calc-inputs-col">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                    <span style="background:rgba(245,158,11,0.15); color:#f59e0b; font-size:11px; font-weight:800; padding:3px 8px; border-radius:6px; letter-spacing:0.5px; text-transform:uppercase;">Flagship Free Tool</span>
+                </div>
+                <h3 style="font-family:'Outfit'; font-size:22px; margin-bottom:6px;">Rent vs. Buy 5% Rule Decision Matrix</h3>
+                <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Quantify unrecoverable homeownership costs (interest, maintenance, taxes) against renting and compounding the difference.</p>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">Property Purchase Price (₹)</span>
+                        <span class="input-val-box" id="rvb-price-val">₹1,20,00,000</span>
+                    </div>
+                    <input type="range" id="rvb-price" min="2500000" max="50000000" step="500000" value="12000000" oninput="calculateRentVsBuy()">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">Monthly Rent for Equivalent Property (₹)</span>
+                        <span class="input-val-box" id="rvb-rent-val">₹32,000</span>
+                    </div>
+                    <input type="range" id="rvb-rent" min="8000" max="200000" step="2000" value="32000" oninput="calculateRentVsBuy()">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">Home Loan Interest Rate (% p.a.)</span>
+                        <span class="input-val-box" id="rvb-rate-val">8.75%</span>
+                    </div>
+                    <input type="range" id="rvb-rate" min="7.0" max="12.0" step="0.25" value="8.75" oninput="calculateRentVsBuy()">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">Alternative Index Fund Return (% p.a.)</span>
+                        <span class="input-val-box" id="rvb-equity-val">13.5%</span>
+                    </div>
+                    <input type="range" id="rvb-equity" min="10" max="18" step="0.5" value="13.5" oninput="calculateRentVsBuy()">
+                </div>
+            </div>
+
+            <div class="calc-results-col">
+                <div>
+                    <h4 style="font-size:14px; text-transform:uppercase; color:var(--text-muted); font-family:'JetBrains Mono'; margin-bottom:12px;">5% RULE QUANT DIAGNOSTIC</h4>
+                    <div class="res-metric highlight">
+                        <span class="res-label">5% Rule Break-Even Rent</span>
+                        <span class="res-val" id="rvb-breakeven-rent" style="color:#f59e0b;">₹50,000 / mo</span>
+                    </div>
+                    <div class="res-metric">
+                        <span class="res-label">Current Actual Rent</span>
+                        <span class="res-val" id="rvb-actual-rent">₹32,000 / mo</span>
+                    </div>
+                    <div class="res-metric">
+                        <span class="res-label">Monthly Capital Saved by Renting</span>
+                        <span class="res-val" id="rvb-monthly-saved" style="color:var(--groww-mint);">+₹18,000 / mo</span>
+                    </div>
+                    <div class="res-metric">
+                        <span class="res-label">15-Yr Wealth Gap (SIPing Difference)</span>
+                        <span class="res-val" id="rvb-wealth-gap" style="color:var(--groww-mint); font-family:'JetBrains Mono'; font-weight:800;">+₹1.03 Crores</span>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="res-metric" style="border:none; padding:12px; background:rgba(0,135,90,0.1); border-radius:8px;">
+                        <span class="res-label" style="font-weight:700; color:var(--text-primary);">MATHEMATICAL VERDICT:</span>
+                        <span class="res-val" id="rvb-verdict" style="color:var(--groww-mint); font-size:14px; text-align:right;">RENT & INVEST DIFFERENCE</span>
+                    </div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:10px; line-height:1.4;">
+                        *5% Rule accounts for 3% cost of debt capital + 1% property tax/insurance + 1% annual maintenance depreciation.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8. Car Loan Depreciation Trap -->
+        <div id="panel-car-trap" class="calc-panel">
+            <div class="calc-inputs-col">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                    <span style="background:rgba(239,68,68,0.15); color:#ef4444; font-size:11px; font-weight:800; padding:3px 8px; border-radius:6px; letter-spacing:0.5px; text-transform:uppercase;">Flagship Free Tool</span>
+                </div>
+                <h3 style="font-family:'Outfit'; font-size:22px; margin-bottom:6px;">Car Loan Depreciation & Wealth Trap</h3>
+                <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Discover the exact opportunity cost of buying a luxury vehicle on EMI vs compounding that capital in equity index funds.</p>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">On-Road Car Price (₹)</span>
+                        <span class="input-val-box" id="car-price-val">₹18,00,000</span>
+                    </div>
+                    <input type="range" id="car-price" min="500000" max="6000000" step="100000" value="1800000" oninput="calculateCarTrap()">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">Down Payment Paid (₹)</span>
+                        <span class="input-val-box" id="car-down-val">₹3,00,000</span>
+                    </div>
+                    <input type="range" id="car-down" min="50000" max="2000000" step="50000" value="300000" oninput="calculateCarTrap()">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">Car Loan Tenure (Years)</span>
+                        <span class="input-val-box" id="car-tenure-val">5 Years</span>
+                    </div>
+                    <input type="range" id="car-tenure" min="3" max="7" step="1" value="5" oninput="calculateCarTrap()">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">Car Loan Interest Rate (%)</span>
+                        <span class="input-val-box" id="car-rate-val">9.5%</span>
+                    </div>
+                    <input type="range" id="car-rate" min="7.5" max="14.0" step="0.25" value="9.5" oninput="calculateCarTrap()">
+                </div>
+            </div>
+
+            <div class="calc-results-col">
+                <div>
+                    <h4 style="font-size:14px; text-transform:uppercase; color:var(--text-muted); font-family:'JetBrains Mono'; margin-bottom:12px;">OPPORTUNITY COST IN 10 YEARS</h4>
+                    <div class="res-metric highlight">
+                        <span class="res-label">Monthly Car EMI</span>
+                        <span class="res-val" id="car-emi-val">₹31,500</span>
+                    </div>
+                    <div class="res-metric">
+                        <span class="res-label">Total Out of Pocket (Loan + Down)</span>
+                        <span class="res-val" id="car-total-paid">₹21,90,000</span>
+                    </div>
+                    <div class="res-metric">
+                        <span class="res-label">Car Value After 5 Years</span>
+                        <span class="res-val" id="car-resale-val" style="color:#ef4444;">₹7,20,000 (-60%)</span>
+                    </div>
+                    <div class="res-metric">
+                        <span class="res-label">Lost Net Worth (Compounded in Nifty)</span>
+                        <span class="res-val" id="car-lost-wealth" style="color:#ef4444; font-family:'JetBrains Mono'; font-weight:800;">₹58,40,000</span>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="res-metric" style="border:none; padding:12px; background:rgba(239,68,68,0.1); border-radius:8px;">
+                        <span class="res-label" style="font-weight:700; color:var(--text-primary);">RETARDATION PENALTY:</span>
+                        <span class="res-val" id="car-delay-years" style="color:#ef4444; font-size:14px; text-align:right;">Delays Retirement by ~3.2 Yrs</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 9. Debt Snowball vs Avalanche Destroyer -->
+        <div id="panel-debt-destroyer" class="calc-panel">
+            <div class="calc-inputs-col">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                    <span style="background:rgba(16,185,129,0.15); color:#10b981; font-size:11px; font-weight:800; padding:3px 8px; border-radius:6px; letter-spacing:0.5px; text-transform:uppercase;">Flagship Free Tool</span>
+                </div>
+                <h3 style="font-family:'Outfit'; font-size:22px; margin-bottom:6px;">Debt Snowball vs. Avalanche Optimizer</h3>
+                <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Model aggressive debt elimination. Compare paying highest-interest debt first vs smallest balance for psychological velocity.</p>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">High-Interest Credit Card / Personal Debt (₹)</span>
+                        <span class="input-val-box" id="debt-card-val">₹2,50,000</span>
+                    </div>
+                    <input type="range" id="debt-card" min="20000" max="1500000" step="10000" value="250000" oninput="calculateDebtDestroyer()">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">Credit Card APR Interest (%)</span>
+                        <span class="input-val-box" id="debt-card-rate-val">42%</span>
+                    </div>
+                    <input type="range" id="debt-card-rate" min="18" max="48" step="1" value="42" oninput="calculateDebtDestroyer()">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">Personal / Auto Loan Balance (₹)</span>
+                        <span class="input-val-box" id="debt-loan-val">₹4,00,000</span>
+                    </div>
+                    <input type="range" id="debt-loan" min="50000" max="2500000" step="25000" value="400000" oninput="calculateDebtDestroyer()">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">Personal Loan Interest Rate (%)</span>
+                        <span class="input-val-box" id="debt-loan-rate-val">14%</span>
+                    </div>
+                    <input type="range" id="debt-loan-rate" min="9" max="24" step="0.5" value="14" oninput="calculateDebtDestroyer()">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">Extra Monthly Debt Payoff Budget (₹)</span>
+                        <span class="input-val-box" id="debt-extra-val">₹20,000</span>
+                    </div>
+                    <input type="range" id="debt-extra" min="5000" max="100000" step="2500" value="20000" oninput="calculateDebtDestroyer()">
+                </div>
+            </div>
+
+            <div class="calc-results-col">
+                <div>
+                    <h4 style="font-size:14px; text-transform:uppercase; color:var(--text-muted); font-family:'JetBrains Mono'; margin-bottom:12px;">OPTIMIZED PAYOFF TIMELINE</h4>
+                    <div class="res-metric highlight">
+                        <span class="res-label">Debt Freedom Date (Avalanche)</span>
+                        <span class="res-val" id="debt-freedom-val" style="color:var(--groww-mint);">19 Months</span>
+                    </div>
+                    <div class="res-metric">
+                        <span class="res-label">Standard Minimum Due Payoff</span>
+                        <span class="res-val" id="debt-standard-months" style="color:#ef4444;">114 Months (9.5 Yrs)</span>
+                    </div>
+                    <div class="res-metric">
+                        <span class="res-label">Pure Interest Saved</span>
+                        <span class="res-val" id="debt-interest-saved" style="color:var(--groww-mint); font-family:'JetBrains Mono'; font-weight:800;">₹4,85,000</span>
+                    </div>
+                    <div class="res-metric">
+                        <span class="res-label">Recommended Strategy</span>
+                        <span class="res-val" style="color:var(--groww-mint);">AVALANCHE (Priority: 42% Card)</span>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="calc-bar-container">
+                        <div class="calc-bar-fill" style="width: 83%; background: var(--groww-mint);"></div>
+                    </div>
+                    <div class="bar-legend">
+                        <span>● 83% Time Slashed</span>
+                        <span style="color:var(--groww-mint);">● Fast-track to zero debt</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 10. Stock DCF Intrinsic Value Screener -->
+        <div id="panel-dcf" class="calc-panel">
+            <div class="calc-inputs-col">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                    <span style="background:rgba(59,130,246,0.15); color:#3b82f6; font-size:11px; font-weight:800; padding:3px 8px; border-radius:6px; letter-spacing:0.5px; text-transform:uppercase;">Flagship Free Tool</span>
+                </div>
+                <h3 style="font-family:'Outfit'; font-size:22px; margin-bottom:6px;">Stock DCF (Discounted Cash Flow) Fair Value</h3>
+                <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Hedge fund 2-stage discounted cash flow model. Calculate intrinsic per-share value with margin of safety.</p>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">Latest Free Cash Flow per Share (₹)</span>
+                        <span class="input-val-box" id="dcf-fcf-val">₹45.0</span>
+                    </div>
+                    <input type="range" id="dcf-fcf" min="5" max="500" step="2.5" value="45.0" oninput="calculateDCF()">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">5-Year Growth Rate (% p.a.)</span>
+                        <span class="input-val-box" id="dcf-growth-val">16%</span>
+                    </div>
+                    <input type="range" id="dcf-growth" min="5" max="40" step="1" value="16" oninput="calculateDCF()">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">Discount Rate / Cost of Capital (%)</span>
+                        <span class="input-val-box" id="dcf-discount-val">11.5%</span>
+                    </div>
+                    <input type="range" id="dcf-discount" min="8" max="18" step="0.5" value="11.5" oninput="calculateDCF()">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">Terminal Multiple (P/FCF in Year 5)</span>
+                        <span class="input-val-box" id="dcf-terminal-val">20x</span>
+                    </div>
+                    <input type="range" id="dcf-terminal" min="8" max="35" step="1" value="20" oninput="calculateDCF()">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label-row">
+                        <span class="input-label">Current Stock Market Price (₹)</span>
+                        <span class="input-val-box" id="dcf-price-val">₹680</span>
+                    </div>
+                    <input type="range" id="dcf-price" min="50" max="10000" step="10" value="680" oninput="calculateDCF()">
+                </div>
+            </div>
+
+            <div class="calc-results-col">
+                <div>
+                    <h4 style="font-size:14px; text-transform:uppercase; color:var(--text-muted); font-family:'JetBrains Mono'; margin-bottom:12px;">INTRINSIC VALUE & SAFETY MARGIN</h4>
+                    <div class="res-metric highlight">
+                        <span class="res-label">DCF Intrinsic Fair Value</span>
+                        <span class="res-val" id="dcf-fair-val" style="color:var(--groww-mint);">₹842.50</span>
+                    </div>
+                    <div class="res-metric">
+                        <span class="res-label">Current Market Price</span>
+                        <span class="res-val" id="dcf-cmp-val">₹680.00</span>
+                    </div>
+                    <div class="res-metric">
+                        <span class="res-label">Margin of Safety (Discount)</span>
+                        <span class="res-val" id="dcf-mos-val" style="color:var(--groww-mint); font-family:'JetBrains Mono'; font-weight:800;">+23.9% (UNDERVALUED)</span>
+                    </div>
+                    <div class="res-metric">
+                        <span class="res-label">Recommended Buy Below Price (15% MOS)</span>
+                        <span class="res-val" id="dcf-buy-below">₹716.00</span>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="res-metric" style="border:none; padding:12px; background:rgba(0,135,90,0.1); border-radius:8px;">
+                        <span class="res-label" style="font-weight:700; color:var(--text-primary);">ACTIONABLE QUANT SIGNAL:</span>
+                        <span class="res-val" id="dcf-signal-badge" style="color:var(--groww-mint); font-size:14px; text-align:right;">ACCUMULATE / STRONG BUY</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LEAD CAPTURE FORM: Download Pre-Filled Wealth Report & Excel Model -->
+        <section class="lead-report-section" style="margin-top:60px; background:linear-gradient(135deg, rgba(20,24,33,0.95), rgba(15,18,25,0.95)); border:1px solid rgba(255,215,0,0.25); border-radius:20px; padding:40px; box-shadow:0 20px 50px rgba(0,0,0,0.4); text-align:center;">
+            <div style="display:inline-block; background:rgba(255,215,0,0.1); border:1px solid rgba(255,215,0,0.3); color:#ffd700; font-family:'JetBrains Mono'; font-size:12px; font-weight:700; padding:4px 12px; border-radius:9999px; margin-bottom:14px; text-transform:uppercase; letter-spacing:0.5px;">
+                ⚡ 100% Free Institutional Resource
+            </div>
+            <h2 style="font-family:'Outfit'; font-size:30px; font-weight:800; color:#ffffff; margin-bottom:12px;">Get Your Custom Pre-Filled Financial Audit Report + Excel Financial OS</h2>
+            <p style="font-size:15px; color:var(--text-secondary); max-width:640px; margin:0 auto 28px; line-height:1.6;">
+                Save your calculated outputs, unlock the full downloadable spreadsheet model with automated macros, and get instant access to the complete 365-Day Financial Freedom Masterclass.
+            </p>
+
+            <form id="tool-lead-form" onsubmit="handleLeadSubmit(event)" style="max-width:520px; margin:0 auto; display:flex; flex-direction:column; gap:14px; text-align:left;">
+                <div>
+                    <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:5px; font-family:'JetBrains Mono';">FULL NAME *</label>
+                    <input type="text" id="lead-name" required placeholder="e.g. Vikram Sharma" style="width:100%; padding:12px 16px; border-radius:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); color:#fff; font-size:14px; outline:none;">
+                </div>
+                <div>
+                    <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:5px; font-family:'JetBrains Mono';">PRIMARY WORK EMAIL *</label>
+                    <input type="email" id="lead-email" required placeholder="e.g. vikram@gmail.com" style="width:100%; padding:12px 16px; border-radius:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); color:#fff; font-size:14px; outline:none;">
+                </div>
+                <div>
+                    <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:5px; font-family:'JetBrains Mono';">PRIMARY FINANCIAL GOAL *</label>
+                    <select id="lead-goal" required style="width:100%; padding:12px 16px; border-radius:10px; background:#181c26; border:1px solid var(--border-subtle); color:#fff; font-size:14px; outline:none;">
+                        <option value="emergency-runway">Build 12-Month Emergency Moat & Debt Freedom</option>
+                        <option value="rent-vs-buy">Make Rational Rent vs Buy Decision</option>
+                        <option value="wealth-compounding">Compound ₹5 Crores Portfolio via Step-Up SIP</option>
+                        <option value="dcf-valuation">Learn Institutional Stock Valuation (DCF / FCF)</option>
+                    </select>
+                </div>
+                <button type="submit" style="margin-top:10px; background:linear-gradient(135deg, #FFD700, #F59E0B); color:#000; font-family:'Outfit'; font-size:16px; font-weight:800; padding:15px; border-radius:10px; border:none; cursor:pointer; box-shadow:0 4px 15px rgba(245,158,11,0.3); transition:transform 0.15s ease;">
+                    🚀 Download Free Wealth Audit & Excel Model
+                </button>
+                <div id="lead-success-msg" style="display:none; margin-top:10px; padding:12px; border-radius:8px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); color:#10b981; font-size:13px; text-align:center;">
+                    🎉 <strong>Instant Access Granted!</strong> Your institutional model has been generated and dispatched to your email. You can also explore the <a href="course.html" style="color:#ffd700; text-decoration:underline;">365-Day Free Course here</a>.
+                </div>
+            </form>
+        </section>
+
     </main>
 
     <script>
@@ -757,8 +1221,13 @@
             const panel = document.getElementById(`panel-${calcKey}`);
             if (panel) panel.classList.add('active');
 
-            const btn = event.target;
+            const btn = document.getElementById(`tab-${calcKey}`);
             if (btn) btn.classList.add('active');
+
+            // Update URL without reloading
+            const url = new URL(window.location);
+            url.searchParams.set('tool', calcKey);
+            window.history.replaceState({}, '', url);
         }
 
         // 1. SIP Calculator Calculation
@@ -889,7 +1358,253 @@
             document.getElementById('lump-bar-returns').style.width = (100 - investedPct) + '%';
         }
 
+
+        // --- 6. Emergency Runway Calculation ---
+        function calculateRunway() {
+            const liquid = parseFloat(document.getElementById('runway-liquid').value);
+            const fd = parseFloat(document.getElementById('runway-fd').value);
+            const burn = parseFloat(document.getElementById('runway-burn').value);
+            const discret = parseFloat(document.getElementById('runway-discret').value);
+
+            document.getElementById('runway-liquid-val').textContent = '₹' + liquid.toLocaleString('en-IN');
+            document.getElementById('runway-fd-val').textContent = '₹' + fd.toLocaleString('en-IN');
+            document.getElementById('runway-burn-val').textContent = '₹' + burn.toLocaleString('en-IN');
+            document.getElementById('runway-discret-val').textContent = '₹' + discret.toLocaleString('en-IN');
+
+            const totalMoat = liquid + fd;
+            const totalMonthlySpend = burn + discret;
+            const months = totalMonthlySpend > 0 ? (totalMoat / totalMonthlySpend) : 0;
+            const days = Math.round(months * 30.4);
+
+            document.getElementById('runway-months-val').textContent = months.toFixed(1) + ' Months';
+            document.getElementById('runway-days-val').textContent = days + ' Days';
+            document.getElementById('runway-total-capital').textContent = '₹' + totalMoat.toLocaleString('en-IN');
+
+            const statusEl = document.getElementById('runway-status-badge');
+            const fillEl = document.getElementById('runway-bar-fill');
+            const defEl = document.getElementById('runway-deficit-text');
+
+            if (months < 3) {
+                statusEl.textContent = 'CRITICAL DEFICIT (<3 MOS)';
+                statusEl.style.color = '#ef4444';
+                fillEl.style.background = '#ef4444';
+                fillEl.style.width = Math.min(100, Math.round((months / 6) * 100)) + '%';
+                defEl.textContent = '● Immediate Action Required: Freeze Discretionary Spend';
+            } else if (months < 6) {
+                statusEl.textContent = 'MODERATE BUFFER (3-6 MOS)';
+                statusEl.style.color = '#f59e0b';
+                fillEl.style.background = '#f59e0b';
+                fillEl.style.width = Math.min(100, Math.round((months / 6) * 100)) + '%';
+                defEl.textContent = '● Building Towards 6-Month Fortified Status';
+            } else {
+                statusEl.textContent = 'FORTIFIED (6-12+ MOS)';
+                statusEl.style.color = 'var(--groww-mint)';
+                fillEl.style.background = 'var(--groww-mint)';
+                fillEl.style.width = '100%';
+                defEl.textContent = '● Safety Moat Achieved: Invest Surplus In Growth';
+            }
+        }
+
+        // --- 7. Rent vs Buy 5% Rule ---
+        function calculateRentVsBuy() {
+            const price = parseFloat(document.getElementById('rvb-price').value);
+            const actualRent = parseFloat(document.getElementById('rvb-rent').value);
+            const loanRate = parseFloat(document.getElementById('rvb-rate').value) / 100;
+            const equityReturn = parseFloat(document.getElementById('rvb-equity').value) / 100;
+
+            document.getElementById('rvb-price-val').textContent = '₹' + price.toLocaleString('en-IN');
+            document.getElementById('rvb-rent-val').textContent = '₹' + actualRent.toLocaleString('en-IN');
+            document.getElementById('rvb-rate-val').textContent = (loanRate * 100).toFixed(2) + '%';
+            document.getElementById('rvb-equity-val').textContent = (equityReturn * 100).toFixed(1) + '%';
+
+            // 5% Rule: (Property Value * 5%) / 12 months = break-even unrecoverable cost
+            const breakevenMonthly = (price * 0.05) / 12;
+            const monthlySaved = breakevenMonthly - actualRent;
+
+            document.getElementById('rvb-breakeven-rent').textContent = '₹' + Math.round(breakevenMonthly).toLocaleString('en-IN') + ' / mo';
+            document.getElementById('rvb-actual-rent').textContent = '₹' + Math.round(actualRent).toLocaleString('en-IN') + ' / mo';
+
+            const verdictEl = document.getElementById('rvb-verdict');
+            if (actualRent < breakevenMonthly) {
+                document.getElementById('rvb-monthly-saved').textContent = '+₹' + Math.round(monthlySaved).toLocaleString('en-IN') + ' / mo';
+                document.getElementById('rvb-monthly-saved').style.color = 'var(--groww-mint)';
+                verdictEl.textContent = 'RENT & INVEST DIFFERENCE (OPTIMAL)';
+                verdictEl.style.color = 'var(--groww-mint)';
+            } else {
+                document.getElementById('rvb-monthly-saved').textContent = '-₹' + Math.round(Math.abs(monthlySaved)).toLocaleString('en-IN') + ' / mo';
+                document.getElementById('rvb-monthly-saved').style.color = '#ef4444';
+                verdictEl.textContent = 'BUYING IS MATHEMATICALLY JUSTIFIED';
+                verdictEl.style.color = '#f59e0b';
+            }
+
+            // 15-Year Wealth Gap from SIPing the difference (or downpayment opportunity cost)
+            const downpayment = price * 0.20;
+            const r_eq_m = equityReturn / 12;
+            const n_months = 15 * 12;
+            // Compound downpayment over 15 yrs
+            const downpaymentCompounded = downpayment * Math.pow(1 + equityReturn, 15);
+            // Compound monthly savings
+            let sipCompounded = 0;
+            if (monthlySaved > 0) {
+                sipCompounded = monthlySaved * ((Math.pow(1 + r_eq_m, n_months) - 1) / r_eq_m) * (1 + r_eq_m);
+            }
+            const totalWealthAdvantage = downpaymentCompounded + sipCompounded;
+            const inCrores = (totalWealthAdvantage / 10000000).toFixed(2);
+            document.getElementById('rvb-wealth-gap').textContent = `+₹${inCrores} Crores`;
+        }
+
+        // --- 8. Car Loan Trap Calculation ---
+        function calculateCarTrap() {
+            const price = parseFloat(document.getElementById('car-price').value);
+            const down = parseFloat(document.getElementById('car-down').value);
+            const tenure = parseInt(document.getElementById('car-tenure').value);
+            const rate = parseFloat(document.getElementById('car-rate').value) / 100 / 12;
+
+            document.getElementById('car-price-val').textContent = '₹' + price.toLocaleString('en-IN');
+            document.getElementById('car-down-val').textContent = '₹' + down.toLocaleString('en-IN');
+            document.getElementById('car-tenure-val').textContent = tenure + ' Years';
+            document.getElementById('car-rate-val').textContent = (rate * 12 * 100).toFixed(2) + '%';
+
+            const loanAmt = Math.max(0, price - down);
+            const n = tenure * 12;
+            const emi = loanAmt > 0 ? (loanAmt * rate * Math.pow(1 + rate, n)) / (Math.pow(1 + rate, n) - 1) : 0;
+            const totalPaid = down + (emi * n);
+            const resale = price * 0.40; // 60% depreciation
+
+            document.getElementById('car-emi-val').textContent = '₹' + Math.round(emi).toLocaleString('en-IN');
+            document.getElementById('car-total-paid').textContent = '₹' + Math.round(totalPaid).toLocaleString('en-IN');
+            document.getElementById('car-resale-val').textContent = '₹' + Math.round(resale).toLocaleString('en-IN') + ' (-60%)';
+
+            // Compounding in Nifty index fund at 13.5% over 10 years
+            const r_index = 0.135 / 12;
+            const downCompounded = down * Math.pow(1 + 0.135, 10);
+            const emiCompounded = emi * ((Math.pow(1 + r_index, n) - 1) / r_index) * Math.pow(1 + 0.135, 10 - tenure);
+            const lostNetWorth = downCompounded + emiCompounded - resale;
+            document.getElementById('car-lost-wealth').textContent = '₹' + Math.round(lostNetWorth).toLocaleString('en-IN');
+        }
+
+        // --- 9. Debt Destroyer Calculation ---
+        function calculateDebtDestroyer() {
+            const cardBal = parseFloat(document.getElementById('debt-card').value);
+            const cardRate = parseFloat(document.getElementById('debt-card-rate').value) / 100;
+            const loanBal = parseFloat(document.getElementById('debt-loan').value);
+            const loanRate = parseFloat(document.getElementById('debt-loan-rate').value) / 100;
+            const extra = parseFloat(document.getElementById('debt-extra').value);
+
+            document.getElementById('debt-card-val').textContent = '₹' + cardBal.toLocaleString('en-IN');
+            document.getElementById('debt-card-rate-val').textContent = (cardRate * 100).toFixed(0) + '%';
+            document.getElementById('debt-loan-val').textContent = '₹' + loanBal.toLocaleString('en-IN');
+            document.getElementById('debt-loan-rate-val').textContent = (loanRate * 100).toFixed(1) + '%';
+            document.getElementById('debt-extra-val').textContent = '₹' + extra.toLocaleString('en-IN');
+
+            const totalDebt = cardBal + loanBal;
+            const weightedRate = (cardBal * cardRate + loanBal * loanRate) / totalDebt;
+            const totalMonthlyPmt = (totalDebt * 0.03) + extra; // 3% min due + extra
+            const r_m = weightedRate / 12;
+
+            // Approximate months
+            let months = 0;
+            let bal = totalDebt;
+            let totalInterest = 0;
+            while (bal > 0 && months < 300) {
+                const interest = bal * r_m;
+                totalInterest += interest;
+                bal = bal + interest - totalMonthlyPmt;
+                months++;
+            }
+
+            const standardInterest = totalDebt * 1.4; // minimum due pays huge interest
+            const savedInterest = Math.max(0, standardInterest - totalInterest);
+
+            document.getElementById('debt-freedom-val').textContent = months + ' Months';
+            document.getElementById('debt-interest-saved').textContent = '₹' + Math.round(savedInterest).toLocaleString('en-IN');
+        }
+
+        // --- 10. DCF Intrinsic Value Screener ---
+        function calculateDCF() {
+            const fcf = parseFloat(document.getElementById('dcf-fcf').value);
+            const g = parseFloat(document.getElementById('dcf-growth').value) / 100;
+            const r = parseFloat(document.getElementById('dcf-discount').value) / 100;
+            const mult = parseFloat(document.getElementById('dcf-terminal').value);
+            const cmp = parseFloat(document.getElementById('dcf-price').value);
+
+            document.getElementById('dcf-fcf-val').textContent = '₹' + fcf.toFixed(1);
+            document.getElementById('dcf-growth-val').textContent = (g * 100).toFixed(0) + '%';
+            document.getElementById('dcf-discount-val').textContent = (r * 100).toFixed(1) + '%';
+            document.getElementById('dcf-terminal-val').textContent = mult + 'x';
+            document.getElementById('dcf-price-val').textContent = '₹' + cmp.toLocaleString('en-IN');
+
+            // 5-year PV of cash flows
+            let pvCashFlows = 0;
+            let curFCF = fcf;
+            for (let t = 1; t <= 5; t++) {
+                curFCF *= (1 + g);
+                pvCashFlows += curFCF / Math.pow(1 + r, t);
+            }
+            // Terminal Value PV
+            const terminalValue = curFCF * mult;
+            const pvTerminal = terminalValue / Math.pow(1 + r, 5);
+            const intrinsicValue = pvCashFlows + pvTerminal;
+            const mos = ((intrinsicValue - cmp) / cmp) * 100;
+            const buyBelow = intrinsicValue * 0.85;
+
+            document.getElementById('dcf-fair-val').textContent = '₹' + intrinsicValue.toFixed(2);
+            document.getElementById('dcf-cmp-val').textContent = '₹' + cmp.toFixed(2);
+            document.getElementById('dcf-buy-below').textContent = '₹' + buyBelow.toFixed(2);
+
+            const mosEl = document.getElementById('dcf-mos-val');
+            const sigEl = document.getElementById('dcf-signal-badge');
+            if (mos > 15) {
+                mosEl.textContent = `+${mos.toFixed(1)}% (UNDERVALUED)`;
+                mosEl.style.color = 'var(--groww-mint)';
+                sigEl.textContent = 'ACCUMULATE / STRONG BUY';
+                sigEl.style.color = 'var(--groww-mint)';
+            } else if (mos >= 0) {
+                mosEl.textContent = `+${mos.toFixed(1)}% (FAIR VALUE)`;
+                mosEl.style.color = '#f59e0b';
+                sigEl.textContent = 'HOLD / NEUTRAL';
+                sigEl.style.color = '#f59e0b';
+            } else {
+                mosEl.textContent = `${mos.toFixed(1)}% (OVERVALUED)`;
+                mosEl.style.color = '#ef4444';
+                sigEl.textContent = 'TRIM / WAIT FOR PULLBACK';
+                sigEl.style.color = '#ef4444';
+            }
+        }
+
+        // --- Lead Capture Handler ---
+        function handleLeadSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('lead-name').value;
+            const email = document.getElementById('lead-email').value;
+            const goal = document.getElementById('lead-goal').value;
+
+            // Persist to localStorage
+            const leads = JSON.parse(localStorage.getItem('bull_print_leads') || '[]');
+            leads.push({ name, email, goal, timestamp: new Date().toISOString() });
+            localStorage.setItem('bull_print_leads', JSON.stringify(leads));
+
+            document.getElementById('lead-success-msg').style.display = 'block';
+            document.getElementById('tool-lead-form').reset();
+        }
+
+
+        // Auto-switch based on URL query parameter on load
+        function checkUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const tool = params.get('tool');
+            if (tool && document.getElementById(`panel-${tool}`)) {
+                switchCalc(tool);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            calculateRunway();
+            calculateRentVsBuy();
+            calculateCarTrap();
+            calculateDebtDestroyer();
+            calculateDCF();
+            checkUrlParams();
             calculateSIP();
             calculateCAGR();
             calculateLoan();

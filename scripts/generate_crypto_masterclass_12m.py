@@ -553,7 +553,7 @@ def generate_crypto_masterclass():
                     "07:30 - The Tron Siphon & Developing Nation Dollarization\n"
                     "09:00 - Regulatory Siege: EU MiCA Delistings & DOJ\n"
                     "10:30 - The Final Stress Test: What If Tether Breaks?\n\n"
-                    "Read the full 2,850-word forensic article on our website: https://thebullprint.in/article/the-110-billion-tether-shadow-engine-crypto-liquidity-audit-2026\n\n"
+                    "Read the full 2,850-word forensic article on our website: https://bullprintmedia.com/article/the-110-billion-tether-shadow-engine-crypto-liquidity-audit-2026\n\n"
                     "Educational analysis only. Not financial advice."
                 ),
                 "tags": [

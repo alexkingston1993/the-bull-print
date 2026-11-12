@@ -4,10 +4,8 @@ Unified Production Standard for High-CTR YouTube Shorts & Standard Videos.
 
 Enforces:
 1. Strict Segmentation Standards:
-   - 36s Short (9:16, 1080x1920): 1 high-CTR frame every 6 seconds (6 frames total).
-   - 60s Short (9:16, 1080x1920): 1 high-CTR frame every 10 seconds (6 frames total) or 10 frames @ 6s.
-   - Standard Video < 5 min (16:9, 2560x1440 2K Master): 1 high-CTR frame every 15 seconds (e.g., 3 min = 12 frames).
-   - Standard Video >= 5 min (16:9, 2560x1440 2K Master): 1 high-CTR frame every 20 seconds (e.g., 12 min = 36 frames).
+   - Shorts (9:16, 1080x1920): 1 high-CTR frame every 3 seconds (e.g., 30s = 10 frames, 36s = 12 frames, 60s = 20 frames).
+   - Standard YouTube Videos (16:9, 2560x1440 2K Master): 1 high-CTR frame every 4 seconds, regardless of length (e.g., 12 min = 180 frames).
 
 2. Google Flow AI 5-Part Prompt Blueprint:
    [Format & Aspect Ratio] + [Core Subject & Metaphor] + [Lighting & Color Strategy] + [Typography & Text Overlay] + [Composition & Finish]
@@ -45,14 +43,9 @@ class VideoFormatConfig:
         if is_short:
             width, height = 1080, 1920
             aspect_ratio = "9:16"
-            if duration_seconds <= 40.0:
-                frame_interval = 6.0
-                num_frames = 6
-                standard_name = "SHORT_36S"
-            else:
-                frame_interval = 10.0
-                num_frames = 6
-                standard_name = "SHORT_60S"
+            frame_interval = 3.0
+            num_frames = max(1, int(math.ceil(duration_seconds / 3.0)))
+            standard_name = "SHORT_VERTICAL"
             
             caption_font_size = 92
             caption_y = 1530
@@ -62,14 +55,9 @@ class VideoFormatConfig:
         else:
             width, height = 2560, 1440
             aspect_ratio = "16:9"
-            if duration_seconds < 300.0: # Less than 5 minutes
-                frame_interval = 15.0
-                num_frames = int(math.ceil(duration_seconds / 15.0))
-                standard_name = "STANDARD_UNDER_5M"
-            else: # 5 minutes or longer
-                frame_interval = 20.0
-                num_frames = int(math.ceil(duration_seconds / 20.0))
-                standard_name = "STANDARD_OVER_5M"
+            frame_interval = 4.0
+            num_frames = max(1, int(math.ceil(duration_seconds / 4.0)))
+            standard_name = "STANDARD_LANDSCAPE"
 
             caption_font_size = 80
             caption_y = 1180

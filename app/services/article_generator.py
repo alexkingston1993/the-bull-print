@@ -97,7 +97,7 @@ class ArticleGenerator:
         slug: str,
         faqs: List[Dict[str, str]],
         youtube_url: Optional[str] = None,
-        domain: str = "https://the-bull-print.vercel.app",
+        domain: str = "https://bullprintmedia.com",
     ) -> Dict:
         """Generates Triple JSON-LD Schema (Article + VideoObject + FAQPage) for Google Search and AI citation engines."""
         now_iso = datetime.now(timezone.utc).isoformat()

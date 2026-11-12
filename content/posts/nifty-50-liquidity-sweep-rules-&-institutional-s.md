@@ -1,4 +1,7 @@
 ---
+coverImage: "https://bullprintmedia.com/assets/editorial/dalal_street_fii_hero.jpg"
+infographic: "https://bullprintmedia.com/assets/infographics/infographic_indian_stock_market_beginners.png"
+imageAlt: "Indian Stock Market Beginner Roadmap Infographic: The 3-Pillar Family Savings Fortress and Nifty 50 Secular Compounding"
 title: "Nifty 50 Liquidity Sweep Rules & Institutional Stop Hunts: Institutional Market Breakdown"
 slug: "nifty-50-liquidity-sweep-rules-&-institutional-s"
 description: "Comprehensive forensic analysis of Nifty 50 Liquidity Sweep Rules & Institutional Stop Hunts by The Bull Print."
@@ -12,6 +15,14 @@ reading_time: "8 min read"
 <div class="video-embed-container" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; margin:28px 0; border:1px solid rgba(255,255,255,0.1); box-shadow:0 8px 30px rgba(0,0,0,0.5);">
  <iframe src="https://www.youtube.com/embed/qI-3_rhpU_w" title="Nifty 50 Liquidity Sweep Rules & Institutional Stop Hunts: Institutional Market Breakdown" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen></iframe>
 </div>
+
+<!-- Tailor-Made Research Infographic for SEO & AI Overviews -->
+<figure class="article-infographic-embed" style="margin:28px 0; background:rgba(11,19,36,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden;">
+  <img src="https://bullprintmedia.com/assets/infographics/infographic_indian_stock_market_beginners.png" alt="Indian Stock Market Beginner Roadmap Infographic: The 3-Pillar Family Savings Fortress and Nifty 50 Secular Compounding" title="Indian Stock Market Beginner Roadmap Infographic: The 3-Pillar Family Savings Fortress and Nifty 50 Secular Compounding" style="width:100%; height:auto; display:block; border-bottom:1px solid rgba(255,255,255,0.08);" loading="lazy" decoding="async">
+  <figcaption style="padding:12px 18px; font-size:13px; color:#94a3b8; font-family:var(--font-body); display:flex; align-items:center; gap:8px;">
+    <span>📊</span> <span><strong>Infographic:</strong> Dalal Street beginner guide: How everyday families build multi-generational compounding using low-cost index funds, sovereign gold, and zero debt leverage.</span>
+  </figcaption>
+</figure>
 
 
 ## Key Takeaways (TL;DR for Fast Reading)

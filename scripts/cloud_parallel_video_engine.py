@@ -184,7 +184,7 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
               ]
             }}
             """
-            for model_name in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
+            for model_name in ["gemini-3.8-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
                 try:
                     resp = client.models.generate_content(model=model_name, contents=prompt)
                     raw_text = resp.text.strip()

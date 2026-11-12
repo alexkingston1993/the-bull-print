@@ -26,6 +26,7 @@ from googleapiclient.http import MediaFileUpload
 from loguru import logger
 
 from app.config import config
+from app.services.video_seo_optimizer import get_video_seo_optimizer
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data")
 TOKEN_DIR = os.path.join(DATA_DIR, "youtube_tokens")
@@ -538,52 +539,28 @@ class YouTubeUploader:
                     "duration": dur,
                 }
 
-        # 3. Detect vertical & tailor tags / description
-        vertical = detect_vertical_from_content(title, description)
-        video_tags = list(tags or [])
-        target_tags_map = SHORTS_TAGS_MAP if is_short else LONGFORM_TAGS_MAP
-        default_vert_tags = target_tags_map.get(vertical, target_tags_map["stock_market"])
-        for t in default_vert_tags:
-            if t not in video_tags:
-                video_tags.append(t)
+        # 3. Automated vidIQ 50/50 SEO, Canonical Article Backlinking & Video Interlinking
+        seo_optimizer = get_video_seo_optimizer()
+        seo_data = seo_optimizer.optimize_metadata(
+            title=title,
+            description=description,
+            tags=tags,
+            is_short=is_short,
+        )
 
-        channel_name = CHANNEL_LANGUAGES.get(language, {}).get("name", "The Bull Print")
+        title = seo_data["title"]
+        full_description = seo_data["description"]
+        video_tags = seo_data["tags"]
 
-        # Vertical-accurate hashtag footer
-        if vertical == "insurance":
-            footer_hashtags = "#TheBullPrint #HealthInsurance #TermInsurance #IRDAI #PersonalFinanceIndia #InsuranceClaims #ConsumerProtection"
-        elif vertical == "crypto":
-            footer_hashtags = "#TheBullPrint #Bitcoin #CryptoIndia #CryptoTaxIndia #Section115BBH #OnChainData #PerpetualFutures"
-        else:
-            footer_hashtags = "#TheBullPrint #Nifty50 #BankNifty #StockMarketIndia #OptionsTrading #FIIFlows #InstitutionalTrading"
-
-        full_description = (
-            f"{description}\n\n"
-            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"🌐 Official Portal & Research Articles:\n"
-            f"https://thebullprint.in\n"
-            f"(Data models, Actuarial/On-Chain/Order-flow matrices & Calculators)\n\n"
-            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"⚖️ MANDATORY SEBI / IRDAI REGULATORY DISCLAIMER & RISK WARNING\n"
-            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"1. NOT A SEBI REGISTERED FINANCIAL ADVISER / RESEARCH ANALYST:\n"
-            f"The creator of The Bull Print is NOT registered with the Securities and Exchange Board of India (SEBI) "
-            f"as an Investment Adviser (under SEBI IA Regulations, 2013) or as a Research Analyst (under SEBI RA Regulations, 2014).\n\n"
-            f"2. STRICTLY FOR EDUCATIONAL & RESEARCH PURPOSES:\n"
-            f"This video and market breakdown are produced strictly for educational, informational, and financial literacy purposes. "
-            f"Nothing stated in this video constitutes financial, investment, legal, or tax advice.\n\n"
-            f"3. ZERO BUY / SELL / HOLD CALLS OR RECOMMENDATIONS:\n"
-            f"We NEVER provide stock tips, buy/sell recommendations, price targets, or guaranteed return claims. "
-            f"All commentary represents historical price action, mathematical observations, and personal perspectives "
-            f"('What I personally observe / what data shows' — NEVER 'What you should trade or buy').\n\n"
-            f"4. HIGH CAPITAL RISK IN DERIVATIVES (F&O TRADING):\n"
-            f"Trading in Equity Derivatives (Futures and Options) involves substantial leverage and severe capital risk. "
-            f"According to SEBI's official research study, 9 out of 10 individual retail traders in equity derivatives incur net financial losses. "
-            f"Past performance does not guarantee future results. Consult a qualified, SEBI-registered financial professional.\n\n"
-            f"5. AFFILIATE & COMMERCIAL DISCLOSURE:\n"
-            f"Links to platforms may be partner/affiliate links that provide commissions at zero extra cost to you. "
-            f"These affiliations do not influence our independent educational analysis.\n\n"
-            f"{footer_hashtags}"
+        val_res = seo_optimizer.validate_metadata(
+            title=title,
+            description=full_description,
+            tags=video_tags,
+            min_score=48.0
+        )
+        logger.info(
+            f"🎯 [{language}] [SEO & INTERLINK GATE] vidIQ Score: {val_res['score']}/50.0 | "
+            f"Passed: {val_res['passed']} | Article: {seo_data.get('article_slug')} | Interlink: {seo_data.get('interlink_id')}"
         )
 
         effective_privacy = "private" if publish_at else privacy_status
@@ -693,6 +670,12 @@ class YouTubeUploader:
                     except HttpError as e:
                         logger.warning(f"[{language}] Thumbnail upload failed: {e}")
 
+                # Record SEO & Interlink validation audit
+                try:
+                    seo_optimizer.record_upload_audit(video_id=video_id, title=title, validation_result=val_res)
+                except Exception as audit_err:
+                    logger.warning(f"Failed to record SEO audit: {audit_err}")
+
                 return {
                     "success": True,
                     "video_id": video_id,
@@ -702,6 +685,9 @@ class YouTubeUploader:
                     "publish_at": publish_at,
                     "scheduled": bool(publish_at),
                     "oauth_slot_used": slot_index,
+                    "vidiq_score": val_res.get("score"),
+                    "vidiq_passed": val_res.get("passed"),
+                    "seo_validation": val_res,
                 }
 
             except Exception as e:
@@ -763,7 +749,7 @@ class YouTubeUploader:
         """Append the published website article link to the YouTube video description for backlinks."""
         # Ironclad privacy failsafe: never expose GitHub repository or blob URLs to public viewers
         if not article_url or "github.com" in article_url:
-            article_url = "https://the-bull-print.vercel.app"
+            article_url = "https://bullprintmedia.com"
 
         service = self._get_service(language)
         if not service:
@@ -780,7 +766,7 @@ class YouTubeUploader:
             
             # Clean any existing leaked github urls in description
             if "github.com" in current_desc:
-                current_desc = re.sub(r"https?://github\.com/\S+", "https://the-bull-print.vercel.app", current_desc)
+                current_desc = re.sub(r"https?://github\.com/\S+", "https://bullprintmedia.com", current_desc)
 
             # 2. Append link if not already present
             if article_url not in current_desc:
@@ -807,7 +793,7 @@ class YouTubeUploader:
         """Post a single top comment on the video with strict idempotency and deduplication."""
         # Ironclad privacy failsafe: never expose GitHub URLs in public comments
         if "github.com" in comment_text:
-            comment_text = re.sub(r"https?://github\.com/\S+", "https://thebullprint.in", comment_text)
+            comment_text = re.sub(r"https?://github\.com/\S+", "https://bullprintmedia.com", comment_text)
 
         service = self._get_service(language)
         if not service:

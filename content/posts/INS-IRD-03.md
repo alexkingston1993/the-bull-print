@@ -1,4 +1,7 @@
 ---
+coverImage: "https://bullprintmedia.com/assets/editorial/irdai_insurance_claim_hero.jpg"
+infographic: "https://bullprintmedia.com/assets/infographics/infographic_irdai_proportionate_deduction.png"
+imageAlt: "Health Insurance Proportionate Deduction Infographic: How Daily Room Rent Caps Slash Hospital Doctor & Surgery Bills"
 title: "IRDAI Proportionate Deduction Math: Room Caps & Claim Cuts"
 slug: "INS-IRD-03"
 description: "Master IRDAI proportionate deduction math and room-rent sub-limits. Learn how daily caps slash surgeon and ICU claims and how to protect your finances."
@@ -12,6 +15,14 @@ reading_time: "8 min read"
 <div class="video-embed-container" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; margin:28px 0; border:1px solid var(--border-subtle);">
  <iframe src="https://www.youtube.com/embed/nMfqeaCzuAg" title="IRDAI Proportionate Deduction Math: Room Caps & Claim Cuts" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen></iframe>
 </div>
+
+ <!-- Tailor-Made Research Infographic for SEO & AI Overviews -->
+ <figure class="article-infographic-embed" style="margin:28px 0; background:rgba(11,19,36,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden;">
+ <img src="https://bullprintmedia.com/assets/infographics/infographic_irdai_proportionate_deduction.png" alt="Health Insurance Proportionate Deduction Infographic: How Daily Room Rent Caps Slash Hospital Doctor & Surgery Bills" title="Health Insurance Proportionate Deduction Infographic: How Daily Room Rent Caps Slash Hospital Doctor & Surgery Bills" style="width:100%; height:auto; display:block; border-bottom:1px solid rgba(255,255,255,0.08);" loading="lazy" decoding="async">
+ <figcaption style="padding:12px 18px; font-size:13px; color:#94a3b8; font-family:var(--font-body); display:flex; align-items:center; gap:8px;">
+ <span>📊</span> <span><strong>Infographic:</strong> Mathematical breakdown of proportionate deduction: Choosing a room that exceeds the 1% cap triggers a proportional haircut across the entire surgical invoice.</span>
+ </figcaption>
+ </figure>
 
 
 ## Key Takeaways (TL;DR for Fast Reading)

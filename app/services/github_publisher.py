@@ -34,7 +34,7 @@ class GitHubVercelPublisher:
         self.branch = gh_cfg.get("branch", "main")
         self.token = os.getenv("GITHUB_TOKEN", gh_cfg.get("token", ""))
         self.posts_dir = gh_cfg.get("posts_dir", "content/posts").strip("/")
-        self.site_url = os.getenv("SITE_URL", gh_cfg.get("site_url", "https://the-bull-print.vercel.app")).rstrip("/")
+        self.site_url = os.getenv("SITE_URL", gh_cfg.get("site_url", "https://bullprintmedia.com")).rstrip("/")
         self.enabled = bool(self.repo and self.token)
 
     def _update_local_posts_index(self, article: GeneratedArticle, youtube_url: Optional[str] = None):

@@ -1,4 +1,7 @@
 ---
+coverImage: "https://bullprintmedia.com/assets/editorial/irdai_insurance_claim_hero.jpg"
+infographic: "https://bullprintmedia.com/assets/infographics/infographic_irdai_claim_settlement_rules.png"
+imageAlt: "IRDAI New Regulations Infographic: Mandatory 30-Day Claim Settlement Window and Enhanced Surrender Value Standards"
 title: "Why Insurers Legally Slash Your Hospital Claim? #Shorts"
 date: "2026-10-25 18:48:00"
 slug: "why-insurers-legally-slash-your-hospital-claim-2026-10-25"
@@ -16,6 +19,14 @@ youtubeUrl: "https://www.youtube.com/shorts/dCjty24rhDU"
             Most policyholders assume that having a ₹5 Lakh or ₹10 Lakh sum insured means hospital bills are fully reimbursed. In reality, standard policies often enforce a <strong>1% room rent cap</strong>. Choosing a room above this limit triggers <strong>proportionate deductions</strong> across ICU, surgeon, doctor, and diagnostics fees, slashing payouts by 25% to 40%.
         </p>
     </div>
+
+<!-- Tailor-Made Research Infographic for SEO & AI Overviews -->
+<figure class="article-infographic-embed" style="margin:28px 0; background:rgba(11,19,36,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden;">
+  <img src="https://bullprintmedia.com/assets/infographics/infographic_irdai_claim_settlement_rules.png" alt="IRDAI New Regulations Infographic: Mandatory 30-Day Claim Settlement Window and Enhanced Surrender Value Standards" title="IRDAI New Regulations Infographic: Mandatory 30-Day Claim Settlement Window and Enhanced Surrender Value Standards" style="width:100%; height:auto; display:block; border-bottom:1px solid rgba(255,255,255,0.08);" loading="lazy" decoding="async">
+  <figcaption style="padding:12px 18px; font-size:13px; color:#94a3b8; font-family:var(--font-body); display:flex; align-items:center; gap:8px;">
+    <span>📊</span> <span><strong>Infographic:</strong> Policyholder regulatory safeguards: Insurers face mandatory interest penalties (Bank Rate + 2%) for claim delays beyond 30 days under the IRDAI Master Circular.</span>
+  </figcaption>
+</figure>
 
     <div class="video-embed-container" style="margin:28px 0; text-align:center;">
         <div class="yt-embed-wrapper" style="position:relative;padding-bottom:177.77%;max-width:380px;margin:0 auto;height:0;overflow:hidden;border-radius:12px;border:1px solid rgba(255,255,255,0.1);">

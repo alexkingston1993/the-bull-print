@@ -14,7 +14,7 @@ from loguru import logger
 
 BASE_DIR = Path(__file__).parent
 POSTS_JSON = BASE_DIR / "content" / "posts.json"
-SITE_URL = os.getenv("SITE_URL", "https://the-bull-print.vercel.app").rstrip("/")
+SITE_URL = os.getenv("SITE_URL", "https://bullprintmedia.com").rstrip("/")
 
 
 def _ping_indexnow(article_url: str):

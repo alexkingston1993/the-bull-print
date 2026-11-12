@@ -38,6 +38,10 @@ TARGET_PLAYLISTS = {
         "title": "Insurance",
         "description": "IRDAI Regulatory Forensics, Health & Term Insurance Audits, Incurred Claim Ratios, and Consumer Protection.",
     },
+    "beginners_finance": {
+        "title": "Beginners in Finance: The 365-Day Masterclass",
+        "description": "Zero to Wall Street: The complete 365-day masterclass on Corporate Finance, Investment Banking, Quantitative Trading, Equity Analysis, and Wealth Building by The Bull Print.",
+    },
 }
 
 

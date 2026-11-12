@@ -541,8 +541,8 @@ def main():
                 "description": art["excerpt"],
                 "datePublished": art["date"],
                 "dateModified": art["date"],
-                "mainEntityOfPage": {"@type": "WebPage", "@id": f"https://the-bull-print.vercel.app/article?slug={slug}"},
-                "author": {"@type": "Organization", "name": "The Bull Print Desk", "url": "https://the-bull-print.vercel.app"}
+                "mainEntityOfPage": {"@type": "WebPage", "@id": f"https://bullprintmedia.com/article?slug={slug}"},
+                "author": {"@type": "Organization", "name": "The Bull Print Desk", "url": "https://bullprintmedia.com"}
             }
         }
         

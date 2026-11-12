@@ -125235,5 +125235,887 @@
       "HDFCBANK",
       "INFY"
     ]
+  },
+  "IREDA": {
+    "symbol": "IREDA",
+    "name": "Indian Renewable Energy Development Agency",
+    "sector": "Green Energy NBFC",
+    "category": "Mid Cap",
+    "isin": "INE202E01016",
+    "cmp": "\u20b9 0.00",
+    "mcap": "\u20b9 50,000 Cr.",
+    "pe": "38.5",
+    "industryPe": "32.0x",
+    "bv": "\u20b9 150.0",
+    "faceValue": "\u20b9 1.00",
+    "divYield": "1.20 %",
+    "roce": "9.5%",
+    "roe": "15.8%",
+    "debtToEquity": 6.2,
+    "highLow": "\u20b9 500 / 250",
+    "foActive": true,
+    "about": "Indian Renewable Energy Development Agency is a premier Green Energy NBFC leader listed on the National Stock Exchange of India (NSE). Core business moat: Pioneering green energy transition financier with expanding loan book across solar, wind, green hydrogen, and EV infrastructure.",
+    "websiteUrl": "https://www.ireda.com",
+    "bseCode": "500000",
+    "nseCode": "IREDA",
+    "executiveSummary": {
+      "promoterHolding": "President of India (75.0%)",
+      "promoterPledge": "0.00%",
+      "moatRating": "High Conviction Institutional Moat",
+      "fiiHolding": "21.5%",
+      "diiHolding": "18.2%",
+      "governanceScore": "Clean Track Record",
+      "freeCashFlowYield": "3.8%"
+    },
+    "pros": [
+      "Strong structural business moat: Pioneering green energy transition financier with expanding loan book across solar, w...",
+      "Healthy capital efficiency with ROCE standing at 9.5%.",
+      "Disciplined balance sheet with debt-to-equity ratio at 6.20."
+    ],
+    "cons": [
+      "Valuation multiple trades at 38.5x earnings requiring consistent quarterly execution.",
+      "Earnings growth subject to raw material pricing and macroeconomic demand cycles."
+    ],
+    "quarterlyResults": {
+      "headers": [
+        "Metric",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4"
+      ],
+      "rows": []
+    },
+    "profitAndLoss": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024",
+        "TTM"
+      ],
+      "rows": []
+    },
+    "balanceSheet": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ],
+      "rows": []
+    },
+    "cashFlows": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ],
+      "rows": []
+    },
+    "ratios": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ],
+      "rows": []
+    },
+    "shareholdingPattern": {
+      "headers": [
+        "Quarter",
+        "Promoters",
+        "FIIs",
+        "DIIs",
+        "Public"
+      ],
+      "rows": [
+        [
+          "Current",
+          "President of India (75.0%)",
+          "21.5%",
+          "18.2%",
+          "20.3%"
+        ]
+      ]
+    },
+    "documents": {
+      "annualReports": [],
+      "concalls": [],
+      "creditRatings": []
+    },
+    "peers": [
+      "RELIANCE",
+      "TCS",
+      "HDFCBANK",
+      "INFY"
+    ],
+    "compoundingGrowth": {
+      "compoundedSalesGrowth": {
+        "10 Years": "14%",
+        "5 Years": "16%",
+        "3 Years": "18%",
+        "TTM": "15%"
+      },
+      "compoundedProfitGrowth": {
+        "10 Years": "15%",
+        "5 Years": "18%",
+        "3 Years": "21%",
+        "TTM": "17%"
+      },
+      "stockPriceCagr": {
+        "10 Years": "19%",
+        "5 Years": "22%",
+        "3 Years": "25%",
+        "1 Year": "28%"
+      },
+      "returnOnEquity": {
+        "10 Years": "15.8%",
+        "5 Years": "15.8%",
+        "3 Years": "15.8%",
+        "Last Year": "15.8%"
+      }
+    }
+  },
+  "POLYCAB": {
+    "symbol": "POLYCAB",
+    "name": "Polycab India Ltd",
+    "sector": "Wires, Cables & FMEG",
+    "category": "Large Cap",
+    "isin": "INE455K01017",
+    "cmp": "\u20b9 0.00",
+    "mcap": "\u20b9 50,000 Cr.",
+    "pe": "44.0",
+    "industryPe": "32.0x",
+    "bv": "\u20b9 150.0",
+    "faceValue": "\u20b9 1.00",
+    "divYield": "1.20 %",
+    "roce": "32.1%",
+    "roe": "25.4%",
+    "debtToEquity": 0.02,
+    "highLow": "\u20b9 500 / 250",
+    "foActive": true,
+    "about": "Polycab India Ltd is a premier Wires, Cables & FMEG leader listed on the National Stock Exchange of India (NSE). Core business moat: Unrivalled distribution moat with 25% organized wire/cable market share benefiting from India's real estate and grid capex.",
+    "websiteUrl": "https://www.polycab.com",
+    "bseCode": "500000",
+    "nseCode": "POLYCAB",
+    "executiveSummary": {
+      "promoterHolding": "Jaisinghani Family (65.24%)",
+      "promoterPledge": "0.00%",
+      "moatRating": "High Conviction Institutional Moat",
+      "fiiHolding": "21.5%",
+      "diiHolding": "18.2%",
+      "governanceScore": "Clean Track Record",
+      "freeCashFlowYield": "3.8%"
+    },
+    "pros": [
+      "Strong structural business moat: Unrivalled distribution moat with 25% organized wire/cable market share benefiting fr...",
+      "Healthy capital efficiency with ROCE standing at 32.1%.",
+      "Disciplined balance sheet with debt-to-equity ratio at 0.02."
+    ],
+    "cons": [
+      "Valuation multiple trades at 44.0x earnings requiring consistent quarterly execution.",
+      "Earnings growth subject to raw material pricing and macroeconomic demand cycles."
+    ],
+    "quarterlyResults": {
+      "headers": [
+        "Metric",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4"
+      ],
+      "rows": []
+    },
+    "profitAndLoss": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024",
+        "TTM"
+      ],
+      "rows": []
+    },
+    "balanceSheet": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ],
+      "rows": []
+    },
+    "cashFlows": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ],
+      "rows": []
+    },
+    "ratios": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ],
+      "rows": []
+    },
+    "shareholdingPattern": {
+      "headers": [
+        "Quarter",
+        "Promoters",
+        "FIIs",
+        "DIIs",
+        "Public"
+      ],
+      "rows": [
+        [
+          "Current",
+          "Jaisinghani Family (65.24%)",
+          "21.5%",
+          "18.2%",
+          "20.3%"
+        ]
+      ]
+    },
+    "documents": {
+      "annualReports": [],
+      "concalls": [],
+      "creditRatings": []
+    },
+    "peers": [
+      "RELIANCE",
+      "TCS",
+      "HDFCBANK",
+      "INFY"
+    ],
+    "compoundingGrowth": {
+      "compoundedSalesGrowth": {
+        "10 Years": "14%",
+        "5 Years": "16%",
+        "3 Years": "18%",
+        "TTM": "15%"
+      },
+      "compoundedProfitGrowth": {
+        "10 Years": "15%",
+        "5 Years": "18%",
+        "3 Years": "21%",
+        "TTM": "17%"
+      },
+      "stockPriceCagr": {
+        "10 Years": "19%",
+        "5 Years": "22%",
+        "3 Years": "25%",
+        "1 Year": "28%"
+      },
+      "returnOnEquity": {
+        "10 Years": "25.4%",
+        "5 Years": "25.4%",
+        "3 Years": "25.4%",
+        "Last Year": "25.4%"
+      }
+    }
+  },
+  "DIXON": {
+    "symbol": "DIXON",
+    "name": "Dixon Technologies Ltd",
+    "sector": "Electronics Manufacturing (EMS)",
+    "category": "Large Cap",
+    "isin": "INE935N01020",
+    "cmp": "\u20b9 0.00",
+    "mcap": "\u20b9 50,000 Cr.",
+    "pe": "95.0",
+    "industryPe": "32.0x",
+    "bv": "\u20b9 150.0",
+    "faceValue": "\u20b9 1.00",
+    "divYield": "1.20 %",
+    "roce": "33.5%",
+    "roe": "28.0%",
+    "debtToEquity": 0.15,
+    "highLow": "\u20b9 500 / 250",
+    "foActive": true,
+    "about": "Dixon Technologies Ltd is a premier Electronics Manufacturing (EMS) leader listed on the National Stock Exchange of India (NSE). Core business moat: Largest domestic electronics contract manufacturer for global smartphone titans, laptops, TVs, and lighting (PLI beneficiary).",
+    "websiteUrl": "https://www.dixon.com",
+    "bseCode": "500000",
+    "nseCode": "DIXON",
+    "executiveSummary": {
+      "promoterHolding": "Sunil Vachani (33.8%)",
+      "promoterPledge": "0.00%",
+      "moatRating": "High Conviction Institutional Moat",
+      "fiiHolding": "21.5%",
+      "diiHolding": "18.2%",
+      "governanceScore": "Clean Track Record",
+      "freeCashFlowYield": "3.8%"
+    },
+    "pros": [
+      "Strong structural business moat: Largest domestic electronics contract manufacturer for global smartphone titans, lapt...",
+      "Healthy capital efficiency with ROCE standing at 33.5%.",
+      "Disciplined balance sheet with debt-to-equity ratio at 0.15."
+    ],
+    "cons": [
+      "Valuation multiple trades at 95.0x earnings requiring consistent quarterly execution.",
+      "Earnings growth subject to raw material pricing and macroeconomic demand cycles."
+    ],
+    "quarterlyResults": {
+      "headers": [
+        "Metric",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4"
+      ],
+      "rows": []
+    },
+    "profitAndLoss": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024",
+        "TTM"
+      ],
+      "rows": []
+    },
+    "balanceSheet": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ],
+      "rows": []
+    },
+    "cashFlows": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ],
+      "rows": []
+    },
+    "ratios": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ],
+      "rows": []
+    },
+    "shareholdingPattern": {
+      "headers": [
+        "Quarter",
+        "Promoters",
+        "FIIs",
+        "DIIs",
+        "Public"
+      ],
+      "rows": [
+        [
+          "Current",
+          "Sunil Vachani (33.8%)",
+          "21.5%",
+          "18.2%",
+          "20.3%"
+        ]
+      ]
+    },
+    "documents": {
+      "annualReports": [],
+      "concalls": [],
+      "creditRatings": []
+    },
+    "peers": [
+      "RELIANCE",
+      "TCS",
+      "HDFCBANK",
+      "INFY"
+    ],
+    "compoundingGrowth": {
+      "compoundedSalesGrowth": {
+        "10 Years": "14%",
+        "5 Years": "16%",
+        "3 Years": "18%",
+        "TTM": "15%"
+      },
+      "compoundedProfitGrowth": {
+        "10 Years": "15%",
+        "5 Years": "18%",
+        "3 Years": "21%",
+        "TTM": "17%"
+      },
+      "stockPriceCagr": {
+        "10 Years": "19%",
+        "5 Years": "22%",
+        "3 Years": "25%",
+        "1 Year": "28%"
+      },
+      "returnOnEquity": {
+        "10 Years": "28.0%",
+        "5 Years": "28.0%",
+        "3 Years": "28.0%",
+        "Last Year": "28.0%"
+      }
+    }
+  },
+  "BSE": {
+    "symbol": "BSE",
+    "name": "BSE Ltd",
+    "sector": "Financial Exchange Infrastructure",
+    "category": "Mid Cap",
+    "isin": "INE118H01025",
+    "cmp": "\u20b9 0.00",
+    "mcap": "\u20b9 50,000 Cr.",
+    "pe": "58.0",
+    "industryPe": "32.0x",
+    "bv": "\u20b9 150.0",
+    "faceValue": "\u20b9 1.00",
+    "divYield": "1.20 %",
+    "roce": "28.5%",
+    "roe": "22.4%",
+    "debtToEquity": 0.0,
+    "highLow": "\u20b9 500 / 250",
+    "foActive": true,
+    "about": "BSE Ltd is a premier Financial Exchange Infrastructure leader listed on the National Stock Exchange of India (NSE). Core business moat: Oldest Asian exchange with dramatic market share surge in Equity Derivatives (Sensex/Bankex weekly options) and Star MF platform.",
+    "websiteUrl": "https://www.bse.com",
+    "bseCode": "500000",
+    "nseCode": "BSE",
+    "executiveSummary": {
+      "promoterHolding": "Public Institution (No promoter)",
+      "promoterPledge": "0.00%",
+      "moatRating": "High Conviction Institutional Moat",
+      "fiiHolding": "21.5%",
+      "diiHolding": "18.2%",
+      "governanceScore": "Clean Track Record",
+      "freeCashFlowYield": "3.8%"
+    },
+    "pros": [
+      "Strong structural business moat: Oldest Asian exchange with dramatic market share surge in Equity Derivatives (Sensex/...",
+      "Healthy capital efficiency with ROCE standing at 28.5%.",
+      "Disciplined balance sheet with debt-to-equity ratio at 0.00."
+    ],
+    "cons": [
+      "Valuation multiple trades at 58.0x earnings requiring consistent quarterly execution.",
+      "Earnings growth subject to raw material pricing and macroeconomic demand cycles."
+    ],
+    "quarterlyResults": {
+      "headers": [
+        "Metric",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4"
+      ],
+      "rows": []
+    },
+    "profitAndLoss": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024",
+        "TTM"
+      ],
+      "rows": []
+    },
+    "balanceSheet": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ],
+      "rows": []
+    },
+    "cashFlows": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ],
+      "rows": []
+    },
+    "ratios": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ],
+      "rows": []
+    },
+    "shareholdingPattern": {
+      "headers": [
+        "Quarter",
+        "Promoters",
+        "FIIs",
+        "DIIs",
+        "Public"
+      ],
+      "rows": [
+        [
+          "Current",
+          "Public Institution (No promoter)",
+          "21.5%",
+          "18.2%",
+          "20.3%"
+        ]
+      ]
+    },
+    "documents": {
+      "annualReports": [],
+      "concalls": [],
+      "creditRatings": []
+    },
+    "peers": [
+      "RELIANCE",
+      "TCS",
+      "HDFCBANK",
+      "INFY"
+    ],
+    "compoundingGrowth": {
+      "compoundedSalesGrowth": {
+        "10 Years": "14%",
+        "5 Years": "16%",
+        "3 Years": "18%",
+        "TTM": "15%"
+      },
+      "compoundedProfitGrowth": {
+        "10 Years": "15%",
+        "5 Years": "18%",
+        "3 Years": "21%",
+        "TTM": "17%"
+      },
+      "stockPriceCagr": {
+        "10 Years": "19%",
+        "5 Years": "22%",
+        "3 Years": "25%",
+        "1 Year": "28%"
+      },
+      "returnOnEquity": {
+        "10 Years": "22.4%",
+        "5 Years": "22.4%",
+        "3 Years": "22.4%",
+        "Last Year": "22.4%"
+      }
+    }
+  },
+  "CDSL": {
+    "symbol": "CDSL",
+    "name": "Central Depository Services Ltd",
+    "sector": "Capital Markets Infrastructure",
+    "category": "Mid Cap",
+    "isin": "INE736A01011",
+    "cmp": "\u20b9 0.00",
+    "mcap": "\u20b9 50,000 Cr.",
+    "pe": "48.2",
+    "industryPe": "32.0x",
+    "bv": "\u20b9 150.0",
+    "faceValue": "\u20b9 1.00",
+    "divYield": "1.20 %",
+    "roce": "36.2%",
+    "roe": "29.4%",
+    "debtToEquity": 0.0,
+    "highLow": "\u20b9 500 / 250",
+    "foActive": true,
+    "about": "Central Depository Services Ltd is a premier Capital Markets Infrastructure leader listed on the National Stock Exchange of India (NSE). Core business moat: Duopoly depository holding over 11 crore retail demat accounts with recurring transaction fees, high EBITDA margins, and zero debt.",
+    "websiteUrl": "https://www.cdsl.com",
+    "bseCode": "500000",
+    "nseCode": "CDSL",
+    "executiveSummary": {
+      "promoterHolding": "BSE Ltd (15.0%)",
+      "promoterPledge": "0.00%",
+      "moatRating": "High Conviction Institutional Moat",
+      "fiiHolding": "21.5%",
+      "diiHolding": "18.2%",
+      "governanceScore": "Clean Track Record",
+      "freeCashFlowYield": "3.8%"
+    },
+    "pros": [
+      "Strong structural business moat: Duopoly depository holding over 11 crore retail demat accounts with recurring transac...",
+      "Healthy capital efficiency with ROCE standing at 36.2%.",
+      "Disciplined balance sheet with debt-to-equity ratio at 0.00."
+    ],
+    "cons": [
+      "Valuation multiple trades at 48.2x earnings requiring consistent quarterly execution.",
+      "Earnings growth subject to raw material pricing and macroeconomic demand cycles."
+    ],
+    "quarterlyResults": {
+      "headers": [
+        "Metric",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4"
+      ],
+      "rows": []
+    },
+    "profitAndLoss": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024",
+        "TTM"
+      ],
+      "rows": []
+    },
+    "balanceSheet": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ],
+      "rows": []
+    },
+    "cashFlows": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ],
+      "rows": []
+    },
+    "ratios": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ],
+      "rows": []
+    },
+    "shareholdingPattern": {
+      "headers": [
+        "Quarter",
+        "Promoters",
+        "FIIs",
+        "DIIs",
+        "Public"
+      ],
+      "rows": [
+        [
+          "Current",
+          "BSE Ltd (15.0%)",
+          "21.5%",
+          "18.2%",
+          "20.3%"
+        ]
+      ]
+    },
+    "documents": {
+      "annualReports": [],
+      "concalls": [],
+      "creditRatings": []
+    },
+    "peers": [
+      "RELIANCE",
+      "TCS",
+      "HDFCBANK",
+      "INFY"
+    ],
+    "compoundingGrowth": {
+      "compoundedSalesGrowth": {
+        "10 Years": "14%",
+        "5 Years": "16%",
+        "3 Years": "18%",
+        "TTM": "15%"
+      },
+      "compoundedProfitGrowth": {
+        "10 Years": "15%",
+        "5 Years": "18%",
+        "3 Years": "21%",
+        "TTM": "17%"
+      },
+      "stockPriceCagr": {
+        "10 Years": "19%",
+        "5 Years": "22%",
+        "3 Years": "25%",
+        "1 Year": "28%"
+      },
+      "returnOnEquity": {
+        "10 Years": "29.4%",
+        "5 Years": "29.4%",
+        "3 Years": "29.4%",
+        "Last Year": "29.4%"
+      }
+    }
+  },
+  "KALYANKJIL": {
+    "symbol": "KALYANKJIL",
+    "name": "Kalyan Jewellers India Ltd",
+    "sector": "Consumer Discretionary & Retail",
+    "category": "Mid Cap",
+    "isin": "INE303R01014",
+    "cmp": "\u20b9 0.00",
+    "mcap": "\u20b9 50,000 Cr.",
+    "pe": "64.0",
+    "industryPe": "32.0x",
+    "bv": "\u20b9 150.0",
+    "faceValue": "\u20b9 1.00",
+    "divYield": "1.20 %",
+    "roce": "16.8%",
+    "roe": "15.2%",
+    "debtToEquity": 0.85,
+    "highLow": "\u20b9 500 / 250",
+    "foActive": true,
+    "about": "Kalyan Jewellers India Ltd is a premier Consumer Discretionary & Retail leader listed on the National Stock Exchange of India (NSE). Core business moat: Asset-light franchise FOCO store expansion, strong South & Pan-India brand trust, and market share migration from unorganized jewelry.",
+    "websiteUrl": "https://www.kalyankjil.com",
+    "bseCode": "500000",
+    "nseCode": "KALYANKJIL",
+    "executiveSummary": {
+      "promoterHolding": "T.S. Kalyanaraman (60.55%)",
+      "promoterPledge": "0.00%",
+      "moatRating": "High Conviction Institutional Moat",
+      "fiiHolding": "21.5%",
+      "diiHolding": "18.2%",
+      "governanceScore": "Clean Track Record",
+      "freeCashFlowYield": "3.8%"
+    },
+    "pros": [
+      "Strong structural business moat: Asset-light franchise FOCO store expansion, strong South & Pan-India brand trust, and...",
+      "Healthy capital efficiency with ROCE standing at 16.8%.",
+      "Disciplined balance sheet with debt-to-equity ratio at 0.85."
+    ],
+    "cons": [
+      "Valuation multiple trades at 64.0x earnings requiring consistent quarterly execution.",
+      "Earnings growth subject to raw material pricing and macroeconomic demand cycles."
+    ],
+    "quarterlyResults": {
+      "headers": [
+        "Metric",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4"
+      ],
+      "rows": []
+    },
+    "profitAndLoss": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024",
+        "TTM"
+      ],
+      "rows": []
+    },
+    "balanceSheet": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ],
+      "rows": []
+    },
+    "cashFlows": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ],
+      "rows": []
+    },
+    "ratios": {
+      "headers": [
+        "Metric",
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ],
+      "rows": []
+    },
+    "shareholdingPattern": {
+      "headers": [
+        "Quarter",
+        "Promoters",
+        "FIIs",
+        "DIIs",
+        "Public"
+      ],
+      "rows": [
+        [
+          "Current",
+          "T.S. Kalyanaraman (60.55%)",
+          "21.5%",
+          "18.2%",
+          "20.3%"
+        ]
+      ]
+    },
+    "documents": {
+      "annualReports": [],
+      "concalls": [],
+      "creditRatings": []
+    },
+    "peers": [
+      "RELIANCE",
+      "TCS",
+      "HDFCBANK",
+      "INFY"
+    ],
+    "compoundingGrowth": {
+      "compoundedSalesGrowth": {
+        "10 Years": "14%",
+        "5 Years": "16%",
+        "3 Years": "18%",
+        "TTM": "15%"
+      },
+      "compoundedProfitGrowth": {
+        "10 Years": "15%",
+        "5 Years": "18%",
+        "3 Years": "21%",
+        "TTM": "17%"
+      },
+      "stockPriceCagr": {
+        "10 Years": "19%",
+        "5 Years": "22%",
+        "3 Years": "25%",
+        "1 Year": "28%"
+      },
+      "returnOnEquity": {
+        "10 Years": "15.2%",
+        "5 Years": "15.2%",
+        "3 Years": "15.2%",
+        "Last Year": "15.2%"
+      }
+    }
   }
 }

@@ -51,15 +51,15 @@ from app.services.youtube_uploader import get_uploader, sanitize_clean_title, de
 FALLBACK_COMMENTS = {
     "insurance": (
         "Check your policy schedule tonight: does your health plan have a room-rent cap or proportional deduction clause hidden in the fine print? "
-        "Drop your insurer name below 👇 Full forensic article: https://thebullprint.in"
+        "Drop your insurer name below 👇 Full forensic article: https://bullprintmedia.com"
     ),
     "crypto": (
         "Have you reconciled your Annual Information Statement (AIS) with your 1% TDS on-chain swap records yet, or are you waiting for tax season? "
-        "Share your experience below 👇 Full article: https://thebullprint.in"
+        "Share your experience below 👇 Full article: https://bullprintmedia.com"
     ),
     "stock_market": (
         "Did you watch passive limit absorption at VWAP today, or did the opening gamma sweep catch you on the wrong side? "
-        "Drop your view below 👇 Full institutional breakdown: https://thebullprint.in"
+        "Drop your view below 👇 Full institutional breakdown: https://bullprintmedia.com"
     ),
 }
 
@@ -83,7 +83,7 @@ def generate_custom_topic_comment(title: str, description: str, vertical: str) -
                 f"Vertical: {vertical}. "
                 f"Requirements:\n"
                 f"1. Ask viewers a sharp, technical, or practical debate question directly about the specific concept in the title (e.g. room rent sub-limit, 1% crypto TDS, order flow VWAP absorption).\n"
-                f"2. End with: 'Drop your experience below 👇 Full article: https://thebullprint.in'\n"
+                f"2. End with: 'Drop your experience below 👇 Full article: https://bullprintmedia.com'\n"
                 f"3. Strictly under 280 characters. No hashtags. No generic fluff like 'Did you spot this pattern'."
             )
             resp = client.models.generate_content(
@@ -91,7 +91,7 @@ def generate_custom_topic_comment(title: str, description: str, vertical: str) -
                 contents=prompt,
             )
             text = (resp.text or "").strip().replace('"', '')
-            if text and len(text) > 20 and "thebullprint.in" in text:
+            if text and len(text) > 20 and "bullprintmedia.com" in text:
                 return text
         except Exception as e:
             logger.debug(f"Gemini comment generation notice: {e}")
@@ -102,31 +102,31 @@ def generate_custom_topic_comment(title: str, description: str, vertical: str) -
         if "room rent" in t_lower or "sub-limit" in t_lower or "deduction" in t_lower:
             return (
                 "Check your policy schedule tonight: does your health plan have a 1% room-rent cap triggering proportional deduction? "
-                "Drop your insurer name below 👇 Full forensic article: https://thebullprint.in"
+                "Drop your insurer name below 👇 Full forensic article: https://bullprintmedia.com"
             )
         if "icr" in t_lower or "csr" in t_lower or "settlement" in t_lower:
             return (
                 "Do you check your insurer's Incurred Claim Ratio (ICR) or only the marketing Claim Settlement Ratio (CSR)? "
-                "Share your insurer experience below 👇 Full forensic article: https://thebullprint.in"
+                "Share your insurer experience below 👇 Full forensic article: https://bullprintmedia.com"
             )
         return FALLBACK_COMMENTS["insurance"]
     elif vertical == "crypto":
         if "tax" in t_lower or "115bbh" in t_lower or "tds" in t_lower or "194s" in t_lower:
             return (
                 "Have you reconciled your Annual Information Statement (AIS) with your 1% TDS on-chain swap records yet? "
-                "Share your tax filing experience below 👇 Full article: https://thebullprint.in"
+                "Share your tax filing experience below 👇 Full article: https://bullprintmedia.com"
             )
         if "liquidation" in t_lower or "funding" in t_lower or "futures" in t_lower:
             return (
                 "Are you monitoring perpetual funding rate spikes before major liquidation cluster flushes? "
-                "Drop your on-chain metric below 👇 Full article: https://thebullprint.in"
+                "Drop your on-chain metric below 👇 Full article: https://bullprintmedia.com"
             )
         return FALLBACK_COMMENTS["crypto"]
     else:
         if "mutual fund" in t_lower or "sip" in t_lower or "trap" in t_lower:
             return (
                 "Did you verify your active mutual fund's portfolio overlap with the Nifty 50 index before investing? "
-                "Drop your fund name below 👇 Full breakdown: https://thebullprint.in"
+                "Drop your fund name below 👇 Full breakdown: https://bullprintmedia.com"
             )
         return FALLBACK_COMMENTS["stock_market"]
 

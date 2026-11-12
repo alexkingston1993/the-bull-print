@@ -217,7 +217,7 @@ class AriaEngineerTools:
             f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
             f"✅ *Latest Run:* `#{run_id}` finished with `SUCCESS`!\n"
             f"🎬 *Video Status:* 1080p release published to YouTube.\n"
-            f"🌐 *Web Portal:* Research article deployed to `https://the-bull-print.vercel.app`.\n"
+            f"🌐 *Web Portal:* Research article deployed to `https://bullprintmedia.com`.\n"
             f"🎙️ *Voice Profile:* Microsoft Azure Neural (`en-IN-PrabhatNeural`).\n"
             f"🛡️ *Privacy:* 100% Private repository | 0% Dalal Street mentions.\n"
             f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"

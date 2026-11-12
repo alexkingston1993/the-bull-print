@@ -918,5 +918,53 @@
     "category": "Small Cap",
     "isin": "INE785M01010",
     "moat": "Established retail showroom presence across North India undergoing debt normalisation."
+  },
+  {
+    "symbol": "IREDA",
+    "name": "Indian Renewable Energy Development Agency",
+    "sector": "Green Energy NBFC",
+    "category": "Mid Cap",
+    "isin": "INE202E01016",
+    "moat": "Pioneering green energy transition financier with expanding loan book across solar, wind, green hydrogen, and EV infrastructure."
+  },
+  {
+    "symbol": "POLYCAB",
+    "name": "Polycab India Ltd",
+    "sector": "Wires, Cables & FMEG",
+    "category": "Large Cap",
+    "isin": "INE455K01017",
+    "moat": "Unrivalled distribution moat with 25% organized wire/cable market share benefiting from India's real estate and grid capex."
+  },
+  {
+    "symbol": "DIXON",
+    "name": "Dixon Technologies Ltd",
+    "sector": "Electronics Manufacturing (EMS)",
+    "category": "Large Cap",
+    "isin": "INE935N01020",
+    "moat": "Largest domestic electronics contract manufacturer for global smartphone titans, laptops, TVs, and lighting (PLI beneficiary)."
+  },
+  {
+    "symbol": "BSE",
+    "name": "BSE Ltd",
+    "sector": "Financial Exchange Infrastructure",
+    "category": "Mid Cap",
+    "isin": "INE118H01025",
+    "moat": "Oldest Asian exchange with dramatic market share surge in Equity Derivatives (Sensex/Bankex weekly options) and Star MF platform."
+  },
+  {
+    "symbol": "CDSL",
+    "name": "Central Depository Services Ltd",
+    "sector": "Capital Markets Infrastructure",
+    "category": "Mid Cap",
+    "isin": "INE736A01011",
+    "moat": "Duopoly depository holding over 11 crore retail demat accounts with recurring transaction fees, high EBITDA margins, and zero debt."
+  },
+  {
+    "symbol": "KALYANKJIL",
+    "name": "Kalyan Jewellers India Ltd",
+    "sector": "Consumer Discretionary & Retail",
+    "category": "Mid Cap",
+    "isin": "INE303R01014",
+    "moat": "Asset-light franchise FOCO store expansion, strong South & Pan-India brand trust, and market share migration from unorganized jewelry."
   }
 ]

@@ -1,4 +1,7 @@
 ---
+coverImage: "https://bullprintmedia.com/assets/editorial/gold_silver_macro_hero.jpg"
+infographic: "https://bullprintmedia.com/assets/infographics/infographic_silver_gold_crash.png"
+imageAlt: "Silver Crashes ₹56,000 & Gold Price Drop Analysis: Paper Futures Margin Liquidation vs Physical Bullion Reserve Fortress Infographic"
 title: "HDFC Bank: The Gold Standard of Private Banking | Post-Merger Synergies & Valuation Floor"
 date: "2026-10-20 03:25:00"
 slug: "hdfc-bank-deep-dive-2026"
@@ -17,6 +20,14 @@ youtubeUrl: "https://www.youtube.com/watch?v=K62d0jpy55w"
             With gross NPAs held consistently below 1.4% and an aggressive footprint expansion targeting 10,000+ branches, the stock trades at historical valuation percentiles that offer strong margin of safety.
         </p>
     </div>
+
+<!-- Tailor-Made Research Infographic for SEO & AI Overviews -->
+<figure class="article-infographic-embed" style="margin:28px 0; background:rgba(11,19,36,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden;">
+  <img src="https://bullprintmedia.com/assets/infographics/infographic_silver_gold_crash.png" alt="Silver Crashes ₹56,000 & Gold Price Drop Analysis: Paper Futures Margin Liquidation vs Physical Bullion Reserve Fortress Infographic" title="Silver Crashes ₹56,000 & Gold Price Drop Analysis: Paper Futures Margin Liquidation vs Physical Bullion Reserve Fortress Infographic" style="width:100%; height:auto; display:block; border-bottom:1px solid rgba(255,255,255,0.08);" loading="lazy" decoding="async">
+  <figcaption style="padding:12px 18px; font-size:13px; color:#94a3b8; font-family:var(--font-body); display:flex; align-items:center; gap:8px;">
+    <span>📊</span> <span><strong>Infographic:</strong> Institutional macro breakdown: Why international commercial banks liquidate paper commodity derivatives during margin calls while sovereign entities accumulate physical bullion reserves.</span>
+  </figcaption>
+</figure>
 
     <div class="video-embed-container" style="margin:28px 0; text-align:center;">
         <div class="yt-embed-wrapper" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px;margin:24px 0;"><iframe src="https://www.youtube.com/embed/K62d0jpy55w" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen></iframe></div>

@@ -1,4 +1,7 @@
 ---
+coverImage: "https://bullprintmedia.com/assets/editorial/crypto_forensics_hero.jpg"
+infographic: "https://bullprintmedia.com/assets/infographics/infographic_solana_mev_sandwich_bots.png"
+imageAlt: "Solana Memecoin Siphon Infographic: Anatomy of an MEV Sandwich Attack on Decentralized Exchanges"
 title: "Solana Memecoin Siphon: How MEV Bots Frontrun Retail: Institutional Market Breakdown"
 slug: "solana-memecoin-siphon-how-mev-bots-frontrun-ret"
 description: "Comprehensive forensic analysis of Solana Memecoin Siphon: How MEV Bots Frontrun Retail by The Bull Print."
@@ -12,6 +15,14 @@ reading_time: "8 min read"
 <div class="video-embed-container" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; margin:28px 0; border:1px solid rgba(255,255,255,0.1); box-shadow:0 8px 30px rgba(0,0,0,0.5);">
  <iframe src="https://www.youtube.com/embed/2cINkdat26s" title="Solana Memecoin Siphon: How MEV Bots Frontrun Retail: Institutional Market Breakdown" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen></iframe>
 </div>
+
+<!-- Tailor-Made Research Infographic for SEO & AI Overviews -->
+<figure class="article-infographic-embed" style="margin:28px 0; background:rgba(11,19,36,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden;">
+  <img src="https://bullprintmedia.com/assets/infographics/infographic_solana_mev_sandwich_bots.png" alt="Solana Memecoin Siphon Infographic: Anatomy of an MEV Sandwich Attack on Decentralized Exchanges" title="Solana Memecoin Siphon Infographic: Anatomy of an MEV Sandwich Attack on Decentralized Exchanges" style="width:100%; height:auto; display:block; border-bottom:1px solid rgba(255,255,255,0.08);" loading="lazy" decoding="async">
+  <figcaption style="padding:12px 18px; font-size:13px; color:#94a3b8; font-family:var(--font-body); display:flex; align-items:center; gap:8px;">
+    <span>📊</span> <span><strong>Infographic:</strong> On-chain telemetry: How automated MEV bots exploit high retail slippage settings via Jito bundles to extract immediate riskless profit on DEX swaps.</span>
+  </figcaption>
+</figure>
 
 
 ## Key Takeaways (TL;DR for Fast Reading)

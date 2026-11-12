@@ -1,4 +1,7 @@
 ---
+coverImage: "https://bullprintmedia.com/assets/editorial/crypto_forensics_hero.jpg"
+infographic: "https://bullprintmedia.com/assets/infographics/infographic_crypto_funding_rates.png"
+imageAlt: "Crypto Perpetual Futures Funding Rates Infographic: Basis Arbitrage Mechanics and Delta-Neutral Cash & Carry Yields"
 title: "Crypto Funding Rates Explained: Master Perp Structure & Arbitrage Bots"
 slug: "TBP_CRYPTO_FUNDING_02"
 description: "Discover crypto funding rates explained thoroughly. Learn perp structure, open interest delta, exchange flows, and crypto funding rate arbitrage mechanics."
@@ -12,6 +15,14 @@ reading_time: "8 min read"
 <div class="video-embed-container" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; margin:28px 0; border:1px solid var(--border-subtle);">
  <iframe src="https://www.youtube.com/embed/gEkRKqYhCN4" title="Crypto Funding Rates Explained: Master Perp Structure & Arbitrage Bots" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen></iframe>
 </div>
+
+ <!-- Tailor-Made Research Infographic for SEO & AI Overviews -->
+ <figure class="article-infographic-embed" style="margin:28px 0; background:rgba(11,19,36,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden;">
+ <img src="https://bullprintmedia.com/assets/infographics/infographic_crypto_funding_rates.png" alt="Crypto Perpetual Futures Funding Rates Infographic: Basis Arbitrage Mechanics and Delta-Neutral Cash & Carry Yields" title="Crypto Perpetual Futures Funding Rates Infographic: Basis Arbitrage Mechanics and Delta-Neutral Cash & Carry Yields" style="width:100%; height:auto; display:block; border-bottom:1px solid rgba(255,255,255,0.08);" loading="lazy" decoding="async">
+ <figcaption style="padding:12px 18px; font-size:13px; color:#94a3b8; font-family:var(--font-body); display:flex; align-items:center; gap:8px;">
+ <span>📊</span> <span><strong>Infographic:</strong> Perpetual derivative mechanics: How periodic 8-hour funding rate transfers anchor crypto futures prices to spot markets and offer institutional arbitrage.</span>
+ </figcaption>
+ </figure>
 
 
 ## Key Takeaways (TL;DR for Fast Reading)

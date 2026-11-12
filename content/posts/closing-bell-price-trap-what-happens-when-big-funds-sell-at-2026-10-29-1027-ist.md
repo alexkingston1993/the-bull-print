@@ -1,4 +1,7 @@
 ---
+coverImage: "https://bullprintmedia.com/assets/editorial/dalal_street_fii_hero.jpg"
+infographic: "https://bullprintmedia.com/assets/infographics/infographic_closing_bell_price_trap.png"
+imageAlt: "Closing Bell Price Trap Infographic: 3:15 PM Institutional Volume Dump and 30-Minute VWAP Settlement Auction Rules"
 title: "Closing Bell Price Trap: What Happens When Big Funds Sell at 22,936.8 (+1.05%)"
 date: "2026-10-29 10:50:48"
 slug: "closing-bell-price-trap-what-happens-when-big-funds-sell-at-2026-10-29-1027-ist"
@@ -21,6 +24,14 @@ youtubeUrl: "https://youtu.be/C5fjMYw1SbU"
  <li><strong>The 93% Trading Trap:</strong> Official SEBI regulatory data confirms 93% of individual participants lose capital in short-term trading contracts; genuine life-changing compounding requires holding essential everyday monopoly businesses over 5 to 10 years.</li>
  </ul>
  </div>
+
+ <!-- Tailor-Made Research Infographic for SEO & AI Overviews -->
+ <figure class="article-infographic-embed" style="margin:28px 0; background:rgba(11,19,36,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden;">
+ <img src="https://bullprintmedia.com/assets/infographics/infographic_closing_bell_price_trap.png" alt="Closing Bell Price Trap Infographic: 3:15 PM Institutional Volume Dump and 30-Minute VWAP Settlement Auction Rules" title="Closing Bell Price Trap Infographic: 3:15 PM Institutional Volume Dump and 30-Minute VWAP Settlement Auction Rules" style="width:100%; height:auto; display:block; border-bottom:1px solid rgba(255,255,255,0.08);" loading="lazy" decoding="async">
+ <figcaption style="padding:12px 18px; font-size:13px; color:#94a3b8; font-family:var(--font-body); display:flex; align-items:center; gap:8px;">
+ <span>📊</span> <span><strong>Infographic:</strong> Execution forensics: Why late afternoon retail momentum breakouts get crushed by the mandatory 3:00 PM to 3:30 PM Volume Weighted Average Price (VWAP) settlement.</span>
+ </figcaption>
+ </figure>
 
  <!-- 2. Strategic YouTube Video Embed (Boosts Dwell Time & Google Video Search Ranking) -->
  <div class="video-embed-container" style="margin:28px 0; text-align:center;">

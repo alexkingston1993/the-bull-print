@@ -4,23 +4,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- Primary SEO Meta Tags -->
-    <title>The Bull Print — Institutional Indian Equity Intelligence & Screener</title>
-    <meta name="title" content="The Bull Print — Institutional Indian Equity Intelligence & Screener">
-    <meta name="description" content="Simple, buttery smooth Indian equity intelligence platform. Live index constituent weights, top market movers, fundamental screener, and institutional research articles.">
-    <meta name="keywords" content="Nifty 50 live constituents, Bank Nifty stock weights, Indian stock market dashboard, Screener in alternative, stock fundamentals, FII DII data, The Bull Print">
+    <!-- Primary SEO & AEO Meta Tags -->
+    <title>The Bull Print — Real-Time NSE Stock Screener, Financial Calculators & Market Intelligence</title>
+    <meta name="title" content="The Bull Print — Real-Time NSE Stock Screener, Financial Calculators & Market Intelligence">
+    <meta name="description" content="Free institutional equity screener, 10-year balance sheet compounding audits, live Nifty 50 constituent weights, mutual fund calculators, and daily Dalal Street market intelligence.">
+    <meta name="keywords" content="NSE stock screener, Nifty 50 live weights, Indian stock market terminal, FII DII data today, free SIP step-up calculator, stock fundamentals, The Bull Print, BullPrint Media">
     <meta name="author" content="The Bull Print Research Desk">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+
+    <!-- Search Engine Verification -->
+    <meta name="google-site-verification" content="-Gacr-RDEHc0XD9m55DQuX24CsUhlQyEOXegq4Ia4xo">
+    <meta name="msvalidate.01" content="4f29a7d83e204c329b45667e8125ac89">
+
+    <!-- Google Analytics 4 (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BULLPRINT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-BULLPRINT', { 'anonymize_ip': true });
+    </script>
 
     <!-- Open Graph / Social Sharing -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://the-bull-print.vercel.app">
-    <meta property="og:title" content="The Bull Print — Institutional Indian Equity Intelligence">
-    <meta property="og:description" content="Live index constituent weights, top market movers, fundamental screener, and institutional research articles.">
-    <meta property="og:image" content="brand_assets/opengraph_social_card_1200x630.png">
+    <meta property="og:url" content="https://bullprintmedia.com/">
+    <meta property="og:site_name" content="The Bull Print">
+    <meta property="og:title" content="The Bull Print — Real-Time NSE Stock Screener & Market Intelligence">
+    <meta property="og:description" content="Free institutional equity screener, 10-year balance sheet compounding audits, live Nifty 50 weights, and daily Dalal Street intelligence.">
+    <meta property="og:image" content="https://bullprintmedia.com/brand_assets/opengraph_social_card_1200x630.png">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="brand_assets/opengraph_social_card_1200x630.png">
-    <link rel="canonical" href="https://the-bull-print.vercel.app/">
+    <meta name="twitter:title" content="The Bull Print — Real-Time NSE Stock Screener & Market Intelligence">
+    <meta name="twitter:description" content="Free institutional equity screener, 10-year balance sheet compounding audits, live Nifty 50 weights, and daily Dalal Street intelligence.">
+    <meta name="twitter:image" content="https://bullprintmedia.com/brand_assets/opengraph_social_card_1200x630.png">
+    <link rel="canonical" href="https://bullprintmedia.com/">
+
+    <!-- Structured JSON-LD Schema (Organization, FinancialService, WebSite & SearchAction) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": ["FinancialService", "NewsMediaOrganization", "LocalBusiness"],
+          "@id": "https://bullprintmedia.com/#organization",
+          "name": "The Bull Print",
+          "alternateName": "BullPrint Media",
+          "url": "https://bullprintmedia.com/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://bullprintmedia.com/brand_assets/logo_master_1024x1024.png",
+            "width": 1024,
+            "height": 1024
+          },
+          "image": "https://bullprintmedia.com/brand_assets/opengraph_social_card_1200x630.png",
+          "description": "Quantitative market intelligence desk, fundamental equity screener, and educational financial calculators for Indian retail and institutional investors.",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Chennai",
+            "addressRegion": "Tamil Nadu",
+            "addressCountry": "IN"
+          },
+          "priceRange": "Free",
+          "currenciesAccepted": "INR",
+          "sameAs": [
+            "https://www.youtube.com/@thebullprint",
+            "https://www.instagram.com/thebullprint/",
+            "https://twitter.com/thebullprint"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://bullprintmedia.com/#website",
+          "url": "https://bullprintmedia.com/",
+          "name": "The Bull Print",
+          "publisher": { "@id": "https://bullprintmedia.com/#organization" },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://bullprintmedia.com/stocks/{search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+    </script>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="brand_assets/website_favicon_32x32.png">
@@ -1867,8 +1935,8 @@
                 <a href="/tools.html" class="nav-link-item">🛠️ Tools</a>
                 <a href="/portfolio.html" class="nav-link-item">Portfolio</a>
                 <a href="/insurance.html" class="nav-link-item">Insurance</a>
-                <a href="/crypto.html" class="nav-link-item">Crypto</a>
                 <a href="/calculators.html" class="nav-link-item">Calculators</a>
+                <a href="/course.html" class="nav-link-item" style="color:var(--groww-mint); font-weight:700;">🎓 365 Masterclass</a>
             </nav>
 
             <div class="header-utility" style="display:flex; align-items:center; gap:10px;">

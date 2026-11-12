@@ -1,4 +1,7 @@
 ---
+coverImage: "https://bullprintmedia.com/assets/editorial/dalal_street_fii_hero.jpg"
+infographic: "https://bullprintmedia.com/assets/infographics/infographic_indian_stock_market_beginners.png"
+imageAlt: "Indian Stock Market Beginner Roadmap Infographic: The 3-Pillar Family Savings Fortress and Nifty 50 Secular Compounding"
 title: "Infosys: The Consistent Wealth Creator | Enterprise Cloud Migration & Free Cash Flow Yield"
 date: "2026-10-20 03:00:00"
 slug: "infosys-consistent-compounder-2026"
@@ -17,6 +20,14 @@ youtubeUrl: "https://youtu.be/b2ryVj4JRb8"
             Maintaining an aggressive capital return policy returning <strong>>85% of free cash flow</strong> to equity holders, Infosys commands top-quartile client satisfaction scores across Fortune 500 banks and healthcare providers via its <strong>Topaz Generative AI and Cobalt Cloud suites</strong>.
         </p>
     </div>
+
+<!-- Tailor-Made Research Infographic for SEO & AI Overviews -->
+<figure class="article-infographic-embed" style="margin:28px 0; background:rgba(11,19,36,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden;">
+  <img src="https://bullprintmedia.com/assets/infographics/infographic_indian_stock_market_beginners.png" alt="Indian Stock Market Beginner Roadmap Infographic: The 3-Pillar Family Savings Fortress and Nifty 50 Secular Compounding" title="Indian Stock Market Beginner Roadmap Infographic: The 3-Pillar Family Savings Fortress and Nifty 50 Secular Compounding" style="width:100%; height:auto; display:block; border-bottom:1px solid rgba(255,255,255,0.08);" loading="lazy" decoding="async">
+  <figcaption style="padding:12px 18px; font-size:13px; color:#94a3b8; font-family:var(--font-body); display:flex; align-items:center; gap:8px;">
+    <span>📊</span> <span><strong>Infographic:</strong> Dalal Street beginner guide: How everyday families build multi-generational compounding using low-cost index funds, sovereign gold, and zero debt leverage.</span>
+  </figcaption>
+</figure>
 
     <div class="video-embed-container" style="margin:28px 0; text-align:center;">
         

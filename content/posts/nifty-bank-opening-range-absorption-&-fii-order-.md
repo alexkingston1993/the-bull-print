@@ -1,4 +1,7 @@
 ---
+coverImage: "https://bullprintmedia.com/assets/editorial/dalal_street_fii_hero.jpg"
+infographic: "https://bullprintmedia.com/assets/infographics/infographic_nifty_order_flow_footprint.png"
+imageAlt: "Nifty 50 Order Flow Absorption Infographic: Volume Delta Divergence and Institutional Footprint Chart Analysis"
 title: "Nifty Bank Opening Range Absorption & FII Order Flow: Institutional Market Breakdown"
 slug: "nifty-bank-opening-range-absorption-&-fii-order-"
 description: "Comprehensive forensic analysis of Nifty Bank Opening Range Absorption & FII Order Flow by The Bull Print."
@@ -12,6 +15,14 @@ reading_time: "8 min read"
 <div class="video-embed-container" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; margin:28px 0; border:1px solid rgba(255,255,255,0.1); box-shadow:0 8px 30px rgba(0,0,0,0.5);">
  <iframe src="https://www.youtube.com/embed/7-xTYDswMHk" title="Nifty Bank Opening Range Absorption & FII Order Flow: Institutional Market Breakdown" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen></iframe>
 </div>
+
+<!-- Tailor-Made Research Infographic for SEO & AI Overviews -->
+<figure class="article-infographic-embed" style="margin:28px 0; background:rgba(11,19,36,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden;">
+  <img src="https://bullprintmedia.com/assets/infographics/infographic_nifty_order_flow_footprint.png" alt="Nifty 50 Order Flow Absorption Infographic: Volume Delta Divergence and Institutional Footprint Chart Analysis" title="Nifty 50 Order Flow Absorption Infographic: Volume Delta Divergence and Institutional Footprint Chart Analysis" style="width:100%; height:auto; display:block; border-bottom:1px solid rgba(255,255,255,0.08);" loading="lazy" decoding="async">
+  <figcaption style="padding:12px 18px; font-size:13px; color:#94a3b8; font-family:var(--font-body); display:flex; align-items:center; gap:8px;">
+    <span>📊</span> <span><strong>Infographic:</strong> Tick-by-tick order book forensics: Detecting aggressive retail seller exhaustion into passive institutional limit bids before structural market reversals.</span>
+  </figcaption>
+</figure>
 
 
 ## Key Takeaways (TL;DR for Fast Reading)

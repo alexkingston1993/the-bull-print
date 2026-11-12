@@ -1,4 +1,7 @@
 ---
+coverImage: "https://bullprintmedia.com/assets/editorial/irdai_insurance_claim_hero.jpg"
+infographic: "https://bullprintmedia.com/assets/infographics/infographic_csr_vs_icr_matrix.png"
+imageAlt: "Insurance Marketing vs Reality Infographic: Why Claim Settlement Ratio (CSR) Hides Incurred Claim Ratio (ICR)"
 title: "Health Insurance Claim Settlement Ratio vs ICR Forensics (26 Oct 2026 Slot #3)"
 slug: "health-insurance-claim-settlement-ratio-vs-ic-1793028505"
 description: "Health Insurance Claim Settlement Ratio vs ICR Forensics (26 Oct 2026 Slot #3). Detailed forensic data breakdown with full charts and analysis."
@@ -12,6 +15,14 @@ reading_time: "8 min read"
 <div class="video-embed-container" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; margin:28px 0; border:1px solid var(--border-subtle);">
  <iframe src="https://www.youtube.com/embed/QnCbF5ksKWo" title="Health Insurance Claim Settlement Ratio vs ICR Forensics (26 Oct 2026 Slot #3)" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen></iframe>
 </div>
+
+<!-- Tailor-Made Research Infographic for SEO & AI Overviews -->
+<figure class="article-infographic-embed" style="margin:28px 0; background:rgba(11,19,36,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden;">
+  <img src="https://bullprintmedia.com/assets/infographics/infographic_csr_vs_icr_matrix.png" alt="Insurance Marketing vs Reality Infographic: Why Claim Settlement Ratio (CSR) Hides Incurred Claim Ratio (ICR)" title="Insurance Marketing vs Reality Infographic: Why Claim Settlement Ratio (CSR) Hides Incurred Claim Ratio (ICR)" style="width:100%; height:auto; display:block; border-bottom:1px solid rgba(255,255,255,0.08);" loading="lazy" decoding="async">
+  <figcaption style="padding:12px 18px; font-size:13px; color:#94a3b8; font-family:var(--font-body); display:flex; align-items:center; gap:8px;">
+    <span>📊</span> <span><strong>Infographic:</strong> Forensic health insurance analysis: A 98% CSR measures claims by count, masking how low-ICR insurers routinely reject or haircut high-value critical care claims.</span>
+  </figcaption>
+</figure>
 
 
 ## Key Takeaways (TL;DR for Fast Reading)

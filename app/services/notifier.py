@@ -160,13 +160,13 @@ def send_market_release_alert(
     if youtube_url:
         lines.append(f"🎥 *YouTube Video:* {youtube_url}")
     if published_url:
-        clean_pub_url = published_url if "github.com" not in published_url else "https://the-bull-print.vercel.app"
+        clean_pub_url = published_url if "github.com" not in published_url else "https://bullprintmedia.com"
         lines.append(f"🌐 *Full Research Article:* {clean_pub_url}")
 
     lines.extend([
         "",
         "✅ Generated & Published 100% autonomously in the cloud.",
-        "👉 https://the-bull-print.vercel.app",
+        "👉 https://bullprintmedia.com",
     ])
 
     formatted_message = "\n".join(lines)
@@ -183,11 +183,11 @@ def send_market_release_alert(
     # 3. Try Telegram Bot (Personalized Aria Work-Wife Persona)
     try:
         from app.services.assistant_persona import aria
-        clean_pub = published_url if (published_url and "github.com" not in published_url) else "https://the-bull-print.vercel.app"
+        clean_pub = published_url if (published_url and "github.com" not in published_url) else "https://bullprintmedia.com"
         if aria.notify_success(
             slot_name=slot_name,
             article_title=article_title,
-            youtube_url=youtube_url or "https://the-bull-print.vercel.app",
+            youtube_url=youtube_url or "https://bullprintmedia.com",
             published_url=clean_pub,
             nifty_level=nifty_level,
             sentiment=sentiment,
