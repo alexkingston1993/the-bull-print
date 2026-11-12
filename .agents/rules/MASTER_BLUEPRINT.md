@@ -33,9 +33,14 @@
    - Stabilo-style glowing alert badges placed above headlines (e.g., `'DALAL STREET BOMBSHELL'`, `'OCTOBER SURPRISE'`, `'FED TRAPPED'`).
    - Saturated pill background with dark contrasting text or reverse-contrast alert glow.
 
-4. **Lower-Third Word-Level Animated Captions**:
-   - Positioned in mobile safe zone (`Y = 1480` for vertical Shorts).
-   - Displayed in 3 to 5 word chunks inside semi-transparent pill backdrop with glowing yellow active-word highlight.
+4. **Lower-Third Word-Level Animated Captions (Mandatory for ALL Formats)**:
+   - **Universal Requirement**: Applied to **both YouTube Shorts (9:16) and Standard Master Documentaries (16:9)** without exception. Zero flat un-pillboxed text.
+   - **Chunk Structure**: Displayed in dynamic 3-to-5 word clusters inside a semi-transparent glassmorphic pill backdrop (`rgba(8, 12, 22, 0.88)` with emerald/cyan accent border).
+   - **Active Spoken Highlight**: The currently pronounced word illuminates in vibrant electric gold (`#FACC15`), while inactive words in the cluster remain crisp off-white (`#F1F5F9`).
+   - **Safe-Zone Positioning**:
+     - **Vertical Shorts (9:16)**: $Y = 1480$ (centered in 1080×1920 mobile viewport).
+     - **Standard Landscape Documentaries (16:9)**: $Y = 920$ (centered in 1920×1080 widescreen viewport).
+   - **Camera Motion**: Every beat must feature smooth camera slow dolly/zoom drift (`1.00 -> 1.05`) synchronized across background plates.
 
 ---
 

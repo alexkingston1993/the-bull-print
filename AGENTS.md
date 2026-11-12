@@ -20,4 +20,4 @@
   1. `.agents/rules/MASTER_BLUEPRINT.md`
   2. `DESIGN.md`
   3. `.agents/rules/HIGH_CTR_FRAMES.md`
-- Ensure zero baked-in text in background plates, dynamic 3D kinetic typography (0.22 shear, 16px extrusion shadow, Gaussian bloom $r=28$), and mobile safe-zone alignment ($Y = 1480$ for 9:16 Shorts).
+- Ensure zero baked-in text in background plates, dynamic 3D kinetic typography (0.22 shear, 16px extrusion shadow, Gaussian bloom $r=28$), and lower-third word-level animated captions inside glassmorphic pills with vibrant electric gold (`#FACC15`) active-word highlight across ALL formats (safe zone $Y = 1480$ for 9:16 Shorts, $Y = 920$ for 16:9 Documentaries).

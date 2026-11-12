@@ -109,7 +109,7 @@ A modular, CPU-compatible rendering component for GitHub Actions, Kaggle workers
 1. **Clean Photographic Background Plates (Zero Baked-in Text)**: All AI image generation outputs completely clean 35mm cinematic plates with ZERO baked-in letters, numbers, or artificial watermark artifacts.
 2. **Dynamic 3D Extruded Typography Layer**: Giant stacked 3D perspective typography rendered dynamically via Python engine (forward shear angle `0.22`, 16px extrusion shadow, saturated gold/crimson).
 3. **Tactical Highlighter Badges**: Glowing alert badges placed above headlines (`'DALAL STREET BOMBSHELL'`, `'OCTOBER SURPRISE'`, `'FED TRAPPED'`).
-4. **Lower-Third Animated Word-Level Captions**: Positioned in safe zone (`Y = 1480` for Shorts) in high-contrast pill backdrop.
+4. **Lower-Third Animated Word-Level Captions (Mandatory for ALL Formats)**: Dynamic glassmorphic caption pill (`rgba(8, 12, 22, 0.88)` with emerald/cyan accent border) displaying 3-5 word clusters with the currently spoken active word illuminated in electric gold (`#FACC15`) and inactive words in crisp off-white (`#F1F5F9`). Safe-zone positioning: $Y = 1480$ for 9:16 Shorts, $Y = 920$ for 16:9 Documentaries. Zero flat un-pillboxed text.
 
 ### 6.2 Word-Level Dynamic Captioning Engine
 
