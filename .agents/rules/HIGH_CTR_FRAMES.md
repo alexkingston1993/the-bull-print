@@ -17,4 +17,5 @@
 - **Safe Zone Positioning**:
   - Vertical Shorts (9:16): $Y = 1480$ (centered in 1080×1920 mobile viewport).
   - Landscape Documentaries (16:9): $Y = 920$ (centered in 1920×1080 landscape viewport).
+- **Zero Border Overflow & 2-Line Auto-Wrap**: When cluster length exceeds maximum allowable pill width (max 840px in Shorts, 1480px in Docs), automatically wrap into two balanced lines, expanding the pill height dynamically. No word may ever touch or bleed outside the pill outline.
 

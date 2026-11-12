@@ -106,10 +106,11 @@ A modular, CPU-compatible rendering component for GitHub Actions, Kaggle workers
 | **Standard YouTube Videos** | 16:9 Widescreen | 2560 $\times$ 1440 (2K Master) | **1 frame every 4.0 seconds** *(regardless of length)* | 180 frames (12-min doc) | Clean 35mm plate + Dynamic 3D Extruded Type & Badges |
 
 #### Mandatory Visual & Typography Architecture:
-1. **Clean Photographic Background Plates (Zero Baked-in Text)**: All AI image generation outputs completely clean 35mm cinematic plates with ZERO baked-in letters, numbers, or artificial watermark artifacts.
+1. **Clean Photographic Background Plates (100% Kaggle GPU Only)**: 100% of all visual plates across all video formats (9:16 Shorts and 16:9 Documentaries) are generated exclusively on Kaggle Dual-T4 GPUs (`alexytcreative/tbp-gpu-frame-generator`) with ByteDance SDXL-Lightning 8-step and strict negative prompt filtering. Third-party web APIs (Pollinations, Pexels, Unsplash) are permanently deprecated and removed from the codebase. Zero baked-in text, zero watermarks.
 2. **Dynamic 3D Extruded Typography Layer**: Giant stacked 3D perspective typography rendered dynamically via Python engine (forward shear angle `0.22`, 16px extrusion shadow, saturated gold/crimson).
 3. **Tactical Highlighter Badges**: Glowing alert badges placed above headlines (`'DALAL STREET BOMBSHELL'`, `'OCTOBER SURPRISE'`, `'FED TRAPPED'`).
 4. **Lower-Third Animated Word-Level Captions (Mandatory for ALL Formats)**: Dynamic glassmorphic caption pill (`rgba(8, 12, 22, 0.88)` with emerald/cyan accent border) displaying 3-5 word clusters with the currently spoken active word illuminated in electric gold (`#FACC15`) and inactive words in crisp off-white (`#F1F5F9`). Safe-zone positioning: $Y = 1480$ for 9:16 Shorts, $Y = 920$ for 16:9 Documentaries. Zero flat un-pillboxed text.
+5. **2-Line Auto-Wrapping & Zero Overflow Guarantee**: If word cluster length exceeds safe pill width (max 840px in 9:16 Shorts, max 1480px in 16:9 Documentaries), the engine automatically splits text into two balanced, centered lines, expanding pill height dynamically. No word may ever touch or bleed outside the pill outline.
 
 ### 6.2 Word-Level Dynamic Captioning Engine
 

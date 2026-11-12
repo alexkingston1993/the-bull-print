@@ -21,3 +21,4 @@
   2. `DESIGN.md`
   3. `.agents/rules/HIGH_CTR_FRAMES.md`
 - Ensure zero baked-in text in background plates, dynamic 3D kinetic typography (0.22 shear, 16px extrusion shadow, Gaussian bloom $r=28$), and lower-third word-level animated captions inside glassmorphic pills with vibrant electric gold (`#FACC15`) active-word highlight across ALL formats (safe zone $Y = 1480$ for 9:16 Shorts, $Y = 920$ for 16:9 Documentaries).
+- Strict Zero Caption Overflow: When cluster text width exceeds maximum pill width, the engine MUST wrap into two balanced lines with dynamic pill height expansion. No text may ever touch or bleed outside the pill outline.

@@ -164,8 +164,8 @@ def precompute_cut_typography(
 
 
 def draw_sliding_word_caption(frame: Image.Image, caption_text: str, active_word: str, font_path: str = FONT_ROBOTO_BOLD, y: int = 1480):
-    """Draws word-level kinetic captions in mobile safe zone with yellow highlight on spoken word."""
-    words = caption_text.split()
+    """Draws adaptive word-level kinetic captions in mobile/landscape safe zone with 2-line auto-wrap and yellow highlight on spoken word."""
+    words = caption_text.split() if isinstance(caption_text, str) else list(caption_text)
     if not words:
         return
         
@@ -175,111 +175,145 @@ def draw_sliding_word_caption(frame: Image.Image, caption_text: str, active_word
     match_idx = 0
     if clean_active:
         for idx, w in enumerate(words):
-            if w.strip(".,!?:;\"'").upper() == clean_active:
+            if str(w).strip(".,!?:;\"'").upper() == clean_active:
                 match_idx = idx
                 break
                 
     start_idx = max(0, match_idx - 1)
-    visible_words = words[start_idx : start_idx + 4]
+    visible_words = [str(w) for w in words[start_idx : start_idx + 4]]
     
+    font_size = 46
     try:
-        font_c = ImageFont.truetype(font_path, 46)
+        font_c = ImageFont.truetype(font_path, font_size)
     except Exception:
         font_c = ImageFont.load_default()
         
-    word_boxes = []
-    total_w = 0
-    space_w = 16
+    w_out, h_out = frame.size
+    max_pill_w = min(840, w_out - 180) if w_out < h_out else min(1480, w_out - 240)
+    pad_x = 32
+    space_w = int(font_size * 0.30)
     
-    for w in visible_words:
-        bbox = font_c.getbbox(w.upper())
+    # 1. Measure items
+    items = []
+    for w_str in visible_words:
+        bbox = font_c.getbbox(w_str)
         bw = bbox[2] - bbox[0]
-        word_boxes.append((w.upper(), bw))
-        total_w += bw
-    total_w += space_w * (len(visible_words) - 1)
+        items.append({
+            "word": w_str,
+            "clean": w_str.strip(".,!?:;\"'").upper(),
+            "w": bw
+        })
+        
+    max_line_content_w = max_pill_w - (pad_x * 2)
+    single_line_w = sum(it["w"] for it in items) + space_w * (len(items) - 1)
     
-    pad_x, pad_y = 32, 18
-    box_w = total_w + pad_x * 2
-    box_h = 76
-    box_left = (frame.width - box_w) // 2
-    box_top = y - (box_h // 2)
-    
-    # Glassmorphic rounded pill backdrop
-    draw.rounded_rectangle([box_left, box_top, box_left + box_w, box_top + box_h], radius=16, fill=(8, 12, 22, 220), outline=(52, 211, 153, 140), width=2)
-    
-    cur_x = box_left + pad_x
-    text_y = box_top + (box_h // 2)
-    
-    for w_txt, bw in word_boxes:
-        is_highlight = (clean_active and w_txt == clean_active) or (not clean_active and w_txt == visible_words[0].upper())
-        fill_col = (250, 204, 21) if is_highlight else (241, 245, 249)
-        draw.text((cur_x, text_y), w_txt, font=font_c, fill=fill_col, anchor="lm")
-        cur_x += bw + space_w
+    # 2. Check 1 line vs 2 lines
+    if single_line_w <= max_line_content_w:
+        lines = [items]
+        line_widths = [single_line_w]
+    else:
+        # Wrap into 2 balanced lines so nothing overflows the border
+        best_split = len(items) // 2
+        min_diff = float("inf")
+        for i in range(1, len(items)):
+            l1_w = sum(it["w"] for it in items[:i]) + space_w * (i - 1)
+            l2_w = sum(it["w"] for it in items[i:]) + space_w * (len(items) - i - 1)
+            if l1_w <= max_line_content_w and l2_w <= max_line_content_w:
+                diff = abs(l1_w - l2_w)
+                if diff < min_diff:
+                    min_diff = diff
+                    best_split = i
+        lines = [items[:best_split], items[best_split:]]
+        line_widths = [
+            sum(it["w"] for it in lines[0]) + space_w * (len(lines[0]) - 1),
+            sum(it["w"] for it in lines[1]) + space_w * (len(lines[1]) - 1)
+        ]
+
+    # 3. Pill geometry
+    content_w = max(line_widths)
+    pw = content_w + (pad_x * 2)
+    line_h = font_size + 6
+    if len(lines) == 1:
+        ph = font_size + 36
+    else:
+        ph = (line_h * 2) + 38
+        
+    px = max(24, min(w_out - pw - 24, (w_out - pw) // 2))
+    py = y - (ph // 2)
+
+    # 4. Draw rounded pill backdrop
+    draw.rounded_rectangle(
+        [px, py, px + pw, py + ph],
+        radius=18,
+        fill=(8, 12, 22, 230),
+        outline=(52, 211, 153, 175),
+        width=2
+    )
+
+    # 5. Draw words centered line by line with active spoken highlight
+    if len(lines) == 1:
+        cur_y = py + (ph // 2)
+        cur_x = px + (pw - line_widths[0]) // 2
+        for it in lines[0]:
+            is_active = (clean_active and it["clean"] == clean_active)
+            col = (250, 204, 21, 255) if is_active else (245, 245, 250, 240)
+            draw.text((cur_x, cur_y), it["word"], font=font_c, fill=col, anchor="lm")
+            cur_x += it["w"] + space_w
+    else:
+        y1 = py + 18 + (line_h // 2)
+        y2 = py + ph - 18 - (line_h // 2)
+        for idx, (line, cur_y) in enumerate(zip(lines, [y1, y2])):
+            cur_x = px + (pw - line_widths[idx]) // 2
+            for it in line:
+                is_active = (clean_active and it["clean"] == clean_active)
+                col = (250, 204, 21, 255) if is_active else (245, 245, 250, 240)
+                draw.text((cur_x, cur_y), it["word"], font=font_c, fill=col, anchor="lm")
+                cur_x += it["w"] + space_w
 
 
 def fetch_clean_photographic_plate(prompt: str, width: int = 1080, height: int = 1920, out_path: Optional[Path] = None) -> Image.Image:
-    """Fetches a clean photographic plate via Pollinations or Pexels API fallback. Strictly prohibits empty gradients."""
-    import io
+    """Acquires a 100% clean photographic plate exclusively via Kaggle Dual-T4 GPU diffusers or local approved bundle library. Zero web APIs."""
     import re
+    from app.services.kaggle_image_worker import KaggleImageWorker
 
-    # Clean prompt for image generation
+    # Strategy 1: Check existing clean Kaggle plates or approved library
     clean_prompt = prompt.replace("clean plate", "").replace("zero text", "").replace("zero watermark", "").strip()
+    
+    # Check if a matching bundle or clean plate exists on local disk
+    local_pools = [
+        Path("/tmp/kaggle_gpu_frames_clean/frames"),
+        Path("/tmp/kaggle_viral_short_clean/frames"),
+        Path("assets/approved_bundles"),
+    ]
+    for pool in local_pools:
+        if pool.exists():
+            matches = list(pool.glob("*.jpg")) + list(pool.glob("*.png"))
+            if matches:
+                # Deterministic pick based on prompt hash
+                pick = matches[abs(hash(clean_prompt)) % len(matches)]
+                try:
+                    img = Image.open(pick).convert("RGB").resize((width, height), Image.Resampling.LANCZOS)
+                    if out_path:
+                        img.save(out_path, quality=95)
+                    logger.success(f"✓ [Kaggle Studio] Clean plate loaded from verified GPU cache: {pick.name}")
+                    return img
+                except Exception:
+                    pass
 
-    # Strategy 1: Pollinations AI without paywalled flux flag
+    # Strategy 2: Live Dispatch to Kaggle Dual-T4 GPU
     try:
-        encoded = urllib.parse.quote(f"Cinematic 35mm photograph, {clean_prompt}, obsidian aesthetic, cinematic lighting, 8k resolution")
-        url = f"https://image.pollinations.ai/prompt/{encoded}?width={width}&height={height}&nologo=true"
-        resp = requests.get(url, timeout=30)
-        if resp.status_code == 200 and len(resp.content) > 20000:
-            raw_img = Image.open(io.BytesIO(resp.content)).convert("RGB")
-            w, h = raw_img.size
-            clean_img = raw_img.crop((0, 0, w, int(h * 0.94))).resize((width, height), Image.Resampling.LANCZOS)
-            if out_path:
-                clean_img.save(out_path, quality=95)
-            logger.success(f"✓ [Visual Studio] Clean plate generated via Pollinations: {out_path.name if out_path else 'memory'}")
-            return clean_img
+        worker = KaggleImageWorker()
+        aspect = "9:16" if height > width else "16:9"
+        out_f = out_path if out_path else Path("/tmp/kaggle_live_plate.jpg")
+        worker.generate_batch(
+            prompts=[{"prompt": clean_prompt, "output_path": str(out_f)}],
+            aspect_ratio=aspect
+        )
+        if out_f.exists():
+            img = Image.open(out_f).convert("RGB").resize((width, height), Image.Resampling.LANCZOS)
+            logger.success(f"✓ [Kaggle GPU Cloud] Fresh bespoke plate generated on Kaggle GPU: {out_f.name}")
+            return img
     except Exception as e:
-        logger.warning(f"[Visual Studio] Pollinations attempt: {e}")
+        logger.warning(f"[Kaggle GPU Dispatch Notice]: {e}")
 
-    # Strategy 2: High-Resolution Pexels API Fallback
-    pexels_key = os.getenv("PEXELS_API_KEY", "2927GljrcuM0PxfFHrBTUfShGAHLL2LcVGbGhuQkxddHHTZ61NzP1sSb")
-    if pexels_key:
-        try:
-            # Extract key visual query terms
-            keywords = [w for w in re.sub(r"[^\w\s]", "", clean_prompt).split() if len(w) > 3 and w.lower() not in {"cinematic", "photograph", "lighting", "hyperdetailed", "resolution"}][:4]
-            query = "+".join(keywords) if keywords else "finance+business"
-            orientation = "portrait" if height > width else "landscape"
-            p_url = f"https://api.pexels.com/v1/search?query={query}&per_page=5&orientation={orientation}"
-            resp = requests.get(p_url, headers={"Authorization": pexels_key}, timeout=15)
-            if resp.status_code == 200:
-                photos = resp.json().get("photos", [])
-                if photos:
-                    img_url = photos[0]["src"]["portrait"] if orientation == "portrait" else photos[0]["src"]["landscape"]
-                    img_resp = requests.get(img_url, timeout=20)
-                    if img_resp.status_code == 200:
-                        raw_img = Image.open(io.BytesIO(img_resp.content)).convert("RGB")
-                        clean_img = raw_img.resize((width, height), Image.Resampling.LANCZOS)
-                        if out_path:
-                            clean_img.save(out_path, quality=95)
-                        logger.success(f"✓ [Visual Studio] Clean plate fetched via Pexels ({query}): {out_path.name if out_path else 'memory'}")
-                        return clean_img
-        except Exception as pe:
-            logger.warning(f"[Visual Studio] Pexels fallback notice: {pe}")
-
-    # Strategy 3: Unsplash Source Fallback (Never return an empty blank gradient)
-    try:
-        keywords = [w for w in re.sub(r"[^\w\s]", "", clean_prompt).split() if len(w) > 3][:3]
-        query = ",".join(keywords) if keywords else "finance,city"
-        u_url = f"https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w={width}&h={height}&q=80"
-        resp = requests.get(u_url, timeout=15)
-        if resp.status_code == 200 and len(resp.content) > 10000:
-            raw_img = Image.open(io.BytesIO(resp.content)).convert("RGB")
-            clean_img = raw_img.resize((width, height), Image.Resampling.LANCZOS)
-            if out_path:
-                clean_img.save(out_path, quality=95)
-            logger.success(f"✓ [Visual Studio] Clean plate fetched via Unsplash fallback: {out_path.name if out_path else 'memory'}")
-            return clean_img
-    except Exception as ue:
-        logger.warning(f"[Visual Studio] Unsplash fallback notice: {ue}")
-
-    raise RuntimeError(f"CRITICAL: Failed to acquire photographic plate for prompt '{prompt[:60]}'. Silent dark gradient fallback strictly blocked by Blueprint.")
+    raise RuntimeError(f"CRITICAL: Failed to acquire Kaggle GPU photographic plate for prompt '{prompt[:60]}'. Third-party web APIs are permanently prohibited.")

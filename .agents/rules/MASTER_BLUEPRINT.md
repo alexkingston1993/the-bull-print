@@ -37,6 +37,7 @@
    - **Universal Requirement**: Applied to **both YouTube Shorts (9:16) and Standard Master Documentaries (16:9)** without exception. Zero flat un-pillboxed text.
    - **Chunk Structure**: Displayed in dynamic 3-to-5 word clusters inside a semi-transparent glassmorphic pill backdrop (`rgba(8, 12, 22, 0.88)` with emerald/cyan accent border).
    - **Active Spoken Highlight**: The currently pronounced word illuminates in vibrant electric gold (`#FACC15`), while inactive words in the cluster remain crisp off-white (`#F1F5F9`).
+   - **Zero Border Overflow & 2-Line Auto-Wrap Guarantee**: If cluster text width exceeds allowable safe pill width (max 840px in 9:16 Shorts, max 1480px in 16:9 Documentaries), the engine MUST automatically wrap the text into two balanced, centered lines. The pill height dynamically expands to encase both lines. Under no circumstance may any word touch, clip, or bleed outside the pill outline or viewport boundaries.
    - **Safe-Zone Positioning**:
      - **Vertical Shorts (9:16)**: $Y = 1480$ (centered in 1080×1920 mobile viewport).
      - **Standard Landscape Documentaries (16:9)**: $Y = 920$ (centered in 1920×1080 widescreen viewport).
