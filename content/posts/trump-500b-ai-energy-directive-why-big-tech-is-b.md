@@ -1,8 +1,8 @@
 ---
-title: "Trump 500B AI Energy Directive: Why Big Tech Is Buying Nuclear Plants: Institutional Market Breakdown"
+title: "Trump 500B AI Energy Directive: Why Big Tech Is Buying Nuclear: Institutional Market Breakdown"
 slug: "trump-500b-ai-energy-directive-why-big-tech-is-b"
-description: "Comprehensive forensic analysis of Trump 500B AI Energy Directive: Why Big Tech Is Buying Nuclear Plants by The Bull Print."
-youtube_video_id: "Jj8e7ZsufSQ"
+description: "Comprehensive forensic analysis of Trump 500B AI Energy Directive: Why Big Tech Is Buying Nuclear by The Bull Print."
+youtube_video_id: "40iYyR2ZXYg"
 date: "2026-10-24"
 author: "Alex from Chennai"
 reading_time: "8 min read"
@@ -10,7 +10,7 @@ reading_time: "8 min read"
 
 
 <div class="video-embed-container" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; margin:28px 0; border:1px solid rgba(255,255,255,0.1); box-shadow:0 8px 30px rgba(0,0,0,0.5);">
- <iframe src="https://www.youtube.com/embed/Jj8e7ZsufSQ" title="Trump 500B AI Energy Directive: Why Big Tech Is Buying Nuclear Plants: Institutional Market Breakdown" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen></iframe>
+ <iframe src="https://www.youtube.com/embed/40iYyR2ZXYg" title="Trump 500B AI Energy Directive: Why Big Tech Is Buying Nuclear: Institutional Market Breakdown" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen></iframe>
 </div>
 
 
