@@ -252,6 +252,10 @@ jobs:
             echo "$YT_OAUTH_POOL_JSON" > data/youtube_tokens/oauth_pool.json
             echo "✓ Restored OAuth pool JSON"
           fi
+          if [ -n "$YOUTUBE_TOKEN_SLOT_2" ]; then
+            echo "$YOUTUBE_TOKEN_SLOT_2" | base64 -d > data/youtube_tokens/youtube_token_slot_2.pickle
+            echo "✓ Restored Slot 2 YouTube OAuth token"
+          fi
 
       - name: 🚀 Concatenate, Mix Ducked BGM, Upload to YouTube & Publish Article
         env:

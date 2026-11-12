@@ -2,11 +2,8 @@
 Cloud Parallel Video Engine (scripts/cloud_parallel_video_engine.py)
 Massive Cloud Concurrency Video Production System:
 1. Splits videos into discrete sections according to strict formatting rules:
-   - 36s Short: 6 sections (6s each) -> 6 parallel runners
-   - 60s Short: 6-10 sections (6-10s each) -> 6-10 parallel runners
-   - Standard 3-min Video: 12 sections (15s each) -> 12 parallel runners
-   - Standard 5-min Video: 15-20 sections (15-20s each) -> 15-20 parallel runners
-   - Over 20 sections: Excess staged for Kaggle GPU overflow workers!
+   - Shorts (9:16 Vertical): Exactly 1 frame every 3.0 seconds (e.g. 30s = 10 frames, 36s = 12 frames).
+   - Standard YouTube Videos (16:9 Landscape): Exactly 1 frame every 4.0 seconds, regardless of length (e.g. 12-min = 180 frames).
 2. Renders each segment simultaneously across up to 20 GitHub Actions Ubuntu runners.
 3. Aggregates all segments into a master video with FFmpeg concat demuxer,
    mixes speech audio with sidechain ducked background music from the audio pool,
@@ -33,7 +30,11 @@ from loguru import logger
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR))
 
-from app.services.high_ctr_frame_studio import generate_high_ctr_section_frame
+from app.services.magnates_visual_studio import (
+    precompute_cut_typography,
+    draw_sliding_word_caption,
+    fetch_clean_photographic_plate,
+)
 from app.services.viral_video_engine import VideoFormatConfig, extract_word_timestamps
 
 def _send_telegram(msg: str):
@@ -375,9 +376,12 @@ def prepare_session(
             shutil.copy2(approved_frame, frame_path)
             logger.success(f"🎯 [Session Prep] Using verified user-approved frame: {approved_frame.name}")
         else:
-            generate_high_ctr_section_frame(
-                s, vertical=vertical, width=w_out, height=h_out, output_path=frame_path
+            prompt = (
+                f"Cinematic 35mm photograph, {s.get('headline_top', '')} {s.get('headline_mid', '')}, "
+                f"dark moody obsidian lighting, volumetric amber and gold rays, 8k hyper-detailed, "
+                f"clean plate, zero text, zero watermark"
             )
+            fetch_clean_photographic_plate(prompt=prompt, width=w_out, height=h_out, out_path=frame_path)
         frame_files.append(str(frame_path.relative_to(output_dir)))
         s["frame_file"] = str(frame_path.relative_to(output_dir))
 
@@ -561,6 +565,18 @@ def render_segment(segment_index: int, bundle_dir: Path, output_dir: Optional[Pa
             
         cached_chunk_pills[w_global_idx] = (pill, pw, ph)
 
+    # Precompute 3D Kinetic Headline Typography Layer
+    headline_lines = [l for l in [sec.get("headline_top", ""), sec.get("headline_mid", "")] if l]
+    if not headline_lines:
+        headline_lines = ["MARKET CATALYST", "INSTITUTIONAL FLOW"]
+    badge_label = sec.get("badge_text", "BREAKING [!]")
+    
+    typo_3d = precompute_cut_typography(
+        lines=headline_lines,
+        badge_text=badge_label,
+        max_sheared_w=int(w_out * 0.72)
+    )
+
     # Launch FFmpeg Rawvideo Pipe
     cmd = [
         "ffmpeg", "-y",
@@ -578,7 +594,7 @@ def render_segment(segment_index: int, bundle_dir: Path, output_dir: Optional[Pa
     ]
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=subprocess.DEVNULL)
 
-    # Render frame stream with Ken Burns + 4-Word Kinetic Caption Pop-On
+    # Render frame stream with Ken Burns + 3D Kinetic Slam + Sliding Word Captions
     seg_start = sec["start_sec"]
     for f_idx in range(total_frames):
         t_current = seg_start + (f_idx / fps)
@@ -591,31 +607,45 @@ def render_segment(segment_index: int, bundle_dir: Path, output_dir: Optional[Pa
         cx, cy = (zw - w_out) // 2, (zh - h_out) // 2
         frame_canvas = frame_canvas.crop((cx, cy, cx + w_out, cy + h_out))
 
-        # Check active spoken word in the 4-word cluster
+        # Check active spoken word in the audio stream
         active_w_idx = None
         for idx, w in enumerate(words_list):
             if w["start"] <= t_current <= w["end"]:
                 active_w_idx = idx
                 break
             elif w["start"] > t_current:
-                # Small pause smoothing: keep previous word highlighted if in same chunk
                 if idx > 0 and (t_current - words_list[idx - 1]["end"]) < 0.35:
                     active_w_idx = idx - 1
                 break
 
-        if active_w_idx is not None and active_w_idx in cached_chunk_pills:
-            pill_img, pw, ph = cached_chunk_pills[active_w_idx]
-            paste_x = (w_out - pw) // 2
-            paste_y = rules["caption_y"]
-            frame_canvas.paste(pill_img, (paste_x, paste_y), pill_img)
+        # Elastic Kinetic Slam Pop-In for 3D Typography (1.35x -> 1.0x over first 0.45s)
+        slam_dur = 0.45
+        t_in_sec = t_current - seg_start
+        if t_in_sec < slam_dur:
+            p = t_in_sec / slam_dur
+            scale_slam = 1.0 + (0.35 * (1.0 - math.sin(p * math.pi / 2.0)))
+        else:
+            scale_slam = 1.0
 
-        # Method C Glass HUD callout overlay if active at mid-point
-        if sec["method_c_hud"] and (0.35 * seg_duration <= (t_current - seg_start) <= 0.75 * seg_duration):
-            draw = ImageDraw.Draw(frame_canvas)
-            hud_y = int(h_out * 0.42)
-            draw.rectangle([int(w_out * 0.1), hud_y, int(w_out * 0.9), hud_y + 110], fill=(10, 15, 28))
-            draw.rectangle([int(w_out * 0.1), hud_y, int(w_out * 0.9), hud_y + 110], outline=(250, 204, 21), width=3)
-            draw.text((int(w_out * 0.15), hud_y + 35), f"[!] ORDER FLOW SQUEEZE: {sec['badge_text']}", fill=(255, 255, 255))
+        tw, th = typo_3d["width"], typo_3d["height"]
+        if abs(scale_slam - 1.0) > 0.01:
+            cur_w = max(10, int(tw * scale_slam))
+            cur_h = max(10, int(th * scale_slam))
+            t_img = typo_3d["text_img"].resize((cur_w, cur_h), Image.Resampling.BILINEAR)
+            b_img = typo_3d["bloom_img"].resize((cur_w, cur_h), Image.Resampling.BILINEAR)
+        else:
+            t_img, b_img = typo_3d["text_img"], typo_3d["bloom_img"]
+            cur_w, cur_h = tw, th
+
+        paste_x = (w_out - cur_w) // 2
+        paste_y = int(h_out * 0.18) - (cur_h // 2)
+        frame_canvas.paste(b_img, (paste_x, paste_y), b_img)
+        frame_canvas.paste(t_img, (paste_x, paste_y), t_img)
+
+        # Sliding word-level caption in mobile safe zone (Y = 1480 for 9:16 Shorts, Y = 920 for 16:9 Docs)
+        cap_y = int(h_out * 0.77) if is_short else int(h_out * 0.85)
+        active_word = words_list[active_w_idx]["word"] if active_w_idx is not None else ""
+        draw_sliding_word_caption(frame_canvas, sec.get("script", ""), active_word, y=cap_y)
 
         proc.stdin.write(frame_canvas.tobytes())
 
@@ -724,7 +754,7 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
         description = (
             f"Forensic breakdown of {manifest['topic']}.\n\n"
             f"Read the full verified research report & real-time market data on our portal:\n"
-            f"https://the-bull-print.vercel.app/posts/{manifest['slug']}\n\n"
+            f"https://bullprintmedia.com/posts/{manifest['slug']}\n\n"
             f"#trading #finance #investing #algotrading #wealth"
         )
         tags = ["stock market", "crypto", "trading", "finance", "the bull print"]
@@ -791,7 +821,7 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
         f"📌 *Topic:* `{manifest['topic']}`\n"
         f"⚡ *Runners:* Rendered across `{total_segments}` parallel Ubuntu runners\n"
         f"🎬 *Video Master:* `{final_video_mp4.name}`\n"
-        f"🌐 *Web Article:* `https://the-bull-print.vercel.app/posts/{manifest['slug']}`\n"
+        f"🌐 *Web Article:* `https://bullprintmedia.com/posts/{manifest['slug']}`\n"
         f"▶️ *YouTube:* {yt_url or '_Uploaded Headless_'}\n"
         f"🛡️ *Host Status:* 100% cloud-hosted; local Mac remained completely untouchable."
     )
@@ -836,7 +866,19 @@ def main():
     elif args.mode == "aggregate_and_publish":
         aggregate_and_publish(bundle_dir=args.bundle_dir, segments_dir=args.segments_dir, output_dir=args.output_dir)
     elif args.mode == "dispatch_kaggle_overflow":
-        logger.info("Kaggle overflow worker dispatched for excess segments beyond 20 runners.")
+        from app.services.kaggle_image_worker import KaggleImageWorker
+        manifest_file = args.bundle_dir / "session_manifest.json"
+        with open(manifest_file) as f:
+            manifest = json.load(f)
+        overflow_indices = manifest.get("kaggle_indices", [])
+        if overflow_indices:
+            logger.info(f"⚡ [Kaggle Overflow] Dispatching {len(overflow_indices)} overflow segments to Kaggle GPU...")
+            sections = [manifest["sections"][i] for i in overflow_indices]
+            worker = KaggleImageWorker()
+            if worker.dispatch(sections):
+                worker.poll_and_download(args.bundle_dir / "frames")
+        else:
+            logger.info("No overflow segments allocated to Kaggle.")
 
 
 if __name__ == "__main__":
