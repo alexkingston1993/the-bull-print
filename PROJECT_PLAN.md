@@ -573,7 +573,9 @@ Create a directory `resources/visuals/` with:
 - [ ] Test with 5 hand-picked stocks, manually review output quality
 - [ ] Improve prompts based on review
 
-### Phase 2: Video Production (Weeks 4-6)
+### Phase 2: Video Production (Two-Tier 100% Cloud Architecture)
+- [x] **Kaggle GPU Image Studio (`app/services/kaggle_image_worker.py`)**: 100% of video plates (Shorts 9:16 and Documentaries 16:9) generated on Kaggle Dual-T4 GPUs running ByteDance SDXL-Lightning (8-step) with strict negative prompt filtering. Zero reliance on third-party image web APIs.
+- [x] **GitHub Actions Cloud Compositor (`.github/workflows/parallel_video_matrix.yml`)**: 20-runner parallel matrix handles 3D kinetic typography (0.22 forward shear, 16px extrusion shadow, Gaussian bloom $r=28$), offline ChristopherNeural voice synthesis, faster-whisper word-level safe-zone captions ($Y=1480$), and automated publishing. Zero local compute.
 - [ ] Extend The Bull Print with financial chart generation
 - [ ] Create branded intro/outro templates
 - [ ] Build visual library for financial content

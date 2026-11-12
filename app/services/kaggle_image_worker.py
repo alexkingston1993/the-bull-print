@@ -46,15 +46,20 @@ class KaggleImageWorker:
 
     def create_kernel_script(self, segments: List[Dict[str, Any]]) -> str:
         """Generates the Python worker script to execute inside the Kaggle GPU kernel."""
-        # Sanitize segments to only what's needed: id, prompt, title
-        payload = [
-            {
+        # Sanitize segments: id, prompt, title, aspect ratio & dimensions
+        payload = []
+        for s in segments:
+            is_vertical = str(s.get("aspect_ratio", "")).strip() in ("9:16", "vertical") or s.get("height", 0) > s.get("width", 0)
+            w = s.get("width", 576 if is_vertical else 1024)
+            h = s.get("height", 1024 if is_vertical else 576)
+            payload.append({
                 "id": s["id"],
                 "prompt": s["prompt"],
-                "title": s.get("title", f"Segment {s['id']}")
-            }
-            for s in segments
-        ]
+                "title": s.get("title", f"Segment {s['id']}"),
+                "width": w,
+                "height": h,
+                "aspect_ratio": "9:16" if is_vertical else "16:9"
+            })
         payload_json = json.dumps(payload, indent=2)
 
         script = f'''# Auto-generated Kaggle GPU Frame Generator
@@ -103,14 +108,16 @@ for item in PAYLOAD:
     print(f"--> Rendering Segment {{seg_id:02d}}: {{item['title']}}...", flush=True)
     t0 = time.time()
     
-    # 16:9 ratio (1024 x 576) with CFG & Negative Prompt Enforcement
+    # Dynamic Aspect Ratio (16:9 for Docs or 9:16 for Shorts) with CFG & Negative Prompt Enforcement
+    w_dim = item.get("width", 1024)
+    h_dim = item.get("height", 576)
     image = pipe(
         prompt=prompt,
         negative_prompt=NEGATIVE_PROMPT,
         num_inference_steps=8,
         guidance_scale=1.5,
-        width=1024,
-        height=576
+        width=w_dim,
+        height=h_dim
     ).images[0]
     
     image.save(out_path, quality=95)

@@ -48,7 +48,7 @@
 
 ## 4. Key Performance & UX Safeguards
 
-1. **Zero Local Compute Burden**: Rendering and automated pipeline execution remain 100% offloaded to GitHub Actions cloud runners and Google AI Studio.
+1. **Zero Local Compute Burden (Two-Tier Cloud Matrix)**: All visual plate generation for Shorts (9:16) and Documentaries (16:9) runs on Kaggle Dual-T4 GPU runners (`ByteDance SDXL-Lightning`), while parallel compositing, typography, and publishing execute on GitHub Actions cloud runners. Zero local rendering.
 2. **Accessible Native Scrolling**: No `document.body.style.overflow = "hidden"` traps on article content.
 3. **Responsive Viewport Support**: Fluid breakpoint scaling across mobile (375px+), tablet (768px+), and ultra-wide desktop monitors (1440px+).
 4. **Vercel Edge Clean Routing**: Clean rewrites for `/article/:slug` and `/stocks/:symbol` configured in `vercel.json`.
@@ -57,7 +57,7 @@
 
 ## 5. YouTube Shorts High-CTR Frame Standard (Google Flow AI 2K Benchmark)
 
-To guarantee that any random frame auto-selected by YouTube's algorithm serves as a viral, high-CTR thumbnail, all Shorts are constructed from 10 distinct split-section background frames (switching every 6 seconds):
+To guarantee that any random frame auto-selected by YouTube's algorithm serves as a viral, high-CTR thumbnail, all Shorts are constructed from unique background frames switching exactly every **3.0 seconds** (60s Short = 20 unique frames; 30s Short = 10 unique frames), with zero frame reuse:
 
 - **Master Reference Bank**: `assets/flow_ai_masters/`
   - `crypto_mev/`: 10 pristine 2K master frames (`frame_00.jpg` – `frame_09.jpg`).
@@ -67,8 +67,8 @@ To guarantee that any random frame auto-selected by YouTube's algorithm serves a
   3. **Dual-Tone Floating Neon Badges**: Glass/plasma rounded capsules with neon edge borders (e.g., `MEV TRAP [!]`, `BOT EXPOSED`, `92,000 WALLETS`).
   4. **Volumetric Atmosphere**: Glowing candlestick lightning, depth-of-field blur, dark obsidian vignette, falling embers, and laser grid floor.
 - **Section Pacing**:
-  - 60s Short: 10 sections $\times$ 6.0s = 60s total duration.
-  - 36s Short: 6 sections $\times$ 6.0s = 36s total duration.
+  - 60s Short: 20 unique frames × 3.0s = 60s total duration.
+  - 30s Short: 10 unique frames × 3.0s = 30s total duration.
 
 ### 5.1 Google Flow AI Systematic Prompt Blueprint
 
@@ -140,14 +140,16 @@ A modular, CPU-compatible rendering component for GitHub Actions, Kaggle workers
    - **Rendered Output**: `output/solana_mev_masterclass_3m/solana-mev-masterclass_3m.mp4`
    - **Duration**: **179.52 seconds** (3.0 minutes)
    - **Resolution**: **2560 $\times$ 1440 (2K Master)** @ 25.0 fps, H.264 `yuv420p`, AAC stereo.
-   - **Visual Segments**: **12 bespoke 2560x1440 frames** switching every 15.0 seconds (`output/solana_mev_masterclass_3m/frames/frame_00.jpg` – `frame_11.jpg`).
+   - **Visual Segments**: **45 bespoke 2560x1440 frames** switching every **4.0 seconds** (`output/solana_mev_masterclass_3m/frames/frame_00.jpg` – `frame_44.jpg`).
    - **Captions**: 383 millisecond-accurate dynamic spoken-word pop-on overlays.
 
 ---
 
 ## 7. Multi-Pacing A/B Test Suite & Audio Pool Architecture
 
-To eliminate static hold fatigue on 10s (or 6s/15s/20s) slots without amateurish center crop-zooms or doubling image API costs, each frame slot splits cleanly at the halfway mark (`t = frame_hold / 2.0`).
+> **Legacy A/B test suite (not used for final Shorts):** final Shorts pacing is strictly **1 unique frame every 3.0 seconds**. The slot-splitting experiments below remain archived for optional in-hold variation only and must never override the 3.0s cadence or the zero-reuse mandate.
+
+To eliminate static hold fatigue within long documentary slots without amateurish center crop-zooms or doubling image API costs, each frame slot splits cleanly at the halfway mark (`t = frame_hold / 2.0`).
 
 ### 7.1 The 3 Pacing Test Videos
 

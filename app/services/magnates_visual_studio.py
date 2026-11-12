@@ -220,6 +220,7 @@ def draw_sliding_word_caption(frame: Image.Image, caption_text: str, active_word
 def fetch_clean_photographic_plate(prompt: str, width: int = 1080, height: int = 1920, out_path: Optional[Path] = None) -> Image.Image:
     """Fetches a clean photographic plate via Pollinations or Pexels API fallback. Strictly prohibits empty gradients."""
     import io
+    import re
 
     # Clean prompt for image generation
     clean_prompt = prompt.replace("clean plate", "").replace("zero text", "").replace("zero watermark", "").strip()
