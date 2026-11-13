@@ -21,12 +21,15 @@
   2. `DESIGN.md`
   3. `.agents/rules/HIGH_CTR_FRAMES.md`
   4. `.agents/rules/viral_thumbnail_gold_standard.md`
-- **Blockbuster 3D Kinetic Typography**:
+- **Blockbuster 3D Kinetic Typography (Verified Winner Standard)**:
   - Massive scale: 120-144px font scale, occupying 85-88% of canvas width (`max_sheared_w = 950`).
   - Strict 1 to 2 words per line power hooks (e.g. `$7 TRILLION` / `DEBT TRAP`, `1.3 MILLION` / `TROOPS`, `2 CRORE` / `TRAPPED`, `₹85` / `ALL-TIME LOW`).
-  - Two-tone contrast: Line 1 in electric accent (Saffron Gold `#FFE600`, Molten Red `#FF3737`, Cyber Cyan `#06DCFF`, Mint Emerald `#10EB8C`), Line 2 in Titanium White (`#FFFFFF`).
-  - Deep 24px 3D block extrusion shadow, 5px dark outer rim stroke for 100% background separation, subtle specular highlight, and Gaussian bloom $r=28$ with forward italic shear 0.22.
-  - Angled tactical distress badge tilted at -8° with 3px glowing border and drop shadow.
+  - Two-tone contrast: Line 1 in electric accent (Saffron Gold `#FFE600`, Molten Fire `#FF3232`, Cyber Cyan `#06DCFF`, Mint Emerald `#10EB8C`, Hazard Orange `#FF8C14`), Line 2 in Titanium White (`#FFFFFF`).
+  - Unified anchor geometry (`anchor="mt"` at `cx, line_y`) strictly preventing ghosting or duplicate text passes.
+  - Clean 1.22x line spacing ($175\text{ px}$ at $144\text{ px}$ font) providing a crisp $16\text{ px}$ dark separation gap between Line 1's extrusion block and Line 2. Zero inter-line collision.
+  - Deep 22px 3D block extrusion shadow, 7px solid black outer armor rim stroke for 100% background separation, and Gaussian bloom $r=28$ with forward italic shear 0.22.
+  - Angled tactical distress badge tilted at -8° with 40px vertical clearance above Line 1, 4px glowing golden border, and drop shadow.
+  - Atmospheric dark vignette grading (top 38% for title separation, bottom 28% for captions).
 - **Concrete Physical Metaphors Only (Zero Boardrooms Mandate)**:
   - Visual prompts must NEVER generate corporate offices, suits around conference tables, or generic laptops.
   - Every visual plate must depict tangible physical metaphors: split cargo ships with chains, open bank vaults sucking currency vortices, 1kg gold bars on dark marble with laser charts, aerospace fighter jets, passports in chains, robotic arms assembling microchips with sparks, or distressed traders in rain with glowing phones.

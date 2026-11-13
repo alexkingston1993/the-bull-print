@@ -85,10 +85,20 @@ The cloud video path is approximately:
 1. **Resolve request/slot.** Workflow inputs or a scheduled slot provide the vertical, topic/notes, slot number, and Shorts count.
 2. **Initialize run tracking.** The orchestrator creates an editable Telegram status card and starts [`app/services/telemetry_bridge.py`](app/services/telemetry_bridge.py) for progress and control synchronization.
 3. **Select a topic.** It may load performance recommendations from [`app/services/viral_growth_agent.py`](app/services/viral_growth_agent.py) and harvest search intent through [`app/services/seo_topic_harvester.py`](app/services/seo_topic_harvester.py), falling back to configured slot topics.
-4. **Gather visuals and generate content.** It captures charts/infographics, then requests a structured script, metadata, Shorts, and article payload from Gemini/AI Studio.
+4. **Gather visuals and generate content.** It captures charts/infographics, then requests a structured script, metadata, Shorts, and article payload from Gemini/AI Studio. For visual plate generation, Gemini formulates rich, tangible physical visual metaphors (bank vaults, cargo ships, 1kg gold bars, fighter jets, passports in chains, robotic assembly lines; corporate boardrooms, suits, and desks are strictly prohibited).
 5. **Audit and revise.** Content passes through virality, compliance, and authenticity checks, notably [`app/services/viral_script_doctor.py`](app/services/viral_script_doctor.py), [`app/services/compliance_gate.py`](app/services/compliance_gate.py), and [`app/services/content_authenticity_engine.py`](app/services/content_authenticity_engine.py). Some checks regenerate or sanitize rejected content; an authenticity failure can halt the run. These are software gates, not a legal or regulatory certification.
-6. **Create thumbnails.** [`thumbnail_generator.py`](thumbnail_generator.py) composes marketing images. The orchestrator can wait for operator approval, regeneration, or halt commands before rendering.
-7. **Render and upload.** By default, the workflow stages the payload and assets in `kaggle_stage/`, updates the Kaggle dataset, and launches the kernel described by [`kaggle_kernel/kernel-metadata.json`](kaggle_kernel/kernel-metadata.json). [`kaggle_kernel/kaggle_worker.py`](kaggle_kernel/kaggle_worker.py) performs remote audio/subtitle/video work and YouTube upload. If Kaggle is bypassed, unavailable, or fails, the orchestrator can use [`app/services/local_cpu_renderer.py`](app/services/local_cpu_renderer.py) and [`app/services/short_renderer.py`](app/services/short_renderer.py) on the GitHub Actions runner.
+6. **Create thumbnails & blockbuster kinetic typography.** [`thumbnail_generator.py`](thumbnail_generator.py) and [`app/services/magnates_visual_studio.py`](app/services/magnates_visual_studio.py) precompute marketing images and kinetic typography layers:
+   - Massive 120–144px font scale (`max_sheared_w = 950`), strictly 1–2 words per line.
+   - Two-tone color contrast (Hero electric accent + Titanium White).
+   - Unified anchor geometry (`anchor="mt"` at `cx, line_y`) preventing duplicate ghosting.
+   - 1.22x line spacing ($175\text{ px}$ at $144\text{ px}$ font) providing a clean $16\text{ px}$ dark separation gap between lines.
+   - 22px deep 3D block extrusion with 7px solid black outer armor stroke.
+   - Angled ($-8^\circ$) high-friction tactical distress badge with 40px vertical clearance.
+   - Top 38% and bottom 28% atmospheric dark vignettes.
+   - Lower-third animated word-level captions inside glassmorphic pills with vibrant electric gold (`#FACC15`) active highlight and 2-line auto-wrapping.
+7. **Render and upload (100% Cloud Execution).** 
+   - Tier 1 (Kaggle GPU Engine): Generates 100% of clean 35mm photographic plates (zero baked-in text) via ByteDance SDXL-Lightning on Dual-T4 GPUs.
+   - Tier 2 (GitHub Actions 20-Runner Cloud Matrix): Composites segments in parallel, ducks ambient BGM audio (-18 LUFS), aligns millisecond-accurate word captions, concatenates the master video, and publishes directly to YouTube. Zero local rendering.
 8. **Publish and distribute.** The orchestrator generates an article through [`engine.py`](engine.py), updates publication metadata through [`publisher.py`](publisher.py), and performs the configured indexing and social/YouTube follow-up actions. The workflow commits generated content/assets to GitHub; a repository update triggers the Vercel site deployment.
 
 The Kaggle dataset is a **file handoff for a render job**, not persistent application storage. GitHub Actions coordinates the transfer and execution; the worker runs in Kaggle's environment and uploads through the YouTube Data API.
