@@ -885,7 +885,7 @@ def main():
     parser = argparse.ArgumentParser(description="Cloud Parallel Video Engine")
     parser.add_argument("--mode", choices=["prepare", "render_segment", "aggregate_and_publish", "dispatch_kaggle_overflow"], required=True)
     parser.add_argument("--topic", default=None, help="Specific financial topic. Required for prepare mode.")
-    parser.add_argument("--vertical", default="stock_market", choices=["stock_market", "crypto", "insurance"])
+    parser.add_argument("--vertical", default="stock_market", help="Market vertical (e.g. stock_market, crypto, commodities, forex, banking, insurance)")
     parser.add_argument("--duration-sec", type=int, default=60)
     parser.add_argument("--duration-min", type=int, default=3)
     parser.add_argument("--is-short", action="store_true", default=True)
