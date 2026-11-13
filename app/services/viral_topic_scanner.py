@@ -100,12 +100,10 @@ class ViralTopicScanner:
             import time
             from google import genai
             
-            # Models to cascade through with automatic retry
+            # Models to cascade through with automatic retry (gemini-flash-lite-latest is verified working on v1alpha)
             candidate_models = [
-                "gemini-2.5-flash",
-                "gemini-3.8-flash",
-                "gemini-2.0-flash",
                 "gemini-flash-lite-latest",
+                "gemini-3.8-flash",
                 "gemini-2.5-pro",
                 "gemini-1.5-pro"
             ]

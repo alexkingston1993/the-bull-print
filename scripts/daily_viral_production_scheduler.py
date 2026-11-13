@@ -48,7 +48,9 @@ def run_daily_production(dry_run: bool = False):
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     logger.info(f"Saved production manifest: {manifest_path}")
 
-    gh_bin = shutil.which("gh") or "/usr/local/bin/gh"
+    # Locate genuine GitHub CLI binary (avoid node/bun npm "gh" packages)
+    candidates = ["/usr/local/bin/gh", "/usr/bin/gh", "/opt/homebrew/bin/gh"]
+    gh_bin = next((c for c in candidates if Path(c).exists()), shutil.which("gh") or "gh")
 
     # Stage 2: Dispatch 10 Shorts to Cloud Matrix
     for idx, s in enumerate(shorts, 1):
@@ -66,8 +68,8 @@ def run_daily_production(dry_run: bool = False):
                 "-f", "privacy_status=public"
             ]
             try:
-                subprocess.run(cmd, check=True)
-                logger.success(f"✓ Dispatched Short {idx}: {topic[:40]}...")
+                res = subprocess.run(cmd, check=True, stdin=subprocess.DEVNULL, capture_output=True, text=True)
+                logger.success(f"✓ Dispatched Short {idx}: {topic[:40]}... ({res.stdout.strip()})")
             except Exception as e:
                 logger.error(f"Failed to dispatch Short {idx}: {e}")
             time.sleep(2)
@@ -88,8 +90,8 @@ def run_daily_production(dry_run: bool = False):
                 "-f", "privacy_status=public"
             ]
             try:
-                subprocess.run(cmd, check=True)
-                logger.success(f"✓ Dispatched Documentary {idx}: {topic[:40]}...")
+                res = subprocess.run(cmd, check=True, stdin=subprocess.DEVNULL, capture_output=True, text=True)
+                logger.success(f"✓ Dispatched Documentary {idx}: {topic[:40]}... ({res.stdout.strip()})")
             except Exception as e:
                 logger.error(f"Failed to dispatch Doc {idx}: {e}")
             time.sleep(2)
