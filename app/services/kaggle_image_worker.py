@@ -165,6 +165,32 @@ print("[KaggleWorker] All clean photographic frames generated successfully!", fl
         logger.info("Kernel pushed successfully! Waiting for Kaggle GPU execution...")
         return True
 
+    def generate_batch(self, prompts: List[Dict[str, Any]], aspect_ratio: str = "9:16") -> bool:
+        """Helper to dispatch a batch of prompts and poll for completion."""
+        segments = []
+        is_vert = aspect_ratio in ("9:16", "vertical")
+        for idx, p in enumerate(prompts, 1):
+            segments.append({
+                "id": idx,
+                "prompt": p.get("prompt", ""),
+                "title": f"Frame {idx}",
+                "aspect_ratio": "9:16" if is_vert else "16:9",
+                "width": 576 if is_vert else 1024,
+                "height": 1024 if is_vert else 576,
+            })
+        if self.dispatch(segments):
+            out_dest = Path("/tmp/kaggle_downloaded_frames")
+            out_dest.mkdir(parents=True, exist_ok=True)
+            if self.poll_and_download(out_dest, timeout_sec=300):
+                for idx, p in enumerate(prompts, 1):
+                    downloaded = out_dest / f"segment_{idx:02d}.jpg"
+                    if not downloaded.exists():
+                        downloaded = out_dest / f"segment_{idx}.jpg"
+                    if downloaded.exists() and "output_path" in p:
+                        shutil.copy2(downloaded, p["output_path"])
+                return True
+        return False
+
     def poll_and_download(self, dest_dir: Path, timeout_sec: int = 600) -> bool:
         """Polls Kaggle status until complete, then downloads the rendered frames."""
         kaggle_bin = shutil.which("kaggle") or str(BASE_DIR / ".venv" / "bin" / "kaggle")

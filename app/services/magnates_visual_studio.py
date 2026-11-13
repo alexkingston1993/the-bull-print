@@ -283,11 +283,12 @@ def fetch_clean_photographic_plate(prompt: str, width: int = 1080, height: int =
     local_pools = [
         Path("/tmp/kaggle_gpu_frames_clean/frames"),
         Path("/tmp/kaggle_viral_short_clean/frames"),
+        BASE_DIR / "assets" / "approved_bundles",
         Path("assets/approved_bundles"),
     ]
     for pool in local_pools:
         if pool.exists():
-            matches = list(pool.glob("*.jpg")) + list(pool.glob("*.png"))
+            matches = list(pool.rglob("*.jpg")) + list(pool.rglob("*.png"))
             if matches:
                 # Deterministic pick based on prompt hash
                 pick = matches[abs(hash(clean_prompt)) % len(matches)]
