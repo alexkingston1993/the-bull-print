@@ -208,104 +208,62 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
               ]
             }}
             """
-            for model_name in ["gemini-flash-lite-latest", "gemini-3.8-flash", "gemini-2.5-pro"]:
-                try:
-                    resp = client.models.generate_content(model=model_name, contents=prompt)
-                    raw_text = resp.text.strip()
-                    if "```json" in raw_text:
-                        raw_text = raw_text.split("```json")[1].split("```")[0].strip()
-                    elif "```" in raw_text:
-                        raw_text = raw_text.split("```")[1].split("```")[0].strip()
-                    data = json.loads(raw_text)
-                    g_secs = data.get("sections", [])
-                    if len(g_secs) == num_sections:
-                        gemini_sections = g_secs
-                        logger.success(f"✅ [Script Studio] Successfully generated {num_sections} investigative sections via {model_name}")
-                        break
-                except Exception as m_err:
-                    logger.debug(f"Gemini {model_name} attempt notice: {m_err}")
+            models_to_try = [
+                "gemini-flash-lite-latest",
+                "gemini-3.8-flash",
+                "gemini-2.5-pro",
+                "gemini-2.5-flash",
+            ]
+            for attempt in range(2):
+                for model_name in models_to_try:
+                    try:
+                        resp = client.models.generate_content(model=model_name, contents=prompt)
+                        raw_text = resp.text.strip()
+                        if "```json" in raw_text:
+                            raw_text = raw_text.split("```json")[1].split("```")[0].strip()
+                        elif "```" in raw_text:
+                            raw_text = raw_text.split("```")[1].split("```")[0].strip()
+                        data = json.loads(raw_text)
+                        g_secs = data.get("sections", [])
+                        if len(g_secs) >= num_sections:
+                            gemini_sections = g_secs[:num_sections]
+                            logger.success(f"✅ [Script Studio] Successfully generated {num_sections} custom investigative sections via {model_name}")
+                            break
+                    except Exception as m_err:
+                        logger.debug(f"Gemini {model_name} attempt {attempt+1} notice: {m_err}")
+                if gemini_sections:
+                    break
+                time.sleep(2)
         except Exception as e:
-            logger.warning(f"[Script Studio] Gemini generation fallback: {e}")
+            logger.error(f"[Script Studio] Gemini API error: {e}")
 
-    # Fallback narrative scripts if Gemini is unavailable (Human storytelling & investigative stakes)
-    stock_scripts = [
-        f"Right as millions of retail traders were sleeping, a massive trap was sprung around {topic_clean}.",
-        "Foreign institutional desks offloaded billions in risk, leaving everyday salary earners to take the hit.",
-        "Here is the smoking gun: while the headlines told the public to buy the dip, insiders were cashing out completely.",
-        "The banks don't lose money in market crashes. They transfer their losses directly into your savings account.",
-        "Every single time this pattern appears, everyday retail investors become the exit liquidity for Wall Street.",
-        "Before you put another rupee into this market, check your portfolio statement tonight to see if you are caught in the blast zone.",
-    ]
-    crypto_scripts = [
-        f"Behind the hype of {topic_clean}, a multi-million dollar liquidity heist just unfolded in plain sight.",
-        "While everyday crypto buyers were celebrating the pump, hidden whale wallets were dumping on everyone.",
-        "On-chain data reveals the brutal truth: automated bots siphoned user funds before the exchange could react.",
-        "The founders walked away with tens of millions, while retail holders were left with frozen balances.",
-        "This is not bad luck—it was an engineered trap designed to take your life savings.",
-        "If you hold your coins on an exchange tonight, take them off immediately before the doors lock for good.",
-    ]
-    insurance_scripts = [
-        f"There is a devastating secret clause buried on page forty-seven regarding {topic_clean}.",
-        "When an emergency hits your family, this single fine-print trick legally slashes your insurance claim by forty percent.",
-        "Hospital bills arrive in lakhs, and the insurance company denies your payout because of a two-word definition.",
-        "They took your monthly premiums for ten straight years without a word, but the moment you need care, they vanish.",
-        "Thousands of families across the country have lost their entire life savings to this exact trap.",
-        "Audit your health insurance policy tonight, or your family will end up paying the price out of pocket.",
-    ]
+    # ZERO HARDCODED FALLBACK MANDATE: Every single beat must be 100% custom-generated for the topic
+    if not gemini_sections or len(gemini_sections) < num_sections:
+        raise RuntimeError(
+            f"⛔ CRITICAL: Failed to generate custom investigative narrative script for topic '{topic_clean}'. "
+            f"Acquired {len(gemini_sections) if gemini_sections else 0}/{num_sections} beats. "
+            f"Hardcoded scripts, generic modulo fallbacks, and canned text are PERMANENTLY PROHIBITED."
+        )
 
     for i in range(num_sections):
         start_t = round(i * interval, 2)
         end_t = round((i + 1) * interval, 2)
         has_hud = (i in (1, 3, 5))
 
-        if gemini_sections and i < len(gemini_sections):
-            g = gemini_sections[i]
-            top = str(g.get("headline_top", lead_word))[:24]
-            mid = str(g.get("headline_mid", second_word))[:24]
-            badge = str(g.get("badge_text", "MARKET SHOCK"))[:20]
-            color_theme = str(g.get("color_theme", "gold")).lower()
-            visual_prompt = str(g.get("visual_prompt", "")).strip()
-            script_text = str(g.get("script", "")).strip()
-        else:
-            color_theme = "gold" if i % 2 == 0 else "fire"
-            visual_prompt = ""
-            if vertical == "stock_market":
-                script_text = stock_scripts[i % len(stock_scripts)]
-            elif vertical == "crypto":
-                script_text = crypto_scripts[i % len(crypto_scripts)]
-            else:
-                script_text = insurance_scripts[i % len(insurance_scripts)]
+        g = gemini_sections[i]
+        top = str(g.get("headline_top", lead_word))[:24]
+        mid = str(g.get("headline_mid", second_word))[:24]
+        badge = str(g.get("badge_text", "MARKET SHOCK"))[:20]
+        color_theme = str(g.get("color_theme", "gold")).lower()
+        visual_prompt = str(g.get("visual_prompt", "")).strip()
+        script_text = str(g.get("script", "")).strip()
 
-            if i == 0:
-                top = f"{lead_word}"
-                mid = f"{second_word}"
-                badge = "MARKET ALERT ⚠️"
-                visual_prompt = f"A colossal golden bank vault door swinging wide open on Dalal Street as rivers of digital cash are sucked into a dark vortex, cinematic 35mm photograph, volumetric amber and gold rays, 8k, clean plate"
-            elif i == 1:
-                top = "LIQUIDITY"
-                mid = "CASCADE" if vertical != "insurance" else "REJECTION"
-                badge = "ALGO TRACKER" if vertical != "insurance" else "LEGAL AUDIT"
-                visual_prompt = f"A massive 3D golden bull monument on cracked dark obsidian floor with fluctuating laser candlestick charts, volumetric red and cyan rim lighting, 8k render"
-            elif i == 2:
-                top = "ORDER FLOW"
-                mid = "ABSORPTION" if vertical != "insurance" else "FINE PRINT"
-                badge = "DATA EVIDENCE [!]"
-                visual_prompt = f"Two giant robotic arms assembling microchips with flying electrical sparks on an automated assembly line, dark high-tech industrial aesthetic, 8k render"
-            elif i == 3:
-                top = "RETAIL"
-                mid = "SQUEEZE"
-                badge = "RISK WARNING"
-                visual_prompt = f"A distressed stock trader clutching head in agony in front of a giant glowing smartphone showing crashing red candlestick charts, rain slicked city, 8k"
-            elif i == 4:
-                top = "SMART MONEY"
-                mid = "EXIT"
-                badge = "WHALE DUMP"
-                visual_prompt = f"A colossal cargo container ship cutting through stormy dark ocean waves with heavy glowing red chains, dark moody lighting, 8k"
-            else:
-                top = f"PHASE {i + 1}"
-                mid = "VERIFIED"
-                badge = "FORENSIC AUDIT"
-                visual_prompt = f"A 1-kilogram 999.9 pure gold bar sitting on an ornate dark marble pedestal surrounded by fluctuating laser candlesticks, 8k render"
+        if not visual_prompt or len(visual_prompt) < 15:
+            visual_prompt = (
+                f"Cinematic 35mm photograph, visual metaphor of {top} {mid}, "
+                f"massive concrete physical monuments, bank vaults, cargo ships, dark moody obsidian lighting, "
+                f"volumetric amber and gold rays, 8k hyper-detailed, clean plate, zero text, zero watermark"
+            )
 
         sections.append({
             "section_index": i,
