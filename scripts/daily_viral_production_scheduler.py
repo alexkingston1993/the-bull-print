@@ -58,7 +58,7 @@ def run_daily_production(dry_run: bool = False):
         if not dry_run:
             cmd = [
                 gh_bin, "workflow", "run",
-                "20-Runner Parallel Cloud Video Matrix (The Bull Print)",
+                "parallel_video_matrix.yml",
                 "-f", f"topic={topic}",
                 "-f", f"vertical={vertical}",
                 "-f", "shorts_only=true",
@@ -79,8 +79,8 @@ def run_daily_production(dry_run: bool = False):
         print(f"\n[Doc {idx:02d}/02] 🎬 Dispatching Master Documentary: {topic}")
         if not dry_run:
             cmd = [
-                "/usr/local/bin/gh", "workflow", "run",
-                "20-Runner Parallel Cloud Video Matrix (The Bull Print)",
+                gh_bin, "workflow", "run",
+                "parallel_video_matrix.yml",
                 "-f", f"topic={topic}",
                 "-f", f"vertical={vertical}",
                 "-f", "shorts_only=false",
