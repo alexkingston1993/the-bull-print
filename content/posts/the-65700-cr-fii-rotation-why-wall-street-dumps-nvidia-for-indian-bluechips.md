@@ -2,7 +2,7 @@
 title: "Why Wall Street Dumped Nvidia to Flood India With ₹65,700 Cr: The Great FII Rotation Breakdown"
 slug: "the-65700-cr-fii-rotation-why-wall-street-dumps-nvidia-for-indian-bluechips"
 description: "Forensic analysis of the ₹65,700 Cr institutional rotation: why Wall Street algorithms dumped overstretched semiconductor equities like Nvidia to allocate into high-ROIC Indian banking and energy monopolies."
-youtube_video_id: "IDoMBoAgVaA"
+youtube_video_id: "CMrPqqXcLWQ"
 date: "2026-11-13"
 author: "Alex from Chennai"
 reading_time: "9 min read"
@@ -25,7 +25,7 @@ reading_time: "9 min read"
 
   <!-- 2. Video Embed Container -->
   <div class="video-embed-container" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; margin:28px 0; border:1px solid rgba(255,255,255,0.1); box-shadow:0 8px 30px rgba(0,0,0,0.5);">
-    <iframe id="article-yt-player" src="https://www.youtube.com/embed/IDoMBoAgVaA" title="Why Wall Street Dumped Nvidia to Flood India With ₹65,700 Cr" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen></iframe>
+    <iframe id="article-yt-player" src="https://www.youtube.com/embed/CMrPqqXcLWQ" title="Why Wall Street Dumped Nvidia to Flood India With ₹65,700 Cr" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen></iframe>
   </div>
 
   <!-- 3. Author E-E-A-T Byline Box -->
