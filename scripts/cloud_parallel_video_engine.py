@@ -24,7 +24,7 @@ import shutil
 import re
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 from loguru import logger
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -624,6 +624,19 @@ def render_segment(segment_index: int, bundle_dir: Path, output_dir: Optional[Pa
     ]
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=subprocess.DEVNULL)
 
+    # Precompute atmospheric vignette gradients (top 38% for title separation, bottom 28% for captions)
+    vignette_top = Image.new("RGBA", (w_out, int(h_out * 0.38)), (0, 0, 0, 0))
+    d_vt = ImageDraw.Draw(vignette_top)
+    for vy in range(vignette_top.height):
+        valpha = int(185 * (1.0 - (vy / vignette_top.height) ** 1.3))
+        d_vt.line([(0, vy), (w_out, vy)], fill=(5, 8, 15, valpha))
+
+    vignette_bot = Image.new("RGBA", (w_out, int(h_out * 0.28)), (0, 0, 0, 0))
+    d_vb = ImageDraw.Draw(vignette_bot)
+    for vy in range(vignette_bot.height):
+        valpha = int(190 * ((vy / vignette_bot.height) ** 1.2))
+        d_vb.line([(0, vy), (w_out, vy)], fill=(5, 8, 15, valpha))
+
     # Render frame stream with Ken Burns + 3D Kinetic Slam + Sliding Word Captions
     seg_start = sec["start_sec"]
     for f_idx in range(total_frames):
@@ -636,6 +649,12 @@ def render_segment(segment_index: int, bundle_dir: Path, output_dir: Optional[Pa
         frame_canvas = base_img.resize((zw, zh), Image.Resampling.BILINEAR)
         cx, cy = (zw - w_out) // 2, (zh - h_out) // 2
         frame_canvas = frame_canvas.crop((cx, cy, cx + w_out, cy + h_out))
+
+        # Atmospheric grading & dark separation vignette
+        frame_canvas = ImageEnhance.Contrast(frame_canvas).enhance(1.15)
+        frame_canvas = ImageEnhance.Color(frame_canvas).enhance(1.18)
+        frame_canvas.paste(vignette_top, (0, 0), vignette_top)
+        frame_canvas.paste(vignette_bot, (0, h_out - vignette_bot.height), vignette_bot)
 
         # Check active spoken word in the audio stream
         active_w_idx = None
