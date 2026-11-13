@@ -59,3 +59,4 @@ jobs:
           YT_OAUTH_POOL_JSON: ${{ secrets.YT_OAUTH_POOL_JSON }}
         run: |
           python scripts/daily_production_supervisor.py
+

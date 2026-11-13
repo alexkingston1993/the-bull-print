@@ -47,26 +47,34 @@ class ViralTopicScanner:
         date_str = now.strftime("%Y-%m-%d %H:%M UTC")
 
         prompt = f"""
-        You are the Chief Intelligence Officer & Lead Financial Journalist for 'The Bull Print' media network.
+        You are the Chief Investigative Journalist & Media Director for 'The Bull Print' (in the style of Coffeezilla, James Jani, and MagnatesMedia).
         Current Timestamp: {date_str}.
         
         TASK:
-        Identify the most viral, high-velocity financial events and institutional shifts from the PAST 24 HOURS (today and yesterday).
-        Target Audiences: Everyday retail investors in India, US, UK, and global financial hubs.
+        Identify the 10 most viral, high-velocity financial events and institutional scandals from the PAST 24 HOURS (today and yesterday).
+        Target Audiences: Everyday retail investors, salaried professionals, and traders who fear losing their savings to institutional traps.
         
-        REQUIREMENTS:
-        1. Produce exactly 10 VIRAL SHORTS TOPICS (60-second 9:16 vertical focus):
-           - Must cover recent breaking news: FII/DII liquidity moves, big tech earnings/contractions, SEBI/regulatory alerts, commodities/gold moves, currency/forex, or AI datacenter energy shocks.
-           - High CTR hook text and tactical alert badge.
-        
-        2. Produce exactly 2 MASTER DOCUMENTARY TOPICS (12-minute 16:9 widescreen focus):
-           - Deep investigative forensic topics with systemic implications (e.g. multi-billion dollar capital rotations, corporate debt spirals, shadow banking, exchange arbitrage).
-           - 5-act narrative arc outline.
-        
-        3. COMPLIANCE MANDATE (SEBI & GLOBAL REGULATORY SAFE HARBOR):
+        CRITICAL NARRATIVE DIRECTIVES (FOR ZERO-SWIPE-AWAY RETENTION):
+        1. BAN BORING CORPORATE PRESS RELEASES:
+           - NEVER generate headlines like "SEBI Clears Mega IPO Rush" or "Rupee Stands Firm at 93.93". These get single-digit views.
+           - Every headline MUST promise a scandal, a trap, a secret, or an urgent warning.
+           - Examples of WINNER Headlines:
+             * "The ₹4,800 Cr Trap: How Foreign Desks Are Dumping on Retail"
+             * "Why Wall Street Quietly Dumped Nvidia While Telling You to Buy"
+             * "The Secret Bank Rule That Liquidates Your Savings Account"
+             * "2 Crore Traders Trapped: Inside the Sudden F&O Margin Crash"
+
+        2. PUNCHY 1-2 WORD BLOCKBUSTER HOOKS & BADGES:
+           - 'hook_text': Exactly 1 to 2 words per line (e.g. '$7 TRILLION / DEBT TRAP', '2 CRORE / TRAPPED', '₹85 / RECORD LOW', '1.3 MILLION / TROOPS').
+           - 'badge': High-friction urgency stamps (e.g. 'MARKET SHOCK', 'TIME-BOMB', 'CRACKDOWN', 'OVERPRICED', 'TOP SECRET', 'WARNING').
+
+        3. PERSONALIZE THE THREAT:
+           - The core thesis must state clearly: Who is profiting? Who is getting destroyed? What hidden trap must the viewer check tonight?
+
+        4. COMPLIANCE MANDATE (SEBI & GLOBAL REGULATORY SAFE HARBOR):
            - ZERO stock recommendations (no 'buy', 'sell', 'target price', 'multibagger').
            - Strictly educational, forensic, and investigative.
-           - Every topic must protect family savings and expose market traps.
+           - Every topic must expose traps to protect everyday retail families.
         
         OUTPUT FORMAT:
         Respond ONLY with a valid JSON object matching this exact structure:
@@ -78,7 +86,7 @@ class ViralTopicScanner:
               "title": "Headline (Max 65 chars)",
               "badge": "ALERT BADGE (Max 16 chars)",
               "hook_text": "HOOK PHRASE (Max 22 chars)",
-              "core_thesis": "Why this broke in the past 24 hours and why retail must know.",
+              "core_thesis": "Why this broke in the past 24 hours, who is the victim, and what trap it exposes.",
               "vertical": "stock_market"
             }}
           ],
@@ -88,7 +96,7 @@ class ViralTopicScanner:
               "title": "Documentary Headline (Max 75 chars)",
               "badge": "INVESTIGATION BADGE",
               "hook_text": "MASTER TITLE HOOK",
-              "investigative_thesis": "Deep investigative summary covering past 24h developments.",
+              "investigative_thesis": "Deep investigative summary exposing the systemic institutional trap.",
               "vertical": "stock_market"
             }}
           ]

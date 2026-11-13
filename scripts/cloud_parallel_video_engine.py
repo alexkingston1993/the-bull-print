@@ -158,31 +158,40 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
             from google import genai
             client = genai.Client(api_key=api_key, http_options={"api_version": "v1alpha"})
             prompt = f"""
-            You are the lead institutional investigative financial documentary director and headline designer for 'The Bull Print'.
-            Narrator Persona: Christopher (authoritative, forensic, sharp, blockbuster documentary tone).
+            You are an investigative financial journalist and thriller documentary director (in the style of Coffeezilla, James Jani, and MagnatesMedia).
+            Narrator Persona: Christopher (dark, authoritative, forensic, breathless, exposing high-stakes financial crimes and institutional traps).
             Topic: {topic_clean}
             Vertical: {vertical}
-            Format: {'60-Second Short (9:16 Vertical)' if is_short else f'{int(duration_sec // 60)}-Minute Masterclass (16:9 Landscape)'}
+            Format: {'60-Second Viral Short (9:16 Vertical)' if is_short else f'{int(duration_sec // 60)}-Minute Masterclass (16:9 Landscape)'}
             Number of discrete sections: {num_sections}
 
-            CRITICAL DIRECTIVES FOR HIGH-CTR VIRAL FRAMES & BLOCKBUSTER TYPOGRAPHY:
-            1. 'headline_top': Exactly 1 to 2 words uppercase punchy hook (e.g. '$7 TRILLION', '1.3 MILLION', '2 CRORE', '₹85 LOW', 'H-1B', 'HAL & BEL', '85% OIL').
-            2. 'headline_mid': Exactly 1 to 2 words uppercase anchor (e.g. 'DEBT TRAP', 'TROOPS', 'TRAPPED', 'CRASH', 'CRACKDOWN', 'SURGE', 'IMPORTED').
-            3. 'badge_text': High-friction tactical alert stamp (e.g. 'MARKET SHOCK', 'TIME-BOMB', 'CRACKDOWN', 'OVERPRICED', 'TOP SECRET', 'WARNING').
-            4. 'color_theme': One of 'gold', 'fire', 'emerald', 'cyan', 'warning'.
-            5. 'visual_prompt': A vivid, cinematic, tangible 35mm photographic description of a CONCRETE PHYSICAL METAPHOR.
-               - STRICTLY FORBIDDEN: Boardrooms, office desks, suits around conference tables, generic business people, charts on laptop screens.
-               - MANDATORY CONCRETE METAPHOR EXAMPLES:
-                 * A colossal cargo container ship split down the middle with heavy red chains labeled 60% TARIFF in stormy dark ocean waters
-                 * A massive institutional bank vault door swinging wide open as rivers of digital cash are sucked into a dark vortex
-                 * A 1-kilogram 999.9 pure gold bar on an ornate dark marble pedestal surrounded by fluctuating laser candlesticks
-                 * Futuristic fighter jet and stealth drone flying dramatically toward camera flanked by glowing national flags
-                 * Indian passport wrapped in heavy steel chains and padlocks with a red stamped RESTRICTED document
-                 * Two giant robotic arms assembling microchips with flying electrical sparks on an automated assembly line
-                 * Distressed stock trader clutching head in agony in front of a giant glowing smartphone showing crashing red candlestick charts
-                 * Towering golden bull monument breaking through a cracked obsidian concrete floor with volumetric god rays
-               - Suffix: "cinematic 35mm photograph, dark moody obsidian lighting, volumetric amber and gold rays, 8k hyper-detailed, clean plate, zero text, zero watermark"
-            6. 'script': 1-2 sentences of spoken narration for this exact section. Total duration is {duration_sec} seconds across all sections. Cite real numbers, institutional order flows, regulatory traps, or forensic clauses. Zero filler.
+            CRITICAL DIRECTIVES FOR HIGH-RETENTION HUMAN STORYTELLING (AVD >= 70%):
+            1. ZERO FINANCIAL JARGON IN THE FIRST 5 SECONDS:
+               - STRICTLY FORBIDDEN WORDS in Section 0: 'liquidity', 'absorption', 'VWAP', 'delta', 'correlation', 'fiscal deficit', 'implied volatility', 'order book', 'macroeconomic', 'consolidation'.
+               - Section 0 MUST BE A VISCERAL, UNIGNORABLE HOOK: A direct threat, shocking accusation, or urgent mystery confronting the viewer's bank account.
+                 * Example: "While you were sleeping, someone just quietly pulled half a billion dollars out of your retirement stocks."
+                 * Example: "There is a secret clause hidden in your fixed deposit that the banks pray you never read."
+
+            2. PERSONALIZE THE THREAT (EVERY STORY HAS A VILLAIN, A VICTIM, AND A CRIME):
+               - The victim is the everyday viewer working a 9-to-5 job.
+               - The villain is the institutional desk, shadow banker, or predatory algorithm.
+               - Frame the stakes around what the viewer stands to lose: their hard-earned salary, their children's college fund, their home equity, or their savings.
+
+            3. ONE SINGLE INSANE FACT PER SHORT (NO ACADEMIC DATA DUMPS):
+               - Stop trying to explain the entire global economy in 60 seconds.
+               - Focus on ONE shocking smoking gun (e.g. "For every ₹100 retail traders poured into this stock, insiders cashed out ₹85 within 48 hours").
+               - Build relentless tension for 40 seconds, then drop the jaw-dropping revelation in the final 15 seconds.
+
+            4. PACING & BLOCKBUSTER 3D TYPOGRAPHY DIRECTIVES:
+               - 'headline_top': Exactly 1 to 2 words uppercase punchy hook (e.g. '$7 TRILLION', '1.3 MILLION', '2 CRORE', '₹85 LOW', 'H-1B', 'HAL & BEL', '85% OIL').
+               - 'headline_mid': Exactly 1 to 2 words uppercase anchor (e.g. 'DEBT TRAP', 'TROOPS', 'TRAPPED', 'CRASH', 'CRACKDOWN', 'SURGE', 'IMPORTED').
+               - 'badge_text': High-friction tactical alert stamp (e.g. 'MARKET SHOCK', 'TIME-BOMB', 'CRACKDOWN', 'OVERPRICED', 'TOP SECRET', 'WARNING').
+               - 'color_theme': One of 'gold', 'fire', 'emerald', 'cyan', 'warning'.
+               - 'visual_prompt': A vivid, cinematic, tangible 35mm photographic description of a CONCRETE PHYSICAL METAPHOR.
+                 * STRICTLY FORBIDDEN: Boardrooms, office desks, suits around conference tables, generic business people, charts on laptop screens.
+                 * MANDATORY PHYSICAL METAPHORS: Bank vaults sucking vortices, split cargo container ships in storms, gold bullion on dark marble, fighter jets flanking flags, passports locked in chains, robotic arms throwing sparks, distressed trader clutching head before giant red smartphone chart.
+                 * Suffix: "cinematic 35mm photograph, dark moody obsidian lighting, volumetric amber and gold rays, 8k hyper-detailed, clean plate, zero text, zero watermark"
+               - 'script': Natural, conversational, breathless spoken sentences. Speak like you are leaning in to whisper a dangerous secret.
 
             Respond ONLY with a valid JSON object matching this structure:
             {{
@@ -218,30 +227,30 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
         except Exception as e:
             logger.warning(f"[Script Studio] Gemini generation fallback: {e}")
 
-    # Fallback narrative scripts if Gemini is unavailable
+    # Fallback narrative scripts if Gemini is unavailable (Human storytelling & investigative stakes)
     stock_scripts = [
-        f"Beneath the surface of {topic_clean}, institutional algorithms executed a coordinated liquidation sweep.",
-        "Smart money absorption triggered massive volume spikes right as retail traders chased the breakout.",
-        "Order book delta revealed aggressive market sell orders absorbing every limit bid in the book.",
-        "VWAP deviation reached extreme levels, trapping late participants into an irreversible liquidity pocket.",
-        "Foreign institutional desks offloaded risk across block windows while options implied volatility surged.",
-        "The mathematical reality is clear: without tracking order flow absorption, retail capital remains the exit liquidity.",
+        f"Right as millions of retail traders were sleeping, a massive trap was sprung around {topic_clean}.",
+        "Foreign institutional desks offloaded billions in risk, leaving everyday salary earners to take the hit.",
+        "Here is the smoking gun: while the headlines told the public to buy the dip, insiders were cashing out completely.",
+        "The banks don't lose money in market crashes. They transfer their losses directly into your savings account.",
+        "Every single time this pattern appears, everyday retail investors become the exit liquidity for Wall Street.",
+        "Before you put another rupee into this market, check your portfolio statement tonight to see if you are caught in the blast zone.",
     ]
     crypto_scripts = [
-        f"In the high-frequency arena of {topic_clean}, on-chain telemetry caught anomalous whale positioning.",
-        "Perpetual futures funding rates pushed into severe divergence, creating a textbook liquidation cascade trap.",
-        "Cross-chain bridge flows accelerated as institutional custodians quietly moved collateral off exchanges.",
-        "Cumulative volume delta collapsed while open interest hit record highs, signaling imminent volatility.",
-        "MEV searchers and toxic order flow siphoned millions before the retail market could react.",
-        "Protecting capital in crypto requires reading on-chain footprint data, not chasing speculative hype.",
+        f"Behind the hype of {topic_clean}, a multi-million dollar liquidity heist just unfolded in plain sight.",
+        "While everyday crypto buyers were celebrating the pump, hidden whale wallets were dumping on everyone.",
+        "On-chain data reveals the brutal truth: automated bots siphoned user funds before the exchange could react.",
+        "The founders walked away with tens of millions, while retail holders were left with frozen balances.",
+        "This is not bad luck—it was an engineered trap designed to take your life savings.",
+        "If you hold your coins on an exchange tonight, take them off immediately before the doors lock for good.",
     ]
     insurance_scripts = [
-        f"When policyholders encounter {topic_clean}, the hidden fine print often dictates their financial fate.",
-        "Proportionate deduction clauses mean a higher room category can slash your entire claim settlement by forty percent.",
-        "Incurred Claim Ratios and Section 45 rules expose how insurers legally scrutinize historical disclosures.",
-        "Copayment penalties and sub-limits turn what looks like comprehensive coverage into massive out-of-pocket debt.",
-        "Forensic claims data reveals that institutional claim rejection rates peak during critical emergency care windows.",
-        "True financial protection comes from auditing policy wording before the medical crisis occurs.",
+        f"There is a devastating secret clause buried on page forty-seven regarding {topic_clean}.",
+        "When an emergency hits your family, this single fine-print trick legally slashes your insurance claim by forty percent.",
+        "Hospital bills arrive in lakhs, and the insurance company denies your payout because of a two-word definition.",
+        "They took your monthly premiums for ten straight years without a word, but the moment you need care, they vanish.",
+        "Thousands of families across the country have lost their entire life savings to this exact trap.",
+        "Audit your health insurance policy tonight, or your family will end up paying the price out of pocket.",
     ]
 
     for i in range(num_sections):
