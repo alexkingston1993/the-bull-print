@@ -1,0 +1,56 @@
+name: Daily 5:00 AM Production Master (10 Shorts + 2 Documentaries)
+
+on:
+  schedule:
+    - cron: '30 23 * * *'  # Exactly 05:00 AM IST Daily
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run test (true/false)'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  orchestrate_daily_productions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🐍 Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Install Orchestrator Dependencies
+        run: |
+          pip install --no-cache-dir google-genai loguru toml requests kaggle
+
+      - name: ⚙️ Setup Kaggle GPU Credentials
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          mkdir -p ~/.kaggle
+          echo "{\"username\":\"$KAGGLE_USERNAME\",\"key\":\"$KAGGLE_KEY\"}" > ~/.kaggle/kaggle.json
+          chmod 600 ~/.kaggle/kaggle.json
+
+      - name: 🚀 Scan Past 24h Viral Topics & Dispatch 12 Cloud Productions
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          IS_DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+        run: |
+          FLAG=""
+          if [ "$IS_DRY_RUN" = "true" ]; then
+            FLAG="--dry-run"
+          fi
+          python scripts/daily_viral_production_scheduler.py $FLAG
