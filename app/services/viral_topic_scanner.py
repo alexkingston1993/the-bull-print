@@ -97,26 +97,56 @@ class ViralTopicScanner:
 
         data = None
         if self.gemini_key:
-            try:
-                from google import genai
-                client = genai.Client(api_key=self.gemini_key)
-                for model_name in ["gemini-flash-lite-latest", "gemini-3.8-flash"]:
-                    try:
-                        logger.info(f"Querying {model_name} for past 24h viral financial intelligence...")
-                        resp = client.models.generate_content(model=model_name, contents=prompt)
-                        raw = resp.text.strip()
-                        if "```json" in raw:
-                            raw = raw.split("```json")[1].split("```")[0].strip()
-                        elif "```" in raw:
-                            raw = raw.split("```")[1].split("```")[0].strip()
-                        data = json.loads(raw)
-                        if len(data.get("shorts_topics", [])) >= 10 and len(data.get("documentary_topics", [])) >= 2:
-                            logger.success(f"✓ Discovered {len(data['shorts_topics'])} Shorts & {len(data['documentary_topics'])} Documentaries via {model_name}")
+            import time
+            from google import genai
+            
+            # Models to cascade through with automatic retry
+            candidate_models = [
+                "gemini-2.5-flash",
+                "gemini-3.8-flash",
+                "gemini-2.0-flash",
+                "gemini-flash-lite-latest",
+                "gemini-2.5-pro",
+                "gemini-1.5-pro"
+            ]
+            
+            # Try both v1alpha and default API versions
+            for api_ver in ["v1alpha", None]:
+                if data:
+                    break
+                try:
+                    client_kwargs = {"api_key": self.gemini_key}
+                    if api_ver:
+                        client_kwargs["http_options"] = {"api_version": api_ver}
+                    client = genai.Client(**client_kwargs)
+                    
+                    for model_name in candidate_models:
+                        for attempt in range(3):
+                            try:
+                                logger.info(f"Querying {model_name} (API {api_ver or 'default'}, attempt {attempt + 1}) for past 24h viral intelligence...")
+                                resp = client.models.generate_content(model=model_name, contents=prompt)
+                                raw = resp.text.strip()
+                                if "```json" in raw:
+                                    raw = raw.split("```json")[1].split("```")[0].strip()
+                                elif "```" in raw:
+                                    raw = raw.split("```")[1].split("```")[0].strip()
+                                parsed = json.loads(raw)
+                                if len(parsed.get("shorts_topics", [])) >= 10 and len(parsed.get("documentary_topics", [])) >= 2:
+                                    data = parsed
+                                    logger.success(f"✓ Discovered {len(data['shorts_topics'])} Shorts & {len(data['documentary_topics'])} Documentaries via {model_name}")
+                                    break
+                            except Exception as me:
+                                err_str = str(me)
+                                logger.warning(f"{model_name} attempt {attempt + 1} error: {err_str[:120]}")
+                                if "503" in err_str or "UNAVAILABLE" in err_str or "429" in err_str:
+                                    time.sleep(2 * (attempt + 1))
+                                    continue
+                                else:
+                                    break  # Don't retry 404 or unsupported model errors
+                        if data:
                             break
-                    except Exception as me:
-                        logger.warning(f"{model_name} attempt: {me}")
-            except Exception as e:
-                logger.error(f"GenAI Client error: {e}")
+                except Exception as ce:
+                    logger.warning(f"Client init error with api_ver {api_ver}: {ce}")
 
         if not data or len(data.get("shorts_topics", [])) < 10:
             raise RuntimeError("CRITICAL: Failed to discover 10 Shorts and 2 Documentaries from past 24h news. Hardcoded fallbacks strictly prohibited.")

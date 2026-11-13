@@ -27,10 +27,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR))
 
 import edge_tts
-from app.services.magnates_visual_studio import precompute_cut_typography
+from app.services.magnates_visual_studio import precompute_cut_typography, draw_sliding_word_caption
 
 OUTPUT_DIR = BASE_DIR / "output" / "viral_short_fii_rotation"
-FRAMES_DIR = Path("/tmp/kaggle_viral_short_clean/frames")
+BUNDLE_DIR = BASE_DIR / "assets" / "approved_bundles" / "the-₹65,700-cr-fii-rotation-why-wall-street-is-d"
+FRAMES_DIR = Path("/tmp/kaggle_viral_short_clean/frames") if Path("/tmp/kaggle_viral_short_clean/frames").exists() else BUNDLE_DIR
 AUDIO_FILE = OUTPUT_DIR / "narration_master.mp3"
 TIMESTAMPS_FILE = OUTPUT_DIR / "word_timestamps.json"
 FINAL_VIDEO = BASE_DIR / "output" / "the_fii_rotation_viral_short_master.mp4"
@@ -238,9 +239,15 @@ def render_magnates_short():
     # Pre-load the 20 clean Kaggle vertical plates
     plates = []
     for i in range(1, 21):
-        p_file = FRAMES_DIR / f"segment_{i:02d}.jpg"
-        if not p_file.exists():
-            p_file = FRAMES_DIR / f"segment_{i}.jpg"
+        candidates = [
+            FRAMES_DIR / f"segment_{i:02d}.jpg",
+            FRAMES_DIR / f"segment_{i}.jpg",
+            BUNDLE_DIR / f"frame_{i-1:02d}.jpg",
+            BUNDLE_DIR / f"frame_{i-1}.jpg"
+        ]
+        p_file = next((c for c in candidates if c.exists()), None)
+        if not p_file:
+            raise FileNotFoundError(f"Missing plate for beat {i}")
         im = Image.open(p_file).convert("RGB")
         # Upscale clean plate full-bleed to 1080x1920
         scale = max(w_out / im.width, h_out / im.height)
