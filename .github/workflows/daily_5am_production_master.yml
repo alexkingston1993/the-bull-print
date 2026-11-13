@@ -54,3 +54,4 @@ jobs:
             FLAG="--dry-run"
           fi
           python scripts/daily_viral_production_scheduler.py $FLAG
+

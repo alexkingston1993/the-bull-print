@@ -23,9 +23,10 @@ from loguru import logger
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Typography fonts discovery
-FONT_IMPACT = "/System/Library/Fonts/Supplemental/Impact.ttf"
+FONT_IMPACT = str(BASE_DIR / "assets/fonts/Impact.ttf")
 if not os.path.exists(FONT_IMPACT):
     for cand in [
+        "/System/Library/Fonts/Supplemental/Impact.ttf",
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
         "/System/Library/Fonts/Supplemental/Arial Black.ttf",
         str(BASE_DIR / "assets/fonts/Inter-Bold.ttf")
@@ -34,92 +35,143 @@ if not os.path.exists(FONT_IMPACT):
             FONT_IMPACT = cand
             break
 
-FONT_ROBOTO_BOLD = "/System/Library/Fonts/Supplemental/Arial Bold.ttf"
+FONT_ROBOTO_BOLD = str(BASE_DIR / "assets/fonts/ArialBold.ttf")
+if not os.path.exists(FONT_ROBOTO_BOLD):
+    for cand in [
+        "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
+        "/System/Library/Fonts/Supplemental/Arial.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+    ]:
+        if os.path.exists(cand):
+            FONT_ROBOTO_BOLD = cand
+            break
 if not os.path.exists(FONT_ROBOTO_BOLD):
     FONT_ROBOTO_BOLD = FONT_IMPACT
 
 
-def auto_fit_typography(lines: List[str], badge_text: str, font_path: str, max_sheared_w: int = 760):
-    """Calculates optimal font size so sheared 3D text never overflows screen boundaries."""
-    f_size = 96
+def auto_fit_typography(lines: List[str], badge_text: str, font_path: str, max_sheared_w: int = 950):
+    """Calculates optimal font size so sheared 3D text dominates the frame without overflowing."""
+    # Split lines if any single line has more than 2 words to preserve huge font scale
+    balanced_lines = []
+    for l in lines:
+        words = l.split()
+        if len(words) > 2 and len(balanced_lines) < 2:
+            mid = (len(words) + 1) // 2
+            balanced_lines.append(" ".join(words[:mid]))
+            balanced_lines.append(" ".join(words[mid:]))
+        else:
+            balanced_lines.append(l)
+
+    f_size = 144
     shear_val = 0.22
     
-    while f_size >= 40:
+    while f_size >= 44:
         try:
             f_hero = ImageFont.truetype(font_path, f_size)
-            f_badge = ImageFont.truetype(font_path, max(24, int(f_size * 0.42)))
+            f_badge = ImageFont.truetype(font_path, max(28, int(f_size * 0.36)))
         except Exception:
             f_hero = ImageFont.load_default()
             f_badge = f_hero
             
         max_line_w = 0
-        for l in lines:
+        for l in balanced_lines:
             bbox = f_hero.getbbox(l)
             w = bbox[2] - bbox[0]
             if w > max_line_w:
                 max_line_w = w
                 
         line_spacing = int(f_size * 0.94)
-        total_h = len(lines) * line_spacing + int(f_size * 0.6)
+        total_h = len(balanced_lines) * line_spacing + int(f_size * 0.5)
         sheared_w = max_line_w + int(total_h * shear_val) + 60
         
         if sheared_w <= max_sheared_w:
-            return f_size, sheared_w, total_h, f_hero, f_badge
+            return f_size, sheared_w, total_h, f_hero, f_badge, balanced_lines
         f_size -= 4
         
-    return f_size, sheared_w, total_h, f_hero, f_badge
+    return f_size, sheared_w, total_h, f_hero, f_badge, balanced_lines
 
 
 def precompute_cut_typography(
     lines: List[str],
     badge_text: str,
     font_path: str = FONT_IMPACT,
-    max_sheared_w: int = 760,
-    face_color: Tuple[int, int, int] = (255, 255, 255),
-    badge_bg: Tuple[int, int, int] = (239, 68, 68)
+    max_sheared_w: int = 950,
+    face_color: Optional[Tuple[int, int, int]] = None,
+    secondary_color: Tuple[int, int, int] = (255, 255, 255),
+    badge_bg: Tuple[int, int, int] = (239, 68, 68),
+    badge_tilt_deg: float = -8.0,
+    color_theme: str = "gold"
 ) -> Dict[str, Any]:
-    """Renders 3D extruded perspective typography with neon bloom and safe margins."""
+    """Renders 3D extruded perspective typography with blockbuster two-tone contrast, angled badge, and neon bloom."""
     sanitized_lines = [l.replace("₹", "RS. ").strip().upper() for l in lines if l.strip()]
     sanitized_badge = badge_text.replace("₹", "RS. ").strip().upper()
     
-    f_size, sheared_w, total_h, f_hero, f_badge = auto_fit_typography(
+    # Resolve hero accent color based on theme
+    THEME_COLORS = {
+        "gold": (255, 230, 0),       # Intense Saffron Gold (#FFE600)
+        "yellow": (255, 230, 0),
+        "fire": (255, 55, 55),        # Molten Crimson Red (#FF3737)
+        "red": (255, 55, 55),
+        "blood_red": (255, 55, 55),
+        "emerald": (16, 235, 140),    # Radiant Mint Emerald (#10EB8C)
+        "green": (16, 235, 140),
+        "cyan": (6, 220, 255),        # Electric Cyber Cyan (#06DCFF)
+        "lightning_cyan": (6, 220, 255),
+        "warning": (255, 130, 20),    # Hazard Amber Orange (#FF8214)
+    }
+    hero_color = face_color or THEME_COLORS.get(color_theme.lower(), (255, 230, 0))
+
+    f_size, sheared_w, total_h, f_hero, f_badge, render_lines = auto_fit_typography(
         sanitized_lines, sanitized_badge, font_path, max_sheared_w=max_sheared_w
     )
     
-    text_canvas_w, text_canvas_h = 1600, 1000
+    text_canvas_w, text_canvas_h = 1800, 1200
     text_layer = Image.new("RGBA", (text_canvas_w, text_canvas_h), (0, 0, 0, 0))
     draw_t = ImageDraw.Draw(text_layer)
     
     cx = text_canvas_w // 2
-    start_y = 100
+    start_y = 60
     
-    # 1. Tactical highlighter badge
-    badge_bbox = f_badge.getbbox(sanitized_badge)
-    badge_w = badge_bbox[2] - badge_bbox[0] + 44
-    badge_h = badge_bbox[3] - badge_bbox[1] + 20
-    b_left = cx - badge_w // 2
-    b_top = start_y
-    draw_t.rounded_rectangle([b_left, b_top, b_left + badge_w, b_top + badge_h], radius=10, fill=badge_bg)
-    badge_txt_y = b_top + (badge_h // 2)
-    draw_t.text((cx, badge_txt_y), sanitized_badge, font=f_badge, fill=(10, 15, 28), anchor="mm")
+    # 1. High-friction tactical distress badge tilted at -8 degrees
+    b_bbox = f_badge.getbbox(sanitized_badge)
+    bw = b_bbox[2] - b_bbox[0] + 52
+    bh = b_bbox[3] - b_bbox[1] + 24
+    b_layer = Image.new("RGBA", (bw + 60, bh + 60), (0, 0, 0, 0))
+    b_draw = ImageDraw.Draw(b_layer)
+    bx0, by0 = 30, 30
+    b_draw.rounded_rectangle([bx0, by0, bx0 + bw, by0 + bh], radius=14, fill=(*badge_bg, 250), outline=(255, 255, 255, 235), width=3)
+    b_draw.text((bx0 + bw // 2, by0 + bh // 2), sanitized_badge, font=f_badge, fill=(255, 255, 255, 255), anchor="mm")
     
-    # 2. 3D Headline extrusion & face
+    # Rotate badge by tilt angle
+    tilted_badge = b_layer.rotate(-badge_tilt_deg, resample=Image.Resampling.BICUBIC, expand=True)
+    badge_x = cx - tilted_badge.width // 2
+    badge_y = start_y
+    text_layer.paste(tilted_badge, (badge_x, badge_y), tilted_badge)
+    
+    # 2. 3D Blockbuster Headline Extrusion & Two-Tone Face
     line_spacing = int(f_size * 0.94)
-    headline_top = start_y + badge_h + 30
+    headline_top = badge_y + tilted_badge.height + 20
     
-    for i, line in enumerate(sanitized_lines):
+    for i, line in enumerate(render_lines):
         line_y = headline_top + (i * line_spacing)
-        # 16px 3D extrusion shadow block
-        for offset in range(16, 0, -1):
-            alpha = int(240 * (1.0 - (offset / 24.0)))
-            draw_t.text((cx + (offset * 0.5), line_y + offset), line, font=f_hero, fill=(5, 7, 12, alpha), anchor="mt")
-        # Dark rim outline
-        for dx, dy in [(-2,0), (2,0), (0,-2), (0,2), (-2,-2), (2,2), (-2,2), (2,-2)]:
-            draw_t.text((cx + dx, line_y + dy), line, font=f_hero, fill=(0, 0, 0, 255), anchor="mt")
-        # Saturated face
-        draw_t.text((cx, line_y), line, font=f_hero, fill=face_color, anchor="mt")
+        line_face = hero_color if i == 0 else secondary_color
+
+        # Deep 24px 3D block extrusion shadow
+        for offset in range(24, 0, -1):
+            alpha = int(250 * (1.0 - (offset / 32.0)))
+            draw_t.text((cx + int(offset * 0.45), line_y + offset), line, font=f_hero, fill=(5, 5, 10, alpha), anchor="mt")
+
+        # Heavy 5px dark outer rim stroke for 100% background separation
+        for dx in range(-5, 6):
+            for dy in range(-5, 6):
+                if dx*dx + dy*dy <= 25:
+                    draw_t.text((cx + dx, line_y + dy), line, font=f_hero, fill=(0, 0, 0, 255), anchor="mt")
+
+        # Saturated face color
+        draw_t.text((cx, line_y), line, font=f_hero, fill=(*line_face, 255), anchor="mt")
+
         # Top-left specular rim highlight
-        draw_t.text((cx - 1, line_y - 1), line, font=f_hero, fill=(255, 255, 255, 130), anchor="mt")
+        draw_t.text((cx - 1, line_y - 1), line, font=f_hero, fill=(255, 255, 255, 95), anchor="mt")
         
     # Volumetric neon bloom layer
     bloom_layer = text_layer.filter(ImageFilter.GaussianBlur(28))

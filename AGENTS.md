@@ -20,5 +20,16 @@
   1. `.agents/rules/MASTER_BLUEPRINT.md`
   2. `DESIGN.md`
   3. `.agents/rules/HIGH_CTR_FRAMES.md`
-- Ensure zero baked-in text in background plates, dynamic 3D kinetic typography (0.22 shear, 16px extrusion shadow, Gaussian bloom $r=28$), and lower-third word-level animated captions inside glassmorphic pills with vibrant electric gold (`#FACC15`) active-word highlight across ALL formats (safe zone $Y = 1480$ for 9:16 Shorts, $Y = 920$ for 16:9 Documentaries).
-- Strict Zero Caption Overflow: When cluster text width exceeds maximum pill width, the engine MUST wrap into two balanced lines with dynamic pill height expansion. No text may ever touch or bleed outside the pill outline.
+  4. `.agents/rules/viral_thumbnail_gold_standard.md`
+- **Blockbuster 3D Kinetic Typography**:
+  - Massive scale: 120-144px font scale, occupying 85-88% of canvas width (`max_sheared_w = 950`).
+  - Strict 1 to 2 words per line power hooks (e.g. `$7 TRILLION` / `DEBT TRAP`, `1.3 MILLION` / `TROOPS`, `2 CRORE` / `TRAPPED`, `₹85` / `ALL-TIME LOW`).
+  - Two-tone contrast: Line 1 in electric accent (Saffron Gold `#FFE600`, Molten Red `#FF3737`, Cyber Cyan `#06DCFF`, Mint Emerald `#10EB8C`), Line 2 in Titanium White (`#FFFFFF`).
+  - Deep 24px 3D block extrusion shadow, 5px dark outer rim stroke for 100% background separation, subtle specular highlight, and Gaussian bloom $r=28$ with forward italic shear 0.22.
+  - Angled tactical distress badge tilted at -8° with 3px glowing border and drop shadow.
+- **Concrete Physical Metaphors Only (Zero Boardrooms Mandate)**:
+  - Visual prompts must NEVER generate corporate offices, suits around conference tables, or generic laptops.
+  - Every visual plate must depict tangible physical metaphors: split cargo ships with chains, open bank vaults sucking currency vortices, 1kg gold bars on dark marble with laser charts, aerospace fighter jets, passports in chains, robotic arms assembling microchips with sparks, or distressed traders in rain with glowing phones.
+- **Lower-Third Word-Level Captions**:
+  - Safe zone $Y = 1480$ for 9:16 Shorts, $Y = 920$ for 16:9 Documentaries in glassmorphic pills with vibrant electric gold (`#FACC15`) active-word highlight.
+  - Strict Zero Caption Overflow: When cluster text width exceeds maximum pill width, the engine MUST wrap into two balanced lines with dynamic pill height expansion. No text may ever touch or bleed outside the pill outline.

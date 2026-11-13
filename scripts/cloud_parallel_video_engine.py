@@ -158,18 +158,31 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
             from google import genai
             client = genai.Client(api_key=api_key, http_options={"api_version": "v1alpha"})
             prompt = f"""
-            You are the lead institutional investigative financial documentary writer for 'The Bull Print'.
-            Narrator Persona: Christopher (authoritative, forensic, sharp, documentary tone).
+            You are the lead institutional investigative financial documentary director and headline designer for 'The Bull Print'.
+            Narrator Persona: Christopher (authoritative, forensic, sharp, blockbuster documentary tone).
             Topic: {topic_clean}
             Vertical: {vertical}
-            Format: {'60-Second Short (9:16)' if is_short else f'{int(duration_sec // 60)}-Minute Deep Dive (16:9)'}
+            Format: {'60-Second Short (9:16 Vertical)' if is_short else f'{int(duration_sec // 60)}-Minute Masterclass (16:9 Landscape)'}
             Number of discrete sections: {num_sections}
 
-            For each section 0 to {num_sections - 1}, provide:
-            - headline_top: (2-3 words uppercase punchy title, max 20 chars)
-            - headline_mid: (Key metric or forensic fact, max 22 chars)
-            - badge_text: (Tag or alert, max 16 chars)
-            - script: (1-2 sentences of spoken narration for this exact section. Total duration is {duration_sec} seconds across all sections. Cite real numbers, institutional order flows, regulatory traps, or forensic clauses. Zero filler.)
+            CRITICAL DIRECTIVES FOR HIGH-CTR VIRAL FRAMES & BLOCKBUSTER TYPOGRAPHY:
+            1. 'headline_top': Exactly 1 to 2 words uppercase punchy hook (e.g. '$7 TRILLION', '1.3 MILLION', '2 CRORE', '₹85 LOW', 'H-1B', 'HAL & BEL', '85% OIL').
+            2. 'headline_mid': Exactly 1 to 2 words uppercase anchor (e.g. 'DEBT TRAP', 'TROOPS', 'TRAPPED', 'CRASH', 'CRACKDOWN', 'SURGE', 'IMPORTED').
+            3. 'badge_text': High-friction tactical alert stamp (e.g. 'MARKET SHOCK', 'TIME-BOMB', 'CRACKDOWN', 'OVERPRICED', 'TOP SECRET', 'WARNING').
+            4. 'color_theme': One of 'gold', 'fire', 'emerald', 'cyan', 'warning'.
+            5. 'visual_prompt': A vivid, cinematic, tangible 35mm photographic description of a CONCRETE PHYSICAL METAPHOR.
+               - STRICTLY FORBIDDEN: Boardrooms, office desks, suits around conference tables, generic business people, charts on laptop screens.
+               - MANDATORY CONCRETE METAPHOR EXAMPLES:
+                 * A colossal cargo container ship split down the middle with heavy red chains labeled 60% TARIFF in stormy dark ocean waters
+                 * A massive institutional bank vault door swinging wide open as rivers of digital cash are sucked into a dark vortex
+                 * A 1-kilogram 999.9 pure gold bar on an ornate dark marble pedestal surrounded by fluctuating laser candlesticks
+                 * Futuristic fighter jet and stealth drone flying dramatically toward camera flanked by glowing national flags
+                 * Indian passport wrapped in heavy steel chains and padlocks with a red stamped RESTRICTED document
+                 * Two giant robotic arms assembling microchips with flying electrical sparks on an automated assembly line
+                 * Distressed stock trader clutching head in agony in front of a giant glowing smartphone showing crashing red candlestick charts
+                 * Towering golden bull monument breaking through a cracked obsidian concrete floor with volumetric god rays
+               - Suffix: "cinematic 35mm photograph, dark moody obsidian lighting, volumetric amber and gold rays, 8k hyper-detailed, clean plate, zero text, zero watermark"
+            6. 'script': 1-2 sentences of spoken narration for this exact section. Total duration is {duration_sec} seconds across all sections. Cite real numbers, institutional order flows, regulatory traps, or forensic clauses. Zero filler.
 
             Respond ONLY with a valid JSON object matching this structure:
             {{
@@ -179,6 +192,8 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                   "headline_top": "...",
                   "headline_mid": "...",
                   "badge_text": "...",
+                  "color_theme": "gold",
+                  "visual_prompt": "...",
                   "script": "..."
                 }}
               ]
@@ -238,9 +253,13 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
             g = gemini_sections[i]
             top = str(g.get("headline_top", lead_word))[:24]
             mid = str(g.get("headline_mid", second_word))[:24]
-            badge = str(g.get("badge_text", "VERIFIED DATA"))[:20]
+            badge = str(g.get("badge_text", "MARKET SHOCK"))[:20]
+            color_theme = str(g.get("color_theme", "gold")).lower()
+            visual_prompt = str(g.get("visual_prompt", "")).strip()
             script_text = str(g.get("script", "")).strip()
         else:
+            color_theme = "gold" if i % 2 == 0 else "fire"
+            visual_prompt = ""
             if vertical == "stock_market":
                 script_text = stock_scripts[i % len(stock_scripts)]
             elif vertical == "crypto":
@@ -249,29 +268,35 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                 script_text = insurance_scripts[i % len(insurance_scripts)]
 
             if i == 0:
-                top = f"{lead_word} {second_word}"
-                mid = "THE HIDDEN TRAP" if vertical == "stock_market" else "FORENSIC BREAKDOWN"
+                top = f"{lead_word}"
+                mid = f"{second_word}"
                 badge = "MARKET ALERT ⚠️"
+                visual_prompt = f"A colossal golden bank vault door swinging wide open on Dalal Street as rivers of digital cash are sucked into a dark vortex, cinematic 35mm photograph, volumetric amber and gold rays, 8k, clean plate"
             elif i == 1:
-                top = "LIQUIDITY CASCADE" if vertical != "insurance" else "POLICY CLAUSE"
-                mid = "INSTITUTIONAL MOVE" if vertical != "insurance" else "CLAIM REJECTION"
+                top = "LIQUIDITY"
+                mid = "CASCADE" if vertical != "insurance" else "REJECTION"
                 badge = "ALGO TRACKER" if vertical != "insurance" else "LEGAL AUDIT"
+                visual_prompt = f"A massive 3D golden bull monument on cracked dark obsidian floor with fluctuating laser candlestick charts, volumetric red and cyan rim lighting, 8k render"
             elif i == 2:
-                top = "ORDER FLOW DRAIN" if vertical != "insurance" else "FINE PRINT HIDDEN"
-                mid = "SMART MONEY LEVEL" if vertical != "insurance" else "SECTION 45 EXPOSED"
+                top = "ORDER FLOW"
+                mid = "ABSORPTION" if vertical != "insurance" else "FINE PRINT"
                 badge = "DATA EVIDENCE [!]"
+                visual_prompt = f"Two giant robotic arms assembling microchips with flying electrical sparks on an automated assembly line, dark high-tech industrial aesthetic, 8k render"
             elif i == 3:
-                top = "RETAIL EXPOSURE"
-                mid = "MOMENTUM SQUEEZE" if vertical != "insurance" else "PREMIUM LOSS"
+                top = "RETAIL"
+                mid = "SQUEEZE"
                 badge = "RISK WARNING"
+                visual_prompt = f"A distressed stock trader clutching head in agony in front of a giant glowing smartphone showing crashing red candlestick charts, rain slicked city, 8k"
             elif i == 4:
-                top = "SMART MONEY EXIT"
-                mid = "EXECUTION MATH"
-                badge = "WHALE MOVEMENT"
+                top = "SMART MONEY"
+                mid = "EXIT"
+                badge = "WHALE DUMP"
+                visual_prompt = f"A colossal cargo container ship cutting through stormy dark ocean waves with heavy glowing red chains, dark moody lighting, 8k"
             else:
-                top = f"PHASE {i + 1} AUDIT"
-                mid = "INSTITUTIONAL PLAY"
-                badge = "VERIFIED DATA"
+                top = f"PHASE {i + 1}"
+                mid = "VERIFIED"
+                badge = "FORENSIC AUDIT"
+                visual_prompt = f"A 1-kilogram 999.9 pure gold bar sitting on an ornate dark marble pedestal surrounded by fluctuating laser candlesticks, 8k render"
 
         sections.append({
             "section_index": i,
@@ -281,6 +306,8 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
             "headline_top": top[:24],
             "headline_mid": mid[:24],
             "badge_text": badge[:20],
+            "color_theme": color_theme,
+            "visual_prompt": visual_prompt,
             "theme": theme,
             "symbol_type": default_symbol,
             "method_c_hud": has_hud,
@@ -376,11 +403,13 @@ def prepare_session(
             shutil.copy2(approved_frame, frame_path)
             logger.success(f"🎯 [Session Prep] Using verified user-approved frame: {approved_frame.name}")
         else:
-            prompt = (
-                f"Cinematic 35mm photograph, {s.get('headline_top', '')} {s.get('headline_mid', '')}, "
-                f"dark moody obsidian lighting, volumetric amber and gold rays, 8k hyper-detailed, "
-                f"clean plate, zero text, zero watermark"
-            )
+            prompt = s.get("visual_prompt")
+            if not prompt or len(prompt.strip()) < 10:
+                prompt = (
+                    f"Cinematic 35mm photograph, visual metaphor of {s.get('headline_top', '')} {s.get('headline_mid', '')}, "
+                    f"massive concrete physical monuments, bank vaults, cargo ships, dark moody obsidian lighting, "
+                    f"volumetric amber and gold rays, 8k hyper-detailed, clean plate, zero text, zero watermark"
+                )
             fetch_clean_photographic_plate(prompt=prompt, width=w_out, height=h_out, out_path=frame_path)
         frame_files.append(str(frame_path.relative_to(output_dir)))
         s["frame_file"] = str(frame_path.relative_to(output_dir))
@@ -574,7 +603,8 @@ def render_segment(segment_index: int, bundle_dir: Path, output_dir: Optional[Pa
     typo_3d = precompute_cut_typography(
         lines=headline_lines,
         badge_text=badge_label,
-        max_sheared_w=int(w_out * 0.72)
+        max_sheared_w=int(w_out * 0.88),
+        color_theme=sec.get("color_theme", "gold")
     )
 
     # Launch FFmpeg Rawvideo Pipe
