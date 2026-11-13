@@ -80,7 +80,7 @@ def auto_fit_typography(lines: List[str], badge_text: str, font_path: str, max_s
             if w > max_line_w:
                 max_line_w = w
                 
-        line_spacing = int(f_size * 0.94)
+        line_spacing = int(f_size * 1.22)
         total_h = len(balanced_lines) * line_spacing + int(f_size * 0.5)
         sheared_w = max_line_w + int(total_h * shear_val) + 60
         
@@ -98,7 +98,7 @@ def precompute_cut_typography(
     max_sheared_w: int = 950,
     face_color: Optional[Tuple[int, int, int]] = None,
     secondary_color: Tuple[int, int, int] = (255, 255, 255),
-    badge_bg: Tuple[int, int, int] = (239, 68, 68),
+    badge_bg: Tuple[int, int, int] = (220, 20, 30),
     badge_tilt_deg: float = -8.0,
     color_theme: str = "gold"
 ) -> Dict[str, Any]:
@@ -106,25 +106,19 @@ def precompute_cut_typography(
     sanitized_lines = [l.replace("₹", "RS. ").strip().upper() for l in lines if l.strip()]
     sanitized_badge = badge_text.replace("₹", "RS. ").strip().upper()
     
-    # Linear gradient color palettes: (top_color, bottom_color)
-    THEME_PALETTES = {
-        "gold": ((255, 255, 140), (235, 140, 0)),        # Radiant Lemon -> Deep Molten Saffron
-        "yellow": ((255, 255, 140), (235, 140, 0)),
-        "fire": ((255, 110, 70), (200, 15, 25)),         # Neon Coral Red -> Deep Blood Crimson
-        "red": ((255, 110, 70), (200, 15, 25)),
-        "blood_red": ((255, 110, 70), (200, 15, 25)),
-        "emerald": ((170, 255, 200), (10, 185, 95)),     # Neon Mint -> Deep Forest Emerald
-        "green": ((170, 255, 200), (10, 185, 95)),
-        "cyan": ((180, 255, 255), (0, 160, 230)),        # Ice Cyan -> Electric Royal Cyan
-        "lightning_cyan": ((180, 255, 255), (0, 160, 230)),
-        "warning": ((255, 210, 70), (240, 90, 0)),       # Hazard Gold -> Intense Warning Flame
+    THEME_COLORS = {
+        "gold": (255, 230, 0),         # Radiant Saffron Gold (#FFE600)
+        "yellow": (255, 230, 0),
+        "fire": (255, 50, 50),          # Molten Crimson Red (#FF3232)
+        "red": (255, 50, 50),
+        "blood_red": (255, 50, 50),
+        "emerald": (16, 235, 140),      # Neon Mint Emerald (#10EB8C)
+        "green": (16, 235, 140),
+        "cyan": (6, 220, 255),          # Electric Cyber Cyan (#06DCFF)
+        "lightning_cyan": (6, 220, 255),
+        "warning": (255, 140, 20),      # Hazard Amber Orange (#FF8C14)
     }
-    WHITE_PALETTE = ((255, 255, 255), (195, 205, 220))   # Titanium White -> Polished Metallic Chrome
-
-    top_hero, bot_hero = THEME_PALETTES.get(color_theme.lower(), ((255, 255, 140), (235, 140, 0)))
-    if face_color:
-        top_hero, bot_hero = face_color, (max(0, face_color[0]-60), max(0, face_color[1]-60), max(0, face_color[2]-60))
-    top_sec, bot_sec = WHITE_PALETTE
+    hero_color = face_color or THEME_COLORS.get(color_theme.lower(), (255, 230, 0))
 
     f_size, sheared_w, total_h, f_hero, f_badge, render_lines = auto_fit_typography(
         sanitized_lines, sanitized_badge, font_path, max_sheared_w=max_sheared_w
@@ -135,7 +129,7 @@ def precompute_cut_typography(
     draw_t = ImageDraw.Draw(text_layer)
     
     cx = text_canvas_w // 2
-    start_y = 50
+    start_y = 60
     
     # 1. High-friction tactical distress badge tilted at -8 degrees
     b_bbox = f_badge.getbbox(sanitized_badge)
@@ -146,9 +140,9 @@ def precompute_cut_typography(
     bx0, by0 = 30, 30
     
     # Badge drop shadow
-    b_draw.rounded_rectangle([bx0 + 3, by0 + 4, bx0 + bw + 3, by0 + bh + 4], radius=14, fill=(5, 5, 10, 180))
+    b_draw.rounded_rectangle([bx0 + 3, by0 + 4, bx0 + bw + 3, by0 + bh + 4], radius=14, fill=(0, 0, 0, 180))
     # Badge body with glowing accent border
-    b_draw.rounded_rectangle([bx0, by0, bx0 + bw, by0 + bh], radius=14, fill=(*badge_bg, 255), outline=(255, 240, 140, 240), width=3)
+    b_draw.rounded_rectangle([bx0, by0, bx0 + bw, by0 + bh], radius=14, fill=(*badge_bg, 255), outline=(255, 230, 120, 240), width=4)
     b_draw.text((bx0 + bw // 2, by0 + bh // 2), sanitized_badge, font=f_badge, fill=(255, 255, 255, 255), anchor="mm")
     
     # Rotate badge by tilt angle
@@ -157,56 +151,51 @@ def precompute_cut_typography(
     badge_y = start_y
     text_layer.paste(tilted_badge, (badge_x, badge_y), tilted_badge)
     
-    # 2. 3D Blockbuster Headline Extrusion & Two-Tone Metallic Gradient Face
-    line_spacing = int(f_size * 0.94)
-    headline_top = badge_y + tilted_badge.height + 18
+    # 2. Blockbuster 3D Headline Extrusion & Two-Tone Color Face
+    headline_top = badge_y + tilted_badge.height + 40
+    line_spacing = int(f_size * 1.22)
+    depth = 22
     
     for i, line in enumerate(render_lines):
         line_y = headline_top + (i * line_spacing)
-        c_top, c_bot = (top_hero, bot_hero) if i == 0 else (top_sec, bot_sec)
+        line_color = hero_color if i == 0 else secondary_color
 
-        # 26px Deep 3D block extrusion shadow
-        for offset in range(26, 0, -1):
-            alpha = int(250 * (1.0 - (offset / 34.0)))
-            draw_t.text((cx + int(offset * 0.45), line_y + offset), line, font=f_hero, fill=(5, 5, 12, alpha), anchor="mt")
+        # Deep 3D solid black block extrusion pass
+        for d in range(depth, 0, -2):
+            draw_t.text(
+                (cx + int(d * 0.45), line_y + d),
+                line,
+                font=f_hero,
+                fill=(5, 5, 10, 255),
+                stroke_width=7,
+                stroke_fill=(5, 5, 10, 255),
+                anchor="mt"
+            )
 
-        # 6px Solid Black Outer Rim Stroke for 100% background separation
-        for dx in range(-6, 7):
-            for dy in range(-6, 7):
-                if dx*dx + dy*dy <= 36:
-                    draw_t.text((cx + dx, line_y + dy), line, font=f_hero, fill=(0, 0, 0, 255), anchor="mt")
+        # Crisp outer black armor rim stroke
+        draw_t.text(
+            (cx, line_y),
+            line,
+            font=f_hero,
+            fill=(0, 0, 0, 255),
+            stroke_width=7,
+            stroke_fill=(0, 0, 0, 255),
+            anchor="mt"
+        )
 
-        # Metallic Vertical Gradient Face via Mask
-        bbox_l = f_hero.getbbox(line)
-        lw = bbox_l[2] - bbox_l[0] + 40
-        lh = bbox_l[3] - bbox_l[1] + 20
+        # Face text (Pixel-perfect exact alignment, zero ghosting)
+        draw_t.text(
+            (cx, line_y),
+            line,
+            font=f_hero,
+            fill=(*line_color, 255),
+            stroke_width=1,
+            stroke_fill=(*line_color, 255),
+            anchor="mt"
+        )
         
-        line_mask = Image.new("L", (lw, lh), 0)
-        lm_draw = ImageDraw.Draw(line_mask)
-        lm_draw.text((lw // 2, lh // 2), line, font=f_hero, fill=255, anchor="mm")
-        
-        grad_img = Image.new("RGBA", (lw, lh), (0, 0, 0, 0))
-        g_draw = ImageDraw.Draw(grad_img)
-        for y in range(lh):
-            factor = y / max(lh - 1, 1)
-            r = int(c_top[0] + (c_bot[0] - c_top[0]) * factor)
-            g = int(c_top[1] + (c_bot[1] - c_top[1]) * factor)
-            b = int(c_top[2] + (c_bot[2] - c_top[2]) * factor)
-            g_draw.line([(0, y), (lw, y)], fill=(r, g, b, 255))
-            
-        line_face = Image.new("RGBA", (lw, lh), (0, 0, 0, 0))
-        line_face.paste(grad_img, (0, 0), line_mask)
-        
-        fx = cx - lw // 2
-        fy = line_y + (bbox_l[1] - (lh // 2 - (bbox_l[3] - bbox_l[1]) // 2))
-        text_layer.paste(line_face, (fx, fy), line_face)
-
-        # Top-left specular rim chisel highlight
-        draw_t.text((cx - 1, line_y - 1), line, font=f_hero, fill=(255, 255, 255, 120), anchor="mt")
-        
-    # Dual-stage Volumetric Bloom (wide ambient halo + intense tight core)
-    bloom_wide = text_layer.filter(ImageFilter.GaussianBlur(36))
-    bloom_tight = text_layer.filter(ImageFilter.GaussianBlur(14))
+    # Volumetric neon bloom layer
+    bloom_layer = text_layer.filter(ImageFilter.GaussianBlur(28))
     
     # Forward italic shear angle 0.22
     shear_val = 0.22
@@ -218,13 +207,7 @@ def precompute_cut_typography(
         affine_matrix,
         resample=Image.Resampling.BICUBIC
     )
-    sheared_bloom_wide = bloom_wide.transform(
-        (text_canvas_w, text_canvas_h),
-        Image.AFFINE,
-        affine_matrix,
-        resample=Image.Resampling.BICUBIC
-    )
-    sheared_bloom_tight = bloom_tight.transform(
+    sheared_bloom = bloom_layer.transform(
         (text_canvas_w, text_canvas_h),
         Image.AFFINE,
         affine_matrix,
@@ -240,18 +223,14 @@ def precompute_cut_typography(
             min(text_canvas_h, bbox[3] + 40)
         )
         final_text = sheared_text.crop(crop_box)
-        final_wide = sheared_bloom_wide.crop(crop_box)
-        final_tight = sheared_bloom_tight.crop(crop_box)
-        
-        # Combine dual bloom
-        combined_bloom = Image.alpha_composite(final_wide, final_tight)
+        final_bloom = sheared_bloom.crop(crop_box)
     else:
         final_text = sheared_text
-        combined_bloom = sheared_bloom_wide
+        final_bloom = sheared_bloom
         
     return {
         "text_img": final_text,
-        "bloom_img": combined_bloom,
+        "bloom_img": final_bloom,
         "width": final_text.width,
         "height": final_text.height
     }
