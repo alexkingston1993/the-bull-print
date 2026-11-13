@@ -1,0 +1,52 @@
+name: Social Media Expert & Channel Auditor (Every 6 Hours)
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours daily
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  audit-channel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Install Auditor Dependencies
+        run: |
+          pip install --no-cache-dir requests loguru google-api-python-client google-auth google-auth-oauthlib toml Pillow
+
+      - name: 🔑 Materialize YouTube OAuth Tokens
+        env:
+          YOUTUBE_TOKEN_EN: ${{ secrets.YOUTUBE_TOKEN_EN }}
+          YT_OAUTH_POOL_JSON: ${{ secrets.YT_OAUTH_POOL_JSON }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+        run: |
+          mkdir -p data/youtube_tokens
+          if [ -n "$YOUTUBE_TOKEN_EN" ]; then
+            echo "$YOUTUBE_TOKEN_EN" | base64 -d > data/youtube_tokens/youtube_token_en.pickle
+          fi
+          if [ -n "$YT_OAUTH_POOL_JSON" ]; then
+            echo "$YT_OAUTH_POOL_JSON" > data/youtube_tokens/oauth_pool.json
+          fi
+
+      - name: 🚀 Execute 6-Hour Social Media & SEO Quality Audit
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          YOUTUBE_TOKEN_EN: ${{ secrets.YOUTUBE_TOKEN_EN }}
+          YT_OAUTH_POOL_JSON: ${{ secrets.YT_OAUTH_POOL_JSON }}
+        run: |
+          python scripts/social_media_auditor.py

@@ -1,8 +1,8 @@
 {
   "version": "2.0.0",
   "engine_name": "Aria Cognitive Self-Healing & Continuous Learning Engine",
-  "last_synced": "2026-11-04T16:20:00Z",
-  "total_learned_rules": 36,
+  "last_synced": "2026-11-13T17:45:00Z",
+  "total_learned_rules": 46,
   "learned_rules": [
     {
       "rule_id": "BUG-01-RUNNER-DEP-REQUESTS",
@@ -399,6 +399,116 @@
       "action_plan": "Filter out 'Deleted video' and 'Private video' placeholders from live YouTube audit, and scope active run matching strictly by slot ID and schedule window.",
       "auto_executable": null,
       "learned_from": "Live incident: Nov 4 supervisor falsely reported deleted uploads as live"
+    },
+    {
+      "rule_id": "BUG-37-ARGPARSE-RESTRICTIVE-VERTICAL",
+      "signature_pattern": "(cloud_parallel_video_engine.*invalid choice:.*vertical|argument --vertical: invalid choice)",
+      "domain": "parallel_matrix",
+      "failed_component": "Cloud Parallel Video Engine CLI",
+      "severity": "CRITICAL",
+      "root_cause": "Hardcoded choices in argparse (stock_market, crypto, insurance) rejected dynamically discovered valid market verticals (commodities, forex, banking, regulatory).",
+      "action_plan": "Allow any market vertical string; sanitize and pass through dynamically without restrictive choices constraint.",
+      "auto_executable": null,
+      "learned_from": "Live incident: Nov 13 daily 5 AM dispatch failed 8/12 runs due to vertical=commodities/forex"
+    },
+    {
+      "rule_id": "BUG-38-KAGGLE-CONCURRENT-KERNEL-LOCK",
+      "signature_pattern": "(Failed to acquire Kaggle GPU photographic plate|kaggle.*conflict|409.*conflict|kernel.*already running)",
+      "domain": "kaggle_gpu",
+      "failed_component": "Kaggle Dual-T4 GPU Engine",
+      "severity": "CRITICAL",
+      "root_cause": "Multiple GitHub Actions workers pushed metadata to the exact same Kaggle notebook slug simultaneously, causing race conditions and session locks.",
+      "action_plan": "Implement sequential queueing, exponential backoff, and poll kernel completion before next dispatch.",
+      "auto_executable": null,
+      "learned_from": "Live incident: Nov 13 daily 5 AM dispatch failed 4 runs due to simultaneous Kaggle kernel pushes"
+    },
+    {
+      "rule_id": "BUG-39-TYPOGRAPHY-COORDINATE-ANCHOR-GHOSTING",
+      "signature_pattern": "(typography.*double.*vision|typography.*ghosting|typography.*duplicated|extrusion.*misaligned)",
+      "domain": "render_ffmpeg",
+      "failed_component": "Magnates Visual Studio 3D Typography Engine",
+      "severity": "CRITICAL",
+      "root_cause": "Sub-box mask coordinates computed with anchor=mm while outer rim and extrusion used anchor=mt, causing 3 offset layers.",
+      "action_plan": "Unify all layers (shadow extrusion, armor rim, face gradient, specular gloss) to a single (cx, line_y) coordinate with anchor=mt.",
+      "auto_executable": null,
+      "learned_from": "Live incident: Nov 13 user review of $7 TRILLION DEBT TRAP frame"
+    },
+    {
+      "rule_id": "BUG-40-TYPOGRAPHY-LINE-SPACING-COLLISION",
+      "signature_pattern": "(typography.*overlap|typography.*collision|line 2.*overlapping line 1)",
+      "domain": "render_ffmpeg",
+      "failed_component": "Magnates Visual Studio 3D Typography Engine",
+      "severity": "HIGH",
+      "root_cause": "Line spacing was 0.94x (135px) while font height (135px) + extrusion (26px) was 161px, producing negative 26px collision gap.",
+      "action_plan": "Enforce 1.22x line spacing (175px at 144px font), providing a guaranteed 16px dark separation gap.",
+      "auto_executable": null,
+      "learned_from": "Live incident: Nov 13 user review of gold_standard_v2_frame"
+    },
+    {
+      "rule_id": "BUG-41-TILTED-BADGE-LINE1-COLLISION",
+      "signature_pattern": "(badge.*collision|badge.*overlapping.*line 1|badge.*tilted.*corner)",
+      "domain": "render_ffmpeg",
+      "failed_component": "Tactical Distress Badge Renderer",
+      "severity": "MEDIUM",
+      "root_cause": "+18px clearance collided with the downward-rotated corner of the -8 deg tilted badge.",
+      "action_plan": "Increase vertical badge clearance to +40px above Line 1 bounding box.",
+      "auto_executable": null,
+      "learned_from": "Live incident: Nov 13 typography alignment overhaul"
+    },
+    {
+      "rule_id": "BUG-42-CAPTION-BORDER-OVERFLOW",
+      "signature_pattern": "(caption.*outside.*border|caption.*overflow|text.*bleeding.*pill)",
+      "domain": "render_ffmpeg",
+      "failed_component": "Sliding Spoken Word Caption System",
+      "severity": "CRITICAL",
+      "root_cause": "Long spoken word clusters exceeded fixed pill width, clipping outside screen margin.",
+      "action_plan": "Auto-wrap words into two balanced lines whenever cluster width exceeds safe threshold, expanding pill height dynamically.",
+      "auto_executable": null,
+      "learned_from": "Live incident: Nov 13 user uploaded caption overflow defect screenshot"
+    },
+    {
+      "rule_id": "BUG-43-CORPORATE-BOARDROOM-METAPHOR-VIOLATION",
+      "signature_pattern": "(corporate.*boardroom|suits.*table|generic.*laptop|conference.*room)",
+      "domain": "visual_qa_critic",
+      "failed_component": "Visual Prompt & B-Roll Generation Engine",
+      "severity": "HIGH",
+      "root_cause": "Prompts produced low-CTR corporate tropes instead of concrete physical metaphors.",
+      "action_plan": "Strict negative prompt enforcement (suits, office, meeting, laptop) and mandatory physical metaphors (cargo ships, vaults, gold bars, fighter jets).",
+      "auto_executable": null,
+      "learned_from": "Live incident: Nov 13 channel audit of corporate desk visual frames"
+    },
+    {
+      "rule_id": "BUG-44-MISSING-ARTICLE-INTERLINK",
+      "signature_pattern": "(missing.*article.*link|404.*bullprintmedia|broken.*website.*link)",
+      "domain": "compliance_seo",
+      "failed_component": "Social Media & Channel Auditor",
+      "severity": "HIGH",
+      "root_cause": "YouTube description lacked matching article URL or article had not yet deployed to Vercel.",
+      "action_plan": "Audit description links, verify HTTP 200 on Vercel, and auto-patch description via videos.update.",
+      "auto_executable": null,
+      "learned_from": "Requirement: 6-hour Social Media Auditor mandate"
+    },
+    {
+      "rule_id": "BUG-45-YOUTUBE-OAUTH-REFRESH-EXHAUSTION",
+      "signature_pattern": "(quotaExceeded|invalid_grant|token.*expired|upload.*limit.*exceeded)",
+      "domain": "youtube_api",
+      "failed_component": "YouTube Uploader Multi-Slot Pool",
+      "severity": "CRITICAL",
+      "root_cause": "10,000 units/day quota exhausted or OAuth refresh token expired on primary client slot.",
+      "action_plan": "Hot-swap to alternate OAuth credentials (Slot 2/3) in oauth_pool.json and resume upload without re-rendering.",
+      "auto_executable": null,
+      "learned_from": "Architecture: 20,000-unit multi-slot failover pool"
+    },
+    {
+      "rule_id": "BUG-46-MACRO-TECH-FINANCE-EVENT-TRIGGER",
+      "signature_pattern": "(outlook.*down|microsoft.*outage|aws.*outage|crowdstrike.*halt|payment.*gateway.*crash)",
+      "domain": "viral_radar",
+      "failed_component": "Hourly Viral Radar & Breaking News Engine",
+      "severity": "HIGH",
+      "root_cause": "Systemic tech/cloud outages disrupt global trading, banking, and communications but bypass equity-only scanners.",
+      "action_plan": "Expand scanner to cloud/IT status feeds, assess systemic financial impact via Gemini, and dispatch emergency Ad-Hoc Shorts.",
+      "auto_executable": null,
+      "learned_from": "Requirement: User macro event specification (Microsoft Outlook outage)"
     }
   ],
   "incident_history": [

@@ -101,6 +101,29 @@ The cloud video path is approximately:
    - Tier 2 (GitHub Actions 20-Runner Cloud Matrix): Composites segments in parallel, ducks ambient BGM audio (-18 LUFS), aligns millisecond-accurate word captions, concatenates the master video, and publishes directly to YouTube. Zero local rendering.
 8. **Publish and distribute.** The orchestrator generates an article through [`engine.py`](engine.py), updates publication metadata through [`publisher.py`](publisher.py), and performs the configured indexing and social/YouTube follow-up actions. The workflow commits generated content/assets to GitHub; a repository update triggers the Vercel site deployment.
 
+### Standing Autonomous Supervisor & Growth Jobs
+
+To ensure 100% uninterrupted broadcast reliability, zero human micromanagement, and real-time responsiveness to black swan market events, the architecture runs three automated standing jobs:
+
+1. **Daily Production Supervisor & Cognitive Auto-Healer (`daily_production_supervisor.yml` / `scripts/daily_production_supervisor.py`)**
+   - **Schedule**: Every hour from 6:00 AM to 10:00 AM IST (`30 0,1,2,3,4 * * *` UTC).
+   - **Audit**: Verifies whether today's 5:00 AM IST cron successfully generated and published all 12 target videos (10 Shorts + 2 Master Documentaries).
+   - **Cognitive Auto-Healing**: If any deficit is detected, pulls failed run logs, matches failure signatures against Aria's Cognitive Healing Vault (46 learned rules across Kaggle GPU locks, OAuth quotas, line overlaps, and argparse gates), auto-remediates, and resumes sequential pipeline dispatch until the full 12-video quota is live.
+   - **Alerting**: Dispatches diagnostic audit cards directly to Telegram.
+
+2. **Social Media Expert & Channel Auditor (`social_media_auditor.yml` / `scripts/social_media_auditor.py`)**
+   - **Schedule**: Every 6 hours around the clock (`0 */6 * * *` UTC).
+   - **Duplicate Gate**: Scans latest 50 uploads for semantic cannibalization ($\ge 65\%$ title/script overlap) and unlists duplicates.
+   - **Thumbnail & Visual Quality**: Evaluates live thumbnails against WCAG contrast ($\ge 4.5$) and 3D typography standards; re-renders and auto-updates defective thumbnails via `thumbnails.set`.
+   - **Intelligent Article & Video Interlinking**: Verifies corresponding verified portal articles are linked (`https://bullprintmedia.com/posts/<slug>`) with live HTTP 200 verification on Vercel; injects contextually related YouTube videos into descriptions rather than generic links.
+   - **50/50 vidIQ SEO Health**: Enforces compliant descriptions, mandatory SEBI safe harbor disclaimers, and 15–20 high-velocity search tags, auto-rectifying flawed metadata via `videos.update`.
+
+3. **Real-Time Hourly Viral Radar (`viral_radar_hourly.yml` / `scripts/hourly_viral_radar.py`)**
+   - **Schedule**: Every hour 24/7 (`0 * * * *` UTC).
+   - **Macro Horizon**: Scans high-velocity financial market movements (FII flash dumps, currency extremes) and systemic technology/cloud disruptions (e.g., Microsoft Outlook/365 global outages, AWS downtime, CrowdStrike kernel halts impacting stock exchanges and banking).
+   - **Gemini AI Editorial Judgement**: Evaluates virality ($\ge 85/100$) and determines whether to trigger an emergency Ad-Hoc production, dynamically deciding the exact number of Shorts (1, 2, or 3) and distinct angles.
+   - **Independent Ad-Hoc Quota**: These emergency productions do NOT consume or count toward the daily scheduled 12-video quota. Dispatches directly to Kaggle GPU for rapid synthesis, upload, and Telegram breaking news broadcast.
+
 The Kaggle dataset is a **file handoff for a render job**, not persistent application storage. GitHub Actions coordinates the transfer and execution; the worker runs in Kaggle's environment and uploads through the YouTube Data API.
 
 ### Market/article publishing flow

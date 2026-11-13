@@ -71,3 +71,27 @@
 - **Narrator**: `en-US-ChristopherNeural` with `-2Hz` pitch calibration.
 - **Soundtrack**: Ambient tension drone / modular 5-act score normalized to `-18 LUFS` relative to voiceover.
 - **Workflow Sequence**: Lock narrative script -> synthesize voiceovers -> extract exact millisecond beat timestamps -> generate clean background plates -> composite & render.
+
+---
+
+## 4. Standing Autonomous Supervisor & Production Jobs
+
+To ensure 24/7 broadcast resilience, zero human babysitting, and real-time response to breaking global market disruptions:
+
+1. **Daily Production Supervisor (06:00 - 10:00 AM IST Hourly)**:
+   - Workflow: `.github/workflows/daily_production_supervisor.yml`
+   - Checks YouTube uploads to verify today's 12-video quota (10 Shorts + 2 Master Documentaries).
+   - If any deficit exists, pulls logs, queries Aria's Cognitive Healing Vault (46 learned rules), auto-heals, and resumes sequential dispatch.
+
+2. **Social Media & Channel Auditor (Every 6 Hours)**:
+   - Workflow: `.github/workflows/social_media_auditor.yml`
+   - Scans 50 latest uploads for semantic cannibalization/duplicates ($\ge 65\%$ overlap).
+   - Audits thumbnail WCAG contrast ($\ge 4.5$) and re-renders defective covers.
+   - Verifies companion research article backlinks with HTTP 200 checks on Vercel (`https://bullprintmedia.com/posts/<slug>`).
+   - Injects intelligent contextual video interlinks and enforces 50/50 vidIQ SEO tags and SEBI safe harbor disclaimers.
+
+3. **Real-Time Hourly Viral Radar (Hourly 24/7)**:
+   - Workflow: `.github/workflows/viral_radar_hourly.yml`
+   - Scans breaking financial news and systemic macro tech shocks (e.g. Microsoft Outlook/365 outages, AWS downtime, banking halts).
+   - Uses Gemini AI for high-stakes editorial judgement (virality score $\ge 85/100$) and decides the exact number of emergency Ad-Hoc Shorts (1 to 3).
+   - Dispatches emergency productions through Kaggle GPU without counting toward the daily 12-video quota.
