@@ -509,6 +509,39 @@
       "action_plan": "Expand scanner to cloud/IT status feeds, assess systemic financial impact via Gemini, and dispatch emergency Ad-Hoc Shorts.",
       "auto_executable": null,
       "learned_from": "Requirement: User macro event specification (Microsoft Outlook outage)"
+    },
+    {
+      "rule_id": "BUG-47-VIRAL-TOPIC-SCANNER-ACCUMULATION",
+      "signature_pattern": "(failed to discover 10 shorts and 2 documentaries|viral_topic_scanner.*runtimeerror)",
+      "domain": "script_generation",
+      "failed_component": "Viral Topic Scanner",
+      "severity": "CRITICAL",
+      "root_cause": "Single-shot Gemini API response returned fewer than 10 topics, rejecting the entire discovery batch.",
+      "action_plan": "Accumulate topics across iterative Gemini requests and model cascade (gemini-2.0-flash, gemini-1.5-flash) until 10 Shorts and 2 Documentaries quota is fulfilled.",
+      "auto_executable": null,
+      "learned_from": "Production incident: Nov 14 5:00 AM master run failure"
+    },
+    {
+      "rule_id": "BUG-48-KINETIC-CAPTION-WORD-DESYNC-JUMBLE",
+      "signature_pattern": "(draw_sliding_word_caption|sliding.*word.*caption|caption.*jumble|word.*overlap.*bleed)",
+      "domain": "rendering",
+      "failed_component": "Kinetic Caption & Word Sync Engine",
+      "severity": "CRITICAL",
+      "root_cause": "Repeated common words ('the', 'of', 'in') caused string-search to snap back to index 0, and rigid 3.0s time slicing bled words across segment boundaries.",
+      "action_plan": "Partition words sequentially by script sentence word count, and render captions using precomputed integer-indexed cached chunk pills (active_w_idx). Zero string matching.",
+      "auto_executable": null,
+      "learned_from": "Production incident: Flawed YouTube Short SpYqSeSy_1k"
+    },
+    {
+      "rule_id": "BUG-49-VOICE-NARRATOR-IDENTITY-LEAK",
+      "signature_pattern": "(i am christopher|narrator.*christopher|name.*christopher)",
+      "domain": "script_generation",
+      "failed_component": "Script Studio Narration Prompt",
+      "severity": "CRITICAL",
+      "root_cause": "Edge TTS voice model name ('Christopher') leaked into the Gemini persona prompt, causing Gemini to write self-introductions ('I am Christopher').",
+      "action_plan": "Purge all personal names from narrator persona prompts, enforce strict zero-self-identification mandate, enforce 'Alex' as the only allowable creator identity, and regex-scrub scripts before TTS.",
+      "auto_executable": null,
+      "learned_from": "Production incident: Flawed YouTube Short SpYqSeSy_1k"
     }
   ],
   "incident_history": [

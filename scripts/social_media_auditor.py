@@ -104,10 +104,34 @@ def audit_channel_and_rectify():
     rectifications = []
     seen_titles = []
 
+    # Quarantine file: Defective or user-rejected videos to immediately privatize
+    quarantine_file = BASE_DIR / "app" / "config" / "quarantined_videos.json"
+    quarantined_ids = []
+    if quarantine_file.exists():
+        try:
+            with open(quarantine_file, "r", encoding="utf-8") as f:
+                quarantined_ids = json.load(f)
+        except Exception:
+            quarantined_ids = []
+
     for v in videos_detail:
         v_id = v["id"]
         snip = v.get("snippet", {})
         status = v.get("status", {})
+
+        # Immediate Quarantine Gate
+        if v_id in quarantined_ids:
+            cur_privacy = status.get("privacyStatus")
+            if cur_privacy != "private":
+                try:
+                    service.videos().update(
+                        part="status",
+                        body={"id": v_id, "status": {"privacyStatus": "private"}}
+                    ).execute()
+                    rectifications.append(f"Quarantined defective video {v_id} -> set to PRIVATE.")
+                    logger.success(f"🔒 [Quarantine] Successfully privatized defective video {v_id}.")
+                except Exception as q_err:
+                    logger.error(f"Failed to privatize {v_id}: {q_err}")
         title = snip.get("title", "")
         desc = snip.get("description", "")
         tags = snip.get("tags", [])

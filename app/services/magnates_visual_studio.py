@@ -236,7 +236,14 @@ def precompute_cut_typography(
     }
 
 
-def draw_sliding_word_caption(frame: Image.Image, caption_text: str, active_word: str, font_path: str = FONT_ROBOTO_BOLD, y: int = 1480):
+def draw_sliding_word_caption(
+    frame: Image.Image,
+    caption_text: str,
+    active_word: str,
+    font_path: str = FONT_ROBOTO_BOLD,
+    y: int = 1480,
+    active_word_index: Optional[int] = None,
+):
     """Draws adaptive word-level kinetic captions in mobile/landscape safe zone with 2-line auto-wrap and yellow highlight on spoken word."""
     words = caption_text.split() if isinstance(caption_text, str) else list(caption_text)
     if not words:
@@ -246,7 +253,9 @@ def draw_sliding_word_caption(frame: Image.Image, caption_text: str, active_word
     clean_active = active_word.strip(".,!?:;\"'").upper() if active_word else ""
     
     match_idx = 0
-    if clean_active:
+    if active_word_index is not None and 0 <= active_word_index < len(words):
+        match_idx = active_word_index
+    elif clean_active:
         for idx, w in enumerate(words):
             if str(w).strip(".,!?:;\"'").upper() == clean_active:
                 match_idx = idx

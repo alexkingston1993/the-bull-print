@@ -108,17 +108,19 @@ class ViralTopicScanner:
             import time
             from google import genai
             
-            # Models to cascade through with automatic retry (gemini-flash-lite-latest is verified working on v1alpha)
             candidate_models = [
-                "gemini-flash-lite-latest",
-                "gemini-3.8-flash",
-                "gemini-2.5-pro",
-                "gemini-1.5-pro"
+                "gemini-2.0-flash",
+                "gemini-1.5-flash",
+                "gemini-1.5-pro",
+                "gemini-flash-lite-latest"
             ]
             
+            accumulated_shorts = []
+            accumulated_docs = []
+
             # Try both v1alpha and default API versions
             for api_ver in ["v1alpha", None]:
-                if data:
+                if len(accumulated_shorts) >= 10 and len(accumulated_docs) >= 2:
                     break
                 try:
                     client_kwargs = {"api_key": self.gemini_key}
@@ -127,9 +129,15 @@ class ViralTopicScanner:
                     client = genai.Client(**client_kwargs)
                     
                     for model_name in candidate_models:
+                        if len(accumulated_shorts) >= 10 and len(accumulated_docs) >= 2:
+                            break
                         for attempt in range(3):
+                            needed_s = max(0, 10 - len(accumulated_shorts))
+                            needed_d = max(0, 2 - len(accumulated_docs))
+                            if needed_s == 0 and needed_d == 0:
+                                break
                             try:
-                                logger.info(f"Querying {model_name} (API {api_ver or 'default'}, attempt {attempt + 1}) for past 24h viral intelligence...")
+                                logger.info(f"Querying {model_name} (API {api_ver or 'default'}, attempt {attempt + 1}) for {needed_s} Shorts & {needed_d} Docs...")
                                 resp = client.models.generate_content(model=model_name, contents=prompt)
                                 raw = resp.text.strip()
                                 if "```json" in raw:
@@ -137,9 +145,17 @@ class ViralTopicScanner:
                                 elif "```" in raw:
                                     raw = raw.split("```")[1].split("```")[0].strip()
                                 parsed = json.loads(raw)
-                                if len(parsed.get("shorts_topics", [])) >= 10 and len(parsed.get("documentary_topics", [])) >= 2:
-                                    data = parsed
-                                    logger.success(f"✓ Discovered {len(data['shorts_topics'])} Shorts & {len(data['documentary_topics'])} Documentaries via {model_name}")
+                                
+                                for st in parsed.get("shorts_topics", []):
+                                    if st.get("title") and not any(x["title"] == st["title"] for x in accumulated_shorts):
+                                        accumulated_shorts.append(st)
+                                        
+                                for dt in parsed.get("documentary_topics", []):
+                                    if dt.get("title") and not any(x["title"] == dt["title"] for x in accumulated_docs):
+                                        accumulated_docs.append(dt)
+                                        
+                                logger.info(f"Progress: {len(accumulated_shorts)}/10 Shorts, {len(accumulated_docs)}/2 Documentaries")
+                                if len(accumulated_shorts) >= 10 and len(accumulated_docs) >= 2:
                                     break
                             except Exception as me:
                                 err_str = str(me)
@@ -149,10 +165,15 @@ class ViralTopicScanner:
                                     continue
                                 else:
                                     break  # Don't retry 404 or unsupported model errors
-                        if data:
-                            break
                 except Exception as ce:
                     logger.warning(f"Client init error with api_ver {api_ver}: {ce}")
+
+            if len(accumulated_shorts) >= 10 and len(accumulated_docs) >= 2:
+                data = {
+                    "shorts_topics": accumulated_shorts[:10],
+                    "documentary_topics": accumulated_docs[:2]
+                }
+                logger.success(f"✓ Discovered full batch: {len(data['shorts_topics'])} Shorts & {len(data['documentary_topics'])} Documentaries")
 
         if not data or len(data.get("shorts_topics", [])) < 10:
             raise RuntimeError("CRITICAL: Failed to discover 10 Shorts and 2 Documentaries from past 24h news. Hardcoded fallbacks strictly prohibited.")

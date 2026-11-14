@@ -159,7 +159,11 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
             client = genai.Client(api_key=api_key, http_options={"api_version": "v1alpha"})
             prompt = f"""
             You are an investigative financial journalist and thriller documentary director (in the style of Coffeezilla, James Jani, and MagnatesMedia).
-            Narrator Persona: Christopher (dark, authoritative, forensic, breathless, exposing high-stakes financial crimes and institutional traps).
+            Tone: Dark, authoritative, forensic, breathless investigative thriller exposing high-stakes financial crimes and institutional traps.
+            STRICT IDENTITY MANDATE:
+            - The narrator must NEVER state their name, introduce themselves, or say 'I am [Name]' or 'This is [Name]'.
+            - Zero self-identification. Jump straight into the story from the very first syllable.
+            - If an identity is ever referenced anywhere, it must ONLY be 'Alex' (Founder & Chief Analyst). Never mention or use the name 'Christopher'.
             Topic: {topic_clean}
             Vertical: {vertical}
             Format: {'60-Second Viral Short (9:16 Vertical)' if is_short else f'{int(duration_sec // 60)}-Minute Masterclass (16:9 Landscape)'}
@@ -257,6 +261,9 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
         color_theme = str(g.get("color_theme", "gold")).lower()
         visual_prompt = str(g.get("visual_prompt", "")).strip()
         script_text = str(g.get("script", "")).strip()
+        # Strict zero identity leak guardrail: Scrub any accidental self-introduction or Christopher references
+        script_text = re.sub(r"\b(?:I am|I'm|this is|my name is)\s+Christopher\b", "I'm Alex", script_text, flags=re.IGNORECASE)
+        script_text = re.sub(r"\bChristopher\b", "Alex", script_text, flags=re.IGNORECASE)
 
         if not visual_prompt or len(visual_prompt) < 15:
             visual_prompt = (
@@ -381,8 +388,17 @@ def prepare_session(
         frame_files.append(str(frame_path.relative_to(output_dir)))
         s["frame_file"] = str(frame_path.relative_to(output_dir))
 
-        # Assign words that fall into this section
-        s_words = [w for w in words if s["start_sec"] <= w["start"] < s["end_sec"]]
+    # Assign words sequentially to sections by script word count to prevent cross-segment bleeding
+    current_cursor = 0
+    total_audio_words = len(words)
+    for s_idx, s in enumerate(sections):
+        s_text_words = [w.strip() for w in s.get("script", "").split() if w.strip()]
+        needed_words = len(s_text_words)
+        if s_idx == len(sections) - 1:
+            s_words = words[current_cursor:]
+        else:
+            s_words = words[current_cursor : min(total_audio_words, current_cursor + needed_words)]
+            current_cursor += needed_words
         s["words"] = s_words
 
     # 3. Partition into GHA (up to 20 runners) vs Kaggle GPU Overflow
@@ -630,9 +646,16 @@ def render_segment(segment_index: int, bundle_dir: Path, output_dir: Optional[Pa
                 active_w_idx = idx
                 break
             elif w["start"] > t_current:
-                if idx > 0 and (t_current - words_list[idx - 1]["end"]) < 0.35:
+                if idx > 0 and (t_current - words_list[idx - 1]["end"]) < 0.45:
                     active_w_idx = idx - 1
                 break
+        
+        # Smooth boundaries: start of segment shows first word, end of segment retains last word
+        if active_w_idx is None and total_words_count > 0:
+            if words_list and t_current < words_list[0]["start"]:
+                active_w_idx = 0
+            elif words_list and t_current >= words_list[-1]["end"]:
+                active_w_idx = total_words_count - 1
 
         # Elastic Kinetic Slam Pop-In for 3D Typography (1.35x -> 1.0x over first 0.45s)
         slam_dur = 0.45
@@ -658,10 +681,16 @@ def render_segment(segment_index: int, bundle_dir: Path, output_dir: Optional[Pa
         frame_canvas.paste(b_img, (paste_x, paste_y), b_img)
         frame_canvas.paste(t_img, (paste_x, paste_y), t_img)
 
-        # Sliding word-level caption in mobile safe zone (Y = 1480 for 9:16 Shorts, Y = 920 for 16:9 Docs)
+        # Kinetic Word-Level Captions in Mobile Safe Zone (Y = 1480 for 9:16 Shorts, Y = 920 for 16:9 Docs)
         cap_y = int(h_out * 0.77) if is_short else int(h_out * 0.85)
-        active_word = words_list[active_w_idx]["word"] if active_w_idx is not None else ""
-        draw_sliding_word_caption(frame_canvas, sec.get("script", ""), active_word, y=cap_y)
+        if active_w_idx is not None and active_w_idx in cached_chunk_pills:
+            pill_img, pw, ph = cached_chunk_pills[active_w_idx]
+            cap_px = (w_out - pw) // 2
+            cap_py = cap_y - (ph // 2)
+            frame_canvas.paste(pill_img, (cap_px, cap_py), pill_img)
+        elif active_w_idx is not None and words_list:
+            active_word = words_list[active_w_idx]["word"]
+            draw_sliding_word_caption(frame_canvas, sec.get("script", ""), active_word, y=cap_y, active_word_index=active_w_idx)
 
         proc.stdin.write(frame_canvas.tobytes())
 
