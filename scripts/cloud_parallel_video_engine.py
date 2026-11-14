@@ -213,10 +213,10 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
             }}
             """
             models_to_try = [
+                "gemini-2.0-flash",
+                "gemini-1.5-flash",
+                "gemini-1.5-pro",
                 "gemini-flash-lite-latest",
-                "gemini-3.8-flash",
-                "gemini-2.5-pro",
-                "gemini-2.5-flash",
             ]
             for attempt in range(2):
                 for model_name in models_to_try:

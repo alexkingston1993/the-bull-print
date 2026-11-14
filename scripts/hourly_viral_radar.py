@@ -136,20 +136,27 @@ def evaluate_breaking_signals_via_gemini() -> Optional[Dict[str, Any]]:
 
     try:
         from google import genai
-        client = genai.Client(api_key=api_key)
-        for model in ["gemini-flash-lite-latest", "gemini-3.8-flash", "gemini-2.5-pro"]:
+        for api_ver in ["v1alpha", None]:
+            client_kwargs = {"api_key": api_key}
+            if api_ver:
+                client_kwargs["http_options"] = {"api_version": api_ver}
             try:
-                resp = client.models.generate_content(model=model, contents=prompt)
-                raw = resp.text.strip()
-                if "```json" in raw:
-                    raw = raw.split("```json")[1].split("```")[0].strip()
-                elif "```" in raw:
-                    raw = raw.split("```")[1].split("```")[0].strip()
-                data = json.loads(raw)
-                logger.success(f"✅ [Viral Radar] Gemini {model} assessment completed. Groundbreaking: {data.get('is_groundbreaking')}")
-                return data
-            except Exception as e:
-                logger.debug(f"Attempt with {model} failed: {e}")
+                client = genai.Client(**client_kwargs)
+                for model in ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-flash-lite-latest"]:
+                    try:
+                        resp = client.models.generate_content(model=model, contents=prompt)
+                        raw = resp.text.strip()
+                        if "```json" in raw:
+                            raw = raw.split("```json")[1].split("```")[0].strip()
+                        elif "```" in raw:
+                            raw = raw.split("```")[1].split("```")[0].strip()
+                        data = json.loads(raw)
+                        logger.success(f"✅ [Viral Radar] Gemini {model} assessment completed. Groundbreaking: {data.get('is_groundbreaking')}")
+                        return data
+                    except Exception as e:
+                        logger.debug(f"Attempt with {model} ({api_ver}) failed: {e}")
+            except Exception as ce:
+                logger.debug(f"Client init error: {ce}")
     except Exception as e:
         logger.error(f"[Viral Radar] Gemini evaluation error: {e}")
 
