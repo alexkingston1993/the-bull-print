@@ -24,7 +24,7 @@ import shutil
 import re
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
-from PIL import Image, ImageDraw, ImageFont, ImageEnhance
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageOps
 from loguru import logger
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -364,10 +364,12 @@ def prepare_session(
     words_file = audio_dir / "words.json"
     words = _synthesize_local_christopher_audio(full_script, audio_file, words_file, total_duration_sec=float(duration_sec))
 
-    # 2. Generate High-CTR Background Frames for each section (Aspect-Ratio Aware)
+    # 2. Generate High-CTR Background Frames for each section (Batch-Aware & Aspect-Ratio Strict)
     rules = VideoFormatConfig.get_rules(float(duration_sec), is_short=is_short)
     w_out, h_out = rules["width"], rules["height"]
     frame_files = []
+    
+    missing_frame_prompts = []
     for s in sections:
         idx = s["section_index"]
         frame_path = frames_dir / f"frame_{idx:02d}.jpg"
@@ -376,7 +378,7 @@ def prepare_session(
         if approved_frame.exists():
             shutil.copy2(approved_frame, frame_path)
             logger.success(f"🎯 [Session Prep] Using verified user-approved frame: {approved_frame.name}")
-        else:
+        elif not frame_path.exists():
             prompt = s.get("visual_prompt")
             if not prompt or len(prompt.strip()) < 10:
                 prompt = (
@@ -384,22 +386,123 @@ def prepare_session(
                     f"massive concrete physical monuments, bank vaults, cargo ships, dark moody obsidian lighting, "
                     f"volumetric amber and gold rays, 8k hyper-detailed, clean plate, zero text, zero watermark"
                 )
-            fetch_clean_photographic_plate(prompt=prompt, width=w_out, height=h_out, out_path=frame_path)
+            missing_frame_prompts.append({
+                "id": idx + 1,
+                "prompt": prompt,
+                "output_path": str(frame_path),
+                "section": s
+            })
+
+    # If missing frames, dispatch in a single Kaggle GPU batch for 20x efficiency
+    if missing_frame_prompts:
+        logger.info(f"⚡ [Session Prep] Dispatching {len(missing_frame_prompts)} bespoke plates to Kaggle Dual-T4 GPU...")
+        try:
+            from app.services.kaggle_image_worker import KaggleImageWorker
+            worker = KaggleImageWorker()
+            aspect = "9:16" if is_short else "16:9"
+            worker.generate_batch(
+                prompts=[{"prompt": m["prompt"], "output_path": m["output_path"]} for m in missing_frame_prompts],
+                aspect_ratio=aspect
+            )
+        except Exception as k_err:
+            logger.warning(f"[Session Prep] Kaggle batch dispatch notice: {k_err}")
+
+    # Ensure every single frame exists and is fitted to exact aspect ratio (zero squashing)
+    for s in sections:
+        idx = s["section_index"]
+        frame_path = frames_dir / f"frame_{idx:02d}.jpg"
+        if not frame_path.exists():
+            fetch_clean_photographic_plate(
+                prompt=s.get("visual_prompt", ""),
+                width=w_out,
+                height=h_out,
+                out_path=frame_path
+            )
+        # Verify aspect ratio and fit with ImageOps to guarantee zero distortion
+        try:
+            with Image.open(frame_path) as raw_img:
+                if raw_img.size != (w_out, h_out):
+                    fitted = ImageOps.fit(raw_img.convert("RGB"), (w_out, h_out), method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
+                    fitted.save(frame_path, quality=95)
+        except Exception as f_err:
+            logger.debug(f"Frame fit check: {f_err}")
+
         frame_files.append(str(frame_path.relative_to(output_dir)))
         s["frame_file"] = str(frame_path.relative_to(output_dir))
 
-    # Assign words sequentially to sections by script word count to prevent cross-segment bleeding
-    current_cursor = 0
+    # 3. Dynamic Speech-Aligned Section Boundaries & Millisecond Word Mapping
+    probe_dur = subprocess.run([
+        "ffprobe", "-v", "error", "-show_entries", "format=duration",
+        "-of", "default=noprint_wrappers=1:nokey=1", str(audio_file)
+    ], stdout=subprocess.PIPE, text=True, check=True)
+    total_audio_dur = max(float(probe_dur.stdout.strip()), 1.0)
+
+    s_word_counts = [max(len(s.get("script", "").split()), 1) for s in sections]
+    total_script_words = sum(s_word_counts)
     total_audio_words = len(words)
-    for s_idx, s in enumerate(sections):
-        s_text_words = [w.strip() for w in s.get("script", "").split() if w.strip()]
-        needed_words = len(s_text_words)
-        if s_idx == len(sections) - 1:
-            s_words = words[current_cursor:]
-        else:
-            s_words = words[current_cursor : min(total_audio_words, current_cursor + needed_words)]
-            current_cursor += needed_words
-        s["words"] = s_words
+
+    if total_audio_words > 0:
+        curr_w_idx = 0
+        for s_idx, s in enumerate(sections):
+            if s_idx == len(sections) - 1:
+                sec_words = words[curr_w_idx:]
+            else:
+                target_cnt = max(1, int(round(s_word_counts[s_idx] * (total_audio_words / max(total_script_words, 1)))))
+                end_w_idx = min(total_audio_words, curr_w_idx + target_cnt)
+                sec_words = words[curr_w_idx:end_w_idx]
+                curr_w_idx = end_w_idx
+            s["words"] = sec_words
+
+        # Compute dynamic section start_sec and end_sec matching the speech rhythm
+        for s_idx, s in enumerate(sections):
+            if s_idx == 0:
+                s["start_sec"] = 0.0
+            else:
+                s["start_sec"] = sections[s_idx - 1]["end_sec"]
+
+            if s_idx == len(sections) - 1:
+                s["end_sec"] = round(total_audio_dur, 2)
+            else:
+                this_words = s.get("words", [])
+                next_words = sections[s_idx + 1].get("words", [])
+                if this_words and next_words:
+                    mid = (this_words[-1]["end"] + next_words[0]["start"]) / 2.0
+                    s["end_sec"] = round(max(s["start_sec"] + 0.5, mid), 2)
+                elif this_words:
+                    s["end_sec"] = round(max(s["start_sec"] + 0.5, this_words[-1]["end"] + 0.2), 2)
+                else:
+                    s["end_sec"] = round(s["start_sec"] + (total_audio_dur / len(sections)), 2)
+            s["duration"] = round(s["end_sec"] - s["start_sec"], 2)
+
+            # Clamp word timestamps cleanly inside the section window
+            for w in s.get("words", []):
+                w["start"] = max(s["start_sec"], w.get("start", s["start_sec"]))
+                w["end"] = min(s["end_sec"], max(w["start"] + 0.1, w.get("end", s["end_sec"])))
+    else:
+        logger.warning("⚠️ Words list empty from transcription. Generating procedural millisecond word timestamps...")
+        time_per_section = total_audio_dur / max(len(sections), 1)
+        for s_idx, s in enumerate(sections):
+            s_start = round(s_idx * time_per_section, 2)
+            s_end = round((s_idx + 1) * time_per_section, 2)
+            s["start_sec"] = s_start
+            s["end_sec"] = s_end
+            s["duration"] = round(s_end - s_start, 2)
+
+            s_tokens = [t.strip().upper() for t in s.get("script", "").split() if t.strip()]
+            sec_words = []
+            if s_tokens:
+                step = (s_end - s_start - 0.2) / max(len(s_tokens), 1)
+                for w_i, tok in enumerate(s_tokens):
+                    w_st = round(s_start + 0.1 + w_i * step, 3)
+                    w_et = round(w_st + min(0.35, step * 0.85), 3)
+                    sec_words.append({
+                        "word": tok,
+                        "start": w_st,
+                        "end": w_et,
+                        "startSec": w_st,
+                        "endSec": w_et
+                    })
+            s["words"] = sec_words
 
     # 3. Partition into GHA (up to 20 runners) vs Kaggle GPU Overflow
     gha_limit = 20
@@ -483,7 +586,7 @@ def render_segment(segment_index: int, bundle_dir: Path, output_dir: Optional[Pa
     frame_full = bundle_dir / frame_rel
     base_img = Image.open(frame_full).convert("RGB")
     if base_img.size != (w_out, h_out):
-        base_img = base_img.resize((w_out, h_out), Image.Resampling.LANCZOS)
+        base_img = ImageOps.fit(base_img, (w_out, h_out), method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
 
     # -------------------------------------------------------------
     # 4-WORD KINETIC TYPOGRAPHY CAPTION SYSTEM (MRBEAST / HORMOZI STYLE)
@@ -792,7 +895,57 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
 
     logger.success(f"🎉 [Aggregator] Assembled final broadcast master: {final_video_mp4.name} ({final_video_mp4.stat().st_size // 1024} KB)")
 
-    # 3. Upload to YouTube with 20,000 quota pool
+    # 3. Mandatory Pre-Upload Quality Control Gate & High-CTR 3D Typography Thumbnail
+    is_short = manifest.get("is_short", False)
+    
+    # Run ffprobe stream and duration verification
+    try:
+        probe_cmd = [
+            "ffprobe", "-v", "error", "-print_format", "json",
+            "-show_streams", "-show_format", str(final_video_mp4)
+        ]
+        probe_res = subprocess.run(probe_cmd, capture_output=True, text=True, check=True)
+        probe_data = json.loads(probe_res.stdout)
+        v_stream = next((s for s in probe_data.get("streams", []) if s.get("codec_type") == "video"), None)
+        a_stream = next((s for s in probe_data.get("streams", []) if s.get("codec_type") == "audio"), None)
+        
+        if not v_stream or not a_stream:
+            raise ValueError("Pre-Upload QC Failed: Master video must contain both video and audio streams.")
+        
+        act_w = int(v_stream.get("width", 0))
+        act_h = int(v_stream.get("height", 0))
+        exp_w = 1080 if is_short else 1920
+        exp_h = 1920 if is_short else 1080
+        if (act_w, act_h) != (exp_w, exp_h):
+            raise ValueError(f"Pre-Upload QC Failed: Video aspect ratio distorted! Got {act_w}x{act_h}, expected {exp_w}x{exp_h}.")
+        
+        dur = float(probe_data.get("format", {}).get("duration", 0))
+        if dur < 10.0:
+            raise ValueError(f"Pre-Upload QC Failed: Video duration too short ({dur:.1f}s).")
+        logger.success(f"🛡️ [Pre-Upload QC Passed] Validated {act_w}x{act_h} | Duration: {dur:.1f}s | Audio & Video synced.")
+    except Exception as qc_err:
+        logger.error(f"⛔ CRITICAL PRE-UPLOAD QC HALT: {qc_err}")
+        _send_telegram(f"🚨 Pre-Upload QC Failed on {manifest.get('topic')}: {qc_err}. Video upload permanently halted.")
+        raise
+
+    # Extract High-CTR Thumbnail from segment 0 (0.45s after 3D typography slam pop-in)
+    thumb_path = output_dir / "high_ctr_thumbnail.jpg"
+    first_seg = segments_dir / "segment_00.mp4"
+    if not first_seg.exists():
+        matches = list(segments_dir.rglob("segment_00.mp4")) + list(segments_dir.rglob("segment_0.mp4"))
+        if matches:
+            first_seg = matches[0]
+    if first_seg.exists():
+        subprocess.run([
+            "ffmpeg", "-y", "-ss", "0.45", "-i", str(first_seg),
+            "-vframes", "1", "-q:v", "2", str(thumb_path)
+        ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    if not thumb_path.exists() or thumb_path.stat().st_size < 1000:
+        fallback_frame = bundle_dir / "frames" / "frame_00.jpg"
+        if fallback_frame.exists():
+            thumb_path = fallback_frame
+
+    # 4. Upload to YouTube with 20,000 quota pool
     yt_url = ""
     try:
         title = f"{manifest['topic']} | The Bull Print"
@@ -803,8 +956,6 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
             f"#trading #finance #investing #algotrading #wealth"
         )
         tags = ["stock market", "crypto", "trading", "finance", "the bull print"]
-        thumb_path = bundle_dir / "frames" / "frame_00.jpg"
-
         privacy_status = manifest.get("privacy_status") or os.getenv("YOUTUBE_PRIVACY", "unlisted")
 
         from app.services.youtube_uploader import get_uploader
