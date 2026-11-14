@@ -88,15 +88,7 @@ jobs:
         run: |
           if [ -z "$INPUT_TOPIC" ]; then
             echo "⚡ No manual topic passed; dynamically discovering past 24h viral market topic..."
-            python -c "
-import os
-from app.services.viral_topic_scanner import ViralTopicScanner
-scanner = ViralTopicScanner()
-data = scanner.scan_past_24h_topics()
-topic = data['shorts_topics'][0]['title'] if data.get('shorts_topics') else 'Indian Bluechips Institutional Order Flow Trap'
-with open('discovered_topic.txt', 'w') as f:
-    f.write(topic)
-"
+            python -c "import os; from app.services.viral_topic_scanner import ViralTopicScanner; data = ViralTopicScanner().scan_past_24h_topics(); topic = data['shorts_topics'][0]['title'] if data.get('shorts_topics') else 'Indian Bluechips Institutional Order Flow Trap'; open('discovered_topic.txt', 'w').write(topic)"
             if [ -f discovered_topic.txt ]; then
               INPUT_TOPIC=$(cat discovered_topic.txt)
             else
