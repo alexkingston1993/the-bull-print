@@ -398,22 +398,14 @@ def fetch_clean_photographic_plate(prompt: str, width: int = 1080, height: int =
             logger.success(f"✓ [Kaggle GPU Cloud] Fresh bespoke plate generated on Kaggle GPU: {out_f.name}")
             return img
     except Exception as e:
-        logger.warning(f"[Kaggle GPU Dispatch Notice]: {e}")
+        logger.error(f"[Kaggle GPU Dispatch Failed]: {e}")
+        raise RuntimeError(
+            f"⛔ CRITICAL: Failed to acquire Kaggle Dual-T4 GPU photographic plate for prompt '{prompt[:60]}'. "
+            f"Per Standing Rule 1 & Zero Compromise Mandate, procedural placeholders, blank gradients, and web APIs are PERMANENTLY PROHIBITED. "
+            f"100% of plates must be generated via native CUDA diffusers on Kaggle GPU."
+        ) from e
 
-    # Strategy 3: Clean Procedural Obsidian/Gold Cinematic Plate (Zero text, zero watermarks, perfect aspect ratio)
-    logger.info("🎨 [Kaggle Studio Fallback] Generating clean procedural 35mm dark cinematic photographic plate...")
-    img = Image.new("RGB", (width, height), (8, 12, 22))
-    pdraw = ImageDraw.Draw(img, "RGBA")
-    # Soft volumetric lighting gradient (amber/gold accent)
-    cx, cy = width // 2, int(height * 0.42)
-    max_r = max(width, height) // 2
-    for r in range(max_r, 0, -18):
-        alpha = int(45 * (1.0 - (r / max_r) ** 1.5))
-        pdraw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(220, 160, 30, alpha))
-    # Subtle dark obsidian gradient
-    for y in range(height):
-        grad_a = int(140 * (y / height))
-        pdraw.line([(0, y), (width, y)], fill=(4, 6, 12, grad_a))
-    if out_path:
-        img.save(out_path, quality=95)
-    return img
+    raise RuntimeError(
+        f"⛔ CRITICAL: Kaggle Dual-T4 GPU did not return an image plate for '{prompt[:60]}'. "
+        f"Zero compromise mandate: pipeline will abort rather than generate synthetic or substandard frames."
+    )
