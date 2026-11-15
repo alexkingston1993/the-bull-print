@@ -52,12 +52,38 @@ def run_daily_production(dry_run: bool = False):
     candidates = ["/usr/local/bin/gh", "/usr/bin/gh", "/opt/homebrew/bin/gh"]
     gh_bin = next((c for c in candidates if Path(c).exists()), shutil.which("gh") or "gh")
 
-    # Stage 2: Dispatch 10 Shorts to Cloud Matrix
-    for idx, s in enumerate(shorts, 1):
-        topic = s["title"]
-        vertical = s.get("vertical", "stock_market")
-        print(f"\n[Short {idx:02d}/10] 🚀 Dispatching Short: {topic}")
-        if not dry_run:
+    # Stage 2: Calculate Staggered 24-Hour Drip Schedule
+    from datetime import datetime, timezone, timedelta
+    now_utc = datetime.now(timezone.utc)
+    base_publish_time = now_utc + timedelta(hours=1)
+
+    # Interleave 10 Shorts and 2 Documentaries across 12 two-hour slots
+    # Docs are scheduled at Slot 4 (+9h) and Slot 9 (+19h) for peak audience retention
+    scheduled_items = []
+    s_idx = 0
+    d_idx = 0
+    for slot in range(12):
+        slot_time = (base_publish_time + timedelta(hours=slot * 2)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        if slot in (4, 9) and d_idx < len(docs):
+            scheduled_items.append({"type": "doc", "data": docs[d_idx], "slot": slot, "publish_at": slot_time, "num": d_idx + 1})
+            d_idx += 1
+        elif s_idx < len(shorts):
+            scheduled_items.append({"type": "short", "data": shorts[s_idx], "slot": slot, "publish_at": slot_time, "num": s_idx + 1})
+            s_idx += 1
+        elif d_idx < len(docs):
+            scheduled_items.append({"type": "doc", "data": docs[d_idx], "slot": slot, "publish_at": slot_time, "num": d_idx + 1})
+            d_idx += 1
+
+    # Stage 3: Dispatch Scheduled Productions to Cloud Matrix
+    for item in scheduled_items:
+        data = item["data"]
+        topic = data["title"]
+        vertical = data.get("vertical", "stock_market")
+        publish_at = item["publish_at"]
+        is_short = item["type"] == "short"
+
+        if is_short:
+            print(f"\n[Short {item['num']:02d}/10] 🚀 Dispatching Short: {topic} (Scheduled: {publish_at} UTC)")
             cmd = [
                 gh_bin, "workflow", "run",
                 "parallel_video_matrix.yml",
@@ -65,21 +91,11 @@ def run_daily_production(dry_run: bool = False):
                 "-f", f"vertical={vertical}",
                 "-f", "shorts_only=true",
                 "-f", "duration_sec=60",
-                "-f", "privacy_status=public"
+                "-f", "privacy_status=private",
+                "-f", f"publish_at={publish_at}"
             ]
-            try:
-                res = subprocess.run(cmd, check=True, stdin=subprocess.DEVNULL, capture_output=True, text=True)
-                logger.success(f"✓ Dispatched Short {idx}: {topic[:40]}... ({res.stdout.strip()})")
-            except Exception as e:
-                logger.error(f"Failed to dispatch Short {idx}: {e}")
-            time.sleep(2)
-
-    # Stage 3: Dispatch 2 Master Documentaries to Cloud Matrix
-    for idx, d in enumerate(docs, 1):
-        topic = d["title"]
-        vertical = d.get("vertical", "stock_market")
-        print(f"\n[Doc {idx:02d}/02] 🎬 Dispatching Master Documentary: {topic}")
-        if not dry_run:
+        else:
+            print(f"\n[Doc {item['num']:02d}/02] 🎬 Dispatching Master Documentary (16:9): {topic} (Scheduled: {publish_at} UTC)")
             cmd = [
                 gh_bin, "workflow", "run",
                 "parallel_video_matrix.yml",
@@ -87,14 +103,18 @@ def run_daily_production(dry_run: bool = False):
                 "-f", f"vertical={vertical}",
                 "-f", "shorts_only=false",
                 "-f", "duration_min=12",
-                "-f", "privacy_status=public"
+                "-f", "privacy_status=private",
+                "-f", f"publish_at={publish_at}"
             ]
+
+        if not dry_run:
             try:
                 res = subprocess.run(cmd, check=True, stdin=subprocess.DEVNULL, capture_output=True, text=True)
-                logger.success(f"✓ Dispatched Documentary {idx}: {topic[:40]}... ({res.stdout.strip()})")
+                tag = f"Short {item['num']}" if is_short else f"Doc {item['num']}"
+                logger.success(f"✓ Dispatched {tag}: {topic[:40]}... (PublishAt: {publish_at})")
             except Exception as e:
-                logger.error(f"Failed to dispatch Doc {idx}: {e}")
-            time.sleep(2)
+                logger.error(f"Failed to dispatch {item['type']} {topic}: {e}")
+            time.sleep(3)
 
     print("\n" + "=" * 70)
     print("🎉 ALL 12 CLOUD PRODUCTIONS SUCCESSFULLY DISPATCHED!")

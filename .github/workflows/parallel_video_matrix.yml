@@ -26,6 +26,9 @@ on:
         description: 'Render as 9:16 Short (true/false)'
         required: false
         default: 'true'
+      publish_at:
+        description: 'ISO 8601 UTC timestamp for scheduled release (e.g. 2026-11-15T22:00:00Z)'
+        required: false
 
   repository_dispatch:
     types: [trigger_parallel_video, trigger_media_engine]
@@ -40,6 +43,9 @@ jobs:
   prepare_session:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    concurrency:
+      group: kaggle-gpu-queue
+      cancel-in-progress: false
     outputs:
       matrix: ${{ steps.prep.outputs.matrix }}
       total_segments: ${{ steps.prep.outputs.total_segments }}
@@ -79,6 +85,7 @@ jobs:
           INPUT_TOPIC: "${{ github.event.inputs.topic || github.event.client_payload.topic }}"
           INPUT_VERTICAL: ${{ github.event.inputs.vertical || github.event.client_payload.vertical || 'stock_market' }}
           INPUT_PRIVACY: ${{ github.event.inputs.privacy_status || 'public' }}
+          INPUT_PUBLISH_AT: "${{ github.event.inputs.publish_at || github.event.client_payload.publish_at }}"
           INPUT_DURATION_SEC: ${{ github.event.inputs.duration_sec || github.event.client_payload.duration_sec || '60' }}
           INPUT_DURATION_MIN: ${{ github.event.inputs.duration_min || github.event.client_payload.duration_min || '3' }}
           INPUT_SHORTS_ONLY: ${{ github.event.inputs.shorts_only || github.event.client_payload.shorts_only || 'true' }}
@@ -96,18 +103,19 @@ jobs:
             fi
             echo "🎯 Discovered Topic: $INPUT_TOPIC"
           fi
-          SHORT_FLAG=""
-          if [ "$INPUT_SHORTS_ONLY" = "true" ]; then
-            SHORT_FLAG="--is-short"
+          PUBLISH_AT_ARG=""
+          if [ -n "$INPUT_PUBLISH_AT" ]; then
+            PUBLISH_AT_ARG="--publish-at $INPUT_PUBLISH_AT"
           fi
           python scripts/cloud_parallel_video_engine.py \
             --mode prepare \
             --topic "$INPUT_TOPIC" \
             --vertical "$INPUT_VERTICAL" \
             --privacy-status "$INPUT_PRIVACY" \
+            $PUBLISH_AT_ARG \
             --duration-sec "$INPUT_DURATION_SEC" \
             --duration-min "$INPUT_DURATION_MIN" \
-            $SHORT_FLAG \
+            --is-short "$INPUT_SHORTS_ONLY" \
             --bundle-dir output/session_bundle
 
       - name: 📤 Upload Session Bundle Artifact

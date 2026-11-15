@@ -332,6 +332,7 @@ def prepare_session(
     is_short: bool = True,
     output_dir: Optional[Path] = None,
     privacy_status: str = "unlisted",
+    publish_at: Optional[str] = None,
     skip_duplicate_check: bool = False
 ):
     """
@@ -543,6 +544,7 @@ def prepare_session(
         "is_short": is_short,
         "duration_sec": duration_sec,
         "privacy_status": privacy_status,
+        "publish_at": publish_at,
         "slug": slug,
         "total_segments": total_segments,
         "gha_indices": gha_indices,
@@ -995,6 +997,7 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
         )
         tags = ["stock market", "crypto", "trading", "finance", "the bull print"]
         privacy_status = manifest.get("privacy_status") or os.getenv("YOUTUBE_PRIVACY", "unlisted")
+        publish_at = manifest.get("publish_at")
 
         from app.services.youtube_uploader import get_uploader
         uploader = get_uploader()
@@ -1007,6 +1010,7 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
             thumbnail_path=str(thumb_path) if thumb_path.exists() else None,
             category_id="27",
             privacy_status=privacy_status,
+            publish_at=publish_at,
             is_short=manifest.get("is_short", False),
             force_upload=True,
         )
@@ -1066,6 +1070,17 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
 # CLI ENTRYPOINT
 # ─────────────────────────────────────────────────────────────
 
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ("yes", "true", "t", "y", "1"):
+        return True
+    elif v.lower() in ("no", "false", "f", "n", "0"):
+        return False
+    else:
+        raise argparse.ArgumentTypeError("Boolean value expected.")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Cloud Parallel Video Engine")
     parser.add_argument("--mode", choices=["prepare", "render_segment", "aggregate_and_publish", "dispatch_kaggle_overflow"], required=True)
@@ -1073,7 +1088,8 @@ def main():
     parser.add_argument("--vertical", default="stock_market", help="Market vertical (e.g. stock_market, crypto, commodities, forex, banking, insurance)")
     parser.add_argument("--duration-sec", type=int, default=60)
     parser.add_argument("--duration-min", type=int, default=3)
-    parser.add_argument("--is-short", action="store_true", default=True)
+    parser.add_argument("--is-short", type=str2bool, default=True, help="true for 9:16 vertical short, false for 16:9 widescreen doc")
+    parser.add_argument("--publish-at", default=None, help="ISO 8601 UTC timestamp for scheduled release (e.g. 2026-11-15T22:00:00Z)")
     parser.add_argument("--segment-index", type=int, default=0)
     parser.add_argument("--privacy-status", default=os.getenv("YOUTUBE_PRIVACY", "unlisted"), choices=["public", "unlisted", "private"])
     parser.add_argument("--skip-duplicate-check", action="store_true", default=False)
@@ -1093,6 +1109,7 @@ def main():
             is_short=args.is_short,
             output_dir=args.bundle_dir,
             privacy_status=args.privacy_status,
+            publish_at=args.publish_at,
             skip_duplicate_check=args.skip_duplicate_check
         )
     elif args.mode == "render_segment":

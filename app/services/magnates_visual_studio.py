@@ -360,28 +360,7 @@ def fetch_clean_photographic_plate(prompt: str, width: int = 1080, height: int =
 
     clean_prompt = prompt.replace("clean plate", "").replace("zero text", "").replace("zero watermark", "").strip()
 
-    # Strategy 1: Check existing clean Kaggle plates cache (NEVER recycle legacy bundles with text)
-    local_pools = [
-        Path("/tmp/kaggle_gpu_frames_clean/frames"),
-        Path("/tmp/kaggle_viral_short_clean/frames"),
-        Path("/tmp/kaggle_downloaded_frames"),
-    ]
-    for pool in local_pools:
-        if pool.exists():
-            matches = list(pool.rglob("*.jpg")) + list(pool.rglob("*.png"))
-            if matches:
-                pick = matches[abs(hash(clean_prompt)) % len(matches)]
-                try:
-                    raw_img = Image.open(pick).convert("RGB")
-                    img = ImageOps.fit(raw_img, (width, height), method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
-                    if out_path:
-                        img.save(out_path, quality=95)
-                    logger.success(f"✓ [Kaggle Studio] Clean plate loaded from verified GPU cache: {pick.name}")
-                    return img
-                except Exception:
-                    pass
-
-    # Strategy 2: Live Dispatch to Kaggle Dual-T4 GPU
+    # Zero Compromise & Zero Reuse: Live Dispatch to Kaggle Dual-T4 GPU
     try:
         worker = KaggleImageWorker()
         aspect = "9:16" if height > width else "16:9"
