@@ -62,7 +62,7 @@ jobs:
       - name: 📦 Install Synthesis Dependencies (100% Offline Cloned Christopher Voice & Kaggle)
         run: |
           sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core
-          pip install --no-cache-dir Pillow soundfile soxr faster-whisper requests google-genai loguru toml edge-tts kaggle
+          pip install --no-cache-dir six urllib3 certifi python-dateutil Pillow soundfile soxr faster-whisper requests google-genai loguru toml edge-tts kaggle
 
       - name: ⚙️ Setup Kaggle GPU Credentials
         env:
@@ -185,7 +185,7 @@ jobs:
           python-version: '3.11'
 
       - name: 📦 Install Kaggle CLI
-        run: pip install --no-cache-dir kaggle loguru requests
+        run: pip install --no-cache-dir six urllib3 certifi python-dateutil kaggle loguru requests
 
       - name: 📥 Download Session Bundle
         uses: actions/download-artifact@v4

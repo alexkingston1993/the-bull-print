@@ -32,7 +32,7 @@ jobs:
 
       - name: 📦 Install Orchestrator Dependencies
         run: |
-          pip install --no-cache-dir google-genai loguru toml requests kaggle
+          pip install --no-cache-dir six urllib3 certifi python-dateutil google-genai loguru toml requests kaggle
 
       - name: ⚙️ Setup Kaggle GPU Credentials
         env:

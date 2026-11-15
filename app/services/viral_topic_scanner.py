@@ -153,10 +153,20 @@ class ViralTopicScanner:
           "documentary_topics": [
             {{
               "id": "doc_01",
-              "title": "Documentary Headline (Max 75 chars)",
+              "title": "Documentary Headline 1 (Max 75 chars)",
               "badge": "INVESTIGATION BADGE",
               "hook_text": "MASTER TITLE HOOK",
               "investigative_thesis": "Deep investigative summary exposing the systemic institutional trap.",
+              "sector": "Sector Name",
+              "vertical": "stock_market"
+            }},
+            {{
+              "id": "doc_02",
+              "title": "Documentary Headline 2 (Max 75 chars)",
+              "badge": "INVESTIGATION BADGE",
+              "hook_text": "MASTER TITLE HOOK",
+              "investigative_thesis": "Deep investigative summary exposing the systemic institutional trap.",
+              "sector": "Sector Name",
               "vertical": "stock_market"
             }}
           ]
@@ -169,16 +179,16 @@ class ViralTopicScanner:
             from google import genai
 
             candidate_models = [
-                "gemini-2.0-flash",
-                "gemini-1.5-flash",
-                "gemini-1.5-pro",
-                "gemini-flash-lite-latest"
+                "gemini-flash-lite-latest",
+                "gemini-2.5-flash",
+                "gemini-2.0-flash-lite",
+                "gemini-1.5-flash"
             ]
 
             accumulated_shorts = []
             accumulated_docs = []
 
-            for api_ver in ["v1alpha", None]:
+            for api_ver in [None, "v1alpha"]:
                 if len(accumulated_shorts) >= 10 and len(accumulated_docs) >= 2:
                     break
                 try:
@@ -291,12 +301,21 @@ class ViralTopicScanner:
                 return False
 
         # 4. Check Intra-Batch Diversity
+        FINANCE_SECTOR_WORDS = {
+            "central", "bank", "banks", "banking", "market", "markets", "credit", "debt",
+            "power", "energy", "data", "center", "centers", "ai", "fund", "funds",
+            "traders", "retail", "institutional", "dealers", "dealer", "bond", "bonds",
+            "gold", "silver", "dollar", "dollars", "rupee", "rupees", "pool", "pools",
+            "liquidity", "trade", "trading", "scam", "trap", "crisis", "fall", "rise",
+            "india", "global", "wall", "street", "dalal", "money", "hidden", "secret"
+        }
         for item in current_batch:
             other_title = item.get("title", "")
             other_tokens = _core_title_tokens(other_title)
             shared_batch = cand_tokens & other_tokens
-            if len(shared_batch) >= 2:
-                logger.warning(f"🛡️ [Compliance Gate] Candidate '{title}' too similar to another topic in current batch: '{other_title}'")
+            specific_shared = shared_batch - FINANCE_SECTOR_WORDS
+            if len(shared_batch) >= 3 or len(specific_shared) >= 2:
+                logger.warning(f"🛡️ [Compliance Gate] Candidate '{title}' too similar to another topic in current batch: '{other_title}' (shared: {shared_batch})")
                 return False
 
         return True
