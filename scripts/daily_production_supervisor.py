@@ -158,10 +158,52 @@ def audit_today_published_videos() -> Dict[str, Any]:
     }
 
 
+def check_today_completed_matrix_runs() -> int:
+    """Checks how many parallel_video_matrix.yml workflows completed successfully today in IST."""
+    try:
+        gh_bin = get_gh_binary()
+        res = subprocess.run(
+            [gh_bin, "run", "list", "--workflow=parallel_video_matrix.yml", "--limit", "30", "--json", "conclusion,createdAt"],
+            capture_output=True, text=True
+        )
+        if res.returncode == 0:
+            stdout = res.stdout.strip()
+            idx_start = stdout.find("[")
+            idx_end = stdout.rfind("]")
+            if idx_start == -1 or idx_end == -1:
+                return 0
+            runs = json.loads(stdout[idx_start:idx_end + 1])
+            ist_tz = timezone(timedelta(hours=5, minutes=30))
+            today_ist = datetime.now(timezone.utc).astimezone(ist_tz).strftime("%Y-%m-%d")
+            today_successful = 0
+            for r in runs:
+                c_at = r.get("createdAt")
+                if c_at:
+                    run_date = datetime.fromisoformat(c_at.replace("Z", "+00:00")).astimezone(ist_tz).strftime("%Y-%m-%d")
+                    if run_date == today_ist and r.get("conclusion") == "success":
+                        today_successful += 1
+            return today_successful
+    except Exception as e:
+        logger.debug(f"Failed to check matrix workflow runs: {e}")
+    return 0
+
+
 def diagnose_failed_runs_and_auto_heal(audit_data: Dict[str, Any]):
     """Inspects recent GitHub Actions failures and applies cognitive auto-healing."""
     gh_bin = get_gh_binary()
     logger.info("🧠 [Aria Auto-Heal] Inspecting GitHub Actions workflows for root causes...")
+
+    # First check: If 12 matrix workflows already completed today, master videos exist in artifacts!
+    matrix_completed = check_today_completed_matrix_runs()
+    if matrix_completed >= TARGET_DAILY_VIDEOS:
+        logger.success(f"✓ {matrix_completed} matrix workflows completed successfully today! Master videos are preserved in GitHub Actions artifacts for 13:30 IST quota release. Suppressing supervisor deficit.")
+        send_telegram_alert(
+            f"🛡️ *The Bull Print Supervisor Report*\n\n"
+            f"📅 *Date*: `{audit_data['today_ist']}`\n"
+            f"📦 *All {matrix_completed} Videos Rendered & Preserved*: Stored safely in GitHub Actions artifacts.\n"
+            f"⏳ *YouTube Quota Deferred*: Awaiting Pacific Time reset at 13:30 IST (Option B). Zero re-dispatch needed."
+        )
+        return
 
     # Query last 15 workflow runs
     cmd = [

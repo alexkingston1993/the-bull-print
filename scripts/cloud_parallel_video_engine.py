@@ -1005,6 +1005,30 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
         if not qc_passed:
             raise RuntimeError(f"⛔ PRE-UPLOAD QC GATE REJECTION: Video failed validation: {qc_errors}")
 
+        # Package full upload metadata & thumbnail inside output_dir for zero-loss deferred publishing
+        out_thumb = output_dir / "thumbnail.jpg"
+        if thumb_path.exists():
+            shutil.copy2(thumb_path, out_thumb)
+
+        upload_manifest = {
+            "title": title[:95],
+            "description": description,
+            "tags": tags,
+            "category_id": "27",
+            "is_short": manifest.get("is_short", False),
+            "publish_at": publish_at,
+            "privacy_status": privacy_status,
+            "video_filename": final_video_mp4.name,
+            "thumbnail_filename": out_thumb.name if out_thumb.exists() else None,
+            "topic": manifest.get("topic"),
+            "slug": manifest.get("slug"),
+            "vertical": manifest.get("vertical", "stock_market"),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        with open(output_dir / "upload_manifest.json", "w") as f:
+            json.dump(upload_manifest, f, indent=2)
+        logger.info(f"✓ [Artifact Bundle] Saved upload_manifest.json and assets into {output_dir}")
+
         from app.services.youtube_uploader import get_uploader
         uploader = get_uploader()
         res = uploader.upload_video(
