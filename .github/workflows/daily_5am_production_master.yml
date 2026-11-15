@@ -2,7 +2,7 @@ name: Daily 5:00 AM Production Master (10 Shorts + 2 Documentaries)
 
 on:
   schedule:
-    - cron: '30 23 * * *'  # Exactly 05:00 AM IST Daily
+    - cron: '0 14 * * *'  # Exactly 07:30 PM IST Daily (Test execution)
   workflow_dispatch:
     inputs:
       dry_run:
