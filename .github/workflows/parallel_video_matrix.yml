@@ -301,6 +301,15 @@ jobs:
             --segments-dir output/downloaded_segments \
             --output-dir output/final_broadcast
 
+      - name: 📤 Upload Master Broadcast Video Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: master-broadcast-${{ github.run_id }}-${{ github.run_attempt }}
+          path: output/final_broadcast/
+          retention-days: 7
+          if-no-files-found: ignore
+
       - name: 💾 Commit & Push New Articles, Visual Frames & Manifest to GitHub
         run: |
           git config --global user.name "The Bull Print Autonomous Bot"

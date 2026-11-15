@@ -234,46 +234,59 @@ if __name__ == "__main__":
             logger.error(f"Kaggle push failed: {res.stderr}")
             return False
 
-        logger.info(f"✓ Kernel pushed successfully! Batch UUID: {batch_uuid}. Monitoring execution...")
+        logger.info(f"✓ Kernel pushed successfully! Batch UUID: {batch_uuid}. Sleeping 20s for Kaggle status transition...")
+        time.sleep(20)
         return True
 
-    def generate_batch(self, prompts: List[Dict[str, Any]], aspect_ratio: str = "9:16") -> bool:
-        """Dispatches a batch with unique BATCH_UUID, polls, and verifies before mapping output."""
-        batch_uuid = uuid.uuid4().hex[:8]
-        segments = []
+    def generate_batch(self, prompts: List[Dict[str, Any]], aspect_ratio: str = "9:16", max_retries: int = 3) -> bool:
+        """Dispatches a batch with unique BATCH_UUID, polls, and verifies before mapping output with auto-retries."""
         is_vert = aspect_ratio in ("9:16", "vertical")
-        for idx, p in enumerate(prompts, 1):
-            segments.append({
-                "id": idx,
-                "prompt": p.get("prompt", ""),
-                "title": f"Frame {idx}",
-                "aspect_ratio": "9:16" if is_vert else "16:9",
-                "width": 768 if is_vert else 1344,
-                "height": 1344 if is_vert else 768,
-            })
-
-        if not self.dispatch(segments, batch_uuid=batch_uuid):
-            return False
-
-        # Isolated directory per batch UUID
-        out_dest = Path(f"/tmp/kaggle_downloaded_frames_{batch_uuid}")
-        if out_dest.exists():
-            shutil.rmtree(out_dest, ignore_errors=True)
-        out_dest.mkdir(parents=True, exist_ok=True)
-
-        if self.poll_and_download(out_dest, batch_uuid=batch_uuid, timeout_sec=600):
-            mapped_count = 0
+        
+        for attempt in range(1, max_retries + 1):
+            batch_uuid = uuid.uuid4().hex[:8]
+            segments = []
             for idx, p in enumerate(prompts, 1):
-                downloaded = out_dest / f"segment_{idx:02d}.jpg"
-                if not downloaded.exists():
-                    downloaded = out_dest / f"segment_{idx}.jpg"
-                if downloaded.exists() and "output_path" in p:
-                    target_p = Path(p["output_path"])
-                    target_p.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(downloaded, target_p)
-                    mapped_count += 1
-            logger.success(f"✓ Successfully mapped {mapped_count}/{len(prompts)} frames from Batch {batch_uuid}")
-            return mapped_count == len(prompts)
+                segments.append({
+                    "id": idx,
+                    "prompt": p.get("prompt", ""),
+                    "title": f"Frame {idx}",
+                    "aspect_ratio": "9:16" if is_vert else "16:9",
+                    "width": 768 if is_vert else 1344,
+                    "height": 1344 if is_vert else 768,
+                })
+
+            logger.info(f"🚀 [Kaggle Batch Attempt {attempt}/{max_retries}] Dispatching {len(segments)} frames with UUID: {batch_uuid}")
+            if not self.dispatch(segments, batch_uuid=batch_uuid):
+                logger.warning(f"Dispatch attempt {attempt} failed to acquire lock or push. Retrying in 15s...")
+                time.sleep(15)
+                continue
+
+            # Isolated directory per batch UUID
+            out_dest = Path(f"/tmp/kaggle_downloaded_frames_{batch_uuid}")
+            if out_dest.exists():
+                shutil.rmtree(out_dest, ignore_errors=True)
+            out_dest.mkdir(parents=True, exist_ok=True)
+
+            if self.poll_and_download(out_dest, batch_uuid=batch_uuid, timeout_sec=600):
+                mapped_count = 0
+                for idx, p in enumerate(prompts, 1):
+                    downloaded = out_dest / f"segment_{idx:02d}.jpg"
+                    if not downloaded.exists():
+                        downloaded = out_dest / f"segment_{idx}.jpg"
+                    if downloaded.exists() and "output_path" in p:
+                        target_p = Path(p["output_path"])
+                        target_p.parent.mkdir(parents=True, exist_ok=True)
+                        shutil.copy2(downloaded, target_p)
+                        mapped_count += 1
+                if mapped_count == len(prompts):
+                    logger.success(f"✓ Successfully mapped {mapped_count}/{len(prompts)} frames from Batch {batch_uuid}")
+                    return True
+                else:
+                    logger.warning(f"Only {mapped_count}/{len(prompts)} mapped. Retrying batch in 15s...")
+            else:
+                logger.warning(f"Batch {batch_uuid} failed download/UUID check. Retrying in 15s...")
+            
+            time.sleep(15)
 
         return False
 

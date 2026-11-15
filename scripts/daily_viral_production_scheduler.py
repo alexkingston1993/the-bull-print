@@ -114,7 +114,9 @@ def run_daily_production(dry_run: bool = False):
                 logger.success(f"✓ Dispatched {tag}: {topic[:40]}... (PublishAt: {publish_at})")
             except Exception as e:
                 logger.error(f"Failed to dispatch {item['type']} {topic}: {e}")
-            time.sleep(3)
+            # Stagger workflow starts by 45 seconds to guarantee Kaggle status transitions to RUNNING before next runner checks lock
+            logger.info("⏳ Staggering next workflow dispatch by 45s to prevent T=0 Kaggle push race condition...")
+            time.sleep(45)
 
     print("\n" + "=" * 70)
     print("🎉 ALL 12 CLOUD PRODUCTIONS SUCCESSFULLY DISPATCHED!")
