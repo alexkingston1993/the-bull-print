@@ -101,3 +101,4 @@ def purge_quarantined_videos(dry_run: bool = False):
 if __name__ == "__main__":
     dry_run = "--dry-run" in sys.argv
     purge_quarantined_videos(dry_run=dry_run)
+

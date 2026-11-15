@@ -182,3 +182,4 @@ class PreUploadQCGate:
             logger.error(f"❌ [Pre-Upload QC] Video FAILED quality control gates: {errors}")
 
         return passed, errors
+
