@@ -93,34 +93,56 @@ def audit_today_published_videos() -> Dict[str, Any]:
                     maxResults=50,
                 ).execute().get("items", [])
 
-                for item in recent_items:
-                    snip = item.get("snippet", {})
+                raw_vid_ids = [it.get("snippet", {}).get("resourceId", {}).get("videoId") for it in recent_items if it.get("snippet", {}).get("resourceId", {}).get("videoId")]
+                
+                # Fetch detailed authenticated video status (handles private + publishAt scheduled videos)
+                video_details = {}
+                if raw_vid_ids:
+                    for i in range(0, len(raw_vid_ids), 50):
+                        chunk = raw_vid_ids[i:i+50]
+                        v_res = service.videos().list(id=",".join(chunk), part="snippet,status").execute()
+                        for v_item in v_res.get("items", []):
+                            video_details[v_item["id"]] = v_item
+
+                for vid_id, v_item in video_details.items():
+                    snip = v_item.get("snippet", {})
+                    stat = v_item.get("status", {})
                     title = snip.get("title", "")
                     pub_at = snip.get("publishedAt", "")
-                    vid_id = snip.get("resourceId", {}).get("videoId")
+                    scheduled_at = stat.get("publishAt", "")
+                    privacy = stat.get("privacyStatus", "")
 
-                    if title in ["Deleted video", "Private video"] or not vid_id:
+                    if title in ["Deleted video"] or not vid_id:
                         continue
 
-                    # Check publication date in IST
-                    if pub_at:
-                        pub_dt = datetime.fromisoformat(pub_at.replace("Z", "+00:00")).astimezone(ist_tz)
-                        if pub_dt.strftime("%Y-%m-%d") == today_ist_date:
-                            # Heuristic: 60s Shorts vs Long Documentaries
-                            # If title has #Shorts or duration metadata
-                            is_short = "#short" in title.lower() or "shorts" in title.lower() or len(title) < 70
-                            if is_short:
-                                shorts_count += 1
-                            else:
-                                docs_count += 1
+                    # Check publication date or scheduled publish date in IST
+                    matched_today = False
+                    for date_candidate in [scheduled_at, pub_at]:
+                        if date_candidate:
+                            try:
+                                cand_dt = datetime.fromisoformat(date_candidate.replace("Z", "+00:00")).astimezone(ist_tz)
+                                if cand_dt.strftime("%Y-%m-%d") == today_ist_date:
+                                    matched_today = True
+                                    break
+                            except Exception:
+                                pass
 
-                            published.append({
-                                "id": vid_id,
-                                "title": title,
-                                "published_at": pub_at,
-                                "url": f"https://youtu.be/{vid_id}",
-                                "is_short": is_short,
-                            })
+                    if matched_today:
+                        is_short = "#short" in title.lower() or "shorts" in title.lower() or len(title) < 70
+                        if is_short:
+                            shorts_count += 1
+                        else:
+                            docs_count += 1
+
+                        published.append({
+                            "id": vid_id,
+                            "title": title,
+                            "published_at": pub_at,
+                            "scheduled_at": scheduled_at,
+                            "privacy": privacy,
+                            "url": f"https://youtu.be/{vid_id}",
+                            "is_short": is_short,
+                        })
     except Exception as e:
         logger.error(f"[Supervisor Audit] Failed to query YouTube API: {e}")
 

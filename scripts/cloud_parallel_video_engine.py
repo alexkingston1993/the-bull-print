@@ -999,6 +999,12 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
         privacy_status = manifest.get("privacy_status") or os.getenv("YOUTUBE_PRIVACY", "unlisted")
         publish_at = manifest.get("publish_at")
 
+        # Mandatory Pre-Upload Quality Control Gate
+        from app.services.pre_upload_qc_gate import PreUploadQCGate
+        qc_passed, qc_errors = PreUploadQCGate.validate(final_video_mp4, is_short=manifest.get("is_short", False))
+        if not qc_passed:
+            raise RuntimeError(f"⛔ PRE-UPLOAD QC GATE REJECTION: Video failed validation: {qc_errors}")
+
         from app.services.youtube_uploader import get_uploader
         uploader = get_uploader()
         res = uploader.upload_video(

@@ -2,19 +2,24 @@
 """
 The Bull Print — Kaggle GPU Frame Generation Worker (app/services/kaggle_image_worker.py)
 
-Dispatches image generation batches to Kaggle's free Nvidia Tesla T4 GPU (30 hours/week quota).
-Executes diffusers pipelines on CUDA, generates 16:9 high-CTR documentary plates,
-and downloads the output frames directly into the project workspace.
+Dispatches image generation batches to Kaggle's Dual Nvidia Tesla T4 GPUs.
+Executes native SDXL-Lightning diffusers pipelines on CUDA across cuda:0 and cuda:1,
+generates 100% bespoke photographic plates at native 1MP SDXL resolutions:
+- 768x1344 for Vertical 9:16 Shorts
+- 1344x768 for Landscape 16:9 Documentaries
+Includes API queue lock, BATCH_UUID verification, and isolated download paths.
 """
 
 from __future__ import annotations
 
 import json
 import os
+import random
 import shutil
 import subprocess
 import sys
 import time
+import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from loguru import logger
@@ -25,7 +30,7 @@ if str(BASE_DIR) not in sys.path:
 
 
 class KaggleImageWorker:
-    """Automated Kaggle GPU runner for batch image generation."""
+    """Automated Kaggle Dual-T4 GPU runner for batch image generation."""
 
     def __init__(self, username: Optional[str] = None):
         self.username = username or self._detect_username()
@@ -44,14 +49,43 @@ class KaggleImageWorker:
                 pass
         return os.getenv("KAGGLE_USERNAME", "alexytcreative")
 
-    def create_kernel_script(self, segments: List[Dict[str, Any]]) -> str:
-        """Generates the Python worker script to execute inside the Kaggle GPU kernel."""
-        # Sanitize segments: id, prompt, title, aspect ratio & dimensions
+    def _get_kaggle_cmd(self) -> str:
+        return shutil.which("kaggle") or str(BASE_DIR / ".venv" / "bin" / "kaggle")
+
+    def wait_for_queue_lock(self, timeout_sec: int = 2700) -> bool:
+        """
+        API-Level Queue Lock:
+        Polls Kaggle kernel status before pushing to prevent concurrency collisions.
+        If a batch is already running/queued, waits with jittered sleep until it completes.
+        """
+        kaggle_bin = self._get_kaggle_cmd()
+        ref = f"{self.username}/{self.kernel_slug}"
+        start_time = time.time()
+        logger.info(f"Checking Kaggle GPU queue lock for '{ref}'...")
+
+        while time.time() - start_time < timeout_sec:
+            res = subprocess.run([str(kaggle_bin), "kernels", "status", ref], capture_output=True, text=True)
+            status_line = res.stdout.strip().lower()
+
+            if "running" in status_line or "queued" in status_line:
+                wait_t = random.uniform(15, 30)
+                logger.info(f"⏳ Kaggle GPU busy ({res.stdout.strip()}). Waiting {wait_t:.1f}s for queue slot...")
+                time.sleep(wait_t)
+            else:
+                logger.success(f"✓ Kaggle GPU slot available (Status: {res.stdout.strip()})")
+                return True
+
+        logger.error(f"Timed out after {timeout_sec}s waiting for Kaggle GPU queue lock.")
+        return False
+
+    def create_kernel_script(self, segments: List[Dict[str, Any]], batch_uuid: str) -> str:
+        """Generates the Python worker script to execute inside Kaggle with Dual-T4 multiprocessing."""
         payload = []
         for s in segments:
             is_vertical = str(s.get("aspect_ratio", "")).strip() in ("9:16", "vertical") or s.get("height", 0) > s.get("width", 0)
-            w = s.get("width", 576 if is_vertical else 1024)
-            h = s.get("height", 1024 if is_vertical else 576)
+            # Native 1MP SDXL resolutions
+            w = s.get("width", 768 if is_vertical else 1344)
+            h = s.get("height", 1344 if is_vertical else 768)
             payload.append({
                 "id": s["id"],
                 "prompt": s["prompt"],
@@ -62,37 +96,32 @@ class KaggleImageWorker:
             })
         payload_json = json.dumps(payload, indent=2)
 
-        script = f'''# Auto-generated Kaggle GPU Frame Generator
+        script = f'''# Auto-generated Kaggle GPU Frame Generator (Dual-T4 Optimized)
 import os
 import sys
 import time
 import json
 import torch
+import torch.multiprocessing as mp
 
-print("[KaggleWorker] Booting Python on GPU...", flush=True)
-print(f"[KaggleWorker] CUDA Available: {{torch.cuda.is_available()}}", flush=True)
-if torch.cuda.is_available():
-    print(f"[KaggleWorker] Device: {{torch.cuda.get_device_name(0)}} (VRAM: {{torch.cuda.get_device_properties(0).total_memory / 1e9:.1f}} GB)", flush=True)
+BATCH_UUID = "{batch_uuid}"
+print(f"[KaggleWorker] Booting Python on GPU | BATCH_UUID: {{BATCH_UUID}}", flush=True)
 
-# Install diffusers & accelerate
-print("[KaggleWorker] Installing diffusers, transformers, accelerate...", flush=True)
+num_gpus = torch.cuda.device_count()
+print(f"[KaggleWorker] CUDA Available: {{torch.cuda.is_available()}} | Device Count: {{num_gpus}}", flush=True)
+for i in range(num_gpus):
+    print(f"  --> GPU {{i}}: {{torch.cuda.get_device_name(i)}} ({{torch.cuda.get_device_properties(i).total_memory / 1e9:.1f}} GB VRAM)", flush=True)
+
+# Install diffusers, accelerate & dependencies
 os.system("pip install -q diffusers transformers accelerate safetensors")
 
 from diffusers import StableDiffusionXLPipeline, UNet2DConditionModel, EulerDiscreteScheduler
 from huggingface_hub import hf_hub_download
 from safetensors.torch import load_file
 
-base = "stabilityai/stable-diffusion-xl-base-1.0"
-repo = "ByteDance/SDXL-Lightning"
-ckpt = "sdxl_lightning_8step_unet.safetensors"
-
-print(f"[KaggleWorker] Loading SDXL-Lightning 8-step model from {{repo}} with strict negative prompt enforcement...", flush=True)
-config = UNet2DConditionModel.load_config(base, subfolder="unet")
-unet = UNet2DConditionModel.from_config(config).to("cuda", torch.float16)
-unet.load_state_dict(load_file(hf_hub_download(repo, ckpt), device="cuda"))
-pipe = StableDiffusionXLPipeline.from_pretrained(base, unet=unet, torch_dtype=torch.float16, variant="fp16").to("cuda")
-pipe.scheduler = EulerDiscreteScheduler.from_config(pipe.scheduler.config, timestep_spacing="trailing")
-
+base_model = "stabilityai/stable-diffusion-xl-base-1.0"
+repo_id = "ByteDance/SDXL-Lightning"
+ckpt_file = "sdxl_lightning_8step_unet.safetensors"
 NEGATIVE_PROMPT = "text, letters, words, numbers, digits, typography, watermark, logo, signage, banners, ticker symbols, displays with writing, labels, subtitles, signature, font, writing, cartoon, anime, 3d render, blurry, distorted, low quality"
 
 out_dir = "/kaggle/working/frames"
@@ -100,38 +129,81 @@ os.makedirs(out_dir, exist_ok=True)
 
 PAYLOAD = {payload_json}
 
-print(f"[KaggleWorker] Starting batch generation for {{len(PAYLOAD)}} frames with zero-baked-text enforcement...", flush=True)
-for item in PAYLOAD:
-    seg_id = item["id"]
-    prompt = item["prompt"]
-    out_path = os.path.join(out_dir, f"segment_{{seg_id:02d}}.jpg")
-    print(f"--> Rendering Segment {{seg_id:02d}}: {{item['title']}}...", flush=True)
-    t0 = time.time()
+def run_render_worker(device_id: int, items: list, output_folder: str):
+    device_str = f"cuda:{{device_id}}"
+    print(f"[Worker-{{device_id}}] Initializing SDXL-Lightning on {{device_str}} for {{len(items)}} plates...", flush=True)
     
-    # Dynamic Aspect Ratio (16:9 for Docs or 9:16 for Shorts) with CFG & Negative Prompt Enforcement
-    w_dim = item.get("width", 1024)
-    h_dim = item.get("height", 576)
-    image = pipe(
-        prompt=prompt,
-        negative_prompt=NEGATIVE_PROMPT,
-        num_inference_steps=8,
-        guidance_scale=1.5,
-        width=w_dim,
-        height=h_dim
-    ).images[0]
+    config = UNet2DConditionModel.load_config(base_model, subfolder="unet")
+    unet = UNet2DConditionModel.from_config(config).to(device_str, torch.float16)
+    unet.load_state_dict(load_file(hf_hub_download(repo_id, ckpt_file), device=device_str))
     
-    image.save(out_path, quality=95)
-    elapsed = time.time() - t0
-    print(f"✓ Saved Clean Segment {{seg_id:02d}} in {{elapsed:.2f}}s", flush=True)
+    pipe = StableDiffusionXLPipeline.from_pretrained(
+        base_model,
+        unet=unet,
+        torch_dtype=torch.float16,
+        variant="fp16"
+    ).to(device_str)
+    pipe.scheduler = EulerDiscreteScheduler.from_config(pipe.scheduler.config, timestep_spacing="trailing")
+    
+    for item in items:
+        seg_id = item["id"]
+        prompt = item["prompt"]
+        out_path = os.path.join(output_folder, f"segment_{{seg_id:02d}}.jpg")
+        print(f"[Worker-{{device_id}}] Rendering Segment {{seg_id:02d}} ({{item['width']}}x{{item['height']}})...", flush=True)
+        t0 = time.time()
+        
+        img = pipe(
+            prompt=prompt,
+            negative_prompt=NEGATIVE_PROMPT,
+            num_inference_steps=8,
+            guidance_scale=1.5,
+            width=item["width"],
+            height=item["height"]
+        ).images[0]
+        
+        img.save(out_path, quality=95)
+        print(f"[Worker-{{device_id}}] ✓ Saved segment_{{seg_id:02d}}.jpg in {{time.time() - t0:.2f}}s", flush=True)
 
-print("[KaggleWorker] All clean photographic frames generated successfully!", flush=True)
+if __name__ == "__main__":
+    t_start = time.time()
+    
+    # Dual-T4 Parallel Execution
+    if num_gpus >= 2 and len(PAYLOAD) > 1:
+        print("[KaggleWorker] Distributing batch across 2x T4 GPUs via multiprocessing...", flush=True)
+        ctx = mp.get_context("spawn")
+        
+        # Partition 50/50
+        items_gpu0 = PAYLOAD[0::2]
+        items_gpu1 = PAYLOAD[1::2]
+        
+        p0 = ctx.Process(target=run_render_worker, args=(0, items_gpu0, out_dir))
+        p1 = ctx.Process(target=run_render_worker, args=(1, items_gpu1, out_dir))
+        
+        p0.start()
+        p1.start()
+        
+        p0.join()
+        p1.join()
+    else:
+        # Single GPU execution
+        run_render_worker(0, PAYLOAD, out_dir)
+        
+    # Write BATCH_UUID verification file
+    with open("/kaggle/working/batch_uuid.txt", "w") as f:
+        f.write(BATCH_UUID.strip())
+        
+    print(f"[KaggleWorker] All {{len(PAYLOAD)}} bespoke plates completed in {{time.time() - t_start:.2f}}s! Batch UUID: {{BATCH_UUID}}", flush=True)
 '''
         return script
 
-    def dispatch(self, segments: List[Dict[str, Any]]) -> bool:
-        """Pushes the kernel to Kaggle and monitors its execution."""
-        logger.info(f"Preparing Kaggle GPU Kernel for {len(segments)} frames...")
-        script_content = self.create_kernel_script(segments)
+    def dispatch(self, segments: List[Dict[str, Any]], batch_uuid: str) -> bool:
+        """Acquires queue lock, prepares metadata, and pushes the kernel to Kaggle."""
+        # 1. Wait for queue lock to prevent concurrent kernel abortions
+        if not self.wait_for_queue_lock(timeout_sec=2700):
+            return False
+
+        logger.info(f"Preparing Kaggle GPU Kernel for {len(segments)} frames (Batch UUID: {batch_uuid})...")
+        script_content = self.create_kernel_script(segments, batch_uuid=batch_uuid)
         
         script_file = self.stage_dir / "generate_frames.py"
         with open(script_file, "w") as f:
@@ -155,18 +227,19 @@ print("[KaggleWorker] All clean photographic frames generated successfully!", fl
         with open(self.stage_dir / "kernel-metadata.json", "w") as f:
             json.dump(metadata, f, indent=2)
 
-        kaggle_bin = shutil.which("kaggle") or str(BASE_DIR / ".venv" / "bin" / "kaggle")
-        logger.info(f"Pushing kernel '{self.username}/{self.kernel_slug}' to Kaggle GPU...")
+        kaggle_bin = self._get_kaggle_cmd()
+        logger.info(f"Pushing kernel '{self.username}/{self.kernel_slug}' to Kaggle Dual-T4 GPU...")
         res = subprocess.run([str(kaggle_bin), "kernels", "push", "-p", str(self.stage_dir)], capture_output=True, text=True)
         if res.returncode != 0:
             logger.error(f"Kaggle push failed: {res.stderr}")
             return False
 
-        logger.info("Kernel pushed successfully! Waiting for Kaggle GPU execution...")
+        logger.info(f"✓ Kernel pushed successfully! Batch UUID: {batch_uuid}. Monitoring execution...")
         return True
 
     def generate_batch(self, prompts: List[Dict[str, Any]], aspect_ratio: str = "9:16") -> bool:
-        """Helper to dispatch a batch of prompts and poll for completion."""
+        """Dispatches a batch with unique BATCH_UUID, polls, and verifies before mapping output."""
+        batch_uuid = uuid.uuid4().hex[:8]
         segments = []
         is_vert = aspect_ratio in ("9:16", "vertical")
         for idx, p in enumerate(prompts, 1):
@@ -175,25 +248,38 @@ print("[KaggleWorker] All clean photographic frames generated successfully!", fl
                 "prompt": p.get("prompt", ""),
                 "title": f"Frame {idx}",
                 "aspect_ratio": "9:16" if is_vert else "16:9",
-                "width": 576 if is_vert else 1024,
-                "height": 1024 if is_vert else 576,
+                "width": 768 if is_vert else 1344,
+                "height": 1344 if is_vert else 768,
             })
-        if self.dispatch(segments):
-            out_dest = Path("/tmp/kaggle_downloaded_frames")
-            out_dest.mkdir(parents=True, exist_ok=True)
-            if self.poll_and_download(out_dest, timeout_sec=300):
-                for idx, p in enumerate(prompts, 1):
-                    downloaded = out_dest / f"segment_{idx:02d}.jpg"
-                    if not downloaded.exists():
-                        downloaded = out_dest / f"segment_{idx}.jpg"
-                    if downloaded.exists() and "output_path" in p:
-                        shutil.copy2(downloaded, p["output_path"])
-                return True
+
+        if not self.dispatch(segments, batch_uuid=batch_uuid):
+            return False
+
+        # Isolated directory per batch UUID
+        out_dest = Path(f"/tmp/kaggle_downloaded_frames_{batch_uuid}")
+        if out_dest.exists():
+            shutil.rmtree(out_dest, ignore_errors=True)
+        out_dest.mkdir(parents=True, exist_ok=True)
+
+        if self.poll_and_download(out_dest, batch_uuid=batch_uuid, timeout_sec=600):
+            mapped_count = 0
+            for idx, p in enumerate(prompts, 1):
+                downloaded = out_dest / f"segment_{idx:02d}.jpg"
+                if not downloaded.exists():
+                    downloaded = out_dest / f"segment_{idx}.jpg"
+                if downloaded.exists() and "output_path" in p:
+                    target_p = Path(p["output_path"])
+                    target_p.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(downloaded, target_p)
+                    mapped_count += 1
+            logger.success(f"✓ Successfully mapped {mapped_count}/{len(prompts)} frames from Batch {batch_uuid}")
+            return mapped_count == len(prompts)
+
         return False
 
-    def poll_and_download(self, dest_dir: Path, timeout_sec: int = 600) -> bool:
-        """Polls Kaggle status until complete, then downloads the rendered frames."""
-        kaggle_bin = shutil.which("kaggle") or str(BASE_DIR / ".venv" / "bin" / "kaggle")
+    def poll_and_download(self, dest_dir: Path, batch_uuid: str, timeout_sec: int = 900) -> bool:
+        """Polls Kaggle status until complete, downloads frames, and verifies BATCH_UUID."""
+        kaggle_bin = self._get_kaggle_cmd()
         ref = f"{self.username}/{self.kernel_slug}"
         start_time = time.time()
 
@@ -204,26 +290,29 @@ print("[KaggleWorker] All clean photographic frames generated successfully!", fl
             logger.info(f"[Kaggle Status] {status_line}")
 
             if "complete" in status_line.lower():
-                logger.info("Kaggle GPU generation complete! Downloading output frames...")
+                logger.info(f"Kaggle run completed! Downloading artifacts to {dest_dir}...")
                 out_res = subprocess.run([str(kaggle_bin), "kernels", "output", ref, "-p", str(dest_dir)], capture_output=True, text=True)
                 if out_res.returncode == 0:
-                    logger.info(f"✓ Frames downloaded to {dest_dir}")
-                    return True
+                    uuid_file = dest_dir / "batch_uuid.txt"
+                    if uuid_file.exists():
+                        downloaded_uuid = uuid_file.read_text().strip()
+                        if downloaded_uuid == batch_uuid:
+                            logger.success(f"🎯 [UUID Match Verified] Downloaded frames match target Batch UUID: {batch_uuid}")
+                            return True
+                        else:
+                            logger.warning(f"⚠️ Batch UUID mismatch: Expected {batch_uuid}, got {downloaded_uuid}. Waiting for CDN artifact refresh...")
+                            time.sleep(10)
+                            continue
+                    else:
+                        logger.warning(f"⚠️ batch_uuid.txt not found in download. Retrying output pull...")
+                        time.sleep(10)
+                        continue
                 else:
                     logger.error(f"Failed to download outputs: {out_res.stderr}")
                     return False
             elif "error" in status_line.lower():
-                logger.error(f"Kaggle kernel failed: {status_line}")
+                logger.error(f"Kaggle kernel reported error: {status_line}")
                 return False
 
-        logger.error("Timed out waiting for Kaggle GPU kernel.")
+        logger.error(f"Timed out waiting for Kaggle GPU kernel batch {batch_uuid}.")
         return False
-
-
-if __name__ == "__main__":
-    from output.sebi_hft_documentary.chapters_script import SEGMENTS
-    remaining = [s for s in SEGMENTS if s["id"] >= 11]
-    worker = KaggleImageWorker()
-    if worker.dispatch(remaining):
-        dest = BASE_DIR / "output" / "sebi_hft_documentary" / "frames"
-        worker.poll_and_download(dest)

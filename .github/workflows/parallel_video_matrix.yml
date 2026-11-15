@@ -43,9 +43,6 @@ jobs:
   prepare_session:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    concurrency:
-      group: kaggle-gpu-queue
-      cancel-in-progress: false
     outputs:
       matrix: ${{ steps.prep.outputs.matrix }}
       total_segments: ${{ steps.prep.outputs.total_segments }}
@@ -314,13 +311,15 @@ jobs:
             echo "No new assets to commit."
           else
             git commit -m "feat(media): parallel cloud video & article release [skip ci]" || true
-            for retry in 1 2 3; do
+            for retry in 1 2 3 4 5; do
               git fetch origin main
               git rebase -X ours origin/main || { git rebase --abort; git merge -X ours origin/main -m "merge: resolve content sync" || true; }
               if git push origin HEAD:main; then
                 echo "✓ Changes committed and pushed to GitHub. Vercel deployment triggered automatically."
                 break
               fi
-              sleep 5
+              JITTER=$(( 4 + (RANDOM % 8) ))
+              echo "Push rejected due to concurrent race condition. Retrying in ${JITTER}s (attempt ${retry}/5)..."
+              sleep $JITTER
             done
           fi

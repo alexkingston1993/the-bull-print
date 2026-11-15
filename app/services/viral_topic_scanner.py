@@ -37,6 +37,40 @@ from app.services.content_authenticity_engine import (
 )
 
 
+def fetch_live_financial_rss_headlines() -> List[str]:
+    """Fetches breaking real-world financial catalysts from live RSS feeds to ground topics in reality."""
+    import urllib.request
+    import xml.etree.ElementTree as ET
+
+    FEEDS = [
+        ("MarketWatch", "https://feeds.content.dowjones.io/public/rss/mw_topstories"),
+        ("CNBC", "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664"),
+        ("EconomicTimes", "https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms"),
+        ("Investing", "https://www.investing.com/rss/news.rss"),
+    ]
+    headlines = []
+    headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
+
+    for source, url in FEEDS:
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=6) as response:
+                root = ET.fromstring(response.read())
+                for it in root.findall(".//item"):
+                    t_el = it.find("title")
+                    if t_el is not None and t_el.text:
+                        cleaned = t_el.text.strip()
+                        if len(cleaned) > 15 and cleaned not in headlines:
+                            headlines.append(f"[{source}] {cleaned}")
+                            if len(headlines) >= 40:
+                                break
+        except Exception as e:
+            logger.warning(f"RSS feed fetch error for {source}: {e}")
+
+    logger.info(f"✓ Fetched {len(headlines)} live RSS breaking financial headlines for grounding.")
+    return headlines[:35]
+
+
 class ViralTopicScanner:
     """Discovers viral, compliant financial topics from the past 24 hours with strict semantic anti-duplication."""
 
@@ -95,6 +129,10 @@ class ViralTopicScanner:
         now = datetime.now(timezone.utc)
         date_str = now.strftime("%Y-%m-%d %H:%M UTC")
 
+        # 1. Fetch Live RSS Breaking Headlines for Factual Grounding
+        live_headlines = fetch_live_financial_rss_headlines()
+        live_rss_sample = "\n".join(f"- {h}" for h in live_headlines)
+
         recent_titles = self._get_recent_published_titles(days=30)
         blacklist_sample = "\n".join(f"- {t}" for t in recent_titles[:40])
 
@@ -105,6 +143,18 @@ class ViralTopicScanner:
         TASK:
         Identify 10 high-velocity, completely DISTINCT financial investigations and institutional scandals from the PAST 24 HOURS.
         Target Audiences: Everyday retail investors, salaried professionals, and families who fear losing their savings to institutional traps.
+        
+        [LIVE VERIFIED BREAKING FINANCIAL CATALYSTS - PAST 24 HOURS]
+        You MUST ground your investigative topics in actual breaking news, market movements, regulatory filings, or real corporate scandals from these live verified headlines:
+{live_rss_sample}
+        
+        MANDATORY FACTUAL GROUNDING RULE:
+        Every topic MUST cite, center on, or tie back to real market institutions, regulatory bodies (e.g. SEBI, RBI, US Fed, SEC, DOJ), real companies (e.g. Nvidia, Yes Bank, Adani, BlackRock, Boeing, TSMC, JPMorgan, Apple), or real breaking financial mechanisms.
+        STRICTLY PROHIBITED: Do NOT invent fictional unnamed banks or repeat generic placeholder scenarios. Anchor to reality.
+
+        STRICTLY FORBIDDEN VISUAL CLICHÉS (PROMPT-LEVEL MANDATE):
+        Visual prompts must depict physical real-world artifacts: trading floors, bank vault doors swinging on multi-bolts, chip cleanrooms with silicon wafers, cargo container cranes, courtroom transcripts, server racks with fiber-optic LEDs, stacked 1kg gold bullion on marble.
+        NEVER specify: obsidian monolith, golden crate on cables, red brick corridor, cybernetic bull, or generic floating pedestals.
         
         CRITICAL ZERO-DUPLICATION & ANTI-SAMENESS BLACKLIST:
         The following {len(recent_titles)} titles/topics were ALREADY PRODUCED in the past 30 days. You are STRICTLY FORBIDDEN from generating these topics, repeating their titles, or creating semantic clones, synonyms, or paraphrases of them:
