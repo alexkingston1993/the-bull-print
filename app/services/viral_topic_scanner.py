@@ -226,17 +226,53 @@ class ViralTopicScanner:
         data = None
         if self.gemini_key:
             import time
+            import requests
             from google import genai
-
-            candidate_models = [
-                "gemini-3.8-flash",
-                "gemini-flash-lite-latest",
-                "gemini-3.1-pro-preview",
-                "gemini-2.5-flash",
-            ]
 
             accumulated_shorts = []
             accumulated_docs = []
+
+            # 1. Direct High-Speed REST Caller (Bypasses httpx SSL handshake hangs)
+            rest_models = ["gemini-3-flash-preview", "gemini-flash-lite-latest", "gemini-3.5-flash-lite", "gemini-3.8-flash"]
+            for rm in rest_models:
+                if len(accumulated_shorts) >= 10 and len(accumulated_docs) >= 2:
+                    break
+                try:
+                    logger.info(f"Querying Gemini REST ({rm}) for {10 - len(accumulated_shorts)} Shorts & {2 - len(accumulated_docs)} Docs...")
+                    url = f"https://generativelanguage.googleapis.com/v1beta/models/{rm}:generateContent?key={self.gemini_key}"
+                    payload = {
+                        "contents": [{"parts": [{"text": prompt}]}],
+                        "generationConfig": {
+                            "maxOutputTokens": 4096,
+                            "responseMimeType": "application/json"
+                        }
+                    }
+                    r = requests.post(url, json=payload, timeout=25)
+                    if r.status_code == 200:
+                        raw = r.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+                        import re
+                        cleaned_raw = re.sub(r",\s*([\]}])", r"\1", raw)
+                        parsed = json.loads(cleaned_raw)
+
+                        for st in parsed.get("shorts_topics", []):
+                            if st.get("title") and self._is_compliant_and_unique(st["title"], accumulated_shorts, recent_titles):
+                                accumulated_shorts.append(st)
+
+                        for dt in parsed.get("documentary_topics", []):
+                            if dt.get("title") and self._is_compliant_and_unique(dt["title"], accumulated_docs, recent_titles):
+                                accumulated_docs.append(dt)
+
+                        logger.info(f"REST Progress: {len(accumulated_shorts)}/10 Shorts, {len(accumulated_docs)}/2 Documentaries")
+                        if len(accumulated_shorts) >= 10 and len(accumulated_docs) >= 2:
+                            break
+                except Exception as rest_err:
+                    logger.debug(f"REST {rm} notice: {rest_err}")
+
+            candidate_models = [
+                "gemini-3-flash-preview",
+                "gemini-flash-lite-latest",
+                "gemini-3.8-flash",
+            ]
 
             for api_ver in ["v1beta", "v1alpha"]:
                 if len(accumulated_shorts) >= 10 and len(accumulated_docs) >= 2:
