@@ -229,10 +229,10 @@ class ViralTopicScanner:
             from google import genai
 
             candidate_models = [
+                "gemini-flash-lite-latest",
                 "gemini-2.0-flash",
                 "gemini-1.5-flash",
                 "gemini-1.5-pro",
-                "gemini-flash-lite-latest",
             ]
 
             accumulated_shorts = []

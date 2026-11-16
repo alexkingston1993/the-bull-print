@@ -162,10 +162,10 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
             logger.error(f"[Script Studio] Failed to initialize Gemini client: {e}")
 
     models_to_try = [
+        "gemini-flash-lite-latest",
         "gemini-2.0-flash",
         "gemini-1.5-flash",
         "gemini-1.5-pro",
-        "gemini-flash-lite-latest",
     ]
 
     sections = []
