@@ -256,9 +256,9 @@ class ViralTopicScanner:
                             # Dynamically tailor prompt if only Documentaries or only Shorts are needed
                             active_prompt = prompt
                             if needed_d > 0 and needed_s == 0:
-                                active_prompt = f"""Based on these breaking financial headlines:\n{headlines_context}\n\nGenerate 4 deep-dive investigative financial documentary topics (16:9 Landscape, 6-minute investigative thrillers). Focus on fraud, capital flight, institutional traps, and hidden balance sheets.\nRespond ONLY with JSON:\n{{\"documentary_topics\": [{{\"title\": \"...\", \"hook\": \"...\", \"synopsis\": \"...\", \"vertical\": \"stock_market\"}}]}}"""
+                                active_prompt = f"""Based on these breaking financial headlines:\n{rss_context}\n\nGenerate 4 deep-dive investigative financial documentary topics (16:9 Landscape, 6-minute investigative thrillers). Focus on fraud, capital flight, institutional traps, and hidden balance sheets.\nRespond ONLY with JSON:\n{{\"documentary_topics\": [{{\"title\": \"...\", \"hook\": \"...\", \"synopsis\": \"...\", \"vertical\": \"stock_market\"}}]}}"""
                             elif needed_s > 0 and needed_d == 0:
-                                active_prompt = f"""Based on these breaking financial headlines:\n{headlines_context}\n\nGenerate {needed_s + 4} viral 60-second financial short topics (9:16 vertical). Focus on visceral hooks, retail traps, and corporate deception.\nRespond ONLY with JSON:\n{{\"shorts_topics\": [{{\"title\": \"...\", \"hook\": \"...\", \"synopsis\": \"...\", \"vertical\": \"stock_market\"}}]}}"""
+                                active_prompt = f"""Based on these breaking financial headlines:\n{rss_context}\n\nGenerate {needed_s + 4} viral 60-second financial short topics (9:16 vertical). Focus on visceral hooks, retail traps, and corporate deception.\nRespond ONLY with JSON:\n{{\"shorts_topics\": [{{\"title\": \"...\", \"hook\": \"...\", \"synopsis\": \"...\", \"vertical\": \"stock_market\"}}]}}"""
 
                             try:
                                 logger.info(f"Querying {model_name} (attempt {attempt + 1}) for {needed_s} Shorts & {needed_d} Docs...")
