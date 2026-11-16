@@ -118,6 +118,58 @@ def check_duplicate_before_prep(topic: str) -> None:
 # 2. SESSION PREPARATION & DYNAMIC MATRIX PARTITIONING
 # ─────────────────────────────────────────────────────────────
 
+def _query_gemini_smart(prompt: str, client, api_key: Optional[str], models_to_try: List[str]) -> Optional[str]:
+    """
+    High-reliability Gemini caller:
+    Prioritizes direct REST via standard requests HTTPS (immune to httpx HTTP/2 ALPN SSL handshake stalls),
+    with automatic model fallback (gemini-flash-lite-latest -> gemini-3.5-flash-lite -> gemini-3.8-flash)
+    and SDK fallback.
+    """
+    import requests
+    # 1. Direct REST call via requests (instant ~1.5s latency, zero SSL handshake stalls)
+    if api_key:
+        rest_models = ["gemini-3-flash-preview", "gemini-flash-lite-latest", "gemini-3.5-flash-lite", "gemini-3.8-flash"]
+        for rm in rest_models:
+            for attempt in range(2):
+                try:
+                    url = f"https://generativelanguage.googleapis.com/v1beta/models/{rm}:generateContent?key={api_key}"
+                    payload = {
+                        "contents": [{"parts": [{"text": prompt}]}],
+                        "generationConfig": {
+                            "maxOutputTokens": 8192,
+                            "responseMimeType": "application/json"
+                        }
+                    }
+                    r = requests.post(url, json=payload, timeout=35)
+                    if r.status_code == 200:
+                        cand = r.json().get("candidates", [])
+                        if cand:
+                            text = cand[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+                            if text:
+                                logger.success(f"✅ [Script Studio] Successfully generated script via REST ({rm})")
+                                return text.strip()
+                    elif r.status_code == 503:
+                        logger.debug(f"REST model {rm} 503 high demand; waiting 2s...")
+                        time.sleep(2)
+                    else:
+                        logger.debug(f"REST model {rm} HTTP {r.status_code}: {r.text[:100]}")
+                except Exception as re_err:
+                    logger.debug(f"REST model {rm} notice: {re_err}")
+
+    # 2. SDK fallback
+    if client:
+        for m in models_to_try:
+            try:
+                resp = client.models.generate_content(model=m, contents=prompt)
+                if resp and resp.text:
+                    logger.success(f"✅ [Script Studio] Successfully generated script via SDK ({m})")
+                    return resp.text.strip()
+            except Exception as e:
+                logger.debug(f"SDK model {m} notice: {e}")
+
+    return None
+
+
 def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, is_short: bool) -> List[Dict[str, Any]]:
     """
     Generates procedural section breakdown and visual prompts dynamically tailored to topic.
@@ -153,19 +205,24 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
     second_word = words_topic[1].upper() if len(words_topic) > 1 else "ANALYSIS"
 
     api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        try:
+            from app.config import config as app_config
+            api_key = app_config.app.get("gemini_api_key")
+        except Exception:
+            pass
     client = None
     if api_key:
         try:
             from google import genai
-            client = genai.Client(api_key=api_key, http_options={"api_version": "v1beta"})
+            client = genai.Client(api_key=api_key, http_options={"api_version": "v1beta", "timeout": 45.0})
         except Exception as e:
             logger.error(f"[Script Studio] Failed to initialize Gemini client: {e}")
 
     models_to_try = [
-        "gemini-3.8-flash",
         "gemini-flash-lite-latest",
-        "gemini-3.1-pro-preview",
-        "gemini-2.5-flash",
+        "gemini-3.5-flash-lite",
+        "gemini-3.8-flash",
     ]
 
     sections = []
@@ -336,10 +393,9 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                 }}
                 """
                 for attempt in range(4):
-                    for model_name in models_to_try:
+                    raw_text = _query_gemini_smart(prompt, client, api_key, models_to_try)
+                    if raw_text:
                         try:
-                            resp = client.models.generate_content(model=model_name, contents=prompt)
-                            raw_text = resp.text.strip()
                             if "```json" in raw_text:
                                 raw_text = raw_text.split("```json")[1].split("```")[0].strip()
                             elif "```" in raw_text:
@@ -348,13 +404,13 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                             g_secs = data.get("sections", [])
                             if len(g_secs) >= s_count:
                                 batch_acquired = g_secs[:s_count]
-                                logger.success(f"✅ [Script Studio] Batch {b_num}/3 ({act_name}) successfully generated via {model_name}")
+                                logger.success(f"✅ [Script Studio] Batch {b_num}/3 ({act_name}) successfully generated")
                                 break
-                        except Exception as m_err:
-                            logger.debug(f"Gemini {model_name} Batch {b_num} attempt {attempt+1} notice: {m_err}")
+                        except Exception as parse_err:
+                            logger.debug(f"JSON parse error on Batch {b_num} attempt {attempt+1}: {parse_err}")
                     if batch_acquired:
                         break
-                    time.sleep(3 * (attempt + 1))
+                    time.sleep(2 * (attempt + 1))
 
                 if not batch_acquired:
                     logger.error(f"❌ [Script Studio] Failed to acquire Batch {b_num}/3 from Gemini API.")
@@ -513,10 +569,9 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
         }}
         """
         for attempt in range(4):
-            for model_name in models_to_try:
+            raw_text = _query_gemini_smart(prompt, client, api_key, models_to_try)
+            if raw_text:
                 try:
-                    resp = client.models.generate_content(model=model_name, contents=prompt)
-                    raw_text = resp.text.strip()
                     if "```json" in raw_text:
                         raw_text = raw_text.split("```json")[1].split("```")[0].strip()
                     elif "```" in raw_text:
@@ -525,13 +580,13 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                     g_secs = data.get("sections", [])
                     if len(g_secs) >= num_sections:
                         gemini_sections = g_secs[:num_sections]
-                        logger.success(f"✅ [Script Studio] Successfully generated {num_sections} custom investigative sections via {model_name}")
+                        logger.success(f"✅ [Script Studio] Successfully generated {num_sections} custom investigative sections")
                         break
-                except Exception as m_err:
-                    logger.debug(f"Gemini {model_name} attempt {attempt+1} notice: {m_err}")
+                except Exception as parse_err:
+                    logger.debug(f"JSON parse error on attempt {attempt+1}: {parse_err}")
             if gemini_sections:
                 break
-            time.sleep(3 * (attempt + 1))
+            time.sleep(2 * (attempt + 1))
 
     # ZERO HARDCODED FALLBACK MANDATE
     if not gemini_sections or len(gemini_sections) < num_sections:
