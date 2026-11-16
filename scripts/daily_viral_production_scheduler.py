@@ -102,14 +102,14 @@ def run_daily_production(dry_run: bool = False):
                 "-f", f"publish_at={publish_at}"
             ]
         else:
-            print(f"\n[Doc {item['num']:02d}/02] 🎬 Dispatching Master Documentary (16:9, 6-Min): {topic} (Scheduled: {publish_at} UTC)")
+            print(f"\n[Doc {item['num']:02d}/02] 🎬 Dispatching Master Documentary (16:9, 12-Min Masterclass): {topic} (Scheduled: {publish_at} UTC)")
             cmd = [
                 gh_bin, "workflow", "run",
                 "parallel_video_matrix.yml",
                 "-f", f"topic={topic}",
                 "-f", f"vertical={vertical}",
                 "-f", "shorts_only=false",
-                "-f", "duration_min=6",
+                "-f", "duration_min=12",
                 "-f", "privacy_status=private",
                 "-f", f"publish_at={publish_at}"
             ]
