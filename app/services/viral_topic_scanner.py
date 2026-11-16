@@ -231,20 +231,19 @@ class ViralTopicScanner:
             candidate_models = [
                 "gemini-2.0-flash",
                 "gemini-flash-lite-latest",
-                "gemini-2.0-flash-exp",
-                "gemini-1.5-flash-latest"
+                "gemini-2.5-flash",
+                "gemini-2.0-flash-001",
+                "gemini-2.5-pro",
             ]
 
             accumulated_shorts = []
             accumulated_docs = []
 
-            for api_ver in [None, "v1alpha"]:
+            for api_ver in [None]:
                 if len(accumulated_shorts) >= 10 and len(accumulated_docs) >= 2:
                     break
                 try:
                     client_kwargs = {"api_key": self.gemini_key}
-                    if api_ver:
-                        client_kwargs["http_options"] = {"api_version": api_ver}
                     client = genai.Client(**client_kwargs)
 
                     for model_name in candidate_models:
@@ -255,9 +254,17 @@ class ViralTopicScanner:
                             needed_d = max(0, 2 - len(accumulated_docs))
                             if needed_s == 0 and needed_d == 0:
                                 break
+                            
+                            # Dynamically tailor prompt if only Documentaries or only Shorts are needed
+                            active_prompt = prompt
+                            if needed_d > 0 and needed_s == 0:
+                                active_prompt = f"""Based on these breaking financial headlines:\n{headlines_context}\n\nGenerate 4 deep-dive investigative financial documentary topics (16:9 Landscape, 6-minute investigative thrillers). Focus on fraud, capital flight, institutional traps, and hidden balance sheets.\nRespond ONLY with JSON:\n{{\"documentary_topics\": [{{\"title\": \"...\", \"hook\": \"...\", \"synopsis\": \"...\", \"vertical\": \"stock_market\"}}]}}"""
+                            elif needed_s > 0 and needed_d == 0:
+                                active_prompt = f"""Based on these breaking financial headlines:\n{headlines_context}\n\nGenerate {needed_s + 4} viral 60-second financial short topics (9:16 vertical). Focus on visceral hooks, retail traps, and corporate deception.\nRespond ONLY with JSON:\n{{\"shorts_topics\": [{{\"title\": \"...\", \"hook\": \"...\", \"synopsis\": \"...\", \"vertical\": \"stock_market\"}}]}}"""
+
                             try:
-                                logger.info(f"Querying {model_name} (API {api_ver or 'default'}, attempt {attempt + 1}) for {needed_s} Shorts & {needed_d} Docs...")
-                                resp = client.models.generate_content(model=model_name, contents=prompt)
+                                logger.info(f"Querying {model_name} (attempt {attempt + 1}) for {needed_s} Shorts & {needed_d} Docs...")
+                                resp = client.models.generate_content(model=model_name, contents=active_prompt)
                                 raw = resp.text.strip()
                                 if "```json" in raw:
                                     raw = raw.split("```json")[1].split("```")[0].strip()
