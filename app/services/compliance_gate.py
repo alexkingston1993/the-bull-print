@@ -97,6 +97,20 @@ class ComplianceGate:
         try:
             posts = json.loads(POSTS_MANIFEST.read_text(encoding="utf-8"))
             cutoff = datetime.now(timezone.utc) - timedelta(days=30)
+            STOPWORDS = {
+                "a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are",
+                "as", "at", "be", "because", "been", "before", "being", "below", "between", "both", "but",
+                "by", "can", "could", "did", "do", "does", "doing", "down", "during", "each", "few", "for",
+                "from", "further", "had", "has", "have", "having", "he", "her", "here", "hers", "him",
+                "his", "how", "i", "if", "in", "into", "is", "it", "its", "just", "me", "more", "most", "my",
+                "no", "nor", "not", "now", "of", "off", "on", "once", "only", "or", "other", "our", "out",
+                "over", "own", "s", "same", "should", "so", "some", "such", "t", "than", "that", "the",
+                "their", "theirs", "them", "then", "there", "these", "they", "this", "those", "through", "to",
+                "too", "under", "until", "up", "very", "was", "we", "were", "what", "when", "where", "which",
+                "while", "who", "whom", "why", "will", "with", "would", "you", "your"
+            }
+            topic_words = {w for w in cls._normalize(topic).split() if len(w) > 2 and w not in STOPWORDS}
+
             for post in posts:
                 date_str = post.get("date") or post.get("published_at") or ""
                 try:
@@ -109,11 +123,12 @@ class ComplianceGate:
                     continue
                 existing = post.get("title", "")
                 norm_existing = cls._normalize(existing)
-                # structural overlap: ≥3 shared words OR shared 60-char prefix
-                shared = len(set(cls._normalize(topic).split()) & set(norm_existing.split()))
-                if shared >= 3 or (alt_probe and norm_existing[:60] == alt_probe) or norm_existing[:60] == probe:
+                existing_words = {w for w in norm_existing.split() if len(w) > 2 and w not in STOPWORDS}
+                # structural overlap: ≥4 shared meaningful content keywords OR shared 60-char prefix
+                shared = len(topic_words & existing_words)
+                if shared >= 4 or (alt_probe and norm_existing[:60] == alt_probe) or norm_existing[:60] == probe:
                     logger.warning(
-                        f"[Compliance Gate] freshness overlap: '{existing[:60]}' ({shared} shared words)"
+                        f"[Compliance Gate] freshness overlap: '{existing[:60]}' ({shared} shared content keywords)"
                     )
                     return False
         except Exception as e:

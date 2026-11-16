@@ -316,12 +316,16 @@ if __name__ == "__main__":
         kaggle_bin = self._get_kaggle_cmd()
         ref = f"{self.username}/{self.kernel_slug}"
         start_time = time.time()
+        has_seen_active = False
 
         while time.time() - start_time < timeout_sec:
             time.sleep(15)
             res = subprocess.run([str(kaggle_bin), "kernels", "status", ref], capture_output=True, text=True)
             status_line = res.stdout.strip()
             logger.info(f"[Kaggle Status] {status_line}")
+
+            if any(k in status_line.lower() for k in ["running", "queued", "starting", "saving"]):
+                has_seen_active = True
 
             if "complete" in status_line.lower():
                 logger.info(f"Kaggle run completed! Downloading artifacts to {dest_dir}...")
@@ -334,17 +338,20 @@ if __name__ == "__main__":
                             logger.success(f"🎯 [UUID Match Verified] Downloaded frames match target Batch UUID: {batch_uuid}")
                             return True
                         else:
-                            logger.warning(f"⚠️ Batch UUID mismatch: Expected {batch_uuid}, got {downloaded_uuid}. Waiting for CDN artifact refresh...")
-                            time.sleep(10)
+                            if not has_seen_active:
+                                logger.warning(f"⚠️ Stale output from previous batch (got {downloaded_uuid}, expected {batch_uuid}). Kaggle has not transitioned to queued/running yet. Waiting...")
+                            else:
+                                logger.warning(f"⚠️ Batch UUID mismatch: Expected {batch_uuid}, got {downloaded_uuid}. Waiting for CDN artifact refresh...")
+                            time.sleep(15)
                             continue
                     else:
-                        logger.warning(f"⚠️ batch_uuid.txt not found in download. Retrying output pull...")
-                        time.sleep(10)
+                        logger.warning(f"⚠️ batch_uuid.txt not found in download. Retrying output pull in 15s...")
+                        time.sleep(15)
                         continue
                 else:
                     logger.error(f"Failed to download outputs: {out_res.stderr}")
                     return False
-            elif "error" in status_line.lower():
+            elif any(k in status_line.lower() for k in ["error", "failed", "cancel"]):
                 logger.error(f"Kaggle kernel reported error: {status_line}")
                 return False
 
