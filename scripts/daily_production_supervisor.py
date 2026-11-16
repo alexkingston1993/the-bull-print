@@ -158,6 +158,36 @@ def audit_today_published_videos() -> Dict[str, Any]:
     }
 
 
+def check_today_master_runs() -> int:
+    """Checks how many daily_5am_production_master.yml workflows triggered today in IST."""
+    try:
+        gh_bin = get_gh_binary()
+        res = subprocess.run(
+            [gh_bin, "run", "list", "--workflow=daily_5am_production_master.yml", "--limit", "10", "--json", "databaseId,createdAt,status"],
+            capture_output=True, text=True
+        )
+        if res.returncode == 0:
+            stdout = res.stdout.strip()
+            idx_start = stdout.find("[")
+            idx_end = stdout.rfind("]")
+            if idx_start == -1 or idx_end == -1:
+                return 0
+            runs = json.loads(stdout[idx_start:idx_end + 1])
+            ist_tz = timezone(timedelta(hours=5, minutes=30))
+            today_ist = datetime.now(timezone.utc).astimezone(ist_tz).strftime("%Y-%m-%d")
+            today_runs = 0
+            for r in runs:
+                c_at = r.get("createdAt")
+                if c_at:
+                    run_date = datetime.fromisoformat(c_at.replace("Z", "+00:00")).astimezone(ist_tz).strftime("%Y-%m-%d")
+                    if run_date == today_ist:
+                        today_runs += 1
+            return today_runs
+    except Exception as e:
+        logger.debug(f"Failed to check master runs: {e}")
+    return 0
+
+
 def check_today_completed_matrix_runs() -> int:
     """Checks how many parallel_video_matrix.yml workflows completed successfully today in IST."""
     try:
@@ -193,7 +223,24 @@ def diagnose_failed_runs_and_auto_heal(audit_data: Dict[str, Any]):
     gh_bin = get_gh_binary()
     logger.info("🧠 [Aria Auto-Heal] Inspecting GitHub Actions workflows for root causes...")
 
-    # First check: If 12 matrix workflows already completed today, master videos exist in artifacts!
+    # 1. Backup Starter: If 5:00 AM master cron was missed by GitHub scheduler (0 runs today), trigger it now!
+    master_runs_today = check_today_master_runs()
+    if master_runs_today == 0:
+        logger.warning("⚠️ 5:00 AM master cron was missed by GitHub Actions scheduler (0 runs today). Auto-triggering backup starter...")
+        try:
+            subprocess.run([gh_bin, "workflow", "run", "daily_5am_production_master.yml", "--repo", "alexkingston1993/the-bull-print"], check=True, capture_output=True, text=True)
+            logger.success("✓ Backup starter successfully dispatched daily_5am_production_master.yml!")
+            send_telegram_alert(
+                f"🛡️ *The Bull Print Supervisor Alert*\n\n"
+                f"📅 *Date*: `{audit_data['today_ist']}`\n"
+                f"⚠️ *Missed Cron Detected*: 5:00 AM master did not trigger.\n"
+                f"🚀 *Backup Starter Activated*: Dispatched 12-video production run now."
+            )
+        except Exception as e:
+            logger.error(f"Failed to dispatch backup starter master: {e}")
+        return
+
+    # 2. Artifact Awareness: If 12 matrix workflows already completed today, master videos exist in artifacts!
     matrix_completed = check_today_completed_matrix_runs()
     if matrix_completed >= TARGET_DAILY_VIDEOS:
         logger.success(f"✓ {matrix_completed} matrix workflows completed successfully today! Master videos are preserved in GitHub Actions artifacts for 13:30 IST quota release. Suppressing supervisor deficit.")

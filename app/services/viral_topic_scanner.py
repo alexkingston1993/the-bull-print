@@ -229,10 +229,10 @@ class ViralTopicScanner:
             from google import genai
 
             candidate_models = [
+                "gemini-2.0-flash",
                 "gemini-flash-lite-latest",
-                "gemini-2.5-flash",
-                "gemini-2.0-flash-lite",
-                "gemini-1.5-flash"
+                "gemini-2.0-flash-exp",
+                "gemini-1.5-flash-latest"
             ]
 
             accumulated_shorts = []
@@ -263,7 +263,13 @@ class ViralTopicScanner:
                                     raw = raw.split("```json")[1].split("```")[0].strip()
                                 elif "```" in raw:
                                     raw = raw.split("```")[1].split("```")[0].strip()
-                                parsed = json.loads(raw)
+
+                                import re
+                                cleaned_raw = re.sub(r",\s*([\]}])", r"\1", raw)
+                                try:
+                                    parsed = json.loads(cleaned_raw)
+                                except Exception:
+                                    parsed = json.loads(raw)
 
                                 for st in parsed.get("shorts_topics", []):
                                     if not st.get("title"):
@@ -283,11 +289,10 @@ class ViralTopicScanner:
                             except Exception as me:
                                 err_str = str(me)
                                 logger.warning(f"{model_name} attempt {attempt + 1} error: {err_str[:120]}")
-                                if "503" in err_str or "UNAVAILABLE" in err_str or "429" in err_str:
-                                    time.sleep(2 * (attempt + 1))
-                                    continue
-                                else:
+                                if "404" in err_str or "not found" in err_str.lower() or "no longer available" in err_str.lower():
                                     break
+                                time.sleep(2 * (attempt + 1))
+                                continue
                 except Exception as ce:
                     logger.warning(f"Client init error with api_ver {api_ver}: {ce}")
 
