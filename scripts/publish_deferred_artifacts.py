@@ -79,6 +79,7 @@ def publish_deferred_artifacts(dry_run: bool = False):
 
     base_publish_time = datetime.now(timezone.utc) + timedelta(hours=1)
     published_count = 0
+    seen_topics = []
 
     for idx, run_item in enumerate(today_runs):
         run_id = str(run_item["databaseId"])
@@ -115,13 +116,37 @@ def publish_deferred_artifacts(dry_run: bool = False):
         thumb_files = list(artifact_dir.glob("*.jpg")) + list(artifact_dir.glob("*.png"))
         thumb_path = thumb_files[0] if thumb_files else None
 
-        # Fresh 2-hour staggered timestamp
-        staggered_time = (base_publish_time + timedelta(hours=idx * 2)).strftime("%Y-%m-%dT%H:%M:%SZ")
-
         title = manifest.get("title", "The Bull Print Episode")
         desc = manifest.get("description", "")
         tags = manifest.get("tags", ["the bull print", "finance", "investing"])
         is_short = manifest.get("is_short", True)
+
+        # 1. Title typo sanitization
+        if "October 2027" in title:
+            title = title.replace("October 2027", "2026/2027")
+
+        # 2. Intra-batch topic deduplication (e.g. Polymarket $1.8B Short vs Doc)
+        import re
+        words = set(re.findall(r"\b[a-zA-Z0-9]{3,}\b", title.lower())) - {"the", "and", "why", "how", "what", "for", "with", "into", "new"}
+        is_duplicate = False
+        for seen in seen_topics:
+            overlap = len(words & seen["words"])
+            if len(words) > 0 and (overlap / len(words)) >= 0.5:
+                # If current is Short and an earlier was Doc (or vice versa), keep the high-production Doc
+                if is_short and not seen["is_short"]:
+                    logger.warning(f"⚠️ [Batch Deduplicator] Suppressing duplicate Short '{title}' in favor of 16:9 Documentary '{seen['title']}'.")
+                    is_duplicate = True
+                    break
+                elif not is_short and seen["is_short"]:
+                    logger.warning(f"⚠️ [Batch Deduplicator] Found 16:9 Documentary '{title}' which supersedes Short '{seen['title']}'.")
+
+        if is_duplicate:
+            continue
+
+        seen_topics.append({"title": title, "words": words, "is_short": is_short})
+
+        # Fresh 2-hour staggered timestamp using published_count to avoid gaps
+        staggered_time = (base_publish_time + timedelta(hours=published_count * 2)).strftime("%Y-%m-%dT%H:%M:%SZ")
 
         logger.info(f"🎬 Video: '{title}'")
         logger.info(f"   Format: {'Short 9:16' if is_short else 'Doc 16:9'} | Scheduled: {staggered_time} UTC")
