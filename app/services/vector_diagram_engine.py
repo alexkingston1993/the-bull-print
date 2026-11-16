@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 """
+PERMANENTLY DEPRECATED:
+Per The Bull Print Standing Rules & 5-Point Quality Upgrade:
+Procedural vector diagrams from vector_diagram_engine.py are PERMANENTLY PROHIBITED in video production.
+All visuals must be 100% bespoke Kaggle Dual-T4 GPU SDXL-Lightning 1MP photographic plates.
+"""
+"""
 app/services/vector_diagram_engine.py
 The Bull Print — PaperBanana-Style Vector & SVG Financial Diagram Engine.
 

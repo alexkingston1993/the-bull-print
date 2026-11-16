@@ -138,9 +138,18 @@ def run_render_worker(device_id: int, items: list, output_folder: str):
     device_str = f"cuda:{{device_id}}"
     print(f"[Worker-{{device_id}}] Initializing SDXL-Lightning on {{device_str}} for {{len(items)}} plates...", flush=True)
     
+    local_weights_dir = "/kaggle/input/sdxl-lightning-weights"
+    local_ckpt = os.path.join(local_weights_dir, ckpt_file)
+    if os.path.exists(local_ckpt):
+        print(f"[Worker-{{device_id}}] Found local mounted weights at {{local_ckpt}}! Loading instantly from SSD...", flush=True)
+        weights_path = local_ckpt
+    else:
+        print(f"[Worker-{{device_id}}] Local dataset weights not found at {{local_ckpt}}, downloading from HuggingFace {{repo_id}}/{{ckpt_file}}...", flush=True)
+        weights_path = hf_hub_download(repo_id, ckpt_file)
+    
     config = UNet2DConditionModel.load_config(base_model, subfolder="unet")
     unet = UNet2DConditionModel.from_config(config).to(device_str, torch.float16)
-    unet.load_state_dict(load_file(hf_hub_download(repo_id, ckpt_file), device=device_str))
+    unet.load_state_dict(load_file(weights_path, device=device_str))
     
     pipe = StableDiffusionXLPipeline.from_pretrained(
         base_model,
@@ -225,7 +234,7 @@ if __name__ == "__main__":
             "machine_shape": "NvidiaTeslaT4",
             "enable_tpu": "false",
             "enable_internet": "true",
-            "dataset_sources": [],
+            "dataset_sources": ["alexytcreative/sdxl-lightning-weights"],
             "competition_sources": [],
             "kernel_sources": []
         }

@@ -1,3 +1,9 @@
+"""
+PERMANENTLY DEPRECATED:
+Per The Bull Print Standing Rules & 5-Point Quality Upgrade:
+Procedural charts from chart.py are PERMANENTLY PROHIBITED in video production.
+All visuals must be 100% bespoke Kaggle Dual-T4 GPU SDXL-Lightning 1MP photographic plates.
+"""
 import io
 import os
 import re

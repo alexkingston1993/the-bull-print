@@ -119,11 +119,14 @@ def check_duplicate_before_prep(topic: str) -> None:
 # ─────────────────────────────────────────────────────────────
 
 def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, is_short: bool) -> List[Dict[str, Any]]:
-    """Generates procedural section breakdown and visual prompts dynamically tailored to topic."""
-    rules = VideoFormatConfig.get_rules(duration_sec, is_short=is_short)
-    interval = rules["frame_interval"]
-    num_sections = rules["expected_frames"]
-
+    """
+    Generates procedural section breakdown and visual prompts dynamically tailored to topic.
+    - Shorts (9:16 Vertical, 60s): 20 discrete 3.0s cuts (20 unique bespoke plates).
+    - Documentaries (16:9 Landscape, 12 min): Exactly 36 segments of 20.0s each.
+      Generated in 3 sequential chunked API calls (12 segments × 3 = 36 segments)
+      with 5 bespoke micro-beats per segment (beat_0..beat_4 of 4.0s each = 180 unique bespoke plates)
+      and a running BANNED_VISUAL_MOTIFS list preventing scene fatigue and repetition.
+    """
     topic_clean = topic.strip()
     topic_lower = topic_clean.lower()
     words_topic = [w for w in re.sub(r"[^\w\s]", "", topic_clean).split() if len(w) > 2]
@@ -149,99 +152,388 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
     lead_word = words_topic[0].upper() if words_topic else "MARKET"
     second_word = words_topic[1].upper() if len(words_topic) > 1 else "ANALYSIS"
 
-    sections = []
-    gemini_sections = []
     api_key = os.getenv("GEMINI_API_KEY")
-
+    client = None
     if api_key:
         try:
             from google import genai
-            client = genai.Client(api_key=api_key, http_options={"api_version": "v1alpha"})
-            prompt = f"""
-            You are an investigative financial journalist and thriller documentary director (in the style of Coffeezilla, James Jani, and MagnatesMedia).
-            Tone: Dark, authoritative, forensic, breathless investigative thriller exposing high-stakes financial crimes and institutional traps.
-            STRICT IDENTITY MANDATE:
-            - The narrator must NEVER state their name, introduce themselves, or say 'I am [Name]' or 'This is [Name]'.
-            - Zero self-identification. Jump straight into the story from the very first syllable.
-            - If an identity is ever referenced anywhere, it must ONLY be 'Alex' (Founder & Chief Analyst). Never mention or use the name 'Christopher'.
-            Topic: {topic_clean}
-            Vertical: {vertical}
-            Format: {'60-Second Viral Short (9:16 Vertical)' if is_short else f'{int(duration_sec // 60)}-Minute Masterclass (16:9 Landscape)'}
-            Number of discrete sections: {num_sections}
-
-            CRITICAL DIRECTIVES FOR HIGH-RETENTION HUMAN STORYTELLING (AVD >= 70%):
-            1. ZERO FINANCIAL JARGON IN THE FIRST 5 SECONDS:
-               - STRICTLY FORBIDDEN WORDS in Section 0: 'liquidity', 'absorption', 'VWAP', 'delta', 'correlation', 'fiscal deficit', 'implied volatility', 'order book', 'macroeconomic', 'consolidation'.
-               - Section 0 MUST BE A VISCERAL, UNIGNORABLE HOOK: A direct threat, shocking accusation, or urgent mystery confronting the viewer's bank account.
-                 * Example: "While you were sleeping, someone just quietly pulled half a billion dollars out of your retirement stocks."
-                 * Example: "There is a secret clause hidden in your fixed deposit that the banks pray you never read."
-
-            2. PERSONALIZE THE THREAT (EVERY STORY HAS A VILLAIN, A VICTIM, AND A CRIME):
-               - The victim is the everyday viewer working a 9-to-5 job.
-               - The villain is the institutional desk, shadow banker, or predatory algorithm.
-               - Frame the stakes around what the viewer stands to lose: their hard-earned salary, their children's college fund, their home equity, or their savings.
-
-            3. ONE SINGLE INSANE FACT PER SHORT (NO ACADEMIC DATA DUMPS):
-               - Stop trying to explain the entire global economy in 60 seconds.
-               - Focus on ONE shocking smoking gun (e.g. "For every ₹100 retail traders poured into this stock, insiders cashed out ₹85 within 48 hours").
-               - Build relentless tension for 40 seconds, then drop the jaw-dropping revelation in the final 15 seconds.
-
-            4. PACING & BLOCKBUSTER 3D TYPOGRAPHY DIRECTIVES:
-               - 'headline_top': Exactly 1 to 2 words uppercase punchy hook (e.g. '$7 TRILLION', '1.3 MILLION', '2 CRORE', '₹85 LOW', 'H-1B', 'HAL & BEL', '85% OIL').
-               - 'headline_mid': Exactly 1 to 2 words uppercase anchor (e.g. 'DEBT TRAP', 'TROOPS', 'TRAPPED', 'CRASH', 'CRACKDOWN', 'SURGE', 'IMPORTED').
-               - 'badge_text': High-friction tactical alert stamp (e.g. 'MARKET SHOCK', 'TIME-BOMB', 'CRACKDOWN', 'OVERPRICED', 'TOP SECRET', 'WARNING').
-               - 'color_theme': One of 'gold', 'fire', 'emerald', 'cyan', 'warning'.
-               - 'visual_prompt': A vivid, cinematic, tangible 35mm photographic description of a CONCRETE PHYSICAL METAPHOR.
-                 * STRICTLY FORBIDDEN: Boardrooms, office desks, suits around conference tables, generic business people, charts on laptop screens.
-                 * MANDATORY PHYSICAL METAPHORS: Bank vaults sucking vortices, split cargo container ships in storms, gold bullion on dark marble, fighter jets flanking flags, passports locked in chains, robotic arms throwing sparks, distressed trader clutching head before giant red smartphone chart.
-                 * Suffix: "cinematic 35mm photograph, dark moody obsidian lighting, volumetric amber and gold rays, 8k hyper-detailed, clean plate, zero text, zero watermark"
-               - 'script': Natural, conversational, breathless spoken sentences. Speak like you are leaning in to whisper a dangerous secret.
-
-            Respond ONLY with a valid JSON object matching this structure:
-            {{
-              "sections": [
-                {{
-                  "section_index": 0,
-                  "headline_top": "...",
-                  "headline_mid": "...",
-                  "badge_text": "...",
-                  "color_theme": "gold",
-                  "visual_prompt": "...",
-                  "script": "..."
-                }}
-              ]
-            }}
-            """
-            models_to_try = [
-                "gemini-2.0-flash",
-                "gemini-1.5-flash",
-                "gemini-1.5-pro",
-                "gemini-flash-lite-latest",
-            ]
-            for attempt in range(2):
-                for model_name in models_to_try:
-                    try:
-                        resp = client.models.generate_content(model=model_name, contents=prompt)
-                        raw_text = resp.text.strip()
-                        if "```json" in raw_text:
-                            raw_text = raw_text.split("```json")[1].split("```")[0].strip()
-                        elif "```" in raw_text:
-                            raw_text = raw_text.split("```")[1].split("```")[0].strip()
-                        data = json.loads(raw_text)
-                        g_secs = data.get("sections", [])
-                        if len(g_secs) >= num_sections:
-                            gemini_sections = g_secs[:num_sections]
-                            logger.success(f"✅ [Script Studio] Successfully generated {num_sections} custom investigative sections via {model_name}")
-                            break
-                    except Exception as m_err:
-                        logger.debug(f"Gemini {model_name} attempt {attempt+1} notice: {m_err}")
-                if gemini_sections:
-                    break
-                time.sleep(2)
+            client = genai.Client(api_key=api_key, http_options={"api_version": "v1beta"})
         except Exception as e:
-            logger.error(f"[Script Studio] Gemini API error: {e}")
+            logger.error(f"[Script Studio] Failed to initialize Gemini client: {e}")
 
-    # ZERO HARDCODED FALLBACK MANDATE: Every single beat must be 100% custom-generated for the topic
+    models_to_try = [
+        "gemini-2.0-flash",
+        "gemini-1.5-flash",
+        "gemini-1.5-pro",
+        "gemini-flash-lite-latest",
+    ]
+
+    sections = []
+
+    # =========================================================================
+    # CASE A: DOCUMENTARY (16:9 Landscape, 12 Minutes = 36 Segments x 5 Beats = 180 Plates)
+    # =========================================================================
+    if not is_short:
+        target_segments = 36
+        gemini_sections = []
+        banned_motifs = [
+            "golden vault door",
+            "grid of gold bars",
+            "fighter jets with flag",
+            "red silhouette holding phone",
+            "corporate boardroom table",
+            "suits shaking hands",
+            "generic laptop with chart",
+            "meeting room with businessmen",
+            "handshake in suit",
+            "stock chart on screen",
+        ]
+
+        batch_definitions = [
+            {
+                "batch_num": 1,
+                "start_idx": 0,
+                "count": 12,
+                "act_name": "ACT 1: THE TRAP & THE SMOKING GUN (Segments 0-11)",
+                "act_directive": (
+                    "Establish the visceral hook in the first 5 seconds. Expose the immediate threat to retail investors, "
+                    "the opening catalyst, and the scale of the money trail. "
+                    "Environments: Crisp daylight container ports, active electronic trading floors with cool-blue display glow, "
+                    "automated assembly lines, ocean freight docks, fiber optic subsea cables. "
+                    "Lighting: Crisp natural daylight and cool tech blues. Camera: Sweeping drone aerials, high-angle tracking."
+                ),
+            },
+            {
+                "batch_num": 2,
+                "start_idx": 12,
+                "count": 12,
+                "act_name": "ACT 2: FORENSIC INVESTIGATION & THE HIDDEN MECHANISM (Segments 12-23)",
+                "act_directive": (
+                    "Deep-dive into the forensic crime mechanics: how the algorithm siphoned funds, shell corporation filings, "
+                    "customs manifest tampering, or dark liquidity pools. "
+                    "Environments: Macro forensic hardware, cleanrooms, shredded audit documents, warehouse logistics at twilight, "
+                    "industrial vaults, security checkpoint scanners, server racks with pulsing data LEDs. "
+                    "Camera: Extreme macro close-ups, Dutch tilts, low tracking shots."
+                ),
+            },
+            {
+                "batch_num": 3,
+                "start_idx": 24,
+                "count": 12,
+                "act_name": "ACT 3: THE SYSTEMIC CLIMAX & FINAL WARNING (Segments 24-35)",
+                "act_directive": (
+                    "The climax: regulatory raids, institutional defaults, the irreversible damage, and the direct survival playbook "
+                    "for the everyday viewer. "
+                    "Environments: Architectural exteriors of central bank headquarters at dusk, rain-slicked financial district streets, "
+                    "empty trading pits with discarded ticker tape, sealed vault gates, cold neon dawn. "
+                    "Lighting: Moody cinematic obsidian with subtle cyan/gold reflections. Camera: Low-angle imposing monuments."
+                ),
+            },
+        ]
+
+        if client:
+            for b_def in batch_definitions:
+                b_num = b_def["batch_num"]
+                s_start = b_def["start_idx"]
+                s_count = b_def["count"]
+                s_end = s_start + s_count - 1
+                act_name = b_def["act_name"]
+                act_directive = b_def["act_directive"]
+
+                banned_str = ", ".join(f"'{m}'" for m in banned_motifs[-25:])
+                batch_acquired = []
+
+                prompt = f"""
+                You are an investigative financial journalist and thriller documentary director (in the style of Coffeezilla, James Jani, and MagnatesMedia).
+                Tone: Dark, authoritative, forensic, breathless investigative thriller exposing high-stakes financial crimes and institutional traps.
+                STRICT IDENTITY MANDATE:
+                - The narrator must NEVER state their name, introduce themselves, or say 'I am [Name]' or 'This is [Name]'.
+                - Zero self-identification. Jump straight into the story from the very first syllable.
+                - If an identity is ever referenced anywhere, it must ONLY be 'Alex' (Founder & Chief Analyst). Never mention or use the name 'Christopher'.
+
+                TOPIC: {topic_clean}
+                VERTICAL: {vertical}
+                FORMAT: 12-Minute Masterpiece Documentary (16:9 Landscape)
+                CURRENT PRODUCTION CHUNK: {act_name} (Segments {s_start} through {s_end}, exactly {s_count} segments of 20 seconds each)
+
+                CHUNK DIRECTIVE:
+                {act_directive}
+
+                STRICT ANTI-CLICHE & BANNED MOTIFS MANDATE:
+                The following visual motifs are PERMANENTLY FORBIDDEN (Do NOT use or reference any of these):
+                [{banned_str}]
+                You MUST explore fresh physical metaphors, varied lighting, and concrete real-world objects.
+
+                SEGMENT STRUCTURE (20 Seconds each):
+                Each segment must contain:
+                1. 'section_index': integer from {s_start} to {s_end}
+                2. 'headline_top': Exactly 1 to 2 words uppercase punchy hook (e.g. '$7 TRILLION', '1.3 MILLION', '2 CRORE', '₹85 LOW', 'H-1B', 'HAL & BEL').
+                3. 'headline_mid': Exactly 1 to 2 words uppercase anchor (e.g. 'DEBT TRAP', 'TROOPS', 'TRAPPED', 'CRASH', 'CRACKDOWN', 'SURGE').
+                4. 'badge_text': High-friction tactical alert stamp (e.g. 'MARKET SHOCK', 'TIME-BOMB', 'CRACKDOWN', 'OVERPRICED', 'TOP SECRET').
+                5. 'color_theme': One of 'gold', 'fire', 'emerald', 'cyan', 'warning'.
+                6. 'script': ~45-55 words of spoken narrative for this 20-second segment. Speak like leaning in to whisper a dangerous secret.
+                7. 'micro_beats': Exactly 5 distinct 4-second micro-beats (beat_0 through beat_4):
+                   - Each beat represents 4.0 seconds of speech.
+                   - 'beat_index': integer 0 to 4
+                   - 'start_sec': relative seconds in segment (0.0, 4.0, 8.0, 12.0, 16.0)
+                   - 'end_sec': relative seconds in segment (4.0, 8.0, 12.0, 16.0, 20.0)
+                   - 'spoken_phrase': The exact 8-12 words spoken in this 4-second beat.
+                   - 'visual_prompt': A vivid, cinematic, tangible 35mm photographic description of a CONCRETE PHYSICAL METAPHOR illustrating that exact spoken phrase.
+                     * STRICTLY FORBIDDEN: Boardrooms, suits at conference tables, generic business people, charts on laptops.
+                     * Suffix: "cinematic 35mm photograph, 8k hyper-detailed, clean plate, zero text, zero watermark"
+                     * Rotate lighting: cool blue, crisp daylight, twilight, neon noir. Never force the same amber lighting on every beat.
+                     * Rotate camera angles: macro close-ups, wide aerial drones, low-angle tracking, eye-level forensic scrutiny.
+
+                Respond ONLY with a valid JSON object matching this structure:
+                {{
+                  "sections": [
+                    {{
+                      "section_index": {s_start},
+                      "headline_top": "...",
+                      "headline_mid": "...",
+                      "badge_text": "...",
+                      "color_theme": "gold",
+                      "script": "...",
+                      "micro_beats": [
+                        {{
+                          "beat_index": 0,
+                          "start_sec": 0.0,
+                          "end_sec": 4.0,
+                          "spoken_phrase": "...",
+                          "visual_prompt": "..."
+                        }},
+                        {{
+                          "beat_index": 1,
+                          "start_sec": 4.0,
+                          "end_sec": 8.0,
+                          "spoken_phrase": "...",
+                          "visual_prompt": "..."
+                        }},
+                        {{
+                          "beat_index": 2,
+                          "start_sec": 8.0,
+                          "end_sec": 12.0,
+                          "spoken_phrase": "...",
+                          "visual_prompt": "..."
+                        }},
+                        {{
+                          "beat_index": 3,
+                          "start_sec": 12.0,
+                          "end_sec": 16.0,
+                          "spoken_phrase": "...",
+                          "visual_prompt": "..."
+                        }},
+                        {{
+                          "beat_index": 4,
+                          "start_sec": 16.0,
+                          "end_sec": 20.0,
+                          "spoken_phrase": "...",
+                          "visual_prompt": "..."
+                        }}
+                      ]
+                    }}
+                  ]
+                }}
+                """
+                for attempt in range(2):
+                    for model_name in models_to_try:
+                        try:
+                            resp = client.models.generate_content(model=model_name, contents=prompt)
+                            raw_text = resp.text.strip()
+                            if "```json" in raw_text:
+                                raw_text = raw_text.split("```json")[1].split("```")[0].strip()
+                            elif "```" in raw_text:
+                                raw_text = raw_text.split("```")[1].split("```")[0].strip()
+                            data = json.loads(raw_text)
+                            g_secs = data.get("sections", [])
+                            if len(g_secs) >= s_count:
+                                batch_acquired = g_secs[:s_count]
+                                logger.success(f"✅ [Script Studio] Batch {b_num}/3 ({act_name}) successfully generated via {model_name}")
+                                break
+                        except Exception as m_err:
+                            logger.debug(f"Gemini {model_name} Batch {b_num} attempt {attempt+1} notice: {m_err}")
+                    if batch_acquired:
+                        break
+                    time.sleep(2)
+
+                if not batch_acquired:
+                    logger.error(f"❌ [Script Studio] Failed to acquire Batch {b_num}/3 from Gemini API.")
+                    break
+
+                # Extract key concrete nouns/motifs from this batch and append to running banned_motifs
+                for sec_item in batch_acquired:
+                    for b_item in sec_item.get("micro_beats", []):
+                        vp = b_item.get("visual_prompt", "")
+                        core_match = re.search(r"photograph of (?:a |an |the )?([^,]+)", vp, re.IGNORECASE)
+                        if core_match:
+                            extracted_m = core_match.group(1).strip().lower()
+                            if len(extracted_m) > 3 and extracted_m not in banned_motifs:
+                                banned_motifs.append(extracted_m)
+
+                gemini_sections.extend(batch_acquired)
+
+        if len(gemini_sections) < target_segments:
+            raise RuntimeError(
+                f"⛔ CRITICAL: Failed to generate all 36 bespoke documentary segments for topic '{topic_clean}'. "
+                f"Acquired {len(gemini_sections)}/{target_segments} segments. "
+                f"Hardcoded scripts, generic modulo fallbacks, and canned text are PERMANENTLY PROHIBITED."
+            )
+
+        for i in range(target_segments):
+            start_t = round(i * 20.0, 2)
+            end_t = round((i + 1) * 20.0, 2)
+            has_hud = (i in (1, 3, 5, 8, 12, 18, 24, 30))
+
+            g = gemini_sections[i]
+            top = str(g.get("headline_top", lead_word))[:24]
+            mid = str(g.get("headline_mid", second_word))[:24]
+            badge = str(g.get("badge_text", "MARKET SHOCK"))[:20]
+            color_theme = str(g.get("color_theme", "gold")).lower()
+            script_text = str(g.get("script", "")).strip()
+
+            # Strict zero identity leak guardrail: Scrub any accidental self-introduction or Christopher references
+            script_text = re.sub(r"\b(?:I am|I'm|this is|my name is)\s+Christopher\b", "I'm Alex", script_text, flags=re.IGNORECASE)
+            script_text = re.sub(r"\bChristopher\b", "Alex", script_text, flags=re.IGNORECASE)
+
+            # Ensure micro_beats contains exactly 5 bespoke items
+            raw_beats = g.get("micro_beats", [])
+            micro_beats = []
+            script_sentences = [s.strip() for s in re.split(r"[.!?]+", script_text) if len(s.strip()) > 3]
+
+            for b_idx in range(5):
+                b_start = round(b_idx * 4.0, 2)
+                b_end = round((b_idx + 1) * 4.0, 2)
+
+                if b_idx < len(raw_beats):
+                    rb = raw_beats[b_idx]
+                    vp = str(rb.get("visual_prompt", "")).strip()
+                    sp = str(rb.get("spoken_phrase", "")).strip()
+                else:
+                    vp = ""
+                    sp = ""
+
+                if not sp:
+                    sp = script_sentences[b_idx % len(script_sentences)] if script_sentences else f"{top} {mid}"
+
+                if not vp or len(vp) < 15:
+                    vp = (
+                        f"Cinematic 35mm photograph, visual metaphor of {sp}, "
+                        f"industrial physical structures, container ports, cold cleanroom circuits, "
+                        f"atmospheric lighting, 8k hyper-detailed, clean plate, zero text, zero watermark"
+                    )
+
+                micro_beats.append({
+                    "beat_index": b_idx,
+                    "start_sec": b_start,
+                    "end_sec": b_end,
+                    "duration": 4.0,
+                    "spoken_phrase": sp,
+                    "visual_prompt": vp,
+                })
+
+            primary_vp = micro_beats[0]["visual_prompt"]
+
+            sections.append({
+                "section_index": i,
+                "start_sec": start_t,
+                "end_sec": end_t,
+                "duration": 20.0,
+                "headline_top": top[:24],
+                "headline_mid": mid[:24],
+                "badge_text": badge[:20],
+                "color_theme": color_theme,
+                "visual_prompt": primary_vp,
+                "micro_beats": micro_beats,
+                "theme": theme,
+                "symbol_type": default_symbol,
+                "method_c_hud": has_hud,
+                "script": script_text,
+            })
+
+        logger.success(f"🎬 [Script Studio] Successfully constructed 36 segments with 180 bespoke micro-beats (12-min Documentary).")
+        return sections
+
+    # =========================================================================
+    # CASE B: SHORTS (9:16 Vertical, 60s = 20 Unique Cuts of 3.0s each)
+    # =========================================================================
+    rules = VideoFormatConfig.get_rules(duration_sec, is_short=True)
+    interval = rules["frame_interval"]
+    num_sections = rules["expected_frames"]
+    gemini_sections = []
+
+    if client:
+        prompt = f"""
+        You are an investigative financial journalist and thriller documentary director (in the style of Coffeezilla, James Jani, and MagnatesMedia).
+        Tone: Dark, authoritative, forensic, breathless investigative thriller exposing high-stakes financial crimes and institutional traps.
+        STRICT IDENTITY MANDATE:
+        - The narrator must NEVER state their name, introduce themselves, or say 'I am [Name]' or 'This is [Name]'.
+        - Zero self-identification. Jump straight into the story from the very first syllable.
+        - If an identity is ever referenced anywhere, it must ONLY be 'Alex' (Founder & Chief Analyst). Never mention or use the name 'Christopher'.
+        Topic: {topic_clean}
+        Vertical: {vertical}
+        Format: 60-Second Viral Short (9:16 Vertical)
+        Number of discrete sections: {num_sections}
+
+        CRITICAL DIRECTIVES FOR HIGH-RETENTION HUMAN STORYTELLING (AVD >= 70%):
+        1. ZERO FINANCIAL JARGON IN THE FIRST 5 SECONDS:
+           - STRICTLY FORBIDDEN WORDS in Section 0: 'liquidity', 'absorption', 'VWAP', 'delta', 'correlation', 'fiscal deficit', 'implied volatility', 'order book', 'macroeconomic', 'consolidation'.
+           - Section 0 MUST BE A VISCERAL, UNIGNORABLE HOOK: A direct threat, shocking accusation, or urgent mystery confronting the viewer's bank account.
+
+        2. PERSONALIZE THE THREAT (EVERY STORY HAS A VILLAIN, A VICTIM, AND A CRIME):
+           - The victim is the everyday viewer working a 9-to-5 job.
+           - The villain is the institutional desk, shadow banker, or predatory algorithm.
+
+        3. ONE SINGLE INSANE FACT PER SHORT (NO ACADEMIC DATA DUMPS):
+           - Focus on ONE shocking smoking gun. Build relentless tension for 40 seconds, then drop the jaw-dropping revelation in the final 15 seconds.
+
+        4. PACING & BLOCKBUSTER 3D TYPOGRAPHY DIRECTIVES:
+           - 'headline_top': Exactly 1 to 2 words uppercase punchy hook (e.g. '$7 TRILLION', '1.3 MILLION', '2 CRORE', '₹85 LOW', 'H-1B', 'HAL & BEL').
+           - 'headline_mid': Exactly 1 to 2 words uppercase anchor (e.g. 'DEBT TRAP', 'TROOPS', 'TRAPPED', 'CRASH', 'CRACKDOWN', 'SURGE').
+           - 'badge_text': High-friction tactical alert stamp (e.g. 'MARKET SHOCK', 'TIME-BOMB', 'CRACKDOWN', 'OVERPRICED', 'TOP SECRET').
+           - 'color_theme': One of 'gold', 'fire', 'emerald', 'cyan', 'warning'.
+           - 'visual_prompt': A vivid, cinematic, tangible 35mm photographic description of a CONCRETE PHYSICAL METAPHOR.
+             * STRICTLY FORBIDDEN: Boardrooms, office desks, suits around conference tables, generic business people, charts on laptop screens.
+             * MANDATORY PHYSICAL METAPHORS: Bank vaults sucking vortices, split cargo container ships in storms, gold bullion on dark marble, fighter jets flanking flags, passports locked in chains, robotic arms throwing sparks, distressed trader clutching head before giant red smartphone chart.
+             * Suffix: "cinematic 35mm photograph, dark moody obsidian lighting, volumetric amber and gold rays, 8k hyper-detailed, clean plate, zero text, zero watermark"
+           - 'script': Natural, conversational, breathless spoken sentences. Speak like you are leaning in to whisper a dangerous secret.
+
+        Respond ONLY with a valid JSON object matching this structure:
+        {{
+          "sections": [
+            {{
+              "section_index": 0,
+              "headline_top": "...",
+              "headline_mid": "...",
+              "badge_text": "...",
+              "color_theme": "gold",
+              "visual_prompt": "...",
+              "script": "..."
+            }}
+          ]
+        }}
+        """
+        for attempt in range(2):
+            for model_name in models_to_try:
+                try:
+                    resp = client.models.generate_content(model=model_name, contents=prompt)
+                    raw_text = resp.text.strip()
+                    if "```json" in raw_text:
+                        raw_text = raw_text.split("```json")[1].split("```")[0].strip()
+                    elif "```" in raw_text:
+                        raw_text = raw_text.split("```")[1].split("```")[0].strip()
+                    data = json.loads(raw_text)
+                    g_secs = data.get("sections", [])
+                    if len(g_secs) >= num_sections:
+                        gemini_sections = g_secs[:num_sections]
+                        logger.success(f"✅ [Script Studio] Successfully generated {num_sections} custom investigative sections via {model_name}")
+                        break
+                except Exception as m_err:
+                    logger.debug(f"Gemini {model_name} attempt {attempt+1} notice: {m_err}")
+            if gemini_sections:
+                break
+            time.sleep(2)
+
+    # ZERO HARDCODED FALLBACK MANDATE
     if not gemini_sections or len(gemini_sections) < num_sections:
         raise RuntimeError(
             f"⛔ CRITICAL: Failed to generate custom investigative narrative script for topic '{topic_clean}'. "
@@ -261,7 +553,8 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
         color_theme = str(g.get("color_theme", "gold")).lower()
         visual_prompt = str(g.get("visual_prompt", "")).strip()
         script_text = str(g.get("script", "")).strip()
-        # Strict zero identity leak guardrail: Scrub any accidental self-introduction or Christopher references
+
+        # Strict zero identity leak guardrail
         script_text = re.sub(r"\b(?:I am|I'm|this is|my name is)\s+Christopher\b", "I'm Alex", script_text, flags=re.IGNORECASE)
         script_text = re.sub(r"\bChristopher\b", "Alex", script_text, flags=re.IGNORECASE)
 
@@ -271,6 +564,15 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                 f"massive concrete physical monuments, bank vaults, cargo ships, dark moody obsidian lighting, "
                 f"volumetric amber and gold rays, 8k hyper-detailed, clean plate, zero text, zero watermark"
             )
+
+        micro_beats = [{
+            "beat_index": 0,
+            "start_sec": 0.0,
+            "end_sec": interval,
+            "duration": interval,
+            "spoken_phrase": script_text,
+            "visual_prompt": visual_prompt,
+        }]
 
         sections.append({
             "section_index": i,
@@ -282,6 +584,7 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
             "badge_text": badge[:20],
             "color_theme": color_theme,
             "visual_prompt": visual_prompt,
+            "micro_beats": micro_beats,
             "theme": theme,
             "symbol_type": default_symbol,
             "method_c_hud": has_hud,
@@ -391,28 +694,63 @@ def prepare_session(
     frame_files = []
     
     missing_frame_prompts = []
+    frame_id = 1
     for s in sections:
         idx = s["section_index"]
-        frame_path = frames_dir / f"frame_{idx:02d}.jpg"
-        approved_dir = BASE_DIR / "assets" / "approved_bundles" / slug
-        approved_frame = approved_dir / f"frame_{idx:02d}.jpg"
-        if approved_frame.exists():
-            shutil.copy2(approved_frame, frame_path)
-            logger.success(f"🎯 [Session Prep] Using verified user-approved frame: {approved_frame.name}")
-        elif not frame_path.exists():
-            prompt = s.get("visual_prompt")
-            if not prompt or len(prompt.strip()) < 10:
-                prompt = (
-                    f"Cinematic 35mm photograph, visual metaphor of {s.get('headline_top', '')} {s.get('headline_mid', '')}, "
-                    f"massive concrete physical monuments, bank vaults, cargo ships, dark moody obsidian lighting, "
-                    f"volumetric amber and gold rays, 8k hyper-detailed, clean plate, zero text, zero watermark"
-                )
-            missing_frame_prompts.append({
-                "id": idx + 1,
-                "prompt": prompt,
-                "output_path": str(frame_path),
-                "section": s
-            })
+        micro_beats = s.get("micro_beats", [])
+        if micro_beats and not is_short:
+            s["frame_files"] = []
+            for b in micro_beats:
+                b_idx = b["beat_index"]
+                frame_path = frames_dir / f"frame_{idx:02d}_beat_{b_idx}.jpg"
+                b["frame_file"] = str(frame_path.relative_to(output_dir))
+                s["frame_files"].append(b["frame_file"])
+                
+                approved_dir = BASE_DIR / "assets" / "approved_bundles" / slug
+                approved_frame = approved_dir / f"frame_{idx:02d}_beat_{b_idx}.jpg"
+                if approved_frame.exists():
+                    shutil.copy2(approved_frame, frame_path)
+                    logger.success(f"🎯 [Session Prep] Using verified user-approved frame: {approved_frame.name}")
+                elif not frame_path.exists():
+                    prompt = b.get("visual_prompt", "")
+                    if not prompt or len(prompt.strip()) < 10:
+                        prompt = (
+                            f"Cinematic 35mm photograph, visual metaphor of {b.get('spoken_phrase', '')}, "
+                            f"massive concrete physical monuments, bank vaults, cargo ships, dark moody obsidian lighting, "
+                            f"volumetric amber and gold rays, 8k hyper-detailed, clean plate, zero text, zero watermark"
+                        )
+                    missing_frame_prompts.append({
+                        "id": frame_id,
+                        "prompt": prompt,
+                        "output_path": str(frame_path),
+                        "section": s,
+                        "beat": b
+                    })
+                frame_id += 1
+            s["frame_file"] = s["frame_files"][0]
+        else:
+            frame_path = frames_dir / f"frame_{idx:02d}.jpg"
+            s["frame_file"] = str(frame_path.relative_to(output_dir))
+            approved_dir = BASE_DIR / "assets" / "approved_bundles" / slug
+            approved_frame = approved_dir / f"frame_{idx:02d}.jpg"
+            if approved_frame.exists():
+                shutil.copy2(approved_frame, frame_path)
+                logger.success(f"🎯 [Session Prep] Using verified user-approved frame: {approved_frame.name}")
+            elif not frame_path.exists():
+                prompt = s.get("visual_prompt")
+                if not prompt or len(prompt.strip()) < 10:
+                    prompt = (
+                        f"Cinematic 35mm photograph, visual metaphor of {s.get('headline_top', '')} {s.get('headline_mid', '')}, "
+                        f"massive concrete physical monuments, bank vaults, cargo ships, dark moody obsidian lighting, "
+                        f"volumetric amber and gold rays, 8k hyper-detailed, clean plate, zero text, zero watermark"
+                    )
+                missing_frame_prompts.append({
+                    "id": frame_id,
+                    "prompt": prompt,
+                    "output_path": str(frame_path),
+                    "section": s
+                })
+            frame_id += 1
 
     # If missing frames, dispatch in a single Kaggle GPU batch for 20x efficiency
     if missing_frame_prompts:
@@ -433,30 +771,56 @@ def prepare_session(
     # Ensure every single frame exists exclusively from Kaggle GPU (zero procedural compromise)
     for s in sections:
         idx = s["section_index"]
-        frame_path = frames_dir / f"frame_{idx:02d}.jpg"
-        if not frame_path.exists():
-            fetch_clean_photographic_plate(
-                prompt=s.get("visual_prompt", ""),
-                width=w_out,
-                height=h_out,
-                out_path=frame_path
-            )
-        if not frame_path.exists():
-            raise RuntimeError(
-                f"⛔ CRITICAL: Frame {idx:02d} was not generated by Kaggle GPU. "
-                f"Per Standing Rule 1 & Zero Compromise Mandate, procedural placeholders are permanently prohibited."
-            )
-        # Verify aspect ratio and fit with ImageOps to guarantee zero distortion
-        try:
-            with Image.open(frame_path) as raw_img:
-                if raw_img.size != (w_out, h_out):
-                    fitted = ImageOps.fit(raw_img.convert("RGB"), (w_out, h_out), method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
-                    fitted.save(frame_path, quality=95)
-        except Exception as f_err:
-            logger.debug(f"Frame fit check: {f_err}")
+        micro_beats = s.get("micro_beats", [])
+        if micro_beats and not is_short:
+            for b in micro_beats:
+                b_idx = b["beat_index"]
+                frame_path = frames_dir / f"frame_{idx:02d}_beat_{b_idx}.jpg"
+                if not frame_path.exists():
+                    fetch_clean_photographic_plate(
+                        prompt=b.get("visual_prompt", ""),
+                        width=w_out,
+                        height=h_out,
+                        out_path=frame_path
+                    )
+                if not frame_path.exists():
+                    raise RuntimeError(
+                        f"⛔ CRITICAL: Frame {idx:02d} beat {b_idx} was not generated by Kaggle GPU. "
+                        f"Per Standing Rule 1 & Zero Compromise Mandate, procedural placeholders are permanently prohibited."
+                    )
+                try:
+                    with Image.open(frame_path) as raw_img:
+                        if raw_img.size != (w_out, h_out):
+                            fitted = ImageOps.fit(raw_img.convert("RGB"), (w_out, h_out), method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
+                            fitted.save(frame_path, quality=95)
+                except Exception as f_err:
+                    logger.debug(f"Frame fit check: {f_err}")
+                frame_files.append(str(frame_path.relative_to(output_dir)))
+        else:
+            frame_path = frames_dir / f"frame_{idx:02d}.jpg"
+            if not frame_path.exists():
+                fetch_clean_photographic_plate(
+                    prompt=s.get("visual_prompt", ""),
+                    width=w_out,
+                    height=h_out,
+                    out_path=frame_path
+                )
+            if not frame_path.exists():
+                raise RuntimeError(
+                    f"⛔ CRITICAL: Frame {idx:02d} was not generated by Kaggle GPU. "
+                    f"Per Standing Rule 1 & Zero Compromise Mandate, procedural placeholders are permanently prohibited."
+                )
+            # Verify aspect ratio and fit with ImageOps to guarantee zero distortion
+            try:
+                with Image.open(frame_path) as raw_img:
+                    if raw_img.size != (w_out, h_out):
+                        fitted = ImageOps.fit(raw_img.convert("RGB"), (w_out, h_out), method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
+                        fitted.save(frame_path, quality=95)
+            except Exception as f_err:
+                logger.debug(f"Frame fit check: {f_err}")
 
-        frame_files.append(str(frame_path.relative_to(output_dir)))
-        s["frame_file"] = str(frame_path.relative_to(output_dir))
+            frame_files.append(str(frame_path.relative_to(output_dir)))
+            s["frame_file"] = str(frame_path.relative_to(output_dir))
 
     # 3. Dynamic Speech-Aligned Section Boundaries & Millisecond Word Mapping
     probe_dur = subprocess.run([
@@ -610,12 +974,31 @@ def render_segment(segment_index: int, bundle_dir: Path, output_dir: Optional[Pa
 
     logger.info(f"🎬 [Runner {segment_index}] Rendering segment {segment_index:02d} ({seg_duration:.1f}s, {total_frames} frames)...")
 
-    # Load high-CTR base frame
-    frame_rel = sec["frame_file"]
-    frame_full = bundle_dir / frame_rel
-    base_img = Image.open(frame_full).convert("RGB")
-    if base_img.size != (w_out, h_out):
-        base_img = ImageOps.fit(base_img, (w_out, h_out), method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
+    # Load high-CTR base frames (with 5-beat micro-beat support for 16:9 documentaries)
+    micro_beats = sec.get("micro_beats", [])
+    beat_imgs = []
+    if micro_beats and not is_short:
+        for b in micro_beats:
+            b_rel = b.get("frame_file")
+            if b_rel and (bundle_dir / b_rel).exists():
+                b_path = bundle_dir / b_rel
+            else:
+                b_idx = b.get("beat_index", 0)
+                b_path = bundle_dir / "frames" / f"frame_{segment_index:02d}_beat_{b_idx}.jpg"
+            if not b_path.exists():
+                b_path = bundle_dir / sec.get("frame_file", f"frames/frame_{segment_index:02d}.jpg")
+            img = Image.open(b_path).convert("RGB")
+            if img.size != (w_out, h_out):
+                img = ImageOps.fit(img, (w_out, h_out), method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
+            beat_imgs.append(img)
+
+    if not beat_imgs:
+        frame_rel = sec["frame_file"]
+        frame_full = bundle_dir / frame_rel
+        base_img = Image.open(frame_full).convert("RGB")
+        if base_img.size != (w_out, h_out):
+            base_img = ImageOps.fit(base_img, (w_out, h_out), method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
+        beat_imgs = [base_img]
 
     # -------------------------------------------------------------
     # 4-WORD KINETIC TYPOGRAPHY CAPTION SYSTEM (MRBEAST / HORMOZI STYLE)
@@ -756,12 +1139,21 @@ def render_segment(segment_index: int, bundle_dir: Path, output_dir: Optional[Pa
     seg_start = sec["start_sec"]
     for f_idx in range(total_frames):
         t_current = seg_start + (f_idx / fps)
-        
-        # Ken Burns subtle zoom (1.00 -> 1.04)
-        progress = f_idx / max(total_frames, 1)
-        scale = 1.0 + (0.04 * progress)
+        t_in_sec = f_idx / fps  # relative seconds in this segment (0.0 to 20.0s)
+
+        # Micro-beat selection: 1 unique bespoke plate every 4.0 seconds for documentaries
+        if len(beat_imgs) > 1:
+            beat_idx = min(len(beat_imgs) - 1, int(t_in_sec // 4.0))
+            active_base_img = beat_imgs[beat_idx]
+            beat_progress = (t_in_sec % 4.0) / 4.0
+            scale = 1.0 + (0.04 * beat_progress)
+        else:
+            active_base_img = beat_imgs[0]
+            progress = f_idx / max(total_frames, 1)
+            scale = 1.0 + (0.04 * progress)
+
         zw, zh = int(w_out * scale), int(h_out * scale)
-        frame_canvas = base_img.resize((zw, zh), Image.Resampling.BILINEAR)
+        frame_canvas = active_base_img.resize((zw, zh), Image.Resampling.BILINEAR)
         cx, cy = (zw - w_out) // 2, (zh - h_out) // 2
         frame_canvas = frame_canvas.crop((cx, cy, cx + w_out, cy + h_out))
 
@@ -1001,7 +1393,7 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
 
         # Mandatory Pre-Upload Quality Control Gate
         from app.services.pre_upload_qc_gate import PreUploadQCGate
-        qc_passed, qc_errors = PreUploadQCGate.validate(final_video_mp4, is_short=manifest.get("is_short", False))
+        qc_passed, qc_errors = PreUploadQCGate.validate(final_video_mp4, is_short=manifest.get("is_short", False), manifest_path=manifest_path)
         if not qc_passed:
             raise RuntimeError(f"⛔ PRE-UPLOAD QC GATE REJECTION: Video failed validation: {qc_errors}")
 

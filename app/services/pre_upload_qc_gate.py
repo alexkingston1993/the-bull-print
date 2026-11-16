@@ -13,16 +13,78 @@ Enforces:
 
 import json
 import os
+import re
 import shutil
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 from loguru import logger
 from PIL import Image
 
 class PreUploadQCGate:
     """Pre-Upload QC Gate: Guarantees zero corrupted, silent, misaligned, or cloned video uploads."""
+
+    @classmethod
+    def validate_manifest_prompt_diversity(cls, manifest_path: Path, min_unique_ratio: float = 0.95) -> Tuple[bool, List[str]]:
+        """
+        Validates that >= 95% of visual prompts across micro-beats and sections are strictly unique.
+        Catches repetitive visual prompts, copy-pasted clichés, and prompt recycling.
+        """
+        manifest_path = Path(manifest_path)
+        errors = []
+        if not manifest_path.exists():
+            errors.append(f"Manifest not found for prompt diversity check: {manifest_path}")
+            return False, errors
+
+        try:
+            with open(manifest_path, "r", encoding="utf-8") as f:
+                manifest = json.load(f)
+        except Exception as e:
+            errors.append(f"Failed to read manifest JSON: {e}")
+            return False, errors
+
+        prompts = []
+        for s in manifest.get("sections", []):
+            if s.get("micro_beats"):
+                for b in s["micro_beats"]:
+                    p = b.get("visual_prompt", "").strip()
+                    if p:
+                        prompts.append(p)
+            else:
+                p = s.get("visual_prompt", "").strip()
+                if p:
+                    prompts.append(p)
+
+        if not prompts:
+            errors.append("No visual prompts found in manifest to validate")
+            return False, errors
+
+        # Normalize prompts for strict comparison (strip standard photographic prefix/suffix & punctuation)
+        def normalize_p(text: str) -> str:
+            t = text.lower()
+            t = re.sub(r"^cinematic 35mm photograph(?:,\s*visual metaphor of)?", "", t)
+            t = re.sub(r",?\s*(?:8k hyper-detailed|clean plate|zero text|zero watermark).*", "", t)
+            t = re.sub(r"[^\w\s]", "", t)
+            norm = " ".join(t.split())
+            return norm if norm else text.lower().strip()
+
+        norm_prompts = [normalize_p(p) for p in prompts]
+        unique_norm = set(norm_prompts)
+        unique_ratio = len(unique_norm) / len(norm_prompts)
+
+        logger.info(f"🔍 [Prompt QC] Total prompts: {len(prompts)} | Unique normalized: {len(unique_norm)}/{len(norm_prompts)} ({unique_ratio*100:.1f}%)")
+
+        if unique_ratio < min_unique_ratio:
+            errors.append(
+                f"Prompt repetition detected: unique prompt ratio is {unique_ratio*100:.1f}% "
+                f"({len(unique_norm)}/{len(norm_prompts)}), strictly below required {min_unique_ratio*100:.1f}% threshold. "
+                f"Every beat must have a 100% bespoke prompt illustrating its specific spoken words."
+            )
+            return False, errors
+
+        logger.success(f"✓ [Prompt QC] Passed! {unique_ratio*100:.1f}% unique prompts across all beats (threshold: {min_unique_ratio*100:.1f}%)")
+        return True, []
 
     @staticmethod
     def _compute_dhash(img: Image.Image, hash_size: int = 8) -> int:
@@ -49,11 +111,28 @@ class PreUploadQCGate:
         return bin(h1 ^ h2).count("1")
 
     @classmethod
-    def validate(cls, video_path: Path, is_short: bool = True) -> Tuple[bool, List[str]]:
+    def validate(cls, video_path: Path, is_short: bool = True, manifest_path: Optional[Path] = None) -> Tuple[bool, List[str]]:
         video_path = Path(video_path)
         errors = []
 
         logger.info(f"🔍 [Pre-Upload QC] Validating '{video_path.name}' (Format: {'Short 9:16' if is_short else 'Doc 16:9'})...")
+
+        # 0. Prompt Diversity Check if manifest is provided or locatable
+        candidate_manifest = manifest_path
+        if candidate_manifest is None:
+            # Check adjacent directory structures
+            for cand in [
+                video_path.parent / "session_manifest.json",
+                video_path.parent.parent / "session_bundle" / "session_manifest.json",
+            ]:
+                if cand.exists():
+                    candidate_manifest = cand
+                    break
+
+        if candidate_manifest and candidate_manifest.exists():
+            p_passed, p_errors = cls.validate_manifest_prompt_diversity(candidate_manifest, min_unique_ratio=0.95)
+            if not p_passed:
+                errors.extend(p_errors)
 
         # 1. Existence and File Size Check
         if not video_path.exists():
