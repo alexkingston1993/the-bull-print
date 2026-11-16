@@ -291,10 +291,14 @@ if __name__ == "__main__":
             if self.poll_and_download(out_dest, batch_uuid=batch_uuid, timeout_sec=600):
                 mapped_count = 0
                 for idx, p in enumerate(prompts, 1):
-                    downloaded = out_dest / f"segment_{idx:02d}.jpg"
-                    if not downloaded.exists():
-                        downloaded = out_dest / f"segment_{idx}.jpg"
-                    if downloaded.exists() and "output_path" in p:
+                    candidates = [
+                        out_dest / "frames" / f"segment_{idx:02d}.jpg",
+                        out_dest / "frames" / f"segment_{idx}.jpg",
+                        out_dest / f"segment_{idx:02d}.jpg",
+                        out_dest / f"segment_{idx}.jpg",
+                    ]
+                    downloaded = next((c for c in candidates if c.exists()), None)
+                    if downloaded and "output_path" in p:
                         target_p = Path(p["output_path"])
                         target_p.parent.mkdir(parents=True, exist_ok=True)
                         shutil.copy2(downloaded, target_p)
@@ -331,8 +335,12 @@ if __name__ == "__main__":
                 logger.info(f"Kaggle run completed! Downloading artifacts to {dest_dir}...")
                 out_res = subprocess.run([str(kaggle_bin), "kernels", "output", ref, "-p", str(dest_dir)], capture_output=True, text=True)
                 if out_res.returncode == 0:
-                    uuid_file = dest_dir / "batch_uuid.txt"
-                    if uuid_file.exists():
+                    uuid_candidates = [
+                        dest_dir / "batch_uuid.txt",
+                        dest_dir / "frames" / "batch_uuid.txt",
+                    ]
+                    uuid_file = next((u for u in uuid_candidates if u.exists()), None)
+                    if uuid_file:
                         downloaded_uuid = uuid_file.read_text().strip()
                         if downloaded_uuid == batch_uuid:
                             logger.success(f"🎯 [UUID Match Verified] Downloaded frames match target Batch UUID: {batch_uuid}")
