@@ -222,6 +222,7 @@ if __name__ == "__main__":
             "kernel_type": "script",
             "is_private": "true",
             "enable_gpu": "true",
+            "machine_shape": "NvidiaTeslaT4",
             "enable_tpu": "false",
             "enable_internet": "true",
             "dataset_sources": [],

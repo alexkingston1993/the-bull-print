@@ -57,7 +57,7 @@ def run_daily_production(dry_run: bool = False):
     now_utc = datetime.now(timezone.utc)
     base_publish_time = now_utc + timedelta(hours=1)
 
-    # Interleave 10 Shorts and 2 Documentaries across 12 two-hour slots
+    # Interleave 10 Shorts and 2 Documentaries across 12 two-hour slots for YouTube release
     # Docs are scheduled at Slot 4 (+9h) and Slot 9 (+19h) for peak audience retention
     scheduled_items = []
     s_idx = 0
@@ -75,7 +75,14 @@ def run_daily_production(dry_run: bool = False):
             d_idx += 1
 
     # Stage 3: Dispatch Scheduled Productions to Cloud Matrix
-    for item in scheduled_items:
+    # CRITICAL EFFICIENCY RULE: Dispatch all 10 fast Shorts (20 frames, ~3 mins each) FIRST,
+    # and dispatch the 2 Documentaries (6 mins, 90 frames each) LAST.
+    # This prevents Shorts runners from idling in queue behind heavy documentary renders.
+    shorts_queue = [item for item in scheduled_items if item["type"] == "short"]
+    docs_queue = [item for item in scheduled_items if item["type"] == "doc"]
+    dispatch_queue = shorts_queue + docs_queue
+
+    for item in dispatch_queue:
         data = item["data"]
         topic = data["title"]
         vertical = data.get("vertical", "stock_market")
@@ -95,14 +102,14 @@ def run_daily_production(dry_run: bool = False):
                 "-f", f"publish_at={publish_at}"
             ]
         else:
-            print(f"\n[Doc {item['num']:02d}/02] 🎬 Dispatching Master Documentary (16:9): {topic} (Scheduled: {publish_at} UTC)")
+            print(f"\n[Doc {item['num']:02d}/02] 🎬 Dispatching Master Documentary (16:9, 6-Min): {topic} (Scheduled: {publish_at} UTC)")
             cmd = [
                 gh_bin, "workflow", "run",
                 "parallel_video_matrix.yml",
                 "-f", f"topic={topic}",
                 "-f", f"vertical={vertical}",
                 "-f", "shorts_only=false",
-                "-f", "duration_min=12",
+                "-f", "duration_min=6",
                 "-f", "privacy_status=private",
                 "-f", f"publish_at={publish_at}"
             ]
