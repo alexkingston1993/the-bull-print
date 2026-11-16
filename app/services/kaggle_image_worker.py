@@ -57,6 +57,7 @@ class KaggleImageWorker:
         API-Level Queue Lock:
         Polls Kaggle kernel status before pushing to prevent concurrency collisions.
         If a batch is already running/queued, waits with jittered sleep until it completes.
+        Strict check: an empty status or buffering response is treated as BUSY.
         """
         kaggle_bin = self._get_kaggle_cmd()
         ref = f"{self.username}/{self.kernel_slug}"
@@ -65,11 +66,15 @@ class KaggleImageWorker:
 
         while time.time() - start_time < timeout_sec:
             res = subprocess.run([str(kaggle_bin), "kernels", "status", ref], capture_output=True, text=True)
-            status_line = res.stdout.strip().lower()
+            status_line = (res.stdout or "").strip().lower()
 
-            if "running" in status_line or "queued" in status_line:
-                wait_t = random.uniform(15, 30)
-                logger.info(f"⏳ Kaggle GPU busy ({res.stdout.strip()}). Waiting {wait_t:.1f}s for queue slot...")
+            is_done = any(k in status_line for k in ["complete", "error", "failed", "cancel"]) and len(status_line) > 0
+            is_busy = any(k in status_line for k in ["running", "queued", "saving", "starting"]) or not status_line
+
+            if is_busy or not is_done:
+                wait_t = random.uniform(20, 40)
+                raw_status = res.stdout.strip() or res.stderr.strip() or "Empty/API buffering"
+                logger.info(f"⏳ Kaggle GPU busy (Status: {raw_status}). Waiting {wait_t:.1f}s for queue slot...")
                 time.sleep(wait_t)
             else:
                 logger.success(f"✓ Kaggle GPU slot available (Status: {res.stdout.strip()})")
@@ -229,14 +234,20 @@ if __name__ == "__main__":
 
         kaggle_bin = self._get_kaggle_cmd()
         logger.info(f"Pushing kernel '{self.username}/{self.kernel_slug}' to Kaggle Dual-T4 GPU...")
-        res = subprocess.run([str(kaggle_bin), "kernels", "push", "-p", str(self.stage_dir)], capture_output=True, text=True)
-        if res.returncode != 0:
-            logger.error(f"Kaggle push failed: {res.stderr}")
-            return False
+        
+        for push_try in range(1, 4):
+            res = subprocess.run([str(kaggle_bin), "kernels", "push", "-p", str(self.stage_dir)], capture_output=True, text=True)
+            if res.returncode == 0:
+                logger.info(f"✓ Kernel pushed successfully! Batch UUID: {batch_uuid}. Sleeping 25s for Kaggle status transition...")
+                time.sleep(25)
+                return True
+            
+            logger.warning(f"Kaggle push attempt {push_try}/3 notice: {res.stderr.strip() or res.stdout.strip()}. Backing off 30s...")
+            time.sleep(30)
+            self.wait_for_queue_lock(timeout_sec=300)
 
-        logger.info(f"✓ Kernel pushed successfully! Batch UUID: {batch_uuid}. Sleeping 20s for Kaggle status transition...")
-        time.sleep(20)
-        return True
+        logger.error(f"Kaggle push failed after 3 attempts: {res.stderr}")
+        return False
 
     def generate_batch(self, prompts: List[Dict[str, Any]], aspect_ratio: str = "9:16", max_retries: int = 3) -> bool:
         """Dispatches a batch with unique BATCH_UUID, polls, and verifies before mapping output with auto-retries."""
