@@ -121,9 +121,10 @@ def run_daily_production(dry_run: bool = False):
                 logger.success(f"✓ Dispatched {tag}: {topic[:40]}... (PublishAt: {publish_at})")
             except Exception as e:
                 logger.error(f"Failed to dispatch {item['type']} {topic}: {e}")
-            # Stagger workflow starts by 45 seconds to guarantee Kaggle status transitions to RUNNING before next runner checks lock
-            logger.info("⏳ Staggering next workflow dispatch by 45s to prevent T=0 Kaggle push race condition...")
-            time.sleep(45)
+            # Stagger workflow starts by 150 seconds to guarantee Job #1 finishes its ~85s Kaggle GPU run
+            # before the next runner acquires the lock, eliminating queue collisions and preventing any runner timeouts.
+            logger.info("⏳ Staggering next workflow dispatch by 150s (2.5 mins) for clean sequential Kaggle GPU execution...")
+            time.sleep(150)
 
     print("\n" + "=" * 70)
     print("🎉 ALL 12 CLOUD PRODUCTIONS SUCCESSFULLY DISPATCHED!")
