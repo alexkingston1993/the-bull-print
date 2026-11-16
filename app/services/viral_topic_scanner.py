@@ -230,21 +230,19 @@ class ViralTopicScanner:
 
             candidate_models = [
                 "gemini-2.0-flash",
+                "gemini-1.5-flash",
+                "gemini-1.5-pro",
                 "gemini-flash-lite-latest",
-                "gemini-2.5-flash",
-                "gemini-2.0-flash-001",
-                "gemini-2.5-pro",
             ]
 
             accumulated_shorts = []
             accumulated_docs = []
 
-            for api_ver in [None]:
+            for api_ver in ["v1beta", "v1alpha"]:
                 if len(accumulated_shorts) >= 10 and len(accumulated_docs) >= 2:
                     break
                 try:
-                    client_kwargs = {"api_key": self.gemini_key}
-                    client = genai.Client(**client_kwargs)
+                    client = genai.Client(api_key=self.gemini_key, http_options={"api_version": api_ver})
 
                     for model_name in candidate_models:
                         if len(accumulated_shorts) >= 10 and len(accumulated_docs) >= 2:
