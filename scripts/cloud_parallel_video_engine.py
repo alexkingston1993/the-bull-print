@@ -162,10 +162,9 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
             logger.error(f"[Script Studio] Failed to initialize Gemini client: {e}")
 
     models_to_try = [
+        "gemini-2.5-flash",
         "gemini-flash-lite-latest",
-        "gemini-2.0-flash",
-        "gemini-1.5-flash",
-        "gemini-1.5-pro",
+        "gemini-2.5-pro",
     ]
 
     sections = []
@@ -335,7 +334,7 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                   ]
                 }}
                 """
-                for attempt in range(2):
+                for attempt in range(4):
                     for model_name in models_to_try:
                         try:
                             resp = client.models.generate_content(model=model_name, contents=prompt)
@@ -354,7 +353,7 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                             logger.debug(f"Gemini {model_name} Batch {b_num} attempt {attempt+1} notice: {m_err}")
                     if batch_acquired:
                         break
-                    time.sleep(2)
+                    time.sleep(3 * (attempt + 1))
 
                 if not batch_acquired:
                     logger.error(f"❌ [Script Studio] Failed to acquire Batch {b_num}/3 from Gemini API.")
@@ -512,7 +511,7 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
           ]
         }}
         """
-        for attempt in range(2):
+        for attempt in range(4):
             for model_name in models_to_try:
                 try:
                     resp = client.models.generate_content(model=model_name, contents=prompt)
@@ -531,7 +530,7 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                     logger.debug(f"Gemini {model_name} attempt {attempt+1} notice: {m_err}")
             if gemini_sections:
                 break
-            time.sleep(2)
+            time.sleep(3 * (attempt + 1))
 
     # ZERO HARDCODED FALLBACK MANDATE
     if not gemini_sections or len(gemini_sections) < num_sections:
