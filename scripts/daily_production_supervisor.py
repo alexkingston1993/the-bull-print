@@ -158,75 +158,85 @@ def audit_today_published_videos() -> Dict[str, Any]:
     }
 
 
-def check_today_master_runs() -> int:
-    """Checks how many daily_5am_production_master.yml workflows triggered today in IST."""
-    try:
-        gh_bin = get_gh_binary()
-        res = subprocess.run(
-            [gh_bin, "run", "list", "--workflow=daily_5am_production_master.yml", "--limit", "10", "--json", "databaseId,createdAt,status"],
-            capture_output=True, text=True
-        )
-        if res.returncode == 0:
-            stdout = res.stdout.strip()
-            idx_start = stdout.find("[")
-            idx_end = stdout.rfind("]")
-            if idx_start == -1 or idx_end == -1:
-                return 0
-            runs = json.loads(stdout[idx_start:idx_end + 1])
-            ist_tz = timezone(timedelta(hours=5, minutes=30))
-            today_ist = datetime.now(timezone.utc).astimezone(ist_tz).strftime("%Y-%m-%d")
-            today_runs = 0
-            for r in runs:
-                c_at = r.get("createdAt")
-                if c_at:
-                    run_date = datetime.fromisoformat(c_at.replace("Z", "+00:00")).astimezone(ist_tz).strftime("%Y-%m-%d")
-                    if run_date == today_ist:
-                        today_runs += 1
-            return today_runs
-    except Exception as e:
-        logger.debug(f"Failed to check master runs: {e}")
-    return 0
+def check_active_runs_today() -> Tuple[bool, int, int]:
+    """
+    Inspects workflow runs from today (since 23:00 UTC / 04:30 AM IST).
+    Returns (has_active_runs, master_runs_count, matrix_completed_count).
+    """
+    gh_bin = get_gh_binary()
+    now_utc = datetime.now(timezone.utc)
+    # The production cycle starts at 23:00 UTC for the 5:00 AM IST release
+    if now_utc.hour >= 23:
+        cycle_start_utc = now_utc.replace(hour=23, minute=0, second=0, microsecond=0)
+    else:
+        yesterday_utc = now_utc - timedelta(days=1)
+        cycle_start_utc = yesterday_utc.replace(hour=23, minute=0, second=0, microsecond=0)
 
+    has_active = False
+    master_runs_count = 0
+    matrix_completed_count = 0
 
-def check_today_completed_matrix_runs() -> int:
-    """Checks how many parallel_video_matrix.yml workflows completed successfully today in IST."""
+    # 1. Check daily_5am_production_master.yml runs
     try:
-        gh_bin = get_gh_binary()
         res = subprocess.run(
-            [gh_bin, "run", "list", "--workflow=parallel_video_matrix.yml", "--limit", "30", "--json", "conclusion,createdAt"],
-            capture_output=True, text=True
+            [gh_bin, "run", "list", "--workflow=daily_5am_production_master.yml", "--limit", "10", "--json", "databaseId,status,conclusion,createdAt"],
+            capture_output=True, text=True, check=True
         )
-        if res.returncode == 0:
-            stdout = res.stdout.strip()
-            idx_start = stdout.find("[")
-            idx_end = stdout.rfind("]")
-            if idx_start == -1 or idx_end == -1:
-                return 0
-            runs = json.loads(stdout[idx_start:idx_end + 1])
-            ist_tz = timezone(timedelta(hours=5, minutes=30))
-            today_ist = datetime.now(timezone.utc).astimezone(ist_tz).strftime("%Y-%m-%d")
-            today_successful = 0
-            for r in runs:
-                c_at = r.get("createdAt")
-                if c_at:
-                    run_date = datetime.fromisoformat(c_at.replace("Z", "+00:00")).astimezone(ist_tz).strftime("%Y-%m-%d")
-                    if run_date == today_ist and r.get("conclusion") == "success":
-                        today_successful += 1
-            return today_successful
+        runs = json.loads(res.stdout)
+        for r in runs:
+            c_at = r.get("createdAt")
+            if c_at:
+                r_dt = datetime.fromisoformat(c_at.replace("Z", "+00:00"))
+                if r_dt >= cycle_start_utc:
+                    master_runs_count += 1
+                    status = str(r.get("status", "")).lower()
+                    if status in ["in_progress", "queued", "waiting", "requested"]:
+                        logger.info(f"⏳ [Active Run Guard] Found active master run #{r.get('databaseId')} (status: {status})")
+                        has_active = True
     except Exception as e:
-        logger.debug(f"Failed to check matrix workflow runs: {e}")
-    return 0
+        logger.debug(f"Master runs query error: {e}")
+
+    # 2. Check parallel_video_matrix.yml runs
+    try:
+        res = subprocess.run(
+            [gh_bin, "run", "list", "--workflow=parallel_video_matrix.yml", "--limit", "30", "--json", "databaseId,status,conclusion,createdAt"],
+            capture_output=True, text=True, check=True
+        )
+        runs = json.loads(res.stdout)
+        for r in runs:
+            c_at = r.get("createdAt")
+            if c_at:
+                r_dt = datetime.fromisoformat(c_at.replace("Z", "+00:00"))
+                if r_dt >= cycle_start_utc:
+                    status = str(r.get("status", "")).lower()
+                    if status in ["in_progress", "queued", "waiting", "requested"]:
+                        logger.info(f"⏳ [Active Run Guard] Found active matrix run #{r.get('databaseId')} (status: {status})")
+                        has_active = True
+                    elif r.get("conclusion") == "success":
+                        matrix_completed_count += 1
+    except Exception as e:
+        logger.debug(f"Matrix runs query error: {e}")
+
+    return has_active, master_runs_count, matrix_completed_count
 
 
 def diagnose_failed_runs_and_auto_heal(audit_data: Dict[str, Any]):
-    """Inspects recent GitHub Actions failures and applies cognitive auto-healing."""
+    """Inspects recent GitHub Actions failures and applies cognitive auto-healing with strict active run guard."""
     gh_bin = get_gh_binary()
     logger.info("🧠 [Aria Auto-Heal] Inspecting GitHub Actions workflows for root causes...")
 
-    # 1. Backup Starter: If 5:00 AM master cron was missed by GitHub scheduler (0 runs today), trigger it now!
-    master_runs_today = check_today_master_runs()
+    # RULE 1: ACTIVE RUN GUARD (CRITICAL RACE CONDITION SHIELD)
+    # At 6:00 AM IST, the 5:00 AM master run is still actively processing videos through pipelined Kaggle GPU locks.
+    # If ANY run of daily_5am_production_master.yml or parallel_video_matrix.yml is active, STAND DOWN.
+    has_active, master_runs_today, matrix_completed = check_active_runs_today()
+    if has_active:
+        logger.success("🛡️ Production pipeline actively running — supervisor standing down.")
+        sys.exit(0)
+
+    # RULE 2: MISSED CRON BACKUP STARTER
+    # Only if exactly ZERO runs of daily_5am_production_master.yml exist since 23:00 UTC, trigger once.
     if master_runs_today == 0:
-        logger.warning("⚠️ 5:00 AM master cron was missed by GitHub Actions scheduler (0 runs today). Auto-triggering backup starter...")
+        logger.warning("⚠️ 5:00 AM master cron was missed by GitHub Actions scheduler (0 runs since 23:00 UTC). Auto-triggering backup starter...")
         try:
             subprocess.run([gh_bin, "workflow", "run", "daily_5am_production_master.yml", "--repo", "alexkingston1993/the-bull-print"], check=True, capture_output=True, text=True)
             logger.success("✓ Backup starter successfully dispatched daily_5am_production_master.yml!")
@@ -240,15 +250,15 @@ def diagnose_failed_runs_and_auto_heal(audit_data: Dict[str, Any]):
             logger.error(f"Failed to dispatch backup starter master: {e}")
         return
 
-    # 2. Artifact Awareness: If 12 matrix workflows already completed today, master videos exist in artifacts!
-    matrix_completed = check_today_completed_matrix_runs()
-    if matrix_completed >= TARGET_DAILY_VIDEOS:
-        logger.success(f"✓ {matrix_completed} matrix workflows completed successfully today! Master videos are preserved in GitHub Actions artifacts for 13:30 IST quota release. Suppressing supervisor deficit.")
+    # RULE 3: ARTIFACT & COMPLETION AWARENESS
+    # If 12 matrix workflows already completed today or all 12 videos are live on YouTube, zero deficit.
+    if matrix_completed >= TARGET_DAILY_VIDEOS or audit_data["total_live"] >= TARGET_DAILY_VIDEOS:
+        logger.success(f"✓ All {TARGET_DAILY_VIDEOS} target videos accounted for ({matrix_completed} completed matrix runs, {audit_data['total_live']} live). Suppressing deficit.")
         send_telegram_alert(
             f"🛡️ *The Bull Print Supervisor Report*\n\n"
             f"📅 *Date*: `{audit_data['today_ist']}`\n"
-            f"📦 *All {matrix_completed} Videos Rendered & Preserved*: Stored safely in GitHub Actions artifacts.\n"
-            f"⏳ *YouTube Quota Deferred*: Awaiting Pacific Time reset at 13:30 IST (Option B). Zero re-dispatch needed."
+            f"📦 *All Videos Processed & Preserved*: Stored safely in GitHub Actions artifacts or live on YouTube.\n"
+            f"⏳ *YouTube Quota Deferred*: Zero re-dispatch needed."
         )
         return
 

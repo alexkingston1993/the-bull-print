@@ -160,7 +160,7 @@ def synthesize_chapter_offline(
     # 1. Synthesize audio
     synthesize_christopher_voice(script_text, out_mp3)
 
-    # 1b. Strict Pre-Whisper Audio Conforming for Shorts (Capped at <= 1.15x)
+    # 1b. Strict Pre-Whisper Audio Conforming (Shorts <= 58.0s, Documentaries >= 680.0s)
     if is_short:
         probe = subprocess.run(
             ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(out_mp3)],
@@ -172,6 +172,26 @@ def synthesize_chapter_offline(
             if speed_factor > 1.01:
                 print(f"🎙️ [Voice Engine] Short duration {raw_dur:.1f}s > 58.0s. Conforming pre-Whisper with atempo={speed_factor:.3f}...")
                 tmp_sped = out_mp3.parent / f"sped_{out_mp3.name}"
+                subprocess.run([
+                    "ffmpeg", "-y", "-i", str(out_mp3),
+                    "-af", f"atempo={speed_factor:.3f}",
+                    "-c:a", "libmp3lame", "-b:a", "192k",
+                    str(tmp_sped)
+                ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                import shutil
+                shutil.move(str(tmp_sped), str(out_mp3))
+    else:
+        # Documentaries: Target ~720s (12 minutes, 36 segments x 20s). Bounds: 680s to 760s.
+        probe = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(out_mp3)],
+            stdout=subprocess.PIPE, text=True, check=True
+        )
+        raw_dur = float(probe.stdout.strip())
+        if raw_dur < 680.0:
+            speed_factor = max(0.92, raw_dur / 715.0)
+            if speed_factor < 0.99:
+                print(f"🎙️ [Voice Engine] Documentary duration {raw_dur:.1f}s < 680.0s. Conforming pre-Whisper with atempo={speed_factor:.3f}...")
+                tmp_sped = out_mp3.parent / f"conformed_{out_mp3.name}"
                 subprocess.run([
                     "ffmpeg", "-y", "-i", str(out_mp3),
                     "-af", f"atempo={speed_factor:.3f}",

@@ -366,13 +366,13 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                 3. 'headline_mid': Exactly 1 to 2 words uppercase anchor (e.g. 'DEBT TRAP', 'TROOPS', 'TRAPPED', 'CRASH', 'CRACKDOWN', 'SURGE').
                 4. 'badge_text': High-friction tactical alert stamp (e.g. 'MARKET SHOCK', 'TIME-BOMB', 'CRACKDOWN', 'OVERPRICED', 'TOP SECRET').
                 5. 'color_theme': One of 'gold', 'fire', 'emerald', 'cyan', 'warning'.
-                6. 'script': ~45-55 words of spoken narrative for this 20-second segment. Speak like leaning in to whisper a dangerous secret.
+                6. 'script': Exactly 50 to 60 words of spoken narrative for this 20-second segment (constructed directly from the 5 micro-beats). Speak like leaning in to whisper a dangerous secret.
                 7. 'micro_beats': Exactly 5 distinct 4-second micro-beats (beat_0 through beat_4):
                    - Each beat represents 4.0 seconds of speech.
                    - 'beat_index': integer 0 to 4
                    - 'start_sec': relative seconds in segment (0.0, 4.0, 8.0, 12.0, 16.0)
                    - 'end_sec': relative seconds in segment (4.0, 8.0, 12.0, 16.0, 20.0)
-                   - 'spoken_phrase': The exact 8-12 words spoken in this 4-second beat.
+                   - 'spoken_phrase': Strictly 10 to 12 spoken words for this 4-second beat (50-60 words total per segment = ~1,900 words across 36 segments). Zero short sentences.
                    - 'visual_prompt': A vivid, cinematic, tangible 35mm photographic description of a CONCRETE PHYSICAL METAPHOR illustrating that exact spoken phrase.
                      * STRICTLY FORBIDDEN: Boardrooms, suits at conference tables, generic business people, charts on laptops.
                      * Suffix: "cinematic 35mm photograph, 8k hyper-detailed, clean plate, zero text, zero watermark"
@@ -524,6 +524,12 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                     "spoken_phrase": sp,
                     "visual_prompt": vp,
                 })
+
+            # If script_text is shorter than 45 words, construct it directly from the 5 micro-beat phrases
+            # to guarantee ~50-60 words (~20 seconds of speech per segment, ~720s total)
+            beat_phrases = [b["spoken_phrase"].strip() for b in micro_beats if b.get("spoken_phrase")]
+            if len(script_text.split()) < 45 and len(beat_phrases) == 5:
+                script_text = ". ".join(p.rstrip(".") for p in beat_phrases) + "."
 
             primary_vp = micro_beats[0]["visual_prompt"]
 
@@ -1260,11 +1266,13 @@ def render_segment(segment_index: int, bundle_dir: Path, output_dir: Optional[Pa
         t_current = seg_start + (f_idx / fps)
         t_in_sec = f_idx / fps  # relative seconds in this segment (0.0 to 20.0s)
 
-        # Micro-beat selection: 1 unique bespoke plate every 4.0 seconds for documentaries
+        # Micro-beat selection: proportional micro-beat cut timing across 5 bespoke plates
         if len(beat_imgs) > 1:
-            beat_idx = min(len(beat_imgs) - 1, int(t_in_sec // 4.0))
+            beat_count = len(beat_imgs)
+            beat_dur = max(2.0, seg_duration / float(beat_count))
+            beat_idx = min(beat_count - 1, int(t_in_sec // beat_dur))
             active_base_img = beat_imgs[beat_idx]
-            beat_progress = (t_in_sec % 4.0) / 4.0
+            beat_progress = min(1.0, (t_in_sec % beat_dur) / beat_dur)
             scale = 1.0 + (0.04 * beat_progress)
         else:
             active_base_img = beat_imgs[0]

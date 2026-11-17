@@ -182,8 +182,8 @@ class PreUploadQCGate:
                     if dur < 20.0 or dur > 61.0:
                         errors.append(f"Shorts duration out of bounds: {dur:.1f}s (must be 20s - 61s)")
                 else:
-                    if dur < 150.0:
-                        errors.append(f"Documentary duration too short: {dur:.1f}s (must be >= 150s)")
+                    if dur < 660.0 or dur > 960.0:
+                        errors.append(f"Documentary duration out of bounds: {dur:.1f}s (must be 660s - 960s / 11m - 16m)")
         except Exception as e:
             errors.append(f"ffprobe metadata extraction failed: {e}")
 
