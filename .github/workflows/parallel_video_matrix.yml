@@ -54,6 +54,7 @@ jobs:
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
+        timeout-minutes: 5
         with:
           fetch-depth: 0
 
@@ -139,6 +140,7 @@ jobs:
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
+        timeout-minutes: 5
 
       - name: 🎥 Install FFmpeg & Fonts
         run: |
@@ -185,6 +187,7 @@ jobs:
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
+        timeout-minutes: 5
 
       - name: 🐍 Setup Python 3.11
         uses: actions/setup-python@v5
@@ -224,6 +227,7 @@ jobs:
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
+        timeout-minutes: 5
         with:
           fetch-depth: 0
 
