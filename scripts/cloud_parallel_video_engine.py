@@ -128,7 +128,7 @@ def _query_gemini_smart(prompt: str, client, api_key: Optional[str], models_to_t
     import requests
     # 1. Direct REST call via requests (instant ~1.5s latency, zero SSL handshake stalls)
     if api_key:
-        rest_models = ["gemini-3-flash-preview", "gemini-flash-lite-latest", "gemini-3.5-flash-lite", "gemini-3.8-flash"]
+        rest_models = ["gemini-flash-lite-latest", "gemini-flash-latest", "gemini-3.1-flash-lite", "gemini-3-flash-preview", "gemini-3.5-flash-lite"]
         for rm in rest_models:
             for attempt in range(2):
                 try:
@@ -140,7 +140,7 @@ def _query_gemini_smart(prompt: str, client, api_key: Optional[str], models_to_t
                             "responseMimeType": "application/json"
                         }
                     }
-                    r = requests.post(url, json=payload, timeout=35)
+                    r = requests.post(url, json=payload, timeout=60)
                     if r.status_code == 200:
                         cand = r.json().get("candidates", [])
                         if cand:
@@ -250,8 +250,8 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
             {
                 "batch_num": 1,
                 "start_idx": 0,
-                "count": 12,
-                "act_name": "ACT 1: THE TRAP & THE SMOKING GUN (Segments 0-11)",
+                "count": 6,
+                "act_name": "ACT 1A: THE OPENING TRAP & VISCERAL HOOK (Segments 0-5)",
                 "act_directive": (
                     "Establish the visceral hook in the first 5 seconds. Expose the immediate threat to retail investors, "
                     "the opening catalyst, and the scale of the money trail. "
@@ -262,9 +262,22 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
             },
             {
                 "batch_num": 2,
+                "start_idx": 6,
+                "count": 6,
+                "act_name": "ACT 1B: THE SMOKING GUN & ESCALATION (Segments 6-11)",
+                "act_directive": (
+                    "Escalate the investigation: reveal the initial forensic discrepancy, the red flag that auditors missed, "
+                    "and the first institutional warning bells. "
+                    "Environments: Subterranean bank vaults, high-speed rail freight terminals, algorithmic server corridors, "
+                    "customs impound facilities with container seals, radar installations. "
+                    "Camera: Low-angle tracking, Dutch tilts, dynamic push-ins."
+                ),
+            },
+            {
+                "batch_num": 3,
                 "start_idx": 12,
-                "count": 12,
-                "act_name": "ACT 2: FORENSIC INVESTIGATION & THE HIDDEN MECHANISM (Segments 12-23)",
+                "count": 6,
+                "act_name": "ACT 2A: FORENSIC INVESTIGATION & THE HIDDEN MECHANISM (Segments 12-17)",
                 "act_directive": (
                     "Deep-dive into the forensic crime mechanics: how the algorithm siphoned funds, shell corporation filings, "
                     "customs manifest tampering, or dark liquidity pools. "
@@ -274,16 +287,40 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                 ),
             },
             {
-                "batch_num": 3,
-                "start_idx": 24,
-                "count": 12,
-                "act_name": "ACT 3: THE SYSTEMIC CLIMAX & FINAL WARNING (Segments 24-35)",
+                "batch_num": 4,
+                "start_idx": 18,
+                "count": 6,
+                "act_name": "ACT 2B: THE PAPER TRAIL & DARK LIQUIDITY (Segments 18-23)",
                 "act_directive": (
-                    "The climax: regulatory raids, institutional defaults, the irreversible damage, and the direct survival playbook "
-                    "for the everyday viewer. "
-                    "Environments: Architectural exteriors of central bank headquarters at dusk, rain-slicked financial district streets, "
-                    "empty trading pits with discarded ticker tape, sealed vault gates, cold neon dawn. "
-                    "Lighting: Moody cinematic obsidian with subtle cyan/gold reflections. Camera: Low-angle imposing monuments."
+                    "Uncover the money laundering network, offshore holding accounts, fictitious invoice chains, and collateral rehypothecation. "
+                    "Environments: Offshore banking towers in tropical downpours, deserted luxury marinas, secure document shredding plants, "
+                    "satellite uplink dish arrays, encrypted trading rooms. "
+                    "Camera: Atmospheric wide angles, forensic scrutiny, slow creeping zooms."
+                ),
+            },
+            {
+                "batch_num": 5,
+                "start_idx": 24,
+                "count": 6,
+                "act_name": "ACT 3A: THE BREAKING POINT & INSTITUTIONAL DEFAULTS (Segments 24-29)",
+                "act_directive": (
+                    "The margin calls hit, prime brokers freeze accounts, regulatory raids unfold, and market contagion spreads. "
+                    "Environments: Emergency boardrooms with red digital sirens, trading floors in chaotic aftermath, rain-slicked stock exchange steps, "
+                    "padlocked corporate headquarters, fleet of black executive sedans. "
+                    "Lighting: Moody cinematic obsidian with subtle hazard amber. Camera: High-tension tracking, handheld urgency."
+                ),
+            },
+            {
+                "batch_num": 6,
+                "start_idx": 30,
+                "count": 6,
+                "act_name": "ACT 3B: THE SYSTEMIC CLIMAX & FINAL SURVIVAL PLAYBOOK (Segments 30-35)",
+                "act_directive": (
+                    "The climax and aftermath: irreversible systemic shifts, long-term economic fallout, and the direct survival playbook "
+                    "and actionable defense rules for the everyday viewer. "
+                    "Environments: Architectural exteriors of central bank headquarters at dusk, empty trading pits with discarded ticker tape, "
+                    "sealed vault gates, cold neon dawn over financial district skylines. "
+                    "Lighting: Cold dawn blues with golden horizon rays. Camera: Imposing low-angle architectural monuments."
                 ),
             },
         ]
@@ -404,7 +441,7 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                             g_secs = data.get("sections", [])
                             if len(g_secs) >= s_count:
                                 batch_acquired = g_secs[:s_count]
-                                logger.success(f"✅ [Script Studio] Batch {b_num}/3 ({act_name}) successfully generated")
+                                logger.success(f"✅ [Script Studio] Batch {b_num}/6 ({act_name}) successfully generated")
                                 break
                         except Exception as parse_err:
                             logger.debug(f"JSON parse error on Batch {b_num} attempt {attempt+1}: {parse_err}")
@@ -413,7 +450,7 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                     time.sleep(2 * (attempt + 1))
 
                 if not batch_acquired:
-                    logger.error(f"❌ [Script Studio] Failed to acquire Batch {b_num}/3 from Gemini API.")
+                    logger.error(f"❌ [Script Studio] Failed to acquire Batch {b_num}/6 from Gemini API.")
                     break
 
                 # Extract key concrete nouns/motifs from this batch and append to running banned_motifs
@@ -551,7 +588,12 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
              * STRICTLY FORBIDDEN: Boardrooms, office desks, suits around conference tables, generic business people, charts on laptop screens.
              * MANDATORY PHYSICAL METAPHORS: Bank vaults sucking vortices, split cargo container ships in storms, gold bullion on dark marble, fighter jets flanking flags, passports locked in chains, robotic arms throwing sparks, distressed trader clutching head before giant red smartphone chart.
              * Suffix: "cinematic 35mm photograph, dark moody obsidian lighting, volumetric amber and gold rays, 8k hyper-detailed, clean plate, zero text, zero watermark"
-           - 'script': Natural, conversational, breathless spoken sentences. Speak like you are leaning in to whisper a dangerous secret.
+
+        5. STRICT WORD-COUNT CEILING FOR 60-SECOND SHORTS (52s-58s TARGET DURATION):
+           - Each section represents exactly a 2.8s - 3.0s visual beat.
+           - 'script': MUST be strictly 5 to 7 words (hard maximum 8 words per section).
+           - The total sum of words across ALL 20 sections MUST NOT exceed 130 words.
+           - Breathless, lean, forensic: zero filler, zero conversational greeting, zero self-introduction.
 
         Respond ONLY with a valid JSON object matching this structure:
         {{
@@ -595,6 +637,25 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
             f"Acquired {len(gemini_sections) if gemini_sections else 0}/{num_sections} beats. "
             f"Hardcoded scripts, generic modulo fallbacks, and canned text are PERMANENTLY PROHIBITED."
         )
+
+    # HARD POST-PROCESSING WORD CEILING (STRICT 52s-58s SHORT DURATION GUARDRAIL)
+    for g in gemini_sections:
+        words = str(g.get("script", "")).strip().split()
+        if len(words) > 8:
+            g["script"] = " ".join(words[:8])
+
+    total_script_words = sum(len(str(g.get("script", "")).strip().split()) for g in gemini_sections)
+    if total_script_words > 135:
+        logger.warning(f"⚠️ Total Short script ({total_script_words} words) exceeds 135-word ceiling. Pruning to <= 130 words...")
+        accumulated = 0
+        for g in gemini_sections:
+            words = str(g.get("script", "")).strip().split()
+            if accumulated >= 130:
+                g["script"] = " ".join(words[:4])
+            elif accumulated + len(words) > 130:
+                allow = max(4, 130 - accumulated)
+                g["script"] = " ".join(words[:allow])
+            accumulated += len(str(g.get("script", "")).strip().split())
 
     for i in range(num_sections):
         start_t = round(i * interval, 2)
@@ -648,11 +709,12 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
     return sections
 
 
-def _synthesize_local_christopher_audio(script_text: str, audio_path: Path, words_path: Path, total_duration_sec: float = 60.0) -> List[Dict[str, Any]]:
+def _synthesize_local_christopher_audio(script_text: str, audio_path: Path, words_path: Path, total_duration_sec: float = 60.0, is_short: bool = False) -> List[Dict[str, Any]]:
     """
     OFFICIAL SIGNATURE CHRISTOPHER CLONED VOICE ENGINE
     - Synthesizes 100% authentic Christopher narration for the given script.
     - Mastering: Highpass 70Hz + 135Hz chest resonance EQ + optical compression + -16 LUFS.
+    - Strict Pre-Whisper Conforming: Enforces <=58s audio via capped atempo (<=1.15x) BEFORE Whisper alignment.
     - Word Alignment: Millisecond-accurate word timestamps for kinetic typography.
     """
     audio_path.parent.mkdir(parents=True, exist_ok=True)
@@ -663,7 +725,8 @@ def _synthesize_local_christopher_audio(script_text: str, audio_path: Path, word
     res = synthesize_chapter_offline(
         script_text=script_text,
         out_mp3_path=str(audio_path),
-        out_timestamps_json=str(words_path)
+        out_timestamps_json=str(words_path),
+        is_short=is_short
     )
     with open(words_path, "r", encoding="utf-8") as f:
         words_data = json.load(f)
@@ -741,7 +804,7 @@ def prepare_session(
     # 1. Synthesize 100% Offline Cloned Voice & Extract Word Timestamps
     audio_file = audio_dir / "speech.mp3"
     words_file = audio_dir / "words.json"
-    words = _synthesize_local_christopher_audio(full_script, audio_file, words_file, total_duration_sec=float(duration_sec))
+    words = _synthesize_local_christopher_audio(full_script, audio_file, words_file, total_duration_sec=float(duration_sec), is_short=is_short)
 
     # 2. Generate High-CTR Background Frames for each section (Batch-Aware & Aspect-Ratio Strict)
     rules = VideoFormatConfig.get_rules(float(duration_sec), is_short=is_short)
@@ -1450,7 +1513,9 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
         from app.services.pre_upload_qc_gate import PreUploadQCGate
         qc_passed, qc_errors = PreUploadQCGate.validate(final_video_mp4, is_short=manifest.get("is_short", False), manifest_path=manifest_path)
         if not qc_passed:
-            raise RuntimeError(f"⛔ PRE-UPLOAD QC GATE REJECTION: Video failed validation: {qc_errors}")
+            logger.error(f"⛔ PRE-UPLOAD QC GATE REJECTION: Video failed validation: {qc_errors}")
+            _send_telegram(f"🚨 Pre-Upload QC Failed on {manifest.get('topic')}: {qc_errors}. Execution halted.")
+            sys.exit(1)
 
         # Package full upload metadata & thumbnail inside output_dir for zero-loss deferred publishing
         out_thumb = output_dir / "thumbnail.jpg"
@@ -1496,9 +1561,21 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
             yt_url = res.get("url") or f"https://youtu.be/{vid_id}"
             logger.success(f"🚀 [YouTube Upload] Broadcast Live: {yt_url}")
         elif res and isinstance(res, dict) and not res.get("success"):
-            logger.warning(f"YouTube upload returned error: {res.get('error')}")
+            err_msg = str(res.get("error") or "")
+            if any(k in err_msg.lower() for k in ["quota", "limit", "pool"]):
+                logger.warning(f"YouTube upload quota reached; video packaged for deferred publishing: {err_msg}")
+            else:
+                logger.error(f"⛔ YouTube upload failed with fatal error: {err_msg}")
+                sys.exit(1)
+    except SystemExit:
+        raise
     except Exception as yt_err:
-        logger.warning(f"YouTube upload failed or skipped in this environment: {yt_err}")
+        err_msg = str(yt_err)
+        if any(k in err_msg.lower() for k in ["quota", "limit", "pool"]):
+            logger.warning(f"YouTube upload quota deferral: {yt_err}")
+        else:
+            logger.error(f"⛔ YouTube upload / QC Gate failed: {yt_err}")
+            sys.exit(1)
 
     # 4. Generate Companion Website Article & Alert Telegram
     try:

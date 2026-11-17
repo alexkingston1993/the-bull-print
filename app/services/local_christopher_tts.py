@@ -143,11 +143,12 @@ def synthesize_chapter_offline(
     script_text: str,
     out_mp3_path: str,
     out_timestamps_json: str,
-    reference_wav: Optional[str] = None
+    reference_wav: Optional[str] = None,
+    is_short: bool = False
 ) -> dict:
     """
     Synthesizes script_text completely using Christopher voice, masters audio to broadcast quality,
-    and writes word timestamps.
+    conforms duration strictly before timestamp alignment if is_short, and writes word timestamps.
     """
     out_mp3 = Path(out_mp3_path).resolve()
     out_timestamps = Path(out_timestamps_json).resolve()
@@ -159,7 +160,28 @@ def synthesize_chapter_offline(
     # 1. Synthesize audio
     synthesize_christopher_voice(script_text, out_mp3)
 
-    # 2. Extract timestamps
+    # 1b. Strict Pre-Whisper Audio Conforming for Shorts (Capped at <= 1.15x)
+    if is_short:
+        probe = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(out_mp3)],
+            stdout=subprocess.PIPE, text=True, check=True
+        )
+        raw_dur = float(probe.stdout.strip())
+        if raw_dur > 58.0:
+            speed_factor = min(1.15, raw_dur / 56.0)
+            if speed_factor > 1.01:
+                print(f"🎙️ [Voice Engine] Short duration {raw_dur:.1f}s > 58.0s. Conforming pre-Whisper with atempo={speed_factor:.3f}...")
+                tmp_sped = out_mp3.parent / f"sped_{out_mp3.name}"
+                subprocess.run([
+                    "ffmpeg", "-y", "-i", str(out_mp3),
+                    "-af", f"atempo={speed_factor:.3f}",
+                    "-c:a", "libmp3lame", "-b:a", "192k",
+                    str(tmp_sped)
+                ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                import shutil
+                shutil.move(str(tmp_sped), str(out_mp3))
+
+    # 2. Extract timestamps (Runs directly on the final mastered/sped-up audio for millisecond sync)
     words = extract_timestamps_whisper(out_mp3, out_timestamps)
 
     # If whisper returned empty, produce procedural word timings from script_text

@@ -26,6 +26,66 @@ if str(BASE_DIR) not in sys.path:
 
 from app.services.viral_topic_scanner import ViralTopicScanner
 
+
+def find_latest_dispatched_run(gh_bin: str, max_wait: int = 45):
+    """Finds the most recently created parallel_video_matrix.yml run."""
+    start_t = time.time()
+    while time.time() - start_t < max_wait:
+        time.sleep(5)
+        try:
+            r = subprocess.run(
+                [str(gh_bin), "run", "list", "--workflow=parallel_video_matrix.yml", "--limit=3", "--json=databaseId,status,createdAt"],
+                capture_output=True, text=True, check=True
+            )
+            runs = json.loads(r.stdout)
+            if runs:
+                return int(runs[0]["databaseId"])
+        except Exception:
+            pass
+    return None
+
+
+def wait_for_prepare_session_completion(gh_bin: str, run_id: int, is_short: bool, timeout_sec: int) -> bool:
+    """
+    Polls the parallel_video_matrix.yml workflow run until its 'prepare_session' job is completed.
+    This guarantees that the runner has finished its Kaggle GPU frame generation and released the kernel,
+    allowing the next workflow to use Kaggle with ZERO queue collisions or race conditions.
+    """
+    kind = "Short" if is_short else "Documentary"
+    logger.info(f"⏳ [Pipeline Poller] Monitoring {kind} Run #{run_id} prepare_session (Max wait: {timeout_sec//60}m)...")
+    start_t = time.time()
+    while time.time() - start_t < timeout_sec:
+        time.sleep(20)
+        try:
+            res = subprocess.run(
+                [str(gh_bin), "run", "view", str(run_id), "--json", "status,conclusion,jobs"],
+                capture_output=True, text=True, check=True
+            )
+            data = json.loads(res.stdout)
+            jobs = data.get("jobs", [])
+            prep_job = next((j for j in jobs if j.get("name") == "prepare_session"), None)
+            if prep_job:
+                p_status = prep_job.get("status")
+                p_conclusion = prep_job.get("conclusion")
+                if p_status == "completed":
+                    elapsed = time.time() - start_t
+                    if p_conclusion == "success":
+                        logger.success(f"✓ [Pipeline Poller] Run #{run_id} prepare_session succeeded in {elapsed:.1f}s! Kaggle GPU released. Ready for next dispatch.")
+                        return True
+                    else:
+                        logger.warning(f"⚠️ [Pipeline Poller] Run #{run_id} prepare_session concluded with '{p_conclusion}'. Kaggle GPU released. Proceeding.")
+                        return False
+            run_status = data.get("status")
+            if run_status == "completed":
+                logger.info(f"ℹ️ [Pipeline Poller] Run #{run_id} overall status completed. Proceeding.")
+                return True
+        except Exception as e:
+            logger.debug(f"Poller query notice: {e}")
+
+    logger.warning(f"⚠️ [Pipeline Poller] Timed out after {timeout_sec}s waiting for Run #{run_id} prepare_session. Proceeding to next in queue.")
+    return False
+
+
 def run_daily_production(dry_run: bool = False):
     print("=" * 70)
     print("🌅 5:00 AM AUTONOMOUS VIDEO PRODUCTION ORCHESTRATOR")
@@ -119,12 +179,17 @@ def run_daily_production(dry_run: bool = False):
                 res = subprocess.run(cmd, check=True, stdin=subprocess.DEVNULL, capture_output=True, text=True)
                 tag = f"Short {item['num']}" if is_short else f"Doc {item['num']}"
                 logger.success(f"✓ Dispatched {tag}: {topic[:40]}... (PublishAt: {publish_at})")
+
+                # Active pipelined staggering: Wait for prepare_session to release Kaggle GPU before next dispatch
+                poll_ceiling = 900 if is_short else 4500  # 15m max for Shorts, 75m max for Docs
+                dispatched_run_id = find_latest_dispatched_run(gh_bin)
+                if dispatched_run_id:
+                    wait_for_prepare_session_completion(gh_bin, dispatched_run_id, is_short=is_short, timeout_sec=poll_ceiling)
+                else:
+                    logger.warning("Could not identify dispatched run ID. Applying 120s safety buffer...")
+                    time.sleep(120)
             except Exception as e:
                 logger.error(f"Failed to dispatch {item['type']} {topic}: {e}")
-            # Stagger workflow starts by 150 seconds to guarantee Job #1 finishes its ~85s Kaggle GPU run
-            # before the next runner acquires the lock, eliminating queue collisions and preventing any runner timeouts.
-            logger.info("⏳ Staggering next workflow dispatch by 150s (2.5 mins) for clean sequential Kaggle GPU execution...")
-            time.sleep(150)
 
     print("\n" + "=" * 70)
     print("🎉 ALL 12 CLOUD PRODUCTIONS SUCCESSFULLY DISPATCHED!")

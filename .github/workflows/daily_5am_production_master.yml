@@ -17,7 +17,7 @@ permissions:
 jobs:
   orchestrate_daily_productions:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 240
 
     steps:
       - name: 📥 Checkout Repository
