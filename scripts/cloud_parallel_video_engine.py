@@ -366,13 +366,15 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                 3. 'headline_mid': Exactly 1 to 2 words uppercase anchor (e.g. 'DEBT TRAP', 'TROOPS', 'TRAPPED', 'CRASH', 'CRACKDOWN', 'SURGE').
                 4. 'badge_text': High-friction tactical alert stamp (e.g. 'MARKET SHOCK', 'TIME-BOMB', 'CRACKDOWN', 'OVERPRICED', 'TOP SECRET').
                 5. 'color_theme': One of 'gold', 'fire', 'emerald', 'cyan', 'warning'.
-                6. 'script': Exactly 50 to 60 words of spoken narrative for this 20-second segment (constructed directly from the 5 micro-beats). Speak like leaning in to whisper a dangerous secret.
+                6. CONTINUOUS FLOWING MONOLOGUE (ZERO STACCATO CHOPPING):
+                   - 'script': Exactly 50 to 60 words of continuous spoken narrative for this 20-second segment where sentences span smoothly across micro-beats using clauses, commas, conjunctions, and em-dashes.
+                   - NEVER terminate every micro-beat with a period! Beats flow into one another like an investigative thriller.
                 7. 'micro_beats': Exactly 5 distinct 4-second micro-beats (beat_0 through beat_4):
                    - Each beat represents 4.0 seconds of speech.
                    - 'beat_index': integer 0 to 4
                    - 'start_sec': relative seconds in segment (0.0, 4.0, 8.0, 12.0, 16.0)
                    - 'end_sec': relative seconds in segment (4.0, 8.0, 12.0, 16.0, 20.0)
-                   - 'spoken_phrase': Strictly 10 to 12 spoken words for this 4-second beat (50-60 words total per segment = ~1,900 words across 36 segments). Zero short sentences.
+                   - 'spoken_phrase': Strictly 10 to 12 contiguous spoken words for this 4-second beat (50-60 words total per segment = ~1,900 words across 36 segments). Zero short sentences.
                    - 'visual_prompt': A vivid, cinematic, tangible 35mm photographic description of a CONCRETE PHYSICAL METAPHOR illustrating that exact spoken phrase.
                      * STRICTLY FORBIDDEN: Boardrooms, suits at conference tables, generic business people, charts on laptops.
                      * Suffix: "cinematic 35mm photograph, 8k hyper-detailed, clean plate, zero text, zero watermark"
@@ -596,11 +598,12 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
              * MANDATORY PHYSICAL METAPHORS: Bank vaults sucking vortices, split cargo container ships in storms, gold bullion on dark marble, fighter jets flanking flags, passports locked in chains, robotic arms throwing sparks, distressed trader clutching head before giant red smartphone chart.
              * Suffix: "cinematic 35mm photograph, dark moody obsidian lighting, volumetric amber and gold rays, 8k hyper-detailed, clean plate, zero text, zero watermark"
 
-        5. STRICT WORD-COUNT CEILING FOR 60-SECOND SHORTS (52s-58s TARGET DURATION):
-           - Each section represents exactly a 2.8s - 3.0s visual beat.
-           - 'script': MUST be strictly 5 to 7 words (hard maximum 8 words per section).
-           - The total sum of words across ALL 20 sections MUST NOT exceed 130 words.
-           - Breathless, lean, forensic: zero filler, zero conversational greeting, zero self-introduction.
+        5. CONTINUOUS FLOWING MONOLOGUE (ZERO STACCATO CHOPPING):
+           - Write the spoken narration as ONE CONTINUOUS, FLOWING DOCUMENTARY NARRATIVE where sentences span across multiple visual cuts using clauses, commas, conjunctions ('while', 'as', 'but', 'before'), and em-dashes.
+           - NEVER terminate every section with a period! Most sections must end mid-clause or mid-sentence so the narration flows seamlessly like water.
+           - 'script': The exact 5 to 7 contiguous words of the flowing script spoken during this visual cut (hard max 8 words per section).
+           - When all 20 'script' segments are concatenated with spaces, they MUST read as one uninterrupted, breathless, broadcast monologue.
+           - Total words across ALL 20 sections MUST be between 120 and 130 words (~54-56 seconds at natural cadence). Zero filler, zero self-introduction.
 
         Respond ONLY with a valid JSON object matching this structure:
         {{
@@ -1206,13 +1209,21 @@ def render_segment(segment_index: int, bundle_dir: Path, output_dir: Optional[Pa
         for i, (w_txt, bw, bh, f_curr) in enumerate(wb_list):
             y_off = (max_h - bh) // 2
             if i == active_in_chunk:
-                # Active spoken word: drop shadow + vibrant energetic gold
+                # Active spoken word: Neon Cyan (#00F0FF) if financial metric/number, else Electric Gold (#FFD700)
+                is_metric = bool(re.search(r'[\$\%\d]', w_txt))
+                act_color = (0, 240, 255, 255) if is_metric else (255, 215, 0, 255)
+                # Subtle dark rounded backplate under active word
+                pdraw.rounded_rectangle(
+                    [cx - 4, pad_y + y_off - 2, cx + bw + 4, pad_y + y_off + bh + 2],
+                    radius=6,
+                    fill=(0, 0, 0, 180)
+                )
                 pdraw.text((cx + 3, pad_y + y_off + 3), w_txt, font=f_curr, fill=(0, 0, 0, 255))
-                pdraw.text((cx, pad_y + y_off), w_txt, font=f_curr, fill=(250, 204, 21, 255))
+                pdraw.text((cx, pad_y + y_off), w_txt, font=f_curr, fill=act_color)
             else:
                 # Inactive words in the cluster: drop shadow + crisp white
                 pdraw.text((cx + 2, pad_y + y_off + 2), w_txt, font=f_curr, fill=(0, 0, 0, 230))
-                pdraw.text((cx, pad_y + y_off), w_txt, font=f_curr, fill=(245, 245, 250, 255))
+                pdraw.text((cx, pad_y + y_off), w_txt, font=f_curr, fill=(255, 255, 255, 255))
             cx += bw + spacing
             
         cached_chunk_pills[w_global_idx] = (pill, pw, ph)
@@ -1230,7 +1241,13 @@ def render_segment(segment_index: int, bundle_dir: Path, output_dir: Optional[Pa
         color_theme=sec.get("color_theme", "gold")
     )
 
-    # Launch FFmpeg Rawvideo Pipe
+    # Launch FFmpeg Rawvideo Pipe with Zero-Overhead 35mm Grain & Vignette
+    documentary_grade_vf = (
+        "format=yuv420p,"
+        "eq=contrast=1.06:brightness=-0.02:saturation=0.92:gamma=0.96,"
+        "vignette=angle=PI/5:mode=forward,"
+        "noise=c0s=6:c0f=t+u"
+    )
     cmd = [
         "ffmpeg", "-y",
         "-f", "rawvideo",
@@ -1239,10 +1256,13 @@ def render_segment(segment_index: int, bundle_dir: Path, output_dir: Optional[Pa
         "-pix_fmt", "rgb24",
         "-r", str(fps),
         "-i", "-",
+        "-vf", documentary_grade_vf,
         "-c:v", "libx264",
         "-pix_fmt", "yuv420p",
         "-preset", "veryfast",
-        "-crf", "18",
+        "-tune", "grain",
+        "-crf", "19",
+        "-an",
         str(out_video_path)
     ]
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=subprocess.DEVNULL)
@@ -1267,12 +1287,14 @@ def render_segment(segment_index: int, bundle_dir: Path, output_dir: Optional[Pa
         t_in_sec = f_idx / fps  # relative seconds in this segment (0.0 to 20.0s)
 
         # Micro-beat selection: proportional micro-beat cut timing across 5 bespoke plates
+        # with 180ms J-cut lead (plate appears 180ms before the spoken clause)
+        t_lead = t_in_sec + 0.18
         if len(beat_imgs) > 1:
             beat_count = len(beat_imgs)
             beat_dur = max(2.0, seg_duration / float(beat_count))
-            beat_idx = min(beat_count - 1, int(t_in_sec // beat_dur))
+            beat_idx = min(beat_count - 1, int(t_lead // beat_dur))
             active_base_img = beat_imgs[beat_idx]
-            beat_progress = min(1.0, (t_in_sec % beat_dur) / beat_dur)
+            beat_progress = min(1.0, (t_lead % beat_dur) / beat_dur)
             scale = 1.0 + (0.04 * beat_progress)
         else:
             active_base_img = beat_imgs[0]
@@ -1423,9 +1445,37 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
     speech_audio = bundle_dir / manifest["audio_file"]
     final_video_mp4 = output_dir / f"{manifest['slug']}_final.mp4"
 
-    logger.info(f"🎵 [Aggregator] Mixing subtle cinematic ambient bed (no bloops): {bgm_file.name}")
-    # Subtle -16dB background bed with fast ducking underneath Christopher voice
-    filter_complex = "[1:a]volume=0.16[bg];[bg][0:a]sidechaincompress=threshold=0.06:ratio=8:attack=30:release=250[ducked];[0:a][ducked]amix=inputs=2:duration=first[aout]"
+    # Compute transition timestamps in milliseconds for programmatic sub-drop / whoosh SFX
+    is_short = manifest.get("is_short", False)
+    sections = manifest.get("sections", [])
+    if is_short:
+        hit1_ms = 0
+        hit2_ms = int(sections[min(8, len(sections)-1)].get("start_sec", 24.0) * 1000)
+        hit3_ms = int(sections[min(15, len(sections)-1)].get("start_sec", 45.0) * 1000)
+    else:
+        hit1_ms = 0
+        hit2_ms = int(sections[min(12, len(sections)-1)].get("start_sec", 240.0) * 1000)
+        hit3_ms = int(sections[min(24, len(sections)-1)].get("start_sec", 480.0) * 1000)
+
+    logger.info(f"🎵 [Aggregator] Mixing cinematic ambient bed with sidechain ducking + programmatic SFX (-14 LUFS)...")
+    # Programmatic FFmpeg lavfi Sub-Drop + Cinematic Whoosh Generator (No external files required)
+    # Master audio pass-through + sidechain compression + -14 LUFS mastering
+    filter_complex = (
+        "aevalsrc='0.45*sin(2*PI*(65-37*t/1.2)*t)*exp(-2.8*t)':s=44100:d=1.2[sub];"
+        "anoisesrc=d=1.2:c=pink:r=44100:a=0.18,bandpass=f=380:width_type=h:w=260,"
+        "afade=t=in:st=0:d=0.35,afade=t=out:st=0.35:d=0.85[whoosh];"
+        "[sub][whoosh]amix=inputs=2,volume=-18dB,asplit=3[sfx1][sfx2][sfx3];"
+        f"[sfx1]adelay={hit1_ms}|{hit1_ms}[h1];"
+        f"[sfx2]adelay={hit2_ms}|{hit2_ms}[h2];"
+        f"[sfx3]adelay={hit3_ms}|{hit3_ms}[h3];"
+        "[h1][h2][h3]amix=inputs=3:normalize=0[sfx_bus];"
+        "[1:a]volume=0.20,aloop=loop=-1:size=2e+09[bg_raw];"
+        "[bg_raw][sfx_bus]amix=inputs=2:duration=first:normalize=0[bed_raw];"
+        "[0:a]asplit=2[voice_sc][voice_out];"
+        "[bed_raw][voice_sc]sidechaincompress=threshold=0.015:ratio=6:attack=35:release=450:makeup=1.0[bed_ducked];"
+        "[voice_out][bed_ducked]amix=inputs=2:duration=first:dropout_transition=0,"
+        "loudnorm=I=-14:TP=-1.5:LRA=11[aout]"
+    )
     subprocess.run([
         "ffmpeg", "-y",
         "-i", str(speech_audio),

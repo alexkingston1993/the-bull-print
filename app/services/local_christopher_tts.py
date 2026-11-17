@@ -60,9 +60,11 @@ async def _synthesize_edge_christopher(text: str, out_raw_mp3: Path):
 
 
 def _apply_broadcast_mastering(in_path: Path, out_path: Path, sample_rate: int = 48000, stereo: bool = True):
-    """Applies The Bull Print signature broadcast audio chain."""
+    """Applies The Bull Print signature broadcast audio chain with silence trimming."""
     ac_channels = "2" if stereo else "1"
     filter_chain = (
+        "silenceremove=start_periods=1:start_silence=0.04:start_threshold=-42dB:"
+        "stop_periods=-1:stop_duration=0.14:stop_threshold=-42dB,"
         "highpass=f=70,"
         "equalizer=f=135:width_type=o:width=1.4:g=2.8,"
         "acompressor=threshold=-18dB:ratio=3:attack=5:release=85,"
