@@ -366,9 +366,10 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                 3. 'headline_mid': Exactly 1 to 2 words uppercase anchor (e.g. 'DEBT TRAP', 'TROOPS', 'TRAPPED', 'CRASH', 'CRACKDOWN', 'SURGE').
                 4. 'badge_text': High-friction tactical alert stamp (e.g. 'MARKET SHOCK', 'TIME-BOMB', 'CRACKDOWN', 'OVERPRICED', 'TOP SECRET').
                 5. 'color_theme': One of 'gold', 'fire', 'emerald', 'cyan', 'warning'.
-                6. CONTINUOUS FLOWING MONOLOGUE (ZERO STACCATO CHOPPING):
-                   - 'script': Exactly 50 to 60 words of continuous spoken narrative for this 20-second segment where sentences span smoothly across micro-beats using clauses, commas, conjunctions, and em-dashes.
-                   - NEVER terminate every micro-beat with a period! Beats flow into one another like an investigative thriller.
+                6. NATURAL HUMAN DOCUMENTARY CADENCE & PUNCTUATION:
+                   - The entire documentary script is synthesized as a continuous master audio track.
+                   - 'script': Exactly 50 to 60 words of spoken narrative for this 20-second segment written with natural human punctuation: complete 10–14 word sentences ending with periods ('.'), rhetorical questions ('?'), mid-sentence commas (','), and em-dashes ('—').
+                   - Natural punctuation allows the voice to drop pitch at periods and inflect on questions while thoughts flow smoothly across micro-beats.
                 7. 'micro_beats': Exactly 5 distinct 4-second micro-beats (beat_0 through beat_4):
                    - Each beat represents 4.0 seconds of speech.
                    - 'beat_index': integer 0 to 4
@@ -598,11 +599,11 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
              * MANDATORY PHYSICAL METAPHORS: Bank vaults sucking vortices, split cargo container ships in storms, gold bullion on dark marble, fighter jets flanking flags, passports locked in chains, robotic arms throwing sparks, distressed trader clutching head before giant red smartphone chart.
              * Suffix: "cinematic 35mm photograph, dark moody obsidian lighting, volumetric amber and gold rays, 8k hyper-detailed, clean plate, zero text, zero watermark"
 
-        5. CONTINUOUS FLOWING MONOLOGUE (ZERO STACCATO CHOPPING):
-           - Write the spoken narration as ONE CONTINUOUS, FLOWING DOCUMENTARY NARRATIVE where sentences span across multiple visual cuts using clauses, commas, conjunctions ('while', 'as', 'but', 'before'), and em-dashes.
-           - NEVER terminate every section with a period! Most sections must end mid-clause or mid-sentence so the narration flows seamlessly like water.
-           - 'script': The exact 5 to 7 contiguous words of the flowing script spoken during this visual cut (hard max 8 words per section).
-           - When all 20 'script' segments are concatenated with spaces, they MUST read as one uninterrupted, breathless, broadcast monologue.
+        5. NATURAL HUMAN DOCUMENTARY CADENCE & PUNCTUATION:
+           - Synthesizing as a single master audio track completely eliminates segment boundary gaps.
+           - Write with REAL human punctuation and sentence cadence: punchy 8–14 word complete sentences ending with periods ('.'), rhetorical questions ('?'), mid-sentence commas (','), and dramatic ellipses ('...').
+           - Do NOT write giant breathless run-on sentences without periods. Periods allow the TTS voice to naturally drop its pitch contour at thought boundaries, while questions inflect upward.
+           - 'script': The exact 5 to 7 contiguous words spoken during this visual cut (hard max 8 words per section).
            - Total words across ALL 20 sections MUST be between 120 and 130 words (~54-56 seconds at natural cadence). Zero filler, zero self-introduction.
 
         Respond ONLY with a valid JSON object matching this structure:
@@ -754,6 +755,47 @@ def _synthesize_local_christopher_audio(script_text: str, audio_path: Path, word
 
     logger.success(f"✅ [Voice Engine] Christopher narration mastered: {audio_path.name} ({res['durationSec']:.1f}s, {len(normalized_words)} words)")
     return normalized_words
+
+
+def snap_beat_cuts_to_punctuation(
+    words_with_timings: List[Dict[str, Any]],
+    raw_script: str,
+    num_beats: int,
+    total_dur: float,
+    j_cut_lead_sec: float = 0.18,
+) -> List[tuple[float, float]]:
+    """Snaps visual beat cut points to periods, commas, and em-dashes with a 180ms J-cut lead."""
+    raw_tokens = re.findall(r"\S+", raw_script)
+    n_words = len(words_with_timings)
+    if n_words == 0 or num_beats <= 1:
+        return [(0.0, total_dur)]
+
+    strong_breaks = []  # . ? ! — ...
+    soft_breaks = []    # , ; :
+    for idx, tok in enumerate(raw_tokens[:n_words]):
+        if tok.endswith((".", "?", "!", "—", "...")):
+            strong_breaks.append(idx)
+        elif tok.endswith((",", ";", ":")):
+            soft_breaks.append(idx)
+
+    cut_times = [0.0]
+    target_step = n_words / float(num_beats)
+
+    for b in range(1, num_beats):
+        ideal_idx = int(round(b * target_step))
+        candidates = [i for i in strong_breaks if abs(i - ideal_idx) <= 3]
+        if not candidates:
+            candidates = [i for i in soft_breaks if abs(i - ideal_idx) <= 3]
+
+        chosen_end_idx = min(candidates, key=lambda i: abs(i - ideal_idx)) if candidates else (ideal_idx - 1)
+        next_clause_start_idx = min(n_words - 1, chosen_end_idx + 1)
+
+        clause_start_sec = float(words_with_timings[next_clause_start_idx]["start"])
+        j_cut_sec = max(cut_times[-1] + 1.2, clause_start_sec - j_cut_lead_sec)
+        cut_times.append(j_cut_sec)
+
+    cut_times.append(total_dur)
+    return [(cut_times[i], cut_times[i + 1]) for i in range(num_beats)]
 
 
 def prepare_session(

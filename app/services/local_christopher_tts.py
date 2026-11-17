@@ -32,8 +32,49 @@ _TTS_INSTANCE = None
 _WHISPER_INSTANCE = None
 
 VOICE_IDENTIFIER = "en-US-ChristopherNeural"
-VOICE_RATE = "-2%"
-VOICE_PITCH = "-2Hz"
+VOICE_RATE = "+0%"
+VOICE_PITCH = "+0Hz"
+
+
+def normalize_for_tts(text: str) -> str:
+    """
+    Financial Pronunciation Normalizer:
+    Expands currency shorthand, percentages, and financial metrics so TTS engines
+    pronounce them like a seasoned Wall Street analyst, while display captions
+    retain their high-CTR raw format ($1.8B, 16%, DTCC).
+    """
+    # 1. Expand shorthand currency and numbers
+    text = re.sub(r"\$(\d+(?:\.\d+)?)\s*T\b", r"\1 trillion dollars", text, flags=re.IGNORECASE)
+    text = re.sub(r"\$(\d+(?:\.\d+)?)\s*B\b", r"\1 billion dollars", text, flags=re.IGNORECASE)
+    text = re.sub(r"\$(\d+(?:\.\d+)?)\s*M\b", r"\1 million dollars", text, flags=re.IGNORECASE)
+    text = re.sub(r"\$(\d+(?:\.\d+)?)\s*K\b", r"\1 thousand dollars", text, flags=re.IGNORECASE)
+    text = re.sub(r"\$(\d+(?:\.\d+)?)", r"\1 dollars", text)
+    text = re.sub(r"(\d+(?:\.\d+)?)\s*%", r"\1 percent", text)
+    text = re.sub(r"(\d+)\s*bps\b", r"\1 basis points", text, flags=re.IGNORECASE)
+    text = re.sub(r"\bbps\b", "basis points", text, flags=re.IGNORECASE)
+
+    # 2. Financial acronyms & metric abbreviations
+    replacements = [
+        (r"\bYoY\b", "year over year"),
+        (r"\bQoQ\b", "quarter over quarter"),
+        (r"\bMoM\b", "month over month"),
+        (r"\bFED\b", "Fed"),
+        (r"\bNASDAQ\b", "Nasdaq"),
+        (r"\bBRICS\b", "Brics"),
+        (r"\bOPEC\b", "Opec"),
+        (r"\bS&P\b", "S and P"),
+        (r"\bDTCC\b", "D-T-C-C"),
+        (r"\bFDIC\b", "F-D-I-C"),
+        (r"\bCPI\b", "C-P-I"),
+        (r"\bIMF\b", "I-M-F"),
+        (r"\bSEC\b", "S-E-C"),
+        (r"\bECB\b", "E-C-B"),
+        (r"\bGDP\b", "G-D-P"),
+        (r"\bFOMC\b", "F-O-M-C"),
+    ]
+    for pattern, rep in replacements:
+        text = re.sub(pattern, rep, text, flags=re.IGNORECASE if pattern.islower() else 0)
+    return text
 
 
 def split_into_clauses(text: str) -> List[tuple[str, float]]:
@@ -52,19 +93,112 @@ def split_into_clauses(text: str) -> List[tuple[str, float]]:
     return items
 
 
-async def _synthesize_edge_christopher(text: str, out_raw_mp3: Path):
-    """Synthesizes raw narration using the Christopher master voice model."""
+async def _synthesize_edge_christopher(text: str, out_raw_mp3: Path, voice: str = VOICE_IDENTIFIER):
+    """Synthesizes raw narration using the specified master voice model."""
     import edge_tts
-    comm = edge_tts.Communicate(text, VOICE_IDENTIFIER, rate=VOICE_RATE, pitch=VOICE_PITCH)
+    norm_text = normalize_for_tts(text)
+    comm = edge_tts.Communicate(norm_text, voice, rate=VOICE_RATE, pitch=VOICE_PITCH)
     await comm.save(str(out_raw_mp3))
 
 
+async def synthesize_with_prosody_contours(
+    sentences: List[str],
+    voice: str = VOICE_IDENTIFIER,
+    out_audio_path: Optional[Path] = None,
+) -> tuple[bytes, List[Dict[str, Any]]]:
+    """
+    Synthesizes sentences with dynamic rate/pitch prosody contours and calculates
+    accurate word timestamps aligned with natural sentence cadence:
+    - Hook Sentence (Sentence 0): rate="+2%", pitch="+0Hz" (punchy opening authority)
+    - Analytical Bridge Sentences (Middle): rate="+0%", pitch="+0Hz" (natural conversational pacing)
+    - Climax / Reveal Sentence (Final): rate="-6%", pitch="-2Hz" (deliberate slowdown and deeper resonance)
+    """
+    import edge_tts
+    audio_chunks = bytearray()
+    words_data = []
+    cumulative_offset_sec = 0.0
+
+    for idx, sent in enumerate(sentences):
+        sent = sent.strip()
+        if not sent:
+            continue
+
+        if idx == 0 and len(sentences) > 1:
+            rate, pitch = "+2%", "+0Hz"
+        elif idx == len(sentences) - 1 and len(sentences) > 1:
+            rate, pitch = "-6%", "-2Hz"
+        else:
+            rate, pitch = "+0%", "+0Hz"
+
+        norm_sent = normalize_for_tts(sent)
+        comm = edge_tts.Communicate(norm_sent, voice=voice, rate=rate, pitch=pitch)
+
+        sent_audio = bytearray()
+        sent_dur_sec = 0.0
+
+        async for chunk in comm.stream():
+            if chunk["type"] == "audio":
+                sent_audio.extend(chunk["data"])
+            elif chunk["type"] == "SentenceBoundary":
+                # offset and duration in 100ns units
+                sent_dur_sec = float(chunk["duration"]) / 10_000_000.0
+
+        if not sent_audio:
+            continue
+
+        audio_chunks.extend(sent_audio)
+
+        # Tokenize display words to preserve display formats ($1.8B, 16%, etc.)
+        disp_words = [w.strip() for w in re.findall(r"[\w\$%\.\,\-]+", sent) if w.strip()]
+        if not disp_words:
+            disp_words = sent.split()
+
+        if sent_dur_sec <= 0.1:
+            # Fallback estimation if SentenceBoundary not captured: ~150 WPM (2.5 words/sec)
+            sent_dur_sec = max(0.5, len(disp_words) * 0.38)
+
+        # Distribute word timestamps across sentence duration with character weighting
+        char_counts = [max(1, len(w)) for w in disp_words]
+        total_chars = sum(char_counts)
+        word_start = cumulative_offset_sec
+
+        for w_i, dw in enumerate(disp_words):
+            w_prop = char_counts[w_i] / float(total_chars)
+            w_dur = max(0.18, w_prop * sent_dur_sec)
+            w_end = round(word_start + w_dur, 3)
+            words_data.append({
+                "word": dw.upper(),
+                "start": round(word_start, 3),
+                "end": w_end,
+                "startSec": round(word_start, 3),
+                "endSec": w_end
+            })
+            # Small intra-sentence pause for comma breaks
+            has_comma = dw.endswith(",") or dw.endswith(";") or dw.endswith("—")
+            word_start = w_end + (0.12 if has_comma else 0.02)
+
+        # 0.38s natural sentence period breath pause
+        cumulative_offset_sec = max(cumulative_offset_sec + sent_dur_sec, word_start) + 0.38
+
+    if out_audio_path:
+        out_audio_path = Path(out_audio_path).resolve()
+        out_audio_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(out_audio_path, "wb") as f:
+            f.write(audio_chunks)
+
+    return bytes(audio_chunks), words_data
+
+
 def _apply_broadcast_mastering(in_path: Path, out_path: Path, sample_rate: int = 48000, stereo: bool = True):
-    """Applies The Bull Print signature broadcast audio chain with silence trimming."""
+    """
+    Applies The Bull Print signature broadcast audio chain with gentle silence trimming.
+    Preserves 100% of natural comma breaths (~0.25s), sentence periods (~0.38s), and soft trailing
+    consonants (s, t, f, th) by relaxing stop_duration to 0.42s and threshold to -50dB.
+    """
     ac_channels = "2" if stereo else "1"
     filter_chain = (
-        "silenceremove=start_periods=1:start_silence=0.04:start_threshold=-42dB:"
-        "stop_periods=-1:stop_duration=0.14:stop_threshold=-42dB,"
+        "silenceremove=start_periods=1:start_silence=0.03:start_threshold=-50dB:"
+        "stop_periods=-1:stop_duration=0.42:stop_threshold=-50dB,"
         "highpass=f=70,"
         "equalizer=f=135:width_type=o:width=1.4:g=2.8,"
         "acompressor=threshold=-18dB:ratio=3:attack=5:release=85,"
@@ -83,17 +217,17 @@ def _apply_broadcast_mastering(in_path: Path, out_path: Path, sample_rate: int =
     subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
-def synthesize_christopher_voice(text: str, mp3_path: Path) -> float:
+def synthesize_christopher_voice(text: str, mp3_path: Path, voice: str = VOICE_IDENTIFIER) -> float:
     """
-    Synthesizes speech strictly and exclusively using Christopher cloned voice.
+    Synthesizes speech strictly and exclusively using master voice model with natural prosody.
     Direct drop-in replacement for any legacy voice generator.
     """
     mp3_path = Path(mp3_path).resolve()
     mp3_path.parent.mkdir(parents=True, exist_ok=True)
 
     with tempfile.TemporaryDirectory() as tmp_dir:
-        raw_mp3 = Path(tmp_dir) / "raw_christopher.mp3"
-        asyncio.run(_synthesize_edge_christopher(text, raw_mp3))
+        raw_mp3 = Path(tmp_dir) / "raw_voice.mp3"
+        asyncio.run(_synthesize_edge_christopher(text, raw_mp3, voice=voice))
         _apply_broadcast_mastering(raw_mp3, mp3_path, sample_rate=48000, stereo=True)
 
     probe = subprocess.run(
