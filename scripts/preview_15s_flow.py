@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 """
-15-Second Side-by-Side Voice Comparison & Visual Broadcast Preview
-Voice Shootout: en-US-AndrewMultilingualNeural vs en-US-ChristopherNeural
-Features:
-- Dynamic sentence-role prosody contours (Hook +2%, Bridge +0%, Climax -6%/-2Hz)
+The Bull Print 4-Way Broadcast Voice Shootout (Visual + Audio Master)
+Comparing Top 4 Documentary Voices:
+1. en-US-AndrewMultilingualNeural (Broadcast Gold Standard - Deep Conversational Baritone)
+2. en-US-BrianMultilingualNeural  (Gritty Investigative Edge - Fast-Paced Wall Street Desk)
+3. en-US-SteffanNeural            (Authoritative Institutional Anchor - Crisp PBS/Bloomberg)
+4. en-US-ChristopherNeural        (Signature Master Narrator - Classic Heavyweight Baseline)
+
+Chain Upgrades:
+- Shure SM7B Studio EQ: +2.2dB @ 110Hz chest warmth, +1.5dB @ 3.2kHz studio articulation
+- Relaxed silenceremove (0.42s / -50dB) preserving natural comma breaths & sentence periods
+- Dynamic prosody contours (Hook +2%, Bridge +0%, Climax -6%/-2Hz)
 - Punctuation-snapped 180ms J-cuts (. , ... thought boundaries)
 - Financial pronunciation normalizer ($1.8B -> 1.8 billion dollars, 16% -> 16 percent, Fed)
-- Relaxed silenceremove (0.42s / -50dB) preserving natural comma breaths & sentence periods
 - Real Kaggle SDXL plates (frame_00, frame_01, frame_02)
 - 3D Kinetic Headline Typography + Top-Left Telemetry HUD
 - Safe-Zone 4-Word Active Captions (Electric Gold #FFD700 / Neon Cyan #00F0FF)
@@ -66,7 +72,14 @@ BEAT_CONFIGS = [
     },
 ]
 
-# 2. Synthesize audio with dynamic prosody contours per voice
+VOICE_ROSTER = [
+    ("01_preview_andrew_multilingual", "en-US-AndrewMultilingualNeural", "Andrew Multilingual (Gold Standard)"),
+    ("02_preview_brian_multilingual",  "en-US-BrianMultilingualNeural",  "Brian Multilingual (Investigative)"),
+    ("03_preview_steffan_neural",      "en-US-SteffanNeural",            "Steffan Neural (Bloomberg/PBS)"),
+    ("04_preview_christopher_natural",  "en-US-ChristopherNeural",        "Christopher Natural (Signature)"),
+]
+
+# 2. Synthesize audio with dynamic prosody contours & Shure SM7B broadcast EQ
 async def synthesize_voice_track(voice_id: str, tag: str) -> tuple[Path, list[dict], float, list[float]]:
     """Synthesizes the 3-sentence script with dynamic prosody contours and extracts word timings."""
     import edge_tts
@@ -82,7 +95,7 @@ async def synthesize_voice_track(voice_id: str, tag: str) -> tuple[Path, list[di
     for idx, sent in enumerate(SENTENCES):
         # Dynamic prosody contours per sentence role:
         if idx == 0:
-            rate, pitch = "+2%", "+0Hz"      # Authoritative hook
+            rate, pitch = "+2%", "+0Hz"      # Authoritative opening hook
         elif idx == len(SENTENCES) - 1:
             rate, pitch = "-6%", "-2Hz"      # Deliberate climax reveal slowdown
         else:
@@ -133,12 +146,13 @@ async def synthesize_voice_track(voice_id: str, tag: str) -> tuple[Path, list[di
     with open(raw_mp3, "wb") as f:
         f.write(audio_bytes)
 
-    # Master audio: Relaxed silenceremove preserving natural comma breaths (~0.25s) & periods (~0.38s)
+    # Master audio: Relaxed silenceremove + Shure SM7B broadcast EQ (+2.2dB @ 110Hz, +1.5dB @ 3.2kHz)
     filter_chain = (
         "silenceremove=start_periods=1:start_silence=0.03:start_threshold=-50dB:"
         "stop_periods=-1:stop_duration=0.42:stop_threshold=-50dB,"
         "highpass=f=70,"
-        "equalizer=f=135:width_type=o:width=1.4:g=2.8,"
+        "equalizer=f=110:width_type=q:w=1.2:g=2.2,"
+        "equalizer=f=3200:width_type=q:w=1.5:g=1.5,"
         "acompressor=threshold=-18dB:ratio=3:attack=5:release=85"
     )
     subprocess.run([
@@ -155,7 +169,7 @@ async def synthesize_voice_track(voice_id: str, tag: str) -> tuple[Path, list[di
         stdout=subprocess.PIPE, text=True, check=True
     )
     final_dur = float(probe.stdout.strip())
-    print(f"   ✅ Mastered '{tag}' vocal track: {final_dur:.2f}s ({len(words_data)} words)")
+    print(f"   ✅ Mastered '{tag}' with Shure SM7B EQ: {final_dur:.2f}s ({len(words_data)} words)")
     return clean_wav, words_data, final_dur, sentence_cut_times
 
 
@@ -168,23 +182,13 @@ def render_broadcast_video(
     sentence_cuts: list[float],
     out_mp4: Path,
     plates: list[Image.Image],
-    font_file: str
+    font_file: str,
+    typo_layers: list[dict]
 ):
-    print(f"\n🎬 Rendering visual broadcast MP4 for {voice_label} -> {out_mp4.name}...")
+    print(f"🎬 Rendering visual broadcast MP4: {voice_label} -> {out_mp4.name}...")
     w_out, h_out = 1080, 1920
     fps = 30
     total_frames = int(math.ceil(total_duration * fps))
-
-    # Precompute 3D Typography
-    typo_layers = []
-    for bc in BEAT_CONFIGS:
-        t = precompute_cut_typography(
-            lines=bc["lines"],
-            badge_text=bc["badge"],
-            max_sheared_w=950,
-            color_theme=bc["theme"]
-        )
-        typo_layers.append(t)
 
     # Precompute 4-word safe-zone captions (Y = 1305)
     chunk_size = 4
@@ -276,9 +280,6 @@ def render_broadcast_video(
     hud_font_tc = ImageFont.truetype(font_file, 22)
 
     # Punctuation-Snapped 180ms J-Cut Transition Times
-    # Beat 0: 0.0s to (Sentence 1 start - 0.18s)
-    # Beat 1: (Sentence 1 start - 0.18s) to (Sentence 2 start - 0.18s)
-    # Beat 2: (Sentence 2 start - 0.18s) to total_duration
     j_cut_lead = 0.18
     beat_cuts = [0.0]
     if len(sentence_cuts) >= 3:
@@ -287,8 +288,6 @@ def render_broadcast_video(
         beat_cuts.extend([cut1, cut2, total_duration])
     else:
         beat_cuts = [0.0, 5.0, 10.0, total_duration]
-
-    print(f"   ✂️ Punctuation-snapped J-cut transitions: Beat 0: 0.0s-{beat_cuts[1]:.2f}s | Beat 1: {beat_cuts[1]:.2f}s-{beat_cuts[2]:.2f}s | Beat 2: {beat_cuts[2]:.2f}s-{beat_cuts[3]:.2f}s")
 
     raw_video_tmp = OUT_DIR / f"temp_{tag}.mp4"
     documentary_grade_vf = (
@@ -398,7 +397,7 @@ def render_broadcast_video(
         hud_draw.ellipse([hud_x, hud_y + 4, hud_x + 10, hud_y + 14], fill=(0, 240, 255, dot_alpha))
         hud_draw.text((hud_x + 18, hud_y), f"{bc['chapter']} // {voice_label.upper()}", font=hud_font_sm, fill=(240, 245, 255, 235))
 
-        bar_w = 200
+        bar_w = 220
         hud_draw.line([(hud_x, hud_y + 28), (hud_x + bar_w, hud_y + 28)], fill=(40, 48, 65, 180), width=3)
         prog_w = int(bar_w * min(1.0, t_sec / total_duration))
         if prog_w > 0:
@@ -472,16 +471,15 @@ def render_broadcast_video(
     if raw_video_tmp.exists():
         raw_video_tmp.unlink()
 
-    print(f"   🏆 Finished: {out_mp4}")
+    print(f"   🏆 Finished: {out_mp4.name}\n")
 
 
 def main():
-    print("=" * 65)
-    print("🎙️ The Bull Print Broadcast Prosody & Voice Shootout")
-    print("   Comparing: AndrewMultilingualNeural vs ChristopherNeural")
-    print("=" * 65)
+    print("=" * 70)
+    print("🎙️ The Bull Print 4-Way Broadcast Voice Shootout")
+    print("   Andrew vs Brian vs Steffan vs Christopher (+ Shure SM7B Studio EQ)")
+    print("=" * 70)
 
-    # Load 3 Kaggle SDXL plates
     plate_paths = [
         Path("/tmp/tbp_plates/frames/frame_00.jpg"),
         Path("/tmp/tbp_plates/frames/frame_01.jpg"),
@@ -505,47 +503,45 @@ def main():
             font_file = cand
             break
 
-    # Voice 1: AndrewMultilingualNeural (Next-Gen Multilingual Voice)
-    andrew_wav, andrew_words, andrew_dur, andrew_cuts = asyncio.run(
-        synthesize_voice_track("en-US-AndrewMultilingualNeural", "andrew")
-    )
-    andrew_mp4 = OUT_DIR / "preview_andrew_multilingual.mp4"
-    render_broadcast_video(
-        tag="andrew",
-        voice_label="Andrew Multilingual",
-        clean_wav=andrew_wav,
-        words_list=andrew_words,
-        total_duration=andrew_dur,
-        sentence_cuts=andrew_cuts,
-        out_mp4=andrew_mp4,
-        plates=plates,
-        font_file=font_file
-    )
+    # Precompute 3D Typography once for all videos
+    typo_layers = []
+    for bc in BEAT_CONFIGS:
+        t = precompute_cut_typography(
+            lines=bc["lines"],
+            badge_text=bc["badge"],
+            max_sheared_w=950,
+            color_theme=bc["theme"]
+        )
+        typo_layers.append(t)
 
-    # Voice 2: ChristopherNeural (Master Wall Street Narrator with Relaxed Silence)
-    chris_wav, chris_words, chris_dur, chris_cuts = asyncio.run(
-        synthesize_voice_track("en-US-ChristopherNeural", "christopher")
-    )
-    chris_mp4 = OUT_DIR / "preview_christopher_natural.mp4"
-    render_broadcast_video(
-        tag="christopher",
-        voice_label="Christopher Natural",
-        clean_wav=chris_wav,
-        words_list=chris_words,
-        total_duration=chris_dur,
-        sentence_cuts=chris_cuts,
-        out_mp4=chris_mp4,
-        plates=plates,
-        font_file=font_file
-    )
+    rendered_mp4s = []
 
-    # Pop open both previews side by side
-    print("\n🚀 Opening both preview MP4s on macOS...")
+    for file_prefix, voice_id, label in VOICE_ROSTER:
+        tag = file_prefix.split("_", 2)[-1]
+        out_mp4 = OUT_DIR / f"{file_prefix}.mp4"
+
+        clean_wav, words_list, dur, cuts = asyncio.run(synthesize_voice_track(voice_id, tag))
+
+        render_broadcast_video(
+            tag=tag,
+            voice_label=label,
+            clean_wav=clean_wav,
+            words_list=words_list,
+            total_duration=dur,
+            sentence_cuts=cuts,
+            out_mp4=out_mp4,
+            plates=plates,
+            font_file=font_file,
+            typo_layers=typo_layers
+        )
+        rendered_mp4s.append(str(out_mp4))
+
+    print("\n🚀 Opening all 4 preview MP4s on macOS...")
     try:
-        subprocess.run(["open", str(andrew_mp4), str(chris_mp4)], check=True)
-        print("   ✅ Both players launched successfully.")
+        subprocess.run(["open"] + rendered_mp4s, check=True)
+        print("   ✅ All 4 players launched successfully.")
     except Exception as e:
-        print(f"   ⚠️ Could not launch player: {e}")
+        print(f"   ⚠️ Could not launch players: {e}")
 
 
 if __name__ == "__main__":

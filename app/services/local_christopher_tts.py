@@ -200,7 +200,8 @@ def _apply_broadcast_mastering(in_path: Path, out_path: Path, sample_rate: int =
         "silenceremove=start_periods=1:start_silence=0.03:start_threshold=-50dB:"
         "stop_periods=-1:stop_duration=0.42:stop_threshold=-50dB,"
         "highpass=f=70,"
-        "equalizer=f=135:width_type=o:width=1.4:g=2.8,"
+        "equalizer=f=110:width_type=q:w=1.2:g=2.2,"
+        "equalizer=f=3200:width_type=q:w=1.5:g=1.5,"
         "acompressor=threshold=-18dB:ratio=3:attack=5:release=85,"
         "loudnorm=I=-16:TP=-1.5:LRA=11"
     )
