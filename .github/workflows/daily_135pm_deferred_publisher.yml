@@ -1,0 +1,49 @@
+name: Daily 1:35 PM IST Deferred Artifact Publisher
+
+on:
+  schedule:
+    # 08:05 UTC = 1:35 PM IST (5 minutes after YouTube API daily quota reset at Midnight PT)
+    - cron: '5 8 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: deferred-youtube-publisher
+  cancel-in-progress: false
+
+jobs:
+  publish_deferred:
+    name: Publish Quota-Deferred Broadcast Artifacts
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          pip install Pillow google-api-python-client google-auth google-auth-oauthlib google-auth-httplib2 requests loguru numpy scipy toml
+
+      - name: Scan & Publish Deferred Master Broadcast Artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          YOUTUBE_TOKEN_EN: ${{ secrets.YOUTUBE_TOKEN_EN }}
+          YT_OAUTH_POOL_JSON: ${{ secrets.YT_OAUTH_POOL_JSON }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          YT_CLIENT_ID_1: ${{ secrets.YT_CLIENT_ID_1 }}
+          YT_CLIENT_SECRET_1: ${{ secrets.YT_CLIENT_SECRET_1 }}
+          YT_REFRESH_TOKEN_1: ${{ secrets.YT_REFRESH_TOKEN_1 }}
+          YT_CLIENT_ID_2: ${{ secrets.YT_CLIENT_ID_2 }}
+          YT_CLIENT_SECRET_2: ${{ secrets.YT_CLIENT_SECRET_2 }}
+          YT_REFRESH_TOKEN_2: ${{ secrets.YT_REFRESH_TOKEN_2 }}
+        run: |
+          python3 scripts/publish_deferred_artifacts.py
+
