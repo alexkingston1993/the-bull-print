@@ -1,0 +1,23 @@
+name = "tbp-cloudflare-orchestrator"
+main = "src/index.ts"
+compatibility_date = "2024-11-01"
+account_id = "e91af5ac8ece067368d52e201025a370"
+
+[triggers]
+crons = ["30 23 * * *", "*/30 * * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tbp-production-db"
+database_id = "f54ea399-d524-45d9-8974-bf4edfb4741a"
+
+# R2 Frame Vault (Uncomment once R2 is enabled in Cloudflare Dashboard)
+# [[r2_buckets]]
+# binding = "VAULT"
+# bucket_name = "tbp-frame-vault"
+
+[vars]
+GITHUB_REPO = "alexkingston1993/the-bull-print"
+MASTER_WORKFLOW = "daily_5am_production_master.yml"
+DEFERRED_WORKFLOW = "daily_135pm_deferred_publisher.yml"
+VAULT_COOLDOWN_DAYS = "180"

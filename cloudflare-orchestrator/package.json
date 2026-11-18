@@ -1,0 +1,15 @@
+{
+  "name": "cloudflare-orchestrator",
+  "version": "1.0.0",
+  "description": "Cloudflare Control Plane for The Bull Print autonomous media engine",
+  "main": "src/index.ts",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241112.0",
+    "typescript": "^5.6.3",
+    "wrangler": "^3.90.0"
+  }
+}
