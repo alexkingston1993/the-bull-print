@@ -21,3 +21,4 @@ GITHUB_REPO = "alexkingston1993/the-bull-print"
 MASTER_WORKFLOW = "daily_5am_production_master.yml"
 DEFERRED_WORKFLOW = "daily_135pm_deferred_publisher.yml"
 VAULT_COOLDOWN_DAYS = "180"
+

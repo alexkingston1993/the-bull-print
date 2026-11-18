@@ -29,3 +29,4 @@ CREATE TABLE IF NOT EXISTS frames (
 
 CREATE INDEX IF NOT EXISTS idx_videos_privacy ON videos(privacy_status);
 CREATE INDEX IF NOT EXISTS idx_frames_vault_eligibility ON frames(is_vault_eligible, privacy_status, created_at_epoch);
+

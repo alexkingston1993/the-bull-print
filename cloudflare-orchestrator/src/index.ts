@@ -1,6 +1,6 @@
 /**
  * The Bull Print — Cloudflare Control Plane
- * Cron Orchestrator + D1 Metadata Ledger + R2 Frame Vault Sync & Auto-Purge
+ * Cron Orchestrator + D1 Metadata Ledger + R2 Frame Vault Sync + ARIA Jarvis Autonomous Agent
  */
 
 export interface Env {
@@ -14,6 +14,9 @@ export interface Env {
   YOUTUBE_CLIENT_SECRET?: string;
   YOUTUBE_REFRESH_TOKEN?: string;
   VAULT_COOLDOWN_DAYS?: string;
+  TELEGRAM_BOT_TOKEN?: string;
+  TELEGRAM_CHAT_ID?: string;
+  GEMINI_API_KEY?: string;
 }
 
 export default {
@@ -29,10 +32,26 @@ export default {
       // 5:00 AM IST Master Dispatch
       console.log("🚀 [Master Dispatch] Triggering 5:00 AM IST daily production pipeline...");
       await dispatchGitHubWorkflow(env, env.MASTER_WORKFLOW);
+      if (env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_CHAT_ID) {
+        await sendTelegramMessage(
+          env.TELEGRAM_BOT_TOKEN,
+          env.TELEGRAM_CHAT_ID,
+          "🚀 *[5:00 AM IST BATCH DISPATCHED]*\nMaster Production Workflow triggered via Cloudflare Edge Cron (`daily_5am_production_master.yml`)."
+        );
+      }
     } else {
       // 30-minute sync sweep
       console.log("🔄 [Sync Sweep] Running 30-minute YouTube Privacy & R2 Vault sync...");
-      await syncYouTubePrivacyAndVault(env);
+      const syncResult = await syncYouTubePrivacyAndVault(env);
+
+      // Notify if state transitions occurred
+      if ((syncResult.purged > 0 || syncResult.restored > 0) && env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_CHAT_ID) {
+        await sendTelegramMessage(
+          env.TELEGRAM_BOT_TOKEN,
+          env.TELEGRAM_CHAT_ID,
+          `🔄 *[R2 VAULT SYNC SWEEP]*\n• Videos Checked: ${syncResult.checked}\n• Purged (Made Private/Deleted): ${syncResult.purged}\n• Restored (Public Release): ${syncResult.restored}`
+        );
+      }
 
       // Check for 1:35 PM IST (08:05 UTC) Deferred Publisher trigger
       const now = new Date();
@@ -46,7 +65,7 @@ export default {
   },
 
   /**
-   * HTTP API Interface for Mission Control & Webhooks
+   * HTTP API Interface for Mission Control & Telegram Webhooks
    */
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
@@ -75,9 +94,625 @@ export default {
       return await handleGetVaultEligibleFrames(env);
     }
 
+    // Telegram Bot Webhook endpoint for ARIA
+    if (path === "/telegram-webhook" && request.method === "POST") {
+      return await handleTelegramWebhook(request, env);
+    }
+
     return new Response("Not Found", { status: 404 });
   }
 };
+
+/**
+ * ============================================================================
+ * ARIA: Autonomous Recursive Institutional Agent (Jarvis Control Plane)
+ * ============================================================================
+ */
+
+interface TelegramUpdate {
+  update_id: number;
+  message?: {
+    message_id: number;
+    from?: { id: number; first_name?: string; username?: string };
+    chat: { id: number | string; type: string };
+    text?: string;
+    date: number;
+  };
+}
+
+const ARIA_SYSTEM_PROMPT = `You are ARIA (Autonomous Recursive Institutional Agent), the institutional AI Jarvis and 24/7 autonomous control plane for The Bull Print.
+You have direct, real-time tool-calling execution access over:
+1. GitHub Repository: read/update repository files (e.g. README.md, configurations) and update repository metadata (description, homepage, topics).
+2. Cloud Video Pipeline: trigger workflows, query recent workflow runs and check pipeline health.
+3. Cloudflare D1 Vault: query indexed videos, frame statistics, and 180-day vault-eligible frames.
+4. YouTube Institutional Publishing: set video privacy statuses and trigger frame vault sync sweeps.
+
+Communication Style & Persona:
+- Authoritative, sharp, institutional, concise, and decisive.
+- Tone: High-frequency Wall Street quant desk meets aerospace mission control.
+- Never give generic excuses or AI chatbot pleasantries ("I cannot do that", "As an AI...").
+- When requested to read or update a file, change repo metadata, or check/trigger the pipeline, EXECUTE THE TOOL IMMEDIATELY.
+- Format responses cleanly in GitHub-flavored Markdown with bold callouts and institutional telemetry tags (e.g. [TEL-01], [STATUS], [VAULT]).`;
+
+const ARIA_TOOLS = [
+  {
+    name: "update_github_repo_about",
+    description: "Updates the GitHub repository About section, including description, homepage URL, and topic tags.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        description: { type: "STRING", description: "Brief institutional description of the repository." },
+        homepage: { type: "STRING", description: "Website URL for the repository homepage." },
+        topics: {
+          type: "ARRAY",
+          items: { type: "STRING" },
+          description: "List of lowercase topic tags for the repository."
+        }
+      }
+    }
+  },
+  {
+    name: "read_github_file",
+    description: "Reads the content of any file in the GitHub repository at the specified path.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        path: { type: "STRING", description: "Relative path to the file in the repository (e.g. README.md, package.json)." }
+      },
+      required: ["path"]
+    }
+  },
+  {
+    name: "update_github_file",
+    description: "Creates or updates a file in the GitHub repository with the provided content and commit message.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        path: { type: "STRING", description: "Relative path to the file in the repository." },
+        content: { type: "STRING", description: "Full content of the file." },
+        commit_message: { type: "STRING", description: "Git commit message explaining the change." }
+      },
+      required: ["path", "content", "commit_message"]
+    }
+  },
+  {
+    name: "trigger_or_check_pipeline",
+    description: "Checks recent GitHub Actions workflow runs or dispatches a new workflow run.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        action: {
+          type: "STRING",
+          enum: ["status", "list_runs", "trigger"],
+          description: "Action to perform: 'status' or 'list_runs' to inspect pipelines, or 'trigger' to dispatch."
+        },
+        workflow_name: {
+          type: "STRING",
+          description: "Workflow file name (defaults to MASTER_WORKFLOW: daily_5am_production_master.yml)."
+        }
+      },
+      required: ["action"]
+    }
+  },
+  {
+    name: "query_d1_vault",
+    description: "Queries the Cloudflare D1 database for indexed videos, frame statistics, or 180-day eligible frames.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        query_type: {
+          type: "STRING",
+          enum: ["summary", "recent_videos", "eligible_frames", "video_details"],
+          description: "Type of data to retrieve from D1."
+        },
+        video_id: { type: "STRING", description: "YouTube video ID when querying video_details." }
+      },
+      required: ["query_type"]
+    }
+  },
+  {
+    name: "set_youtube_privacy_and_sync_vault",
+    description: "Updates the YouTube video privacy status and triggers an immediate R2 frame vault sync sweep.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        video_id: { type: "STRING", description: "YouTube video ID to update." },
+        privacy_status: {
+          type: "STRING",
+          enum: ["public", "private", "unlisted"],
+          description: "New target privacy status."
+        }
+      },
+      required: ["video_id", "privacy_status"]
+    }
+  }
+];
+
+async function handleTelegramWebhook(request: Request, env: Env): Promise<Response> {
+  let update: TelegramUpdate;
+  try {
+    update = await request.json();
+  } catch (e) {
+    return new Response("Invalid JSON", { status: 400 });
+  }
+
+  const msg = update.message;
+  if (!msg || !msg.text) {
+    return new Response("OK", { status: 200 });
+  }
+
+  const chatId = String(msg.chat.id);
+  const authChatId = String(env.TELEGRAM_CHAT_ID || "");
+
+  // Strict authentication: only authorized chat ID
+  if (!authChatId || chatId !== authChatId) {
+    console.warn(`🚨 Unauthorized access attempt from chatId: ${chatId}`);
+    return new Response("Unauthorized", { status: 200 });
+  }
+
+  const userText = msg.text.trim();
+  const botToken = env.TELEGRAM_BOT_TOKEN;
+  if (!botToken || !env.GEMINI_API_KEY) {
+    console.error("Missing TELEGRAM_BOT_TOKEN or GEMINI_API_KEY in environment.");
+    return new Response("Configuration Error", { status: 200 });
+  }
+
+  // Send typing status
+  await sendChatAction(botToken, chatId, "typing");
+
+  try {
+    const reply = await executeAriaAgentLoop(userText, env);
+    await sendTelegramMessage(botToken, chatId, reply);
+  } catch (err: any) {
+    console.error("ARIA execution error:", err);
+    await sendTelegramMessage(
+      botToken,
+      chatId,
+      `⚠️ *[ARIA EXCEPTION]*\nExecution halted: ${err.message || String(err)}`
+    );
+  }
+
+  return new Response("OK", { status: 200 });
+}
+
+async function executeAriaAgentLoop(userPrompt: string, env: Env): Promise<string> {
+  const apiKey = env.GEMINI_API_KEY!;
+  const model = "gemini-flash-lite-latest";
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+  const contents: any[] = [
+    {
+      role: "user",
+      parts: [{ text: userPrompt }]
+    }
+  ];
+
+  let turns = 0;
+  const maxTurns = 6;
+
+  while (turns < maxTurns) {
+    turns++;
+
+    const payload = {
+      system_instruction: {
+        parts: [{ text: ARIA_SYSTEM_PROMPT }]
+      },
+      contents: contents,
+      tools: [
+        {
+          function_declarations: ARIA_TOOLS
+        }
+      ]
+    };
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`Gemini API error (${res.status}): ${errText}`);
+    }
+
+    const data: any = await res.json();
+    const candidate = data.candidates?.[0];
+    if (!candidate || !candidate.content) {
+      return "No response returned from ARIA neural core.";
+    }
+
+    const parts = candidate.content.parts || [];
+    const functionCalls = parts.filter((p: any) => p.functionCall);
+
+    if (functionCalls.length === 0) {
+      // Completed, return text response
+      const textParts = parts.filter((p: any) => p.text).map((p: any) => p.text);
+      return textParts.join("\n").trim() || "Action completed with zero visual output.";
+    }
+
+    // Append model response with functionCall
+    contents.push({
+      role: "model",
+      parts: parts
+    });
+
+    // Execute tool calls
+    const responseParts: any[] = [];
+    for (const part of functionCalls) {
+      const call = part.functionCall;
+      console.log(`⚡ [ARIA Tool Exec] Executing ${call.name} with args:`, JSON.stringify(call.args));
+      const toolResult = await executeTool(call.name, call.args || {}, env);
+      const respObj: any = {
+        functionResponse: {
+          name: call.name,
+          response: {
+            name: call.name,
+            content: toolResult
+          }
+        }
+      };
+      if (call.id) {
+        respObj.functionResponse.id = call.id;
+      }
+      responseParts.push(respObj);
+    }
+
+    // In Gemini v1beta, functionResponse parts are sent with role: "user"
+    contents.push({
+      role: "user",
+      parts: responseParts
+    });
+  }
+
+  return "⚠️ Max execution turns exceeded while processing tools.";
+}
+
+async function executeTool(name: string, args: any, env: Env): Promise<any> {
+  switch (name) {
+    case "update_github_repo_about":
+      return await toolUpdateGithubRepoAbout(args, env);
+    case "read_github_file":
+      return await toolReadGithubFile(args.path, env);
+    case "update_github_file":
+      return await toolUpdateGithubFile(args.path, args.content, args.commit_message, env);
+    case "trigger_or_check_pipeline":
+      return await toolTriggerOrCheckPipeline(args.action, args.workflow_name, env);
+    case "query_d1_vault":
+      return await toolQueryD1Vault(args.query_type, args.video_id, env);
+    case "set_youtube_privacy_and_sync_vault":
+      return await toolSetYoutubePrivacyAndSync(args.video_id, args.privacy_status, env);
+    default:
+      return { error: `Unknown tool: ${name}` };
+  }
+}
+
+/**
+ * Tool 1: Update GitHub Repository About Section (Description, Homepage, Topics)
+ */
+async function toolUpdateGithubRepoAbout(args: { description?: string; homepage?: string; topics?: string[] }, env: Env): Promise<any> {
+  const token = env.GITHUB_PAT;
+  if (!token) return { error: "GITHUB_PAT not configured" };
+
+  const repo = env.GITHUB_REPO;
+  const results: any = {};
+
+  if (args.description !== undefined || args.homepage !== undefined) {
+    const patchBody: any = {};
+    if (args.description !== undefined) patchBody.description = args.description;
+    if (args.homepage !== undefined) patchBody.homepage = args.homepage;
+
+    const res = await fetch(`https://api.github.com/repos/${repo}`, {
+      method: "PATCH",
+      headers: {
+        "Accept": "application/vnd.github+json",
+        "Authorization": `Bearer ${token}`,
+        "User-Agent": "ARIA-Jarvis-Control-Plane",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(patchBody)
+    });
+
+    results.repo_update = { status: res.status, ok: res.ok, body: await res.json() };
+  }
+
+  if (args.topics && Array.isArray(args.topics)) {
+    const resTopics = await fetch(`https://api.github.com/repos/${repo}/topics`, {
+      method: "PUT",
+      headers: {
+        "Accept": "application/vnd.github+json",
+        "Authorization": `Bearer ${token}`,
+        "User-Agent": "ARIA-Jarvis-Control-Plane",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ names: args.topics })
+    });
+    results.topics_update = { status: resTopics.status, ok: resTopics.ok, body: await resTopics.json() };
+  }
+
+  return results;
+}
+
+/**
+ * Tool 2: Read GitHub File
+ */
+async function toolReadGithubFile(path: string, env: Env): Promise<any> {
+  const token = env.GITHUB_PAT;
+  if (!token) return { error: "GITHUB_PAT not configured" };
+
+  const repo = env.GITHUB_REPO;
+  const url = `https://api.github.com/repos/${repo}/contents/${encodeURIComponent(path).replace(/%2F/g, "/")}?ref=main`;
+
+  const res = await fetch(url, {
+    headers: {
+      "Accept": "application/vnd.github+json",
+      "Authorization": `Bearer ${token}`,
+      "User-Agent": "ARIA-Jarvis-Control-Plane",
+      "X-GitHub-Api-Version": "2022-11-28"
+    }
+  });
+
+  if (!res.ok) {
+    return { error: `Failed to read file (${res.status}): ${await res.text()}` };
+  }
+
+  const data: any = await res.json();
+  const rawContent = data.content ? atob(data.content.replace(/\n/g, "")) : "";
+  return {
+    path: data.path,
+    sha: data.sha,
+    size: data.size,
+    content: rawContent
+  };
+}
+
+/**
+ * Tool 3: Update GitHub File (Commit & Push via REST API)
+ */
+async function toolUpdateGithubFile(path: string, content: string, commitMessage: string, env: Env): Promise<any> {
+  const token = env.GITHUB_PAT;
+  if (!token) return { error: "GITHUB_PAT not configured" };
+
+  const repo = env.GITHUB_REPO;
+  const url = `https://api.github.com/repos/${repo}/contents/${encodeURIComponent(path).replace(/%2F/g, "/")}`;
+
+  // Check if file exists to get SHA
+  let existingSha: string | undefined = undefined;
+  const getRes = await fetch(`${url}?ref=main`, {
+    headers: {
+      "Accept": "application/vnd.github+json",
+      "Authorization": `Bearer ${token}`,
+      "User-Agent": "ARIA-Jarvis-Control-Plane",
+      "X-GitHub-Api-Version": "2022-11-28"
+    }
+  });
+
+  if (getRes.ok) {
+    const existingData: any = await getRes.json();
+    existingSha = existingData.sha;
+  }
+
+  // Base64 encode UTF-8 string safely
+  const bytes = new TextEncoder().encode(content);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  const base64Content = btoa(binary);
+
+  const putBody: any = {
+    message: commitMessage,
+    content: base64Content,
+    branch: "main"
+  };
+  if (existingSha) {
+    putBody.sha = existingSha;
+  }
+
+  const putRes = await fetch(url, {
+    method: "PUT",
+    headers: {
+      "Accept": "application/vnd.github+json",
+      "Authorization": `Bearer ${token}`,
+      "User-Agent": "ARIA-Jarvis-Control-Plane",
+      "X-GitHub-Api-Version": "2022-11-28",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(putBody)
+  });
+
+  if (!putRes.ok) {
+    return { error: `Failed to commit file (${putRes.status}): ${await putRes.text()}` };
+  }
+
+  const putData: any = await putRes.json();
+  return {
+    success: true,
+    commit_sha: putData.commit?.sha,
+    commit_url: putData.commit?.html_url,
+    path: path
+  };
+}
+
+/**
+ * Tool 4: Trigger or Check GitHub Pipeline Runs
+ */
+async function toolTriggerOrCheckPipeline(action: string, workflowName?: string, env?: Env): Promise<any> {
+  if (!env) return { error: "Environment missing" };
+  const token = env.GITHUB_PAT;
+  if (!token) return { error: "GITHUB_PAT not configured" };
+
+  const repo = env.GITHUB_REPO;
+
+  if (action === "trigger") {
+    const wf = workflowName || env.MASTER_WORKFLOW;
+    return await dispatchGitHubWorkflow(env, wf);
+  }
+
+  // "status" or "list_runs"
+  const url = `https://api.github.com/repos/${repo}/actions/runs?per_page=5`;
+  const res = await fetch(url, {
+    headers: {
+      "Accept": "application/vnd.github+json",
+      "Authorization": `Bearer ${token}`,
+      "User-Agent": "ARIA-Jarvis-Control-Plane",
+      "X-GitHub-Api-Version": "2022-11-28"
+    }
+  });
+
+  if (!res.ok) {
+    return { error: `GitHub Actions API error (${res.status}): ${await res.text()}` };
+  }
+
+  const data: any = await res.json();
+  const runs = (data.workflow_runs || []).map((r: any) => ({
+    id: r.id,
+    name: r.name,
+    status: r.status,
+    conclusion: r.conclusion,
+    event: r.event,
+    created_at: r.created_at,
+    updated_at: r.updated_at,
+    html_url: r.html_url
+  }));
+
+  return { total_count: data.total_count, recent_runs: runs };
+}
+
+/**
+ * Tool 5: Query D1 Vault Database
+ */
+async function toolQueryD1Vault(queryType: string, videoId?: string, env?: Env): Promise<any> {
+  if (!env || !env.DB) return { error: "D1 database binding missing" };
+
+  const now = Math.floor(Date.now() / 1000);
+  const cooldownSecs = parseInt(env.VAULT_COOLDOWN_DAYS || "180", 10) * 86400;
+  const cutoff = now - cooldownSecs;
+
+  if (queryType === "summary") {
+    const { results: videoStats } = await env.DB.prepare(
+      "SELECT privacy_status, COUNT(*) as count FROM videos GROUP BY privacy_status"
+    ).all();
+    const { results: frameStats } = await env.DB.prepare(
+      "SELECT COUNT(*) as total_frames, SUM(is_vault_eligible) as eligible_frames FROM frames"
+    ).all();
+    return {
+      cooldown_cutoff_epoch: cutoff,
+      video_breakdown: videoStats,
+      frame_breakdown: frameStats && frameStats[0] ? frameStats[0] : {}
+    };
+  }
+
+  if (queryType === "recent_videos") {
+    const { results } = await env.DB.prepare(
+      "SELECT video_id, title, privacy_status, total_frames, created_at_epoch, last_checked_epoch FROM videos ORDER BY created_at_epoch DESC LIMIT 10"
+    ).all();
+    return { recent_videos: results || [] };
+  }
+
+  if (queryType === "eligible_frames") {
+    const { results } = await env.DB.prepare(
+      `SELECT frame_id, video_id, frame_index, visual_prompt, seed, created_at_epoch 
+       FROM frames 
+       WHERE privacy_status = 'public' AND created_at_epoch <= ? 
+       ORDER BY last_used_epoch ASC LIMIT 20`
+    ).bind(cutoff).all();
+    return { eligible_count: results ? results.length : 0, frames: results || [] };
+  }
+
+  if (queryType === "video_details" && videoId) {
+    const video = await env.DB.prepare(
+      "SELECT * FROM videos WHERE video_id = ?"
+    ).bind(videoId).first();
+    const { results: frames } = await env.DB.prepare(
+      "SELECT frame_id, frame_index, privacy_status, is_vault_eligible, visual_prompt FROM frames WHERE video_id = ? ORDER BY frame_index ASC"
+    ).bind(videoId).all();
+    return { video, frames };
+  }
+
+  return { error: `Invalid query_type: ${queryType}` };
+}
+
+/**
+ * Tool 6: Set YouTube Privacy Status & Trigger Immediate Vault Sync
+ */
+async function toolSetYoutubePrivacyAndSync(videoId: string, targetPrivacy: string, env: Env): Promise<any> {
+  const token = await getYouTubeAccessToken(env);
+  if (!token) {
+    return { error: "Failed to obtain valid YouTube access token" };
+  }
+
+  const url = `https://www.googleapis.com/youtube/v3/videos?part=status`;
+  const res = await fetch(url, {
+    method: "PUT",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      id: videoId,
+      status: {
+        privacyStatus: targetPrivacy
+      }
+    })
+  });
+
+  if (!res.ok) {
+    return { error: `YouTube API update error (${res.status}): ${await res.text()}` };
+  }
+
+  const ytData: any = await res.json();
+  // Trigger vault sync immediately to enforce R2 purge or restore
+  const syncResult = await syncYouTubePrivacyAndVault(env);
+
+  return {
+    success: true,
+    video_id: videoId,
+    new_privacy_status: ytData.status?.privacyStatus,
+    vault_sync_result: syncResult
+  };
+}
+
+/**
+ * Telegram Messaging Helpers
+ */
+async function sendChatAction(token: string, chatId: string | number, action: string): Promise<void> {
+  try {
+    await fetch(`https://api.telegram.org/bot${token}/sendChatAction`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, action: action })
+    });
+  } catch (e) {
+    // Non-fatal
+  }
+}
+
+async function sendTelegramMessage(token: string, chatId: string | number, text: string): Promise<boolean> {
+  const url = `https://api.telegram.org/bot${token}/sendMessage`;
+  try {
+    let res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, text, parse_mode: "Markdown" })
+    });
+
+    if (!res.ok) {
+      // Fallback without parse_mode if Markdown parsing failed
+      res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, text })
+      });
+    }
+    return res.ok;
+  } catch (e) {
+    console.error("sendTelegramMessage error:", e);
+    return false;
+  }
+}
 
 /**
  * Triggers a GitHub Actions workflow via REST API workflow_dispatch
@@ -318,6 +953,7 @@ async function handleGetStatus(env: Env): Promise<Response> {
 
   const statusObj = {
     service: "The Bull Print — Cloudflare Control Plane",
+    agent: "ARIA // The Bull Print Jarvis (Active on /telegram-webhook)",
     timestamp: new Date().toISOString(),
     epoch: now,
     vault_cooldown_days: 180,
@@ -332,8 +968,7 @@ async function handleGetStatus(env: Env): Promise<Response> {
 }
 
 /**
- * Strict 180-day (6-month) vault reuse query handler:
- * Only returns frames that are strictly >= 180 days old and currently public.
+ * Strict 180-day (6-month) vault reuse query handler
  */
 async function handleGetVaultEligibleFrames(env: Env): Promise<Response> {
   const now = Math.floor(Date.now() / 1000);
@@ -341,7 +976,7 @@ async function handleGetVaultEligibleFrames(env: Env): Promise<Response> {
   const cutoff = now - cooldownSecs;
 
   const { results } = await env.DB.prepare(
-    `SELECT frame_id, video_id, frame_index, r2_key, visual_prompt, seed, created_at_epoch, last_used_epoch 
+    `SELECT frame_id, video_id, frame_index, visual_prompt, seed, created_at_epoch, last_used_epoch 
      FROM frames 
      WHERE privacy_status = 'public' 
        AND created_at_epoch <= ? 

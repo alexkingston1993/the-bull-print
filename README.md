@@ -1,28 +1,73 @@
 <div align="center">
-<h1 align="center">The Bull Print 💸</h1>
+<h1 align="center">The Bull Print ⚡</h1>
+<p align="center"><b>Autonomous Institutional Financial Media Infrastructure & 24/7 AI Jarvis Control Plane</b></p>
 
 <p align="center">
   <a href="https://github.com/alexkingston1993/the-bull-print/stargazers"><img src="https://img.shields.io/github/stars/alexkingston1993/the-bull-print.svg?style=for-the-badge" alt="Stargazers"></a>
   <a href="https://github.com/alexkingston1993/the-bull-print/issues"><img src="https://img.shields.io/github/issues/alexkingston1993/the-bull-print.svg?style=for-the-badge" alt="Issues"></a>
-  <a href="https://github.com/alexkingston1993/the-bull-print/network/members"><img src="https://img.shields.io/github/forks/alexkingston1993/the-bull-print.svg?style=for-the-badge" alt="Forks"></a>
   <a href="https://github.com/alexkingston1993/the-bull-print/blob/main/LICENSE"><img src="https://img.shields.io/github/license/alexkingston1993/the-bull-print.svg?style=for-the-badge" alt="License"></a>
 </p>
 <br>
-<h3>简体中文 | <a href="README-en.md">English</a></h3>
-<div align="center">
-  <a href="https://trendshift.io/repositories/8731" target="_blank"><img src="https://trendshift.io/api/badge/repositories/8731" alt="harry0703%2FThe Bull Print | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
-</div>
-<br>
-只需提供一个视频 <b>主题</b> 或 <b>关键词</b> ，就可以全自动生成视频文案、视频素材、视频字幕、视频背景音乐，然后合成一个高清的短视频。
-<br>
 
-<h4>Web界面</h4>
+<p align="center">
+  <b>100% Cloud Execution</b> • <b>Zero Local Rendering</b> • <b>Autonomous 24/7 Telegram Jarvis</b> • <b>Zero Frame Reuse Mandate</b>
+</p>
 
-![](docs/webui.jpg)
+---
 
-<h4>API界面</h4>
+### 🏛️ Institutional Architecture Overview
 
-![](docs/api.jpg)
+```mermaid
+flowchart TD
+    subgraph ControlPlane ["⚡ 24/7 Autonomous Control Plane"]
+        ARIA["ARIA // The Bull Print Jarvis\n(Telegram Webhook + Gemini Flash Function Calling)"]
+        CF_CRON["Cloudflare Edge Cron\n(5:00 AM IST & 30-Min Sync Sweep)"]
+        D1["Cloudflare D1 SQLite Ledger\n(tbp-production-db)"]
+        R2["Cloudflare R2 Frame Vault\n(Zero Egress • 180-Day Cooldown)"]
+    end
+
+    subgraph CloudEngine ["☁️ Two-Tier Autonomous Cloud Production"]
+        KAGGLE["Tier 1: Kaggle GPU Engine\nDual-T4 CUDA • ByteDance SDXL-Lightning 8-step\nZero Frame Reuse Mandate"]
+        MATRIX["Tier 2: 20-Runner GitHub Actions Matrix\nParallel Ubuntu Compositors\nKinetic 3D Typography + J-Cut Audio"]
+    end
+
+    subgraph VoiceAndPublish ["🎙️ Mastering & Institutional Publishing"]
+        VOICE["Christopher Neural Voice Engine\nShure SM7B Broadcast EQ (+2.2dB @ 110Hz)\nNatural 250ms Comma / 380ms Period Breaths"]
+        YT["YouTube Institutional Channel\nScheduled Release • Automated Quota Metering"]
+    end
+
+    CF_CRON -->|Dispatch 05:00 AM IST| MATRIX
+    ARIA <-->|Bidirectional Tool Calling| MATRIX
+    ARIA <-->|Telemetry & State Query| D1
+    MATRIX -->|Request Clean Photographic Plates| KAGGLE
+    KAGGLE -->|20 Unique Frames per Short| MATRIX
+    MATRIX -->|Synthesize Narration| VOICE
+    MATRIX -->|Publish Staged Video| YT
+    YT <-->|30-Min Privacy Sync Sweep| CF_CRON
+    CF_CRON -->|Auto-Purge Private / Recover Public| R2
+```
+
+---
+
+### 🌟 Key Production Pillars
+
+1. **24/7 ARIA Jarvis Control Plane (`cloudflare-orchestrator/`)**:
+   - Hosted directly on Cloudflare Edge Workers with guaranteed 100% SLA.
+   - Powered by Gemini Flash Tool Calling with strict chat-ID authentication.
+   - Real-time execution over GitHub repository files, Actions pipelines, D1 ledger queries, and YouTube privacy lifecycle.
+2. **100% Cloud Execution (Zero Local CPU/GPU Footprint)**:
+   - **Kaggle Dual-T4 GPU**: Generates 100% of photographic visual plates using SDXL-Lightning.
+   - **GitHub Actions 20-Runner Matrix**: Composites master video files, renders dynamic 3D kinetic typography, ducks audio, aligns word-level safe-zone captions, and publishes directly to YouTube.
+3. **Institutional Voice Engineering (`app/services/local_christopher_tts.py`)**:
+   - Locked channel voice: `en-US-ChristopherNeural`.
+   - Shure SM7B broadcast mastering with chest resonance boost (`+2.2dB @ 110Hz`) and studio clarity (`+1.5dB @ 3.2kHz`).
+   - Relaxed silence gating preserving natural human punctuation pauses (`~0.25s` commas, `~0.38s` periods).
+4. **Cloudflare D1 & R2 Reversible Vault**:
+   - Zero egress fees for high-speed runner asset streaming.
+   - Strict 180-day (`15,552,000s`) cooldown on vault frame reuse with hash-busting transforms.
+   - Synchronized auto-purge: when a video transitions from public to private/unlisted, frame assets are purged from edge storage; restored upon public release.
+
+---
 
 </div>
 
