@@ -1644,23 +1644,61 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
 
         from app.services.youtube_uploader import get_uploader
         uploader = get_uploader()
-        res = uploader.upload_video(
-            language="en",
-            video_path=str(final_video_mp4),
-            title=title[:95],
-            description=description,
-            tags=tags,
-            thumbnail_path=str(thumb_path) if thumb_path.exists() else None,
-            category_id="27",
-            privacy_status=privacy_status,
-            publish_at=publish_at,
-            is_short=manifest.get("is_short", False),
-            force_upload=True,
-        )
-        vid_id = (res.get("video_id") or res.get("id")) if isinstance(res, dict) else None
-        if vid_id:
-            yt_url = res.get("url") or f"https://youtu.be/{vid_id}"
-            logger.success(f"🚀 [YouTube Upload] Broadcast Live: {yt_url}")
+
+        is_short = manifest.get("is_short", False)
+        if not is_short:
+            logger.info("🔴 [Live Broadcast Engine] Formatting standard master documentary for YouTube Live Broadcast...")
+            try:
+                from app.services.youtube_live_streamer import broadcast_documentary_as_live
+                res = broadcast_documentary_as_live(
+                    video_path=final_video_mp4,
+                    thumbnail_path=thumb_path if thumb_path.exists() else None,
+                    title=title,
+                    description=description,
+                    scheduled_start_iso=publish_at
+                )
+                vid_id = res.get("broadcast_id")
+                if vid_id:
+                    yt_url = res.get("watch_url") or f"https://youtu.be/{vid_id}"
+                    logger.success(f"🚀 [YouTube Live Broadcast] Broadcast Active & Streaming: {yt_url}")
+                else:
+                    raise RuntimeError(f"Live broadcast creation returned no broadcast_id: {res}")
+            except Exception as live_err:
+                logger.warning(f"Live broadcast stream encounter: {live_err}; executing scheduled institutional upload fallback...")
+                res = uploader.upload_video(
+                    language="en",
+                    video_path=str(final_video_mp4),
+                    title=title[:95],
+                    description=description,
+                    tags=tags,
+                    thumbnail_path=str(thumb_path) if thumb_path.exists() else None,
+                    category_id="27",
+                    privacy_status=privacy_status,
+                    publish_at=publish_at,
+                    is_short=False,
+                    force_upload=True,
+                )
+                vid_id = (res.get("video_id") or res.get("id")) if isinstance(res, dict) else None
+                if vid_id:
+                    yt_url = res.get("url") or f"https://youtu.be/{vid_id}"
+        else:
+            res = uploader.upload_video(
+                language="en",
+                video_path=str(final_video_mp4),
+                title=title[:95],
+                description=description,
+                tags=tags,
+                thumbnail_path=str(thumb_path) if thumb_path.exists() else None,
+                category_id="27",
+                privacy_status=privacy_status,
+                publish_at=publish_at,
+                is_short=True,
+                force_upload=True,
+            )
+            vid_id = (res.get("video_id") or res.get("id")) if isinstance(res, dict) else None
+            if vid_id:
+                yt_url = res.get("url") or f"https://youtu.be/{vid_id}"
+                logger.success(f"🚀 [YouTube Upload] Broadcast Live: {yt_url}")
         elif res and isinstance(res, dict) and not res.get("success"):
             err_msg = str(res.get("error") or "")
             if any(k in err_msg.lower() for k in ["quota", "limit", "pool"]):

@@ -639,6 +639,10 @@ async function toolQueryD1Vault(queryType: string, videoId?: string, env?: Env):
  * Tool 6: Set YouTube Privacy Status & Trigger Immediate Vault Sync
  */
 async function toolSetYoutubePrivacyAndSync(videoId: string, targetPrivacy: string, env: Env): Promise<any> {
+  if (videoId === "Z6LEnQyhuvw" && targetPrivacy === "public") {
+    return { error: "Security Lock: Video Z6LEnQyhuvw is permanently quarantined and cannot be published to public." };
+  }
+
   const token = await getYouTubeAccessToken(env);
   if (!token) {
     return { error: "Failed to obtain valid YouTube access token" };
@@ -816,12 +820,14 @@ async function syncYouTubePrivacyAndVault(env: Env): Promise<any> {
     }
 
     // 4. Process state transitions
+    const PERMANENT_QUARANTINE = ["Z6LEnQyhuvw"];
+
     for (const v of videos as any[]) {
       const prevStatus = v.privacy_status?.toLowerCase();
-      // If video is not returned in API, it was deleted
-      const currentStatus = liveStatusMap.has(v.video_id)
-        ? liveStatusMap.get(v.video_id)!
-        : "deleted";
+      // If video is permanently quarantined, force private
+      let currentStatus = PERMANENT_QUARANTINE.includes(v.video_id)
+        ? "private"
+        : (liveStatusMap.has(v.video_id) ? liveStatusMap.get(v.video_id)! : "deleted");
 
       if (prevStatus === "public" && currentStatus !== "public") {
         // Transition: PUBLIC -> PRIVATE / UNLISTED / DELETED
@@ -837,7 +843,7 @@ async function syncYouTubePrivacyAndVault(env: Env): Promise<any> {
         ).bind(currentStatus, v.video_id).run();
 
         results.purged++;
-      } else if (prevStatus !== "public" && currentStatus === "public") {
+      } else if (prevStatus !== "public" && currentStatus === "public" && !PERMANENT_QUARANTINE.includes(v.video_id)) {
         // Transition: PRIVATE / UNLISTED -> PUBLIC (Auto-recovery)
         console.log(`🎉 Video ${v.video_id} ('${v.title}') transitioned: ${prevStatus} -> public! Restoring frame index...`);
 
@@ -855,10 +861,16 @@ async function syncYouTubePrivacyAndVault(env: Env): Promise<any> {
 
         results.restored++;
       } else {
-        // Status unchanged
-        await env.DB.prepare(
-          "UPDATE videos SET last_checked_epoch = ? WHERE video_id = ?"
-        ).bind(nowEpoch, v.video_id).run();
+        // Update status even if transitioning between unlisted and private
+        if (prevStatus !== currentStatus) {
+          await env.DB.prepare(
+            "UPDATE videos SET privacy_status = ?, last_checked_epoch = ? WHERE video_id = ?"
+          ).bind(currentStatus, nowEpoch, v.video_id).run();
+        } else {
+          await env.DB.prepare(
+            "UPDATE videos SET last_checked_epoch = ? WHERE video_id = ?"
+          ).bind(nowEpoch, v.video_id).run();
+        }
         results.unchanged++;
       }
     }
