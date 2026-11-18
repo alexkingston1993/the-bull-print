@@ -17,6 +17,8 @@ export interface Env {
   TELEGRAM_BOT_TOKEN?: string;
   TELEGRAM_CHAT_ID?: string;
   GEMINI_API_KEY?: string;
+  INSTAGRAM_ACCOUNT_ID?: string;
+  INSTAGRAM_ACCESS_TOKEN?: string;
 }
 
 export default {
@@ -43,6 +45,14 @@ export default {
       // 30-minute sync sweep
       console.log("🔄 [Sync Sweep] Running 30-minute YouTube Privacy & R2 Vault sync...");
       const syncResult = await syncYouTubePrivacyAndVault(env);
+
+      // Automatic Instagram Reels Drip (spaced >= 2 hours apart)
+      console.log("📸 [Instagram Drip] Checking for pending public shorts to release as Reels...");
+      try {
+        await dripFeedInstagramReels(env);
+      } catch (igErr) {
+        console.error("Error in scheduled Instagram drip:", igErr);
+      }
 
       // Notify if state transitions occurred
       if ((syncResult.purged > 0 || syncResult.restored > 0) && env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_CHAT_ID) {
@@ -92,6 +102,17 @@ export default {
 
     if (path === "/vault-eligible-frames") {
       return await handleGetVaultEligibleFrames(env);
+    }
+
+    if (path === "/register-video" && request.method === "POST") {
+      return await handleRegisterVideo(request, env);
+    }
+
+    if (path === "/drip-instagram" && request.method === "POST") {
+      const res = await dripFeedInstagramReels(env);
+      return new Response(JSON.stringify(res), {
+        headers: { "Content-Type": "application/json" }
+      });
     }
 
     // Telegram Bot Webhook endpoint for ARIA
@@ -224,6 +245,21 @@ const ARIA_TOOLS = [
         }
       },
       required: ["video_id", "privacy_status"]
+    }
+  },
+  {
+    name: "publish_or_check_instagram_reel",
+    description: "Inspects queued YouTube Shorts pending Instagram Reels release, or triggers a drip publish to @thebullprint.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        action: {
+          type: "STRING",
+          enum: ["status", "drip_next"],
+          description: "Action to take: 'status' to view pending/published reels, or 'drip_next' to publish the next queued Short."
+        }
+      },
+      required: ["action"]
     }
   }
 ];
@@ -382,6 +418,8 @@ async function executeTool(name: string, args: any, env: Env): Promise<any> {
       return await toolQueryD1Vault(args.query_type, args.video_id, env);
     case "set_youtube_privacy_and_sync_vault":
       return await toolSetYoutubePrivacyAndSync(args.video_id, args.privacy_status, env);
+    case "publish_or_check_instagram_reel":
+      return await toolPublishOrCheckInstagramReel(args.action, env);
     default:
       return { error: `Unknown tool: ${name}` };
   }
@@ -1004,4 +1042,214 @@ async function handleGetVaultEligibleFrames(env: Env): Promise<Response> {
   }, null, 2), {
     headers: { "Content-Type": "application/json" }
   });
+}
+
+/**
+ * Endpoint: POST /register-video
+ * Indexes an uploaded video immediately into Cloudflare D1
+ */
+async function handleRegisterVideo(request: Request, env: Env): Promise<Response> {
+  try {
+    const body: any = await request.json();
+    const {
+      video_id,
+      title,
+      privacy_status = "unlisted",
+      total_frames = 0,
+      r2_prefix = "",
+      mp4_download_url = null,
+      cut_timestamps_json = "[]"
+    } = body;
+
+    if (!video_id || !title) {
+      return new Response(JSON.stringify({ error: "video_id and title are required" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
+    const now = Math.floor(Date.now() / 1000);
+    await env.DB.prepare(
+      `INSERT INTO videos (video_id, title, privacy_status, total_frames, r2_prefix, mp4_download_url, cut_timestamps_json, created_at_epoch, last_checked_epoch, ig_status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING')
+       ON CONFLICT(video_id) DO UPDATE SET
+         title=excluded.title,
+         privacy_status=excluded.privacy_status,
+         total_frames=excluded.total_frames,
+         r2_prefix=excluded.r2_prefix,
+         mp4_download_url=coalesce(excluded.mp4_download_url, videos.mp4_download_url),
+         cut_timestamps_json=coalesce(excluded.cut_timestamps_json, videos.cut_timestamps_json),
+         last_checked_epoch=excluded.last_checked_epoch`
+    ).bind(video_id, title, privacy_status, total_frames, r2_prefix, mp4_download_url, cut_timestamps_json, now, now).run();
+
+    return new Response(JSON.stringify({ success: true, video_id, status: privacy_status }), {
+      headers: { "Content-Type": "application/json" }
+    });
+  } catch (err: any) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+}
+
+/**
+ * Automatically publishes 9:16 Shorts to Instagram Reels spaced >= 2 hours apart.
+ */
+async function dripFeedInstagramReels(env: Env): Promise<{ published: boolean; message: string; media_id?: string }> {
+  if (!env.INSTAGRAM_ACCOUNT_ID || !env.INSTAGRAM_ACCESS_TOKEN) {
+    return { published: false, message: "Instagram credentials not bound in Worker environment." };
+  }
+
+  // 1. Check when the last reel was published
+  const { results: lastReels } = await env.DB.prepare(
+    "SELECT MAX(ig_scheduled_epoch) as last_epoch FROM videos WHERE ig_status = 'PUBLISHED'"
+  ).all();
+
+  const lastEpoch = (lastReels && lastReels[0] && (lastReels[0] as any).last_epoch) || 0;
+  const now = Math.floor(Date.now() / 1000);
+  const minIntervalSec = 7200; // 2 hours
+
+  if (lastEpoch > 0 && (now - lastEpoch) < minIntervalSec) {
+    const remainingMins = Math.ceil((minIntervalSec - (now - lastEpoch)) / 60);
+    return { published: false, message: `Cooldown active: Next Reel can be published in ${remainingMins} minutes.` };
+  }
+
+  // 2. Find oldest eligible public Short
+  const { results: candidates } = await env.DB.prepare(
+    `SELECT video_id, title, mp4_download_url, cut_timestamps_json 
+     FROM videos 
+     WHERE privacy_status = 'public' 
+       AND total_frames <= 30 
+       AND ig_status = 'PENDING' 
+       AND mp4_download_url IS NOT NULL 
+       AND mp4_download_url != ''
+     ORDER BY created_at_epoch ASC 
+     LIMIT 1`
+  ).all();
+
+  if (!candidates || candidates.length === 0) {
+    return { published: false, message: "No eligible public shorts pending Instagram release." };
+  }
+
+  const candidate = candidates[0] as any;
+  const videoId = candidate.video_id;
+  const title = candidate.title;
+  const videoUrl = candidate.mp4_download_url;
+
+  // Build high-CTR Instagram Caption
+  const caption = `${title.toUpperCase()} 🚨\n\nForensic breakdown of sovereign liquidity flows and macro capital shifts.\n\n📌 Full 12-minute deep dive briefing available via the link in our bio.\n\n#MacroFinance #TheBullPrint #InstitutionalMarkets #GlobalLiquidity #ForensicFinance`;
+
+  const igId = env.INSTAGRAM_ACCOUNT_ID;
+  const igToken = env.INSTAGRAM_ACCESS_TOKEN;
+
+  // Step 1: Create Reel Container
+  const createParams = new URLSearchParams({
+    media_type: "REELS",
+    video_url: videoUrl,
+    caption: caption,
+    share_to_feed: "true",
+    access_token: igToken
+  });
+
+  const createRes = await fetch(`https://graph.facebook.com/v21.0/${igId}/media`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: createParams.toString()
+  });
+
+  const createData: any = await createRes.json();
+  if (!createData.id) {
+    console.error("Instagram media creation error:", createData);
+    return { published: false, message: `Meta API container creation failed: ${JSON.stringify(createData)}` };
+  }
+
+  const containerId = createData.id;
+
+  // Poll status up to 10 times (30 seconds)
+  let ready = false;
+  for (let i = 0; i < 10; i++) {
+    await new Promise(r => setTimeout(r, 3000));
+    const statusRes = await fetch(`https://graph.facebook.com/v21.0/${containerId}?fields=status_code&access_token=${igToken}`);
+    const statusData: any = await statusRes.json();
+    if (statusData.status_code === "FINISHED") {
+      ready = true;
+      break;
+    }
+    if (statusData.status_code === "ERROR") {
+      return { published: false, message: `Meta API processing error for container ${containerId}` };
+    }
+  }
+
+  if (!ready) {
+    return { published: false, message: `Container ${containerId} still processing; will retry on next tick.` };
+  }
+
+  // Publish Media Container
+  const pubParams = new URLSearchParams({
+    creation_id: containerId,
+    access_token: igToken
+  });
+
+  const pubRes = await fetch(`https://graph.facebook.com/v21.0/${igId}/media_publish`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: pubParams.toString()
+  });
+
+  const pubData: any = await pubRes.json();
+  if (!pubData.id) {
+    return { published: false, message: `Meta API publish failed: ${JSON.stringify(pubData)}` };
+  }
+
+  const mediaId = pubData.id;
+
+  // Update D1 row
+  await env.DB.prepare(
+    "UPDATE videos SET ig_status = 'PUBLISHED', ig_media_id = ?, ig_scheduled_epoch = ? WHERE video_id = ?"
+  ).bind(mediaId, now, videoId).run();
+
+  if (env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_CHAT_ID) {
+    await sendTelegramMessage(
+      env.TELEGRAM_BOT_TOKEN,
+      env.TELEGRAM_CHAT_ID,
+      `📸 *[INSTAGRAM REEL PUBLISHED]*\n• Title: *${title}*\n• YouTube: [${videoId}](https://youtu.be/${videoId})\n• IG Media ID: \`${mediaId}\`\n• Drip cadence: >= 2 hours enforced.`
+    );
+  }
+
+  return { published: true, message: `Successfully published Reel: ${mediaId}`, media_id: mediaId };
+}
+
+/**
+ * Tool: ARIA inspects or triggers Instagram Reel publish
+ */
+async function toolPublishOrCheckInstagramReel(action: string, env: Env): Promise<any> {
+  if (action === "drip_next") {
+    return await dripFeedInstagramReels(env);
+  }
+
+  // action === "status"
+  const { results: statusCounts } = await env.DB.prepare(
+    "SELECT ig_status, COUNT(*) as count FROM videos GROUP BY ig_status"
+  ).all();
+
+  const { results: nextCandidate } = await env.DB.prepare(
+    `SELECT video_id, title, privacy_status, ig_status, mp4_download_url 
+     FROM videos 
+     WHERE ig_status = 'PENDING' AND privacy_status = 'public' AND total_frames <= 30
+     ORDER BY created_at_epoch ASC LIMIT 3`
+  ).all();
+
+  const { results: lastPublished } = await env.DB.prepare(
+    `SELECT video_id, title, ig_media_id, ig_scheduled_epoch 
+     FROM videos 
+     WHERE ig_status = 'PUBLISHED' 
+     ORDER BY ig_scheduled_epoch DESC LIMIT 1`
+  ).all();
+
+  return {
+    queue_breakdown: statusCounts || [],
+    next_up_candidates: nextCandidate || [],
+    last_published: lastPublished && lastPublished[0] ? lastPublished[0] : null
+  };
 }

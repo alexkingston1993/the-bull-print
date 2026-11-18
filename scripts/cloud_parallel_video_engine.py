@@ -350,6 +350,7 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                 VERTICAL: {vertical}
                 FORMAT: 12-Minute Masterpiece Documentary (16:9 Landscape)
                 CURRENT PRODUCTION CHUNK: {act_name} (Segments {s_start} through {s_end}, exactly {s_count} segments of 20 seconds each)
+                MINIMUM WORD-COUNT FLOOR: You MUST generate at least 620 spoken words across these 12 segments (strictly 52 to 60 words per segment). Total across 36 segments must exceed 1,860 words to fully fill the 720-second narration runtime. Zero short segments.
 
                 CHUNK DIRECTIVE:
                 {act_directive}
@@ -475,6 +476,17 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                 f"Acquired {len(gemini_sections)}/{target_segments} segments. "
                 f"Hardcoded scripts, generic modulo fallbacks, and canned text are PERMANENTLY PROHIBITED."
             )
+
+        total_doc_words = sum(len(str(g.get("script", "")).split()) for g in gemini_sections)
+        logger.info(f"📊 [Script Studio] 36 Documentary segments acquired: {total_doc_words} words total.")
+        if total_doc_words < 1850:
+            logger.warning(f"⚠️ Script word count ({total_doc_words}) below 1,850 floor. Expanding sparse segments...")
+            for g in gemini_sections:
+                s_words = len(str(g.get("script", "")).split())
+                if s_words < 50:
+                    extra = " ".join(b.get("spoken_phrase", "") for b in g.get("micro_beats", []) if b.get("spoken_phrase") and b.get("spoken_phrase") not in g.get("script", ""))
+                    if extra:
+                        g["script"] = f"{g['script']} {extra}".strip()
 
         for i in range(target_segments):
             start_t = round(i * 20.0, 2)
@@ -1066,11 +1078,10 @@ def prepare_session(
                     })
             s["words"] = sec_words
 
-    # 3. Partition into GHA (up to 20 runners) vs Kaggle GPU Overflow
-    gha_limit = 20
-    gha_indices = list(range(min(total_segments, gha_limit)))
-    kaggle_indices = list(range(gha_limit, total_segments)) if total_segments > gha_limit else []
-    has_overflow = len(kaggle_indices) > 0
+    # 3. Dynamic Matrix Partitioning: All segments render via GitHub Actions Ubuntu matrix (max-parallel: 20 handles concurrency)
+    gha_indices = list(range(total_segments))
+    kaggle_indices = []
+    has_overflow = False
 
     manifest = {
         "topic": topic,
@@ -1744,6 +1755,29 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
         logger.success(f"📰 [Website Article] Published: {article_path}")
     except Exception as a_err:
         logger.warning(f"Article generation notice: {a_err}")
+
+    # Register video with Cloudflare Control Plane (D1 Database)
+    if vid_id:
+        try:
+            cf_worker_url = os.getenv("CLOUDFLARE_WORKER_URL", "https://tbp-cloudflare-orchestrator.cloudflare-orchestrator.workers.dev")
+            reg_payload = json.dumps({
+                "video_id": vid_id,
+                "title": title[:95],
+                "privacy_status": privacy_status,
+                "total_frames": len(manifest.get("sections", [])),
+                "r2_prefix": f"staging/{manifest['slug']}/",
+                "mp4_download_url": f"https://youtu.be/{vid_id}",
+                "cut_timestamps_json": json.dumps(timestamps if 'timestamps' in locals() else [])
+            }).encode("utf-8")
+            reg_req = urllib.request.Request(
+                f"{cf_worker_url}/register-video",
+                data=reg_payload,
+                headers={"Content-Type": "application/json"}
+            )
+            with urllib.request.urlopen(reg_req, timeout=10) as reg_resp:
+                logger.success(f"🌐 [Cloudflare D1] Video {vid_id} registered successfully in control plane.")
+        except Exception as reg_err:
+            logger.warning(f"Cloudflare video registration notice: {reg_err}")
 
     # 5. Telegram Mission Notification
     alert_msg = (
