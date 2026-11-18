@@ -136,7 +136,7 @@ def run_daily_production(dry_run: bool = False):
 
     # Stage 3: Dispatch Scheduled Productions to Cloud Matrix
     # CRITICAL EFFICIENCY RULE: Dispatch all 10 fast Shorts (20 frames, ~3 mins each) FIRST,
-    # and dispatch the 2 Documentaries (6 mins, 90 frames each) LAST.
+    # and dispatch the 2 Master Documentaries (Minimum 12 min / 720s, 36 segments x 5 beats = 180 unique frames) LAST.
     # This prevents Shorts runners from idling in queue behind heavy documentary renders.
     shorts_queue = [item for item in scheduled_items if item["type"] == "short"]
     docs_queue = [item for item in scheduled_items if item["type"] == "doc"]

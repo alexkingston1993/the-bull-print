@@ -45,7 +45,7 @@ class AutonomousScheduler:
         {"name": "us_market_open", "time": "20:30", "days": [0, 1, 2, 3, 4], "desc": "Wall Street Bell & Global Macro"},
         {"name": "night_compounder", "time": "22:00", "days": [0, 1, 2, 3, 4], "desc": "Bluechip Wealth Compounding Secrets"},
         # ── Weekends ──
-        {"name": "weekend_masterclass", "time": "11:00", "days": [5], "desc": "Saturday 10-Min Masterclass"},
+        {"name": "weekend_masterclass", "time": "11:00", "days": [5], "desc": "Saturday 12-Min Masterclass"},
         {"name": "sunday_study", "time": "11:00", "days": [6], "desc": "Sunday 10-Year Wealth Architecture"},
     ]
 

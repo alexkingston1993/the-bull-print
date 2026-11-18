@@ -19,9 +19,9 @@ on:
         required: false
         default: '60'
       duration_min:
-        description: 'Duration in minutes for Standard Video (3, 5, or 10)'
+        description: 'Duration in minutes for Standard Video (Minimum 12 min / 720s Documentary)'
         required: false
-        default: '3'
+        default: '12'
       shorts_only:
         description: 'Render as 9:16 Short (true/false)'
         required: false
@@ -86,7 +86,7 @@ jobs:
           INPUT_PRIVACY: ${{ github.event.inputs.privacy_status || 'public' }}
           INPUT_PUBLISH_AT: "${{ github.event.inputs.publish_at || github.event.client_payload.publish_at }}"
           INPUT_DURATION_SEC: ${{ github.event.inputs.duration_sec || github.event.client_payload.duration_sec || '60' }}
-          INPUT_DURATION_MIN: ${{ github.event.inputs.duration_min || github.event.client_payload.duration_min || '3' }}
+          INPUT_DURATION_MIN: ${{ github.event.inputs.duration_min || github.event.client_payload.duration_min || '12' }}
           INPUT_SHORTS_ONLY: ${{ github.event.inputs.shorts_only || github.event.client_payload.shorts_only || 'true' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}

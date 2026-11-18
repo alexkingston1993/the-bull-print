@@ -7,11 +7,12 @@
   - *Example*: A 30-second Short requires 10 distinct frames; a 36-second Short requires 12 distinct frames.
   - *Pacing Rule*: Fast, punchy micro-beats maintaining relentless visual momentum.
 
-- **Standard YouTube Videos (16:9 Landscape - Any Length)**:
-  - **Cut Frequency**: Exactly **1 frame every 4.0 seconds**, regardless of video length.
-  - *Example*: A 12-minute master documentary (720 seconds) requires exactly **180 distinct frames** (36 segments × 5 micro-beats).
-  - *Example*: An 8-minute documentary (480 seconds) requires exactly **120 distinct frames** (24 segments × 5 micro-beats).
-  - *Pacing Rule*: Pure hard cuts or smooth documentary cross-fades without artificial digital distortion.
+- **Standard YouTube Videos (16:9 Landscape — Minimum 12 Minutes)**:
+  - **Strict Duration Mandate**: Minimum **12 minutes** (720.0 seconds). Video lengths under 12 minutes (e.g. 3m, 5m, 8m, 10m) are strictly prohibited.
+  - **Segmentation**: Exactly **36 segments of 20.0 seconds** each.
+  - **Cut Frequency**: Exactly **1 frame every 4.0 seconds** (5 micro-beats per segment).
+  - **Total Visual Plates**: Exactly **180 distinct bespoke frames** (36 segments × 5 micro-beats) rendered 100% on Kaggle Dual-T4 GPU diffusers.
+  - **Pacing Rule*: Pure hard cuts or smooth documentary cross-fades without artificial digital distortion.
 
 ---
 

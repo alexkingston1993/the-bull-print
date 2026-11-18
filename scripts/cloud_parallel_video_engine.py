@@ -1742,7 +1742,7 @@ def main():
     parser.add_argument("--topic", default=None, help="Specific financial topic. Required for prepare mode.")
     parser.add_argument("--vertical", default="stock_market", help="Market vertical (e.g. stock_market, crypto, commodities, forex, banking, insurance)")
     parser.add_argument("--duration-sec", type=int, default=60)
-    parser.add_argument("--duration-min", type=int, default=3)
+    parser.add_argument("--duration-min", type=int, default=12, help="Strict minimum 12 min (720s) for standard 16:9 documentaries")
     parser.add_argument("--is-short", type=str2bool, default=True, help="true for 9:16 vertical short, false for 16:9 widescreen doc")
     parser.add_argument("--publish-at", default=None, help="ISO 8601 UTC timestamp for scheduled release (e.g. 2026-11-15T22:00:00Z)")
     parser.add_argument("--segment-index", type=int, default=0)
@@ -1756,7 +1756,8 @@ def main():
     if args.mode == "prepare":
         if not args.topic:
             raise ValueError("Error: --topic is required when running in 'prepare' mode. Hardcoded defaults are disabled.")
-        dur = args.duration_sec if args.is_short else (args.duration_min * 60)
+        # Strict duration enforcement: Standard Documentaries (16:9 Landscape) must be a minimum of 12 minutes (720s = 36 segments of 20s)
+        dur = args.duration_sec if args.is_short else max(720, (args.duration_min * 60))
         prepare_session(
             topic=args.topic,
             vertical=args.vertical,

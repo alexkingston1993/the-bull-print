@@ -2,7 +2,7 @@
 Shorts Repurposing Studio — Multiplier Engine (1 Masterclass -> 3 Shorts).
 Inspired by darkzOGx YouTube Automation Agent Shorts Repurposing Studio.
 
-Takes an approved 10-minute long-form masterclass and automatically slices out
+Takes an approved 12-minute long-form documentary and automatically slices out
 three 45-60 second high-impact vertical (9:16) Shorts:
 - Short 1: The Liquidity Sweep & Stop-Loss Trap
 - Short 2: The SEBI Derivatives Negative Expectancy Truth

@@ -477,7 +477,7 @@ class PipelineOrchestrator:
             modal_yt_url = self._try_modal_gpu_masterclass(subject, script)
             if modal_yt_url:
                 return modal_yt_url
-            raise RuntimeError("[Orchestrator] Cloud GPU offload (Kaggle T4 / Modal) required for 10-minute masterclass. Local compute strictly prohibited.")
+            raise RuntimeError("[Orchestrator] Cloud GPU offload (Kaggle T4 / Modal) required for 12-minute documentary/masterclass. Local compute strictly prohibited.")
 
         logger.info(f"[Orchestrator] Launching video rendering task {task_id} for '{subject}'...")
         res = task.start(task_id, params)
@@ -497,12 +497,12 @@ class PipelineOrchestrator:
             raise RuntimeError(f"Task pipeline terminated without youtube_upload result (res={res})")
 
     def _try_kaggle_gpu_masterclass(self, subject: str, script: str) -> Optional[str]:
-        """Attempts to render and upload the 10-minute masterclass using Kaggle Nvidia T4 GPU (100% Free)."""
+        """Attempts to render and upload the 12-minute documentary/masterclass using Kaggle Nvidia T4 GPU (100% Free)."""
         has_kaggle = os.getenv("KAGGLE_USERNAME") or os.path.exists(os.path.expanduser("~/.kaggle/kaggle.json"))
         if not has_kaggle:
             return None
         try:
-            logger.info("[Orchestrator] 🚀 Delegating 10-minute masterclass to Kaggle Nvidia T4 GPU (free tier)...")
+            logger.info("[Orchestrator] 🚀 Delegating 12-minute documentary/masterclass to Kaggle Nvidia T4 GPU (free tier)...")
             from app.services.kaggle_worker import KaggleWorker
             worker = KaggleWorker(timeout=2400)
             token_b64 = os.getenv("YOUTUBE_TOKEN_EN")
@@ -530,7 +530,7 @@ class PipelineOrchestrator:
         return None
 
     def _try_modal_gpu_masterclass(self, subject: str, script: str) -> Optional[str]:
-        """Attempts to render and upload the 10-minute masterclass using Modal GPU in the cloud."""
+        """Attempts to render and upload the 12-minute documentary/masterclass using Modal GPU in the cloud."""
         has_modal = os.getenv("MODAL_TOKEN_ID") or os.path.exists(os.path.expanduser("~/.modal.toml"))
         if not has_modal:
             return None
@@ -711,7 +711,7 @@ class PipelineOrchestrator:
         base_subject: str = "The Bull Print Masterclass",
     ) -> List[Dict]:
         """
-        Slices an approved 10-minute masterclass into 3 vertical 9:16 Shorts
+        Slices an approved 12-minute documentary/masterclass into vertical 9:16 Shorts
         and uploads/schedules them to YouTube with custom thumbnails and TitleLab hooks.
         Multiplies channel reach by 3x at $0 extra compute.
         """

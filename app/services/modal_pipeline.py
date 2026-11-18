@@ -1,7 +1,7 @@
 """
 The Bull Print — Autonomous Modal Serverless GPU Video Engine.
 
-Renders long-form (10-minute) masterclass market videos in the cloud using Nvidia GPUs:
+Renders long-form (12-minute) masterclass market videos in the cloud using Nvidia GPUs:
 - Voiceover: en-IN-PrabhatNeural (synthesized in synchronized sentence chunks)
 - Visuals: Live candlestick charts (Nifty 50, Bank Nifty, Sensex) + institutional overlays
 - Branding: The Bull Print signature color tokens (#0a0f1d, #00e599, #38bdf8), watermarks & typography

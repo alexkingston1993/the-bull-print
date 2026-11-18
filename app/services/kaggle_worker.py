@@ -304,7 +304,7 @@ class KaggleWorker:
         voice_ref_path: str = None,
     ) -> str:
         """
-        Executes the 10-minute masterclass generation and YouTube publication on Kaggle's free Nvidia T4 GPU.
+        Executes the 12-minute documentary/masterclass generation and YouTube publication on Kaggle's free Nvidia T4 GPU.
         Returns the published YouTube URL, or None if failed.
         """
         if not voice_ref_path or not os.path.exists(voice_ref_path):
@@ -368,7 +368,7 @@ class KaggleWorker:
             with open(os.path.join(tmp_dir, "kernel-metadata.json"), "w") as f:
                 json.dump(metadata, f, indent=2)
 
-            print(f"[kaggle] 🚀 Offloading 10-minute masterclass to Kaggle Nvidia T4 GPU: {full_id}...")
+            print(f"[kaggle] 🚀 Offloading 12-minute documentary/masterclass to Kaggle Nvidia T4 GPU: {full_id}...")
             push_resp = self.api.kernels_push(tmp_dir)
             kernel_url = getattr(push_resp, "url", f"https://www.kaggle.com/{full_id}")
             print(f"[kaggle] Kernel dispatched: {kernel_url}")

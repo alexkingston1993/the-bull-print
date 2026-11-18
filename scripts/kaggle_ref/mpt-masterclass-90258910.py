@@ -1,7 +1,7 @@
 """
 The Bull Print — Autonomous Kaggle GPU Masterclass Video Engine.
 Executes 100% on Kaggle's free Nvidia Tesla T4 GPU (30 hours/week quota).
-Synthesizes 10-minute cloned voice on CUDA, generates animated charts,
+Synthesizes 12-minute cloned voice on CUDA, generates animated charts,
 composites 1080p video with GPU acceleration, and uploads to YouTube.
 """
 
@@ -370,7 +370,7 @@ subprocess.run(
 )
 
 # ── Step 4: Video Compositing with Animated Subtitles & Watermark ──
-print("[KaggleWorker] Step 4: Compositing 10-minute 1080p masterclass video via ffmpeg...", flush=True)
+print("[KaggleWorker] Step 4: Compositing 12-minute 1080p masterclass video via ffmpeg...", flush=True)
 
 # Generate SRT subtitle file
 def format_srt_time(sec):

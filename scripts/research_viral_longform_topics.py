@@ -49,8 +49,8 @@ for q in QUERIES:
                 try:
                     data = json.loads(line)
                     duration = data.get("duration") or 0
-                    # Focus on long-format (600s - 3600s = 10 min - 60 min)
-                    if duration >= 500:
+                    # Focus on long-format documentaries (720s - 3600s = 12 min - 60 min)
+                    if duration >= 720:
                         results.append({
                             "id": data.get("id"),
                             "title": data.get("title"),

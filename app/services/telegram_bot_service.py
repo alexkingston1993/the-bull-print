@@ -139,7 +139,7 @@ class AriaEngineerTools:
             f"- WHY IT REPEATED PREVIOUSLY IN RUN #39782386829: In that run, attempt 1 failed, triggering attempts 2 & 3. The retry failed repeatedly because the runner disk filled up completely (OSError: [Errno 28] No space left on device) from Kokoro/PyTorch installing ~3.5GB of heavy CUDA packages, plus a parameter mismatch in the retry handler.\n"
             f"- HOW WE FIXED IT: We purged Kokoro and PyTorch from requirements.txt, added an automatic 20GB runner disk clean step, and accelerated MoviePy encoding with the ultrafast preset.\n"
             f"- IS THIS ERROR REPEATING NOW?: NO. It is completely resolved. The runner has 25+ GB free space, and current runs are executing smoothly.\n"
-            f"- CURRENT ACTIVE TASK: Run #39795865879 for 'weekend_masterclass' (10-minute long-form video). Compiling a 10-minute 1080p video with 100+ stock clips and subtitles on a 2-core cloud runner takes ~45-55 minutes. It is currently in progress / nearing completion.\n"
+            f"- CURRENT ACTIVE TASK: Standard long-form documentaries are strictly a minimum of 12 minutes (720s, 36 segments of 20s = 180 plates) rendered across the 20-Runner Parallel Cloud Video Matrix on GitHub Actions and Kaggle GPU.\n"
         )
         return context
 

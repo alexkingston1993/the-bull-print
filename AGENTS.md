@@ -13,7 +13,7 @@
 - Every single beat must have a fresh, uniquely generated clean photographic plate from Kaggle GPU.
 - Cut pacing must strictly adhere to `.agents/rules/MASTER_BLUEPRINT.md`:
   - **YouTube Shorts (9:16 Vertical)**: Exactly 1 unique frame every 3.0 seconds (60s = 20 unique frames, 30s = 10 unique frames, 36s = 12 unique frames).
-  - **Documentaries (16:9 Landscape)**: Exactly 1 unique frame every 4.0 seconds (12 min = 180 unique frames, 8 min = 120 unique frames).
+  - **Documentaries (16:9 Landscape)**: Minimum 12.0 minutes strictly enforced (720s = 36 segments × 20s). Exactly 1 unique bespoke frame every 4.0 seconds (180 unique frames). Video lengths under 12 minutes (e.g. 3m, 5m, 8m, 10m) are strictly prohibited.
 
 ### 3. Mandatory Design Blueprint Validation
 - Before dispatching any cloud production or publishing, validate the manifest, assets, and typography against:
