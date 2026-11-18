@@ -1699,7 +1699,7 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
             if vid_id:
                 yt_url = res.get("url") or f"https://youtu.be/{vid_id}"
                 logger.success(f"🚀 [YouTube Upload] Broadcast Live: {yt_url}")
-        elif res and isinstance(res, dict) and not res.get("success"):
+        if res and isinstance(res, dict) and not res.get("success"):
             err_msg = str(res.get("error") or "")
             if any(k in err_msg.lower() for k in ["quota", "limit", "pool"]):
                 logger.warning(f"YouTube upload quota reached; video packaged for deferred publishing: {err_msg}")
