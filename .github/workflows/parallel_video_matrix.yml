@@ -66,7 +66,25 @@ jobs:
       - name: 📦 Install Synthesis Dependencies (100% Offline Cloned Christopher Voice & Kaggle)
         run: |
           sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core
-          pip install --no-cache-dir six urllib3 certifi python-dateutil Pillow soundfile soxr faster-whisper requests google-genai loguru toml edge-tts kaggle
+          pip install --no-cache-dir six urllib3 certifi python-dateutil Pillow soundfile soxr faster-whisper requests google-genai loguru toml edge-tts kaggle google-api-python-client google-auth google-auth-oauthlib
+
+      - name: 🔑 Materialize YouTube Quota Pool & Tokens (Mandatory for Live Semantic Deduplication)
+        env:
+          YOUTUBE_TOKEN_EN: ${{ secrets.YOUTUBE_TOKEN_EN }}
+          YT_OAUTH_POOL_JSON: ${{ secrets.YT_OAUTH_POOL_JSON }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+        run: |
+          mkdir -p data/youtube_tokens
+          if [ -n "$YOUTUBE_TOKEN_EN" ]; then
+            echo "$YOUTUBE_TOKEN_EN" | base64 -d > data/youtube_tokens/youtube_token_en.pickle
+            echo "✓ Restored primary YouTube OAuth token for live deduplication guard"
+          fi
+          if [ -n "$YT_OAUTH_POOL_JSON" ]; then
+            echo "$YT_OAUTH_POOL_JSON" > data/youtube_tokens/oauth_pool.json
+            echo "✓ Restored OAuth pool JSON"
+          fi
 
       - name: ⚙️ Setup Kaggle GPU Credentials
         env:
