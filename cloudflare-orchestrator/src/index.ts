@@ -19,6 +19,10 @@ export interface Env {
   GEMINI_API_KEY?: string;
   INSTAGRAM_ACCOUNT_ID?: string;
   INSTAGRAM_ACCESS_TOKEN?: string;
+  TIKTOK_CLIENT_KEY?: string;
+  TIKTOK_CLIENT_SECRET?: string;
+  TIKTOK_ACCESS_TOKEN?: string;
+  TIKTOK_REFRESH_TOKEN?: string;
 }
 
 export default {
@@ -52,6 +56,14 @@ export default {
         await dripFeedInstagramReels(env);
       } catch (igErr) {
         console.error("Error in scheduled Instagram drip:", igErr);
+      }
+
+      // Automatic TikTok Drip (spaced >= 2 hours apart)
+      console.log("📱 [TikTok Drip] Checking for pending public shorts to release on TikTok...");
+      try {
+        await dripFeedTikTok(env);
+      } catch (ttErr) {
+        console.error("Error in scheduled TikTok drip:", ttErr);
       }
 
       // Notify if state transitions occurred
@@ -114,6 +126,13 @@ export default {
 
     if (path === "/drip-instagram" && request.method === "POST") {
       const res = await dripFeedInstagramReels(env);
+      return new Response(JSON.stringify(res), {
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
+    if (path === "/drip-tiktok" && request.method === "POST") {
+      const res = await dripFeedTikTok(env);
       return new Response(JSON.stringify(res), {
         headers: { "Content-Type": "application/json" }
       });
@@ -261,6 +280,21 @@ const ARIA_TOOLS = [
           type: "STRING",
           enum: ["status", "drip_next"],
           description: "Action to take: 'status' to view pending/published reels, or 'drip_next' to publish the next queued Short."
+        }
+      },
+      required: ["action"]
+    }
+  },
+  {
+    name: "publish_or_check_tiktok_post",
+    description: "Inspects queued YouTube Shorts pending TikTok release, or triggers a drip publish to @thebullprint on TikTok.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        action: {
+          type: "STRING",
+          enum: ["status", "drip_next"],
+          description: "Action to take: 'status' to view pending/published TikTok posts, or 'drip_next' to publish the next queued Short."
         }
       },
       required: ["action"]
@@ -424,6 +458,8 @@ async function executeTool(name: string, args: any, env: Env): Promise<any> {
       return await toolSetYoutubePrivacyAndSync(args.video_id, args.privacy_status, env);
     case "publish_or_check_instagram_reel":
       return await toolPublishOrCheckInstagramReel(args.action, env);
+    case "publish_or_check_tiktok_post":
+      return await toolPublishOrCheckTikTok(args.action, env);
     default:
       return { error: `Unknown tool: ${name}` };
   }
@@ -1237,6 +1273,21 @@ function handleLinksPage(): Response {
         </div>
         <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
       </a>
+
+      <a href="https://www.tiktok.com/@thebullprint" target="_blank" rel="noopener noreferrer" class="link-card">
+        <div class="link-content">
+          <div class="link-icon" style="color: #00F2FE;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.298-.002.595.042.88.13V9.4a6.33 6.33 0 0 0-1-.08A6.34 6.34 0 0 0 3 15.66a6.34 6.34 0 0 0 10.82 4.5 6.28 6.28 0 0 0 1.95-4.54V8.78a8.18 8.18 0 0 0 4.82 1.57V6.9a4.85 4.85 0 0 1-1-.21z"/>
+            </svg>
+          </div>
+          <div class="link-title">
+            <span class="link-label">Follow on TikTok</span>
+            <span class="link-sublabel">Macro Explainer Shorts @thebullprint</span>
+          </div>
+        </div>
+        <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </a>
     </div>
 
     <footer>
@@ -1555,6 +1606,137 @@ async function toolPublishOrCheckInstagramReel(action: string, env: Env): Promis
      FROM videos 
      WHERE ig_status = 'PUBLISHED' 
      ORDER BY ig_scheduled_epoch DESC LIMIT 1`
+  ).all();
+
+  return {
+    queue_breakdown: statusCounts || [],
+    next_up_candidates: nextCandidate || [],
+    last_published: lastPublished && lastPublished[0] ? lastPublished[0] : null
+  };
+}
+
+/**
+ * Automatically publishes 9:16 Shorts to TikTok spaced >= 2 hours apart.
+ */
+async function dripFeedTikTok(env: Env): Promise<{ published: boolean; message: string; publish_id?: string }> {
+  if (!env.TIKTOK_ACCESS_TOKEN) {
+    return { published: false, message: "TIKTOK_ACCESS_TOKEN not configured in Worker environment." };
+  }
+
+  // 1. Check cooldown
+  const { results: lastTikTok } = await env.DB.prepare(
+    "SELECT MAX(tiktok_scheduled_epoch) as last_epoch FROM videos WHERE tiktok_status = 'PUBLISHED'"
+  ).all();
+
+  const lastEpoch = (lastTikTok && lastTikTok[0] && (lastTikTok[0] as any).last_epoch) || 0;
+  const now = Math.floor(Date.now() / 1000);
+  const minIntervalSec = 7200; // 2 hours
+
+  if (lastEpoch > 0 && (now - lastEpoch) < minIntervalSec) {
+    const remainingMins = Math.ceil((minIntervalSec - (now - lastEpoch)) / 60);
+    return { published: false, message: `Cooldown active: Next TikTok can be published in ${remainingMins} minutes.` };
+  }
+
+  // 2. Find oldest eligible public Short
+  const { results: candidates } = await env.DB.prepare(
+    `SELECT video_id, title, mp4_download_url 
+     FROM videos 
+     WHERE privacy_status = 'public' 
+       AND total_frames <= 30 
+       AND tiktok_status = 'PENDING' 
+       AND mp4_download_url IS NOT NULL 
+       AND mp4_download_url != ''
+     ORDER BY created_at_epoch ASC 
+     LIMIT 1`
+  ).all();
+
+  if (!candidates || candidates.length === 0) {
+    return { published: false, message: "No eligible public shorts pending TikTok release." };
+  }
+
+  const candidate = candidates[0] as any;
+  const videoId = candidate.video_id;
+  const title = candidate.title;
+  const videoUrl = candidate.mp4_download_url;
+
+  const caption = `${title.toUpperCase()} 🚨\n\nForensic breakdown of sovereign liquidity flows and macro capital shifts.\n\nFinancial freedom for everyone through financial literacy. 💡\n\nWatch full 12-minute breakdown on YouTube @TheBullPrint (link in bio).\n\n#TheBullPrint #MacroEconomics #FinancialLiteracy #FinanceTok #StockMarket`;
+
+  const initUrl = "https://open.tiktokapis.com/v2/post/publish/video/init/";
+  const initPayload = {
+    post_info: {
+      title: caption.slice(0, 2150),
+      privacy_level: "PUBLIC_TO_EVERYONE",
+      disable_duet: false,
+      disable_stitch: false,
+      disable_comment: false
+    },
+    source_info: {
+      source: "PULL_FROM_URL",
+      video_url: videoUrl
+    }
+  };
+
+  try {
+    const res = await fetch(initUrl, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${env.TIKTOK_ACCESS_TOKEN}`,
+        "Content-Type": "application/json; charset=UTF-8"
+      },
+      body: JSON.stringify(initPayload)
+    });
+
+    const data: any = await res.json();
+    if (data.error && data.error.code !== "ok") {
+      return { published: false, message: `TikTok API error: ${JSON.stringify(data.error)}` };
+    }
+
+    const publishId = data.data?.publish_id || "v_pub_pending";
+
+    // Update D1
+    await env.DB.prepare(
+      "UPDATE videos SET tiktok_status = 'PUBLISHED', tiktok_publish_id = ?, tiktok_scheduled_epoch = ? WHERE video_id = ?"
+    ).bind(publishId, now, videoId).run();
+
+    if (env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_CHAT_ID) {
+      await sendTelegramMessage(
+        env.TELEGRAM_BOT_TOKEN,
+        env.TELEGRAM_CHAT_ID,
+        `📱 *[TIKTOK VIDEO PUBLISHED]*\n• Title: *${title}*\n• YouTube: [${videoId}](https://youtu.be/${videoId})\n• TikTok Publish ID: \`${publishId}\`\n• Drip cadence: >= 2 hours enforced.`
+      );
+    }
+
+    return { published: true, message: `Successfully queued TikTok: ${publishId}`, publish_id: publishId };
+  } catch (err: any) {
+    return { published: false, message: `Exception publishing to TikTok: ${err.message}` };
+  }
+}
+
+/**
+ * Tool: ARIA inspects or triggers TikTok publish
+ */
+async function toolPublishOrCheckTikTok(action: string, env: Env): Promise<any> {
+  if (action === "drip_next") {
+    return await dripFeedTikTok(env);
+  }
+
+  // action === "status"
+  const { results: statusCounts } = await env.DB.prepare(
+    "SELECT tiktok_status, COUNT(*) as count FROM videos GROUP BY tiktok_status"
+  ).all();
+
+  const { results: nextCandidate } = await env.DB.prepare(
+    `SELECT video_id, title, privacy_status, tiktok_status, mp4_download_url 
+     FROM videos 
+     WHERE tiktok_status = 'PENDING' AND privacy_status = 'public' AND total_frames <= 30
+     ORDER BY created_at_epoch ASC LIMIT 3`
+  ).all();
+
+  const { results: lastPublished } = await env.DB.prepare(
+    `SELECT video_id, title, tiktok_publish_id, tiktok_scheduled_epoch 
+     FROM videos 
+     WHERE tiktok_status = 'PUBLISHED' 
+     ORDER BY tiktok_scheduled_epoch DESC LIMIT 1`
   ).all();
 
   return {

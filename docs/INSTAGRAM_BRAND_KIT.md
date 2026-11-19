@@ -68,3 +68,4 @@ Every automated 9:16 Short published as an Instagram Reel utilizes this structur
 * **Engine**: Cloudflare Worker (`tbp-cloudflare-orchestrator`) + D1 SQLite Ledger (`tbp-production-db`).
 * **Cadence**: 30-minute cron sweeps (`*/30 * * * *`). Spaced $\ge 2\text{ hours}$ apart.
 * **Quarantine Policy**: Blacklisted videos (e.g. `Z6LEnQyhuvw`) are hard-blocked by D1 (`ig_status = 'QUARANTINED'`) and never published.
+
