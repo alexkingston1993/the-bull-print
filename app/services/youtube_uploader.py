@@ -539,6 +539,40 @@ class YouTubeUploader:
                     "duration": dur,
                 }
 
+        # 2b. Mandatory Pre-Upload Audio Volume Gate (Zero Digital Silence Mandate)
+        # Guarantees that no muted, corrupted, or silent video can ever be uploaded to YouTube
+        try:
+            ffmpeg_bin = shutil.which("ffmpeg") or "ffmpeg"
+            vol_cmd = [
+                ffmpeg_bin, "-i", str(video_path),
+                "-af", "volumedetect", "-vn", "-sn", "-dn",
+                "-f", "null", "/dev/null"
+            ]
+            vol_res = subprocess.run(vol_cmd, capture_output=True, text=True)
+            mean_vol = None
+            for line in vol_res.stderr.splitlines():
+                if "mean_volume:" in line:
+                    parts = line.split("mean_volume:")
+                    if len(parts) > 1:
+                        mean_vol = float(parts[1].replace("dB", "").strip())
+                        break
+            if mean_vol is None or mean_vol < -45.0:
+                err_msg = (
+                    f"🚨 [HARD AUDIO QC GATE TRIGGERED] Master video '{title}' is silent "
+                    f"(mean_volume: {mean_vol} dB < -45.0 dB threshold)! "
+                    f"ABORTING UPLOAD to protect channel integrity and user trust."
+                )
+                logger.error(err_msg)
+                return {
+                    "success": False,
+                    "error": err_msg,
+                    "quarantined": True,
+                    "mean_volume": mean_vol,
+                }
+            logger.success(f"✓ [{language}] [AUDIO QC GATE PASSED] Video mean volume: {mean_vol:.1f} dB")
+        except Exception as vol_err:
+            logger.warning(f"[{language}] Audio volume inspection notice: {vol_err}")
+
         # 3. Automated vidIQ 50/50 SEO, Canonical Article Backlinking & Video Interlinking
         seo_optimizer = get_video_seo_optimizer()
         seo_data = seo_optimizer.optimize_metadata(

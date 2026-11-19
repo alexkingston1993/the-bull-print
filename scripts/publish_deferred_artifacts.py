@@ -152,6 +152,13 @@ def publish_deferred_artifacts(dry_run: bool = False):
         logger.info(f"   Format: {'Short 9:16' if is_short else 'Doc 16:9'} | Scheduled: {staggered_time} UTC")
         logger.info(f"   MP4: {master_mp4.name} ({master_mp4.stat().st_size / 1e6:.1f} MB)")
 
+        # Mandatory Pre-Upload Quality Control Gate (Zero Silence & Corrupted Artifact Guard)
+        from app.services.pre_upload_qc_gate import PreUploadQCGate
+        qc_passed, qc_errors = PreUploadQCGate.validate(master_mp4, is_short=is_short, manifest_path=manifest_path)
+        if not qc_passed:
+            logger.error(f"⛔ [Pre-Upload QC Rejection] Video '{master_mp4.name}' failed quality gates: {qc_errors}")
+            continue
+
         if dry_run:
             logger.info(f"   [DRY RUN] Would upload to YouTube across OAuth pool.")
             published_count += 1
@@ -169,7 +176,7 @@ def publish_deferred_artifacts(dry_run: bool = False):
                 privacy_status="private",
                 publish_at=staggered_time,
                 is_short=is_short,
-                force_upload=True,
+                force_upload=False,
             )
             vid_id = (res.get("video_id") or res.get("id")) if isinstance(res, dict) else None
             if vid_id:

@@ -591,8 +591,8 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
 
         CRITICAL DIRECTIVES FOR HIGH-RETENTION HUMAN STORYTELLING (AVD >= 70%):
         1. ZERO FINANCIAL JARGON IN THE FIRST 5 SECONDS:
-           - STRICTLY FORBIDDEN WORDS in Section 0: 'liquidity', 'absorption', 'VWAP', 'delta', 'correlation', 'fiscal deficit', 'implied volatility', 'order book', 'macroeconomic', 'consolidation'.
-           - Section 0 MUST BE A VISCERAL, UNIGNORABLE HOOK: A direct threat, shocking accusation, or urgent mystery confronting the viewer's bank account.
+           - STRICTLY FORBIDDEN WORDS in Hook: 'liquidity', 'absorption', 'VWAP', 'delta', 'correlation', 'fiscal deficit', 'implied volatility', 'order book', 'macroeconomic', 'consolidation'.
+           - Opening MUST BE A VISCERAL, UNIGNORABLE HOOK: A direct threat, shocking accusation, or urgent mystery confronting the viewer's bank account.
 
         2. PERSONALIZE THE THREAT (EVERY STORY HAS A VILLAIN, A VICTIM, AND A CRIME):
            - The victim is the everyday viewer working a 9-to-5 job.
@@ -601,7 +601,12 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
         3. ONE SINGLE INSANE FACT PER SHORT (NO ACADEMIC DATA DUMPS):
            - Focus on ONE shocking smoking gun. Build relentless tension for 40 seconds, then drop the jaw-dropping revelation in the final 15 seconds.
 
-        4. PACING & BLOCKBUSTER 3D TYPOGRAPHY DIRECTIVES:
+        4. CONTINUOUS UNBROKEN NARRATIVE MONOLOGUE (ZERO ARTIFICIAL 4-SECOND AUDIO STOPS):
+           - The audio narration MUST be written as ONE continuous, free-flowing, breathless investigative monologue for the entire video (130-140 words total).
+           - Do NOT write disjointed 4-second sentence fragments. The monologue must flow with natural human conversational momentum from beginning to end.
+           - Spoken words do NOT stop or pause for plate changes. The visual photographic plates change every 3 to 4 seconds independently while the narrator speaks continuously.
+
+        5. PACING & BLOCKBUSTER 3D TYPOGRAPHY DIRECTIVES FOR EACH VISUAL PLATE:
            - 'headline_top': Exactly 1 to 2 words uppercase punchy hook (e.g. '$7 TRILLION', '1.3 MILLION', '2 CRORE', '₹85 LOW', 'H-1B', 'HAL & BEL').
            - 'headline_mid': Exactly 1 to 2 words uppercase anchor (e.g. 'DEBT TRAP', 'TROOPS', 'TRAPPED', 'CRASH', 'CRACKDOWN', 'SURGE').
            - 'badge_text': High-friction tactical alert stamp (e.g. 'MARKET SHOCK', 'TIME-BOMB', 'CRACKDOWN', 'OVERPRICED', 'TOP SECRET').
@@ -611,15 +616,9 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
              * MANDATORY PHYSICAL METAPHORS: Bank vaults sucking vortices, split cargo container ships in storms, gold bullion on dark marble, fighter jets flanking flags, passports locked in chains, robotic arms throwing sparks, distressed trader clutching head before giant red smartphone chart.
              * Suffix: "cinematic 35mm photograph, dark moody obsidian lighting, volumetric amber and gold rays, 8k hyper-detailed, clean plate, zero text, zero watermark"
 
-        5. NATURAL HUMAN DOCUMENTARY CADENCE & PUNCTUATION:
-           - Synthesizing as a single master audio track completely eliminates segment boundary gaps.
-           - Write with REAL human punctuation and sentence cadence: punchy 8–14 word complete sentences ending with periods ('.'), rhetorical questions ('?'), mid-sentence commas (','), and dramatic ellipses ('...').
-           - Do NOT write giant breathless run-on sentences without periods. Periods allow the TTS voice to naturally drop its pitch contour at thought boundaries, while questions inflect upward.
-           - 'script': The exact 5 to 7 contiguous words spoken during this visual cut (hard max 8 words per section).
-           - Total words across ALL 20 sections MUST be between 120 and 130 words (~54-56 seconds at natural cadence). Zero filler, zero self-introduction.
-
         Respond ONLY with a valid JSON object matching this structure:
         {{
+          "monologue": "Full continuous unbroken narration script of 130 to 140 words for the entire short...",
           "sections": [
             {{
               "section_index": 0,
@@ -628,7 +627,7 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
               "badge_text": "...",
               "color_theme": "gold",
               "visual_prompt": "...",
-              "script": "..."
+              "spoken_phrase": "..."
             }}
           ]
         }}
@@ -643,9 +642,18 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                         raw_text = raw_text.split("```")[1].split("```")[0].strip()
                     data = json.loads(raw_text)
                     g_secs = data.get("sections", [])
+                    monologue = data.get("monologue", "").strip()
                     if len(g_secs) >= num_sections:
                         gemini_sections = g_secs[:num_sections]
-                        logger.success(f"✅ [Script Studio] Successfully generated {num_sections} custom investigative sections")
+                        if monologue:
+                            # Attach continuous monologue slices across sections naturally
+                            mono_words = monologue.split()
+                            step = max(1, len(mono_words) // num_sections)
+                            for s_i, sec_item in enumerate(gemini_sections):
+                                start_w = s_i * step
+                                end_w = len(mono_words) if s_i == num_sections - 1 else (s_i + 1) * step
+                                sec_item["script"] = " ".join(mono_words[start_w:end_w])
+                        logger.success(f"✅ [Script Studio] Successfully generated {num_sections} custom investigative sections with continuous monologue ({len(monologue.split()) if monologue else 'N/A'} words)")
                         break
                 except Exception as parse_err:
                     logger.debug(f"JSON parse error on attempt {attempt+1}: {parse_err}")
@@ -661,23 +669,19 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
             f"Hardcoded scripts, generic modulo fallbacks, and canned text are PERMANENTLY PROHIBITED."
         )
 
-    # HARD POST-PROCESSING WORD CEILING (STRICT 52s-58s SHORT DURATION GUARDRAIL)
-    for g in gemini_sections:
-        words = str(g.get("script", "")).strip().split()
-        if len(words) > 8:
-            g["script"] = " ".join(words[:8])
-
+    # Clean script fields and enforce total monologue bounds naturally without robotic truncating
     total_script_words = sum(len(str(g.get("script", "")).strip().split()) for g in gemini_sections)
-    if total_script_words > 135:
-        logger.warning(f"⚠️ Total Short script ({total_script_words} words) exceeds 135-word ceiling. Pruning to <= 130 words...")
+    if total_script_words > 145:
+        logger.warning(f"⚠️ Total Short script ({total_script_words} words) exceeds 145-word ceiling. Normalizing...")
         accumulated = 0
         for g in gemini_sections:
             words = str(g.get("script", "")).strip().split()
-            if accumulated >= 130:
+            if accumulated >= 140:
                 g["script"] = " ".join(words[:4])
-            elif accumulated + len(words) > 130:
-                allow = max(4, 130 - accumulated)
+            elif accumulated + len(words) > 140:
+                allow = max(4, 140 - accumulated)
                 g["script"] = " ".join(words[:allow])
+            accumulated += len(str(g.get("script", "")).strip().split())
             accumulated += len(str(g.get("script", "")).strip().split())
 
     for i in range(num_sections):
@@ -1573,7 +1577,25 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
         dur = float(probe_data.get("format", {}).get("duration", 0))
         if dur < 10.0:
             raise ValueError(f"Pre-Upload QC Failed: Video duration too short ({dur:.1f}s).")
-        logger.success(f"🛡️ [Pre-Upload QC Passed] Validated {act_w}x{act_h} | Duration: {dur:.1f}s | Audio & Video synced.")
+
+        # Mandatory Audio Volume Level Verification (Zero Digital Silence Mandate)
+        vol_cmd = [
+            "ffmpeg", "-i", str(final_video_mp4),
+            "-af", "volumedetect", "-vn", "-sn", "-dn",
+            "-f", "null", "/dev/null"
+        ]
+        vol_res = subprocess.run(vol_cmd, capture_output=True, text=True)
+        m_vol = None
+        for line in vol_res.stderr.splitlines():
+            if "mean_volume:" in line:
+                parts = line.split("mean_volume:")
+                if len(parts) > 1:
+                    m_vol = float(parts[1].replace("dB", "").strip())
+                    break
+        if m_vol is None or m_vol < -45.0:
+            raise ValueError(f"Pre-Upload QC Failed: Master video audio is silent (mean_volume: {m_vol} dB < -45.0 dB threshold).")
+
+        logger.success(f"🛡️ [Pre-Upload QC Passed] Validated {act_w}x{act_h} | Duration: {dur:.1f}s | Audio volume: {m_vol:.1f} dB | Audio & Video synced.")
     except Exception as qc_err:
         logger.error(f"⛔ CRITICAL PRE-UPLOAD QC HALT: {qc_err}")
         _send_telegram(f"🚨 Pre-Upload QC Failed on {manifest.get('topic')}: {qc_err}. Video upload permanently halted.")
