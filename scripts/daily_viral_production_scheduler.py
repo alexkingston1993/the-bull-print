@@ -134,62 +134,87 @@ def run_daily_production(dry_run: bool = False):
             scheduled_items.append({"type": "doc", "data": docs[d_idx], "slot": slot, "publish_at": slot_time, "num": d_idx + 1})
             d_idx += 1
 
-    # Stage 3: Dispatch Scheduled Productions to Cloud Matrix
-    # CRITICAL EFFICIENCY RULE: Dispatch all 10 fast Shorts (20 frames, ~3 mins each) FIRST,
-    # and dispatch the 2 Master Documentaries (Minimum 12 min / 720s, 36 segments x 5 beats = 180 unique frames) LAST.
-    # This prevents Shorts runners from idling in queue behind heavy documentary renders.
+    # Stage 3: Strictly Staged Cloud Matrix Dispatch
+    # STRICT USER MANDATE: All 10 Shorts MUST complete their prepare_session and plate generation
+    # ONE BY ONE first. The 2 Documentaries (12+ min) may ONLY begin after ALL 10 Shorts are completely done.
     shorts_queue = [item for item in scheduled_items if item["type"] == "short"]
     docs_queue = [item for item in scheduled_items if item["type"] == "doc"]
-    dispatch_queue = shorts_queue + docs_queue
 
-    for item in dispatch_queue:
+    print("\n" + "=" * 70)
+    print("⚡ PHASE 1: DISPATCHING 10 VIRAL SHORTS (ONE BY ONE)")
+    print("=" * 70)
+
+    for item in shorts_queue:
         data = item["data"]
         topic = data["title"]
         vertical = data.get("vertical", "stock_market")
         publish_at = item["publish_at"]
-        is_short = item["type"] == "short"
 
-        if is_short:
-            print(f"\n[Short {item['num']:02d}/10] 🚀 Dispatching Short: {topic} (Scheduled: {publish_at} UTC)")
-            cmd = [
-                gh_bin, "workflow", "run",
-                "parallel_video_matrix.yml",
-                "-f", f"topic={topic}",
-                "-f", f"vertical={vertical}",
-                "-f", "shorts_only=true",
-                "-f", "duration_sec=60",
-                "-f", "privacy_status=private",
-                "-f", f"publish_at={publish_at}"
-            ]
-        else:
-            print(f"\n[Doc {item['num']:02d}/02] 🎬 Dispatching Master Documentary (16:9, 12-Min Masterclass): {topic} (Scheduled: {publish_at} UTC)")
-            cmd = [
-                gh_bin, "workflow", "run",
-                "parallel_video_matrix.yml",
-                "-f", f"topic={topic}",
-                "-f", f"vertical={vertical}",
-                "-f", "shorts_only=false",
-                "-f", "duration_min=12",
-                "-f", "privacy_status=private",
-                "-f", f"publish_at={publish_at}"
-            ]
+        print(f"\n[Short {item['num']:02d}/10] 🚀 Dispatching Short: {topic} (Scheduled: {publish_at} UTC)")
+        cmd = [
+            gh_bin, "workflow", "run",
+            "parallel_video_matrix.yml",
+            "-f", f"topic={topic}",
+            "-f", f"vertical={vertical}",
+            "-f", "shorts_only=true",
+            "-f", "duration_sec=60",
+            "-f", "privacy_status=private",
+            "-f", f"publish_at={publish_at}"
+        ]
 
         if not dry_run:
             try:
                 res = subprocess.run(cmd, check=True, stdin=subprocess.DEVNULL, capture_output=True, text=True)
-                tag = f"Short {item['num']}" if is_short else f"Doc {item['num']}"
-                logger.success(f"✓ Dispatched {tag}: {topic[:40]}... (PublishAt: {publish_at})")
+                logger.success(f"✓ Dispatched Short {item['num']}: {topic[:40]}... (PublishAt: {publish_at})")
 
-                # Active pipelined staggering: Wait for prepare_session to release Kaggle GPU before next dispatch
-                poll_ceiling = 900 if is_short else 4500  # 15m max for Shorts, 75m max for Docs
+                # Wait up to 30 mins for Short prepare_session to complete and release Kaggle GPU
+                poll_ceiling = 1800  # 30m max per Short
                 dispatched_run_id = find_latest_dispatched_run(gh_bin)
                 if dispatched_run_id:
-                    wait_for_prepare_session_completion(gh_bin, dispatched_run_id, is_short=is_short, timeout_sec=poll_ceiling)
+                    wait_for_prepare_session_completion(gh_bin, dispatched_run_id, is_short=True, timeout_sec=poll_ceiling)
                 else:
                     logger.warning("Could not identify dispatched run ID. Applying 120s safety buffer...")
                     time.sleep(120)
             except Exception as e:
-                logger.error(f"Failed to dispatch {item['type']} {topic}: {e}")
+                logger.error(f"Failed to dispatch Short {topic}: {e}")
+
+    print("\n" + "=" * 70)
+    print("🎬 PHASE 2: ALL 10 SHORTS COMPLETE. DISPATCHING 2 MASTER DOCUMENTARIES (>12 MIN)")
+    print("=" * 70)
+
+    for item in docs_queue:
+        data = item["data"]
+        topic = data["title"]
+        vertical = data.get("vertical", "stock_market")
+        publish_at = item["publish_at"]
+
+        print(f"\n[Doc {item['num']:02d}/02] 🎬 Dispatching Master Documentary (16:9, 12-Min Masterclass): {topic} (Scheduled: {publish_at} UTC)")
+        cmd = [
+            gh_bin, "workflow", "run",
+            "parallel_video_matrix.yml",
+            "-f", f"topic={topic}",
+            "-f", f"vertical={vertical}",
+            "-f", "shorts_only=false",
+            "-f", "duration_min=12",
+            "-f", "privacy_status=private",
+            "-f", f"publish_at={publish_at}"
+        ]
+
+        if not dry_run:
+            try:
+                res = subprocess.run(cmd, check=True, stdin=subprocess.DEVNULL, capture_output=True, text=True)
+                logger.success(f"✓ Dispatched Doc {item['num']}: {topic[:40]}... (PublishAt: {publish_at})")
+
+                # Wait up to 60 mins for Documentary prepare_session to release Kaggle GPU
+                poll_ceiling = 3600  # 60m max per Doc
+                dispatched_run_id = find_latest_dispatched_run(gh_bin)
+                if dispatched_run_id:
+                    wait_for_prepare_session_completion(gh_bin, dispatched_run_id, is_short=False, timeout_sec=poll_ceiling)
+                else:
+                    logger.warning("Could not identify dispatched run ID. Applying 180s safety buffer...")
+                    time.sleep(180)
+            except Exception as e:
+                logger.error(f"Failed to dispatch Doc {topic}: {e}")
 
     print("\n" + "=" * 70)
     print("🎉 ALL 12 CLOUD PRODUCTIONS SUCCESSFULLY DISPATCHED!")
