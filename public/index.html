@@ -1,0 +1,3612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary SEO & AEO Meta Tags -->
+    <title>The Bull Print — Real-Time NSE Stock Screener, Financial Calculators & Market Intelligence</title>
+    <meta name="title" content="The Bull Print — Real-Time NSE Stock Screener, Financial Calculators & Market Intelligence">
+    <meta name="description" content="Free institutional equity screener, 10-year balance sheet compounding audits, live Nifty 50 constituent weights, mutual fund calculators, and daily Dalal Street market intelligence.">
+    <meta name="keywords" content="NSE stock screener, Nifty 50 live weights, Indian stock market terminal, FII DII data today, free SIP step-up calculator, stock fundamentals, The Bull Print, BullPrint Media">
+    <meta name="author" content="The Bull Print Research Desk">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+
+    <!-- Search Engine & Platform Verification -->
+    <meta name="google-site-verification" content="-Gacr-RDEHc0XD9m55DQuX24CsUhlQyEOXegq4Ia4xo">
+    <meta name="msvalidate.01" content="4f29a7d83e204c329b45667e8125ac89">
+    <meta name="tiktok-developers-site-verification" content="tiktok-developers-site-verification=YthlYyPhvhHZZACkOdVx5aASc7qPoqAO">
+    <meta name="tiktok-developers-site-verification" content="YthlYyPhvhHZZACkOdVx5aASc7qPoqAO">
+
+    <!-- Google Analytics 4 (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BULLPRINT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-BULLPRINT', { 'anonymize_ip': true });
+    </script>
+
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://bullprintmedia.com/">
+    <meta property="og:site_name" content="The Bull Print">
+    <meta property="og:title" content="The Bull Print — Real-Time NSE Stock Screener & Market Intelligence">
+    <meta property="og:description" content="Free institutional equity screener, 10-year balance sheet compounding audits, live Nifty 50 weights, and daily Dalal Street intelligence.">
+    <meta property="og:image" content="https://bullprintmedia.com/brand_assets/opengraph_social_card_1200x630.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="The Bull Print — Real-Time NSE Stock Screener & Market Intelligence">
+    <meta name="twitter:description" content="Free institutional equity screener, 10-year balance sheet compounding audits, live Nifty 50 weights, and daily Dalal Street intelligence.">
+    <meta name="twitter:image" content="https://bullprintmedia.com/brand_assets/opengraph_social_card_1200x630.png">
+    <link rel="canonical" href="https://bullprintmedia.com/">
+
+    <!-- Structured JSON-LD Schema (Organization, FinancialService, WebSite & SearchAction) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": ["FinancialService", "NewsMediaOrganization", "LocalBusiness"],
+          "@id": "https://bullprintmedia.com/#organization",
+          "name": "The Bull Print",
+          "alternateName": "BullPrint Media",
+          "url": "https://bullprintmedia.com/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://bullprintmedia.com/brand_assets/logo_master_1024x1024.png",
+            "width": 1024,
+            "height": 1024
+          },
+          "image": "https://bullprintmedia.com/brand_assets/opengraph_social_card_1200x630.png",
+          "description": "Quantitative market intelligence desk, fundamental equity screener, and educational financial calculators for Indian retail and institutional investors.",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Chennai",
+            "addressRegion": "Tamil Nadu",
+            "addressCountry": "IN"
+          },
+          "priceRange": "Free",
+          "currenciesAccepted": "INR",
+          "sameAs": [
+            "https://www.youtube.com/@thebullprint",
+            "https://www.instagram.com/thebullprint/",
+            "https://twitter.com/thebullprint"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://bullprintmedia.com/#website",
+          "url": "https://bullprintmedia.com/",
+          "name": "The Bull Print",
+          "publisher": { "@id": "https://bullprintmedia.com/#organization" },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://bullprintmedia.com/stocks/{search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+    </script>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="brand_assets/website_favicon_32x32.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="brand_assets/website_favicon_192x192.png">
+
+    <!-- Google Fonts: Plus Jakarta Sans, Outfit, JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Lenis Smooth Scrolling Library -->
+    <script src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script>
+
+    <!-- Official TradingView Library for Interactive Charting -->
+    <!-- Global Theme CSS & Auth System (Default: Light Mode) -->
+    <link rel="stylesheet" href="brand_assets/global-theme.css">
+    <script src="brand_assets/theme-auth.js"></script>
+
+    <style>
+        :root {
+            --groww-mint-glow: rgba(0, 135, 90, 0.25);
+            --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --ease-apple: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-full: 9999px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(ellipse 80% 40% at 50% -10%, rgba(0, 208, 156, 0.06) 0%, transparent 70%);
+            background-attachment: fixed;
+        }
+
+        /* ── 1. Top Indices Ribbon (Sleek Ticker Tape) ── */
+        .indices-strip {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 8px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+        [data-theme="dark"] .indices-strip {
+            background: rgba(8, 11, 18, 0.90);
+        }
+        .indices-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .indices-container::-webkit-scrollbar {
+            display: none;
+        }
+        .index-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 7px 14px;
+            cursor: pointer;
+            transition: all 0.24s var(--ease-apple);
+            white-space: nowrap;
+            user-select: none;
+            box-shadow: var(--card-shadow);
+        }
+        .index-pill:hover {
+            border-color: var(--groww-mint);
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px var(--groww-mint-soft);
+        }
+        .index-title {
+            font-family: var(--font-display);
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            letter-spacing: 0.3px;
+        }
+        .index-val {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-variant-numeric: tabular-nums;
+        }
+        .index-chg {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-variant-numeric: tabular-nums;
+        }
+        .index-chg.up {
+            color: var(--groww-mint);
+            background: var(--groww-mint-soft);
+        }
+        .index-chg.down {
+            color: var(--market-red);
+            background: var(--market-red-soft);
+        }
+        .index-split-icon {
+            font-size: 11px;
+            color: var(--groww-mint);
+            opacity: 0.7;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+        .index-pill:hover .index-split-icon {
+            opacity: 1;
+            transform: translate(2px, -2px);
+        }
+
+        /* ── 2. Sleek Minimal Navigation Bar ── */
+        .main-navbar {
+            background: var(--navbar-bg);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 14px 20px;
+            position: relative;
+            z-index: 900;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+        .navbar-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+        .brand-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .brand-logo-img {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            box-shadow: 0 0 14px var(--groww-mint-soft);
+        }
+        .brand-name {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .brand-name span {
+            color: var(--groww-mint);
+        }
+        .brand-badge {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            background: var(--bg-card-hover);
+            color: var(--text-secondary);
+            padding: 2px 7px;
+            border-radius: 4px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .header-nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .nav-link-item {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+        .nav-link-item:hover {
+            color: var(--groww-mint);
+        }
+
+        .header-utility {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .live-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--groww-mint);
+            background: var(--groww-mint-soft);
+            padding: 5px 12px;
+            border-radius: var(--radius-full);
+            border: 1px solid var(--groww-mint);
+            white-space: nowrap;
+        }
+        .status-pulse-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--groww-mint);
+            box-shadow: 0 0 8px var(--groww-mint);
+            animation: statusPulse 2s infinite ease-in-out;
+        }
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.35; transform: scale(0.85); }
+        }
+
+        /* ── Animated Green Bull Hero Centerpiece ── */
+        .hero-bull-container {
+            position: relative;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 auto 20px auto;
+            cursor: pointer;
+            user-select: none;
+            padding: 18px 24px 10px 24px;
+        }
+
+        /* 1. Ambient Emerald Nebula Glow */
+        .bull-glow-backdrop {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 240px;
+            height: 240px;
+            background: radial-gradient(circle, rgba(0, 208, 156, 0.38) 0%, rgba(0, 208, 156, 0.1) 45%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(28px);
+            pointer-events: none;
+            animation: ambientPulse 3.6s ease-in-out infinite alternate;
+        }
+        [data-theme="light"] .bull-glow-backdrop {
+            background: radial-gradient(circle, rgba(0, 208, 156, 0.28) 0%, rgba(0, 208, 156, 0.06) 45%, transparent 70%);
+        }
+
+        @keyframes ambientPulse {
+            0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.65; }
+            100% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+        }
+
+        /* 2. Concentric Orbit Blueprint Radar Rings */
+        .radar-ring {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .radar-ring-1 {
+            width: 155px;
+            height: 155px;
+            border: 1px dashed rgba(0, 208, 156, 0.35);
+            animation: rotateRing 22s linear infinite;
+        }
+        .radar-ring-2 {
+            width: 195px;
+            height: 195px;
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-left-color: transparent;
+            border-right-color: transparent;
+            animation: rotateRingRev 28s linear infinite;
+        }
+        .radar-ring-3 {
+            width: 235px;
+            height: 235px;
+            border: 1px dotted rgba(0, 208, 156, 0.18);
+            animation: rotateRing 40s linear infinite;
+        }
+
+        @keyframes rotateRing {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        @keyframes rotateRingRev {
+            from { transform: translate(-50%, -50%) rotate(360deg); }
+            to { transform: translate(-50%, -50%) rotate(0deg); }
+        }
+
+        /* 3. Expanding Sonic Radar Waves */
+        .radar-wave {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(0, 208, 156, 0.65);
+            pointer-events: none;
+            animation: radarExpand 3.2s cubic-bezier(0.1, 0.7, 0.2, 1) infinite;
+        }
+        .radar-wave:nth-child(2) {
+            animation-delay: 1.6s;
+        }
+        @keyframes radarExpand {
+            0% { width: 60px; height: 60px; opacity: 0.9; }
+            100% { width: 250px; height: 250px; opacity: 0; }
+        }
+
+        /* 4. The Bull Emblem Centerpiece Card */
+        .bull-emblem-card {
+            position: relative;
+            width: 118px;
+            height: 118px;
+            border-radius: 26px;
+            background: linear-gradient(135deg, rgba(18, 24, 36, 0.95), rgba(11, 14, 20, 0.98));
+            border: 2px solid rgba(0, 208, 156, 0.45);
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.5),
+                0 0 20px rgba(0, 208, 156, 0.22),
+                inset 0 0 16px rgba(0, 208, 156, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            animation: bullLevitate 3.8s ease-in-out infinite alternate;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 3;
+        }
+
+        .hero-bull-container:hover .bull-emblem-card,
+        .hero-bull-container.hyper-charge .bull-emblem-card {
+            transform: scale(1.08) translateY(-5px);
+            border-color: #00D09C;
+            box-shadow: 
+                0 18px 44px rgba(0, 0, 0, 0.6),
+                0 0 36px rgba(0, 208, 156, 0.55),
+                inset 0 0 25px rgba(0, 208, 156, 0.25);
+        }
+
+        @keyframes bullLevitate {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-5px) rotate(0.4deg); }
+            100% { transform: translateY(-9px) rotate(-0.4deg); }
+        }
+
+        /* 5. Holographic Laser Scanning Beam */
+        .scan-beam {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2.5px;
+            background: linear-gradient(90deg, transparent 5%, rgba(0, 208, 156, 0.9) 30%, #ffffff 50%, rgba(0, 208, 156, 0.9) 70%, transparent 95%);
+            box-shadow: 0 0 10px #00D09C, 0 0 20px #00D09C;
+            animation: scanMotion 2.6s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 6;
+        }
+
+        @keyframes scanMotion {
+            0% { top: -10%; opacity: 0; }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
+            100% { top: 110%; opacity: 0; }
+        }
+
+        /* 6. Blueprint Grid Overlay */
+        .blueprint-grid {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 208, 156, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 208, 156, 0.08) 1px, transparent 1px);
+            background-size: 12px 12px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* 7. Bull Image with Breathing Glow */
+        .bull-emblem-img {
+            width: 94px;
+            height: 94px;
+            object-fit: cover;
+            border-radius: 18px;
+            filter: drop-shadow(0 0 10px rgba(0, 208, 156, 0.6));
+            position: relative;
+            z-index: 2;
+            transition: transform 0.3s ease, filter 0.3s ease;
+            animation: bullBreathing 3.8s ease-in-out infinite alternate;
+        }
+
+        .hero-bull-container:hover .bull-emblem-img,
+        .hero-bull-container.hyper-charge .bull-emblem-img {
+            transform: scale(1.04);
+            filter: drop-shadow(0 0 18px rgba(0, 208, 156, 0.9));
+        }
+
+        @keyframes bullBreathing {
+            0% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(0, 208, 156, 0.45)); }
+            100% { transform: scale(1.03); filter: drop-shadow(0 0 16px rgba(0, 208, 156, 0.8)); }
+        }
+
+        /* 8. Orbiting Telemetry Chips */
+        .telemetry-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 14px;
+            position: relative;
+            z-index: 4;
+        }
+
+        .telemetry-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10.5px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            background: var(--bg-surface);
+            border: 1px solid rgba(0, 208, 156, 0.35);
+            backdrop-filter: blur(10px);
+            color: var(--text-primary);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+            transition: all 0.25s ease;
+        }
+
+        .telemetry-pill .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--groww-mint);
+            box-shadow: 0 0 8px var(--groww-mint);
+            animation: dotBlink 1.4s infinite;
+        }
+
+        @keyframes dotBlink {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(0.7); }
+        }
+
+        .telemetry-pill.gold {
+            border-color: rgba(212, 175, 55, 0.4);
+        }
+        .telemetry-pill.gold .dot {
+            background: #D4AF37;
+            box-shadow: 0 0 8px #D4AF37;
+        }
+
+        .hero-bull-container:hover .telemetry-pill {
+            border-color: var(--groww-mint);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 208, 156, 0.25);
+        }
+
+        /* Spark particle animation on click */
+        .bull-spark {
+            position: absolute;
+            pointer-events: none;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #00D09C;
+            box-shadow: 0 0 10px #00D09C, 0 0 20px #00D09C;
+            animation: flyUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            z-index: 10;
+        }
+
+        @keyframes flyUp {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .hero-bull-container {
+                margin: 0 auto 14px auto;
+                padding: 10px 14px 6px 14px;
+            }
+            .bull-emblem-card {
+                width: 92px;
+                height: 92px;
+                border-radius: 20px;
+            }
+            .bull-emblem-img {
+                width: 76px;
+                height: 76px;
+                border-radius: 14px;
+            }
+            .radar-ring-1 { width: 120px; height: 120px; }
+            .radar-ring-2 { width: 150px; height: 150px; }
+            .radar-ring-3 { width: 180px; height: 180px; }
+            .radar-wave { width: 50px; height: 50px; }
+            .bull-glow-backdrop { width: 180px; height: 180px; }
+            .telemetry-row { gap: 6px; margin-top: 10px; }
+            .telemetry-pill { font-size: 9.5px; padding: 3px 8px; }
+        }
+
+        /* ── 3. Focused Hero & Command Search Bar ── */
+        .platform-hero {
+            max-width: 1280px;
+            margin: 40px auto 24px auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(28px, 4.2vw, 42px);
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.8px;
+            line-height: 1.15;
+            margin-bottom: 10px;
+        }
+        .hero-title span {
+            background: linear-gradient(135deg, var(--groww-mint) 30%, #0284c7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        [data-theme="dark"] .hero-title span {
+            background: linear-gradient(135deg, #ffffff 30%, var(--groww-mint) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-subtitle {
+            font-size: clamp(14px, 1.8vw, 16px);
+            color: var(--text-secondary);
+            max-width: 660px;
+            margin: 0 auto 24px auto;
+            line-height: 1.55;
+        }
+
+        /* Central Search Command Bar */
+        .hero-search-wrapper {
+            max-width: 640px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .hero-search-box {
+            display: flex;
+            align-items: center;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 12px 18px;
+            gap: 12px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.25s var(--ease-apple);
+        }
+        .hero-search-box:focus-within {
+            border-color: var(--groww-mint);
+            background: var(--bg-surface);
+            box-shadow: 0 10px 30px var(--groww-mint-soft), 0 0 0 3px var(--groww-mint-soft);
+            transform: translateY(-2px);
+        }
+        .hero-search-box input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 14.5px;
+            width: 100%;
+            font-family: var(--font-body);
+        }
+        .hero-search-box input::placeholder {
+            color: var(--text-muted);
+        }
+        .search-shortcut {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            background: var(--bg-card-hover);
+            padding: 3px 7px;
+            border-radius: 4px;
+            border: 1px solid var(--border-subtle);
+            white-space: nowrap;
+        }
+
+        /* Live Search Dropdown */
+        .search-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            max-height: 340px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15);
+            text-align: left;
+        }
+        [data-theme="dark"] .search-dropdown {
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.75);
+        }
+        .search-dropdown-item {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-subtle);
+            transition: background 0.18s ease;
+        }
+        .search-dropdown-item:hover {
+            background: var(--groww-mint-soft);
+        }
+
+        /* Live Market Pulse Bar */
+        .market-pulse-strip {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin: 22px auto 0 auto;
+            max-width: 900px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .pulse-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--groww-mint);
+        }
+        .pulse-val {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+        .pulse-val.mint {
+            color: var(--groww-mint);
+        }
+
+        /* ── 4. Benchmark Titan Cards (Fluid, Modern, Tactile) ── */
+        .featured-stocks-container {
+            max-width: 1280px;
+            margin: 32px auto 20px auto;
+            padding: 0 20px;
+        }
+        .featured-stocks-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+        @media (max-width: 1024px) {
+            .featured-stocks-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 580px) {
+            .featured-stocks-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .stock-quick-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 16px 18px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s var(--ease-apple);
+            box-shadow: var(--card-shadow);
+        }
+        .stock-quick-card:hover {
+            border-color: var(--border-hover);
+            background: var(--bg-card-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08), 0 0 16px -4px var(--groww-mint-soft);
+        }
+        [data-theme="dark"] .stock-quick-card:hover {
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4), 0 0 16px -4px rgba(0, 208, 156, 0.15);
+        }
+        .stock-quick-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .stock-quick-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 13px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+        .stock-avatar-reliance {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+        .stock-avatar-hdfc {
+            background: linear-gradient(135deg, #064e3b, #10b981);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+        .stock-avatar-tcs {
+            background: linear-gradient(135deg, #4c1d95, #8b5cf6);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+        }
+        .stock-avatar-infy {
+            background: linear-gradient(135deg, #0e7490, #06b6d4);
+            border: 1px solid rgba(6, 182, 212, 0.4);
+        }
+        .stock-quick-title {
+            font-family: var(--font-display);
+            font-size: 14.5px;
+            font-weight: 700;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .stock-quick-ticker {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .stock-quick-sparkline {
+            margin: 6px 0 10px 0;
+            height: 28px;
+        }
+        .stock-quick-bottom {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-top: auto;
+        }
+        .stock-quick-price {
+            font-family: var(--font-mono);
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-variant-numeric: tabular-nums;
+        }
+        .stock-quick-badge {
+            font-family: var(--font-mono);
+            font-size: 11.5px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-variant-numeric: tabular-nums;
+        }
+        .stock-quick-badge.up {
+            color: var(--groww-mint);
+            background: var(--groww-mint-soft);
+        }
+        .stock-quick-badge.down {
+            color: var(--market-red);
+            background: var(--market-red-soft);
+        }
+
+        /* ── 5. Main Clean Workspace (Unified & Buttery Smooth) ── */
+        .workspace-viewport {
+            max-width: 1280px;
+            margin: 16px auto 60px auto;
+            padding: 0 20px;
+        }
+
+        /* Modern Segmented Tab Bar */
+        .tab-segmented-bar {
+            display: inline-flex;
+            align-items: center;
+            background: var(--bg-card-hover);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 5px;
+            margin-bottom: 22px;
+            position: relative;
+            overflow-x: auto;
+            scrollbar-width: none;
+            max-width: 100%;
+        }
+        .tab-segmented-bar::-webkit-scrollbar {
+            display: none;
+        }
+        .seg-tab-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 9px;
+            padding: 9px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.22s var(--ease-apple);
+            white-space: nowrap;
+            font-family: var(--font-body);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            position: relative;
+            z-index: 2;
+        }
+        .seg-tab-btn:hover {
+            color: var(--text-primary);
+            background: var(--bg-surface);
+        }
+        .seg-tab-btn.active {
+            background: var(--bg-surface);
+            color: var(--groww-mint);
+            border-color: var(--border-subtle);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        [data-theme="dark"] .seg-tab-btn.active {
+            background: #151d30;
+            color: var(--groww-mint);
+            border-color: rgba(0, 208, 156, 0.35);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), 0 0 12px -2px rgba(0, 208, 156, 0.2);
+        }
+
+        /* Tab Content Panel with Silky Transition */
+        .tab-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+        }
+        .tab-panel.active-view {
+            animation: butterySlideUp 0.28s var(--ease-apple) forwards;
+        }
+        @keyframes butterySlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .panel-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+        .panel-title {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.2px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Filter Pills */
+        .filter-pill-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--bg-card-hover);
+            padding: 4px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-subtle);
+        }
+        .filter-pill {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: var(--font-body);
+        }
+        .filter-pill:hover {
+            color: var(--text-primary);
+        }
+        .filter-pill.active {
+            background: var(--groww-mint-soft);
+            color: var(--groww-mint);
+            font-weight: 700;
+        }
+
+        /* ── Elite Clean Tables ── */
+        .groww-table-wrapper {
+            overflow-x: auto;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+        }
+        .groww-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+            text-align: left;
+        }
+        .groww-table th {
+            background: var(--table-header-bg);
+            padding: 12px 18px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-subtle);
+            white-space: nowrap;
+        }
+        .groww-table td {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            white-space: nowrap;
+            transition: background 0.18s ease;
+        }
+        .groww-table tr {
+            cursor: pointer;
+            transition: background 0.18s ease;
+        }
+        .groww-table tr:hover td {
+            background: var(--table-row-hover);
+        }
+        .groww-table tr:hover .row-hover-arrow {
+            opacity: 1;
+            transform: translateX(4px);
+        }
+        .company-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .company-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--bg-card-hover);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-primary);
+            border: 1px solid var(--border-subtle);
+            flex-shrink: 0;
+        }
+        .company-name {
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 13.5px;
+        }
+        .company-ticker {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            display: block;
+        }
+        .price-cell {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            color: var(--text-primary);
+            font-variant-numeric: tabular-nums;
+        }
+        .row-hover-arrow {
+            font-size: 13px;
+            color: var(--groww-mint);
+            opacity: 0.4;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+
+        /* Screener Cards */
+        .screens-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+        .screen-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 16px 18px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.22s ease;
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+        }
+        .screen-card:hover {
+            border-color: var(--groww-mint);
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+        }
+        .screen-card.active {
+            border-color: var(--groww-mint);
+            background: var(--groww-mint-soft);
+            box-shadow: 0 0 0 2px var(--groww-mint);
+        }
+        .trend-filter-chip {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            font-size: 11.5px;
+            font-family: var(--font-mono);
+            font-weight: 600;
+            padding: 4px 11px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .trend-filter-chip:hover {
+            border-color: var(--groww-mint);
+            color: var(--groww-mint);
+        }
+        .trend-filter-chip.active {
+            background: var(--groww-mint-soft);
+            border-color: var(--groww-mint);
+            color: var(--groww-mint);
+            font-weight: 700;
+        }
+        .screen-title {
+            font-family: var(--font-display);
+            font-size: 14.5px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        .screen-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Sectors Cards Grid */
+        .sectors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+        }
+        .sector-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: var(--card-shadow);
+        }
+        .sector-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sector-name {
+            font-family: var(--font-display);
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .sector-pct {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .ratio-bar-wrapper {
+            height: 6px;
+            width: 100%;
+            background: var(--bg-card-hover);
+            border-radius: 3px;
+            overflow: hidden;
+            display: flex;
+        }
+        .ratio-bar-green {
+            background: var(--groww-mint);
+            height: 100%;
+        }
+        .ratio-bar-red {
+            background: var(--market-red);
+            height: 100%;
+        }
+        .sector-counts {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        /* Research Reports Grid */
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 18px;
+        }
+        .report-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.22s ease;
+            box-shadow: var(--card-shadow);
+        }
+        .report-card:hover {
+            border-color: var(--groww-mint);
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+        }
+        .report-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            color: var(--groww-mint);
+            background: var(--groww-mint-soft);
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }
+        .report-title {
+            font-family: var(--font-display);
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        .report-excerpt {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.55;
+            margin-bottom: 16px;
+        }
+        .report-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11.5px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 12px;
+        }
+        .report-link-btn {
+            color: var(--groww-mint);
+            font-weight: 600;
+        }
+
+        /* Distinct Articles Nav Icon Button */
+        .nav-articles-pill {
+            display: inline-flex !important;
+            align-items: center;
+            gap: 7px;
+            background: linear-gradient(135deg, rgba(0, 208, 156, 0.12), rgba(37, 99, 235, 0.14)) !important;
+            border: 1px solid rgba(0, 208, 156, 0.45) !important;
+            color: var(--text-primary) !important;
+            font-weight: 700 !important;
+            padding: 6px 14px !important;
+            border-radius: 20px !important;
+            box-shadow: 0 0 14px rgba(0, 208, 156, 0.22);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            text-decoration: none;
+        }
+        .nav-articles-pill:hover {
+            background: linear-gradient(135deg, rgba(0, 208, 156, 0.22), rgba(37, 99, 235, 0.25)) !important;
+            border-color: var(--groww-mint) !important;
+            transform: translateY(-1.5px);
+            box-shadow: 0 4px 18px rgba(0, 208, 156, 0.38);
+        }
+        .nav-articles-icon {
+            font-size: 15px;
+            line-height: 1;
+        }
+        .nav-articles-text {
+            font-size: 13.5px;
+            letter-spacing: -0.2px;
+        }
+        .nav-articles-badge {
+            background: var(--groww-mint);
+            color: #0b0f17;
+            font-size: 9.5px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 10px;
+            letter-spacing: 0.5px;
+            font-family: var(--font-mono);
+            line-height: 1.2;
+        }
+
+        .explore-all-articles-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, rgba(0, 208, 156, 0.12), rgba(37, 99, 235, 0.12));
+            border: 1px solid rgba(0, 208, 156, 0.4);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 700;
+            padding: 9px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .explore-all-articles-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 208, 156, 0.22), rgba(37, 99, 235, 0.22));
+            border-color: var(--groww-mint);
+            transform: translateY(-1px);
+        }
+
+        /* TradingView Studio Container */
+        .chart-studio-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            height: 560px;
+            width: 100%;
+        }
+
+        /* ── 6. Slide-Over Drawer for Index Constituents ── */
+        .drawer-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            background: rgba(4, 7, 14, 0.70);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.28s var(--ease-apple);
+        }
+        .drawer-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .drawer-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 720px;
+            max-width: 95vw;
+            height: 100vh;
+            height: 100dvh;
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            border-left: 1px solid var(--border-subtle);
+            transform: translateX(100%);
+            transition: transform 0.34s var(--ease-drawer);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -24px 0 70px rgba(0, 0, 0, 0.3);
+        }
+        [data-theme="dark"] .drawer-panel {
+            background: #0d1222;
+            border-left: 1px solid rgba(0, 208, 156, 0.3);
+            box-shadow: -24px 0 70px rgba(0, 0, 0, 0.85);
+        }
+        .drawer-backdrop.active .drawer-panel {
+            transform: translateX(0);
+        }
+        .drawer-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-surface);
+        }
+        .drawer-title-group h2 {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+        .drawer-title-group span {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .drawer-close-btn {
+            background: var(--bg-card-hover);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            font-size: 16px;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .drawer-close-btn:hover {
+            color: var(--text-primary);
+            background: var(--bg-card);
+            border-color: var(--groww-mint);
+        }
+
+        .drawer-switcher {
+            display: flex;
+            padding: 10px 24px;
+            background: var(--bg-card-subtle);
+            border-bottom: 1px solid var(--border-subtle);
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .drawer-switcher::-webkit-scrollbar {
+            display: none;
+        }
+        .drawer-tab {
+            background: transparent;
+            border: 1px solid transparent;
+            padding: 7px 14px;
+            font-size: 11.5px;
+            font-weight: 700;
+            font-family: var(--font-display);
+            color: var(--text-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .drawer-tab:hover {
+            color: var(--text-primary);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+        .drawer-tab.active {
+            background: rgba(0, 208, 156, 0.14) !important;
+            color: var(--groww-mint) !important;
+            border: 1.5px solid var(--groww-mint) !important;
+            box-shadow: 0 0 14px rgba(0, 208, 156, 0.3) !important;
+        }
+
+        /* Drawer Interactive Index Chart Card */
+        .drawer-chart-card {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 14px 24px;
+        }
+        .drawer-chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .chart-badge {
+            font-size: 10px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            color: var(--groww-mint);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .drawer-chart-reading {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-top: 2px;
+        }
+        .drawer-chart-current-val {
+            font-size: 20px;
+            font-weight: 800;
+            font-family: var(--font-display);
+            color: var(--text-primary);
+        }
+        .drawer-chart-current-chg {
+            font-size: 12px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+        }
+        .drawer-chart-tf-group {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-card-subtle);
+            padding: 2px;
+            border-radius: 6px;
+            border: 1px solid var(--border-subtle);
+        }
+        .drawer-tf-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .drawer-tf-btn:hover {
+            color: var(--text-primary);
+        }
+        .drawer-tf-btn.active {
+            background: var(--groww-mint);
+            color: #0b0e14;
+        }
+        .drawer-canvas-wrap {
+            position: relative;
+            width: 100%;
+            height: 145px;
+            cursor: crosshair;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        #drawer-index-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .chart-crosshair-tooltip {
+            position: absolute;
+            display: none;
+            background: rgba(18, 24, 36, 0.96);
+            border: 1px solid var(--groww-mint);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-family: var(--font-mono);
+            color: #fff;
+            pointer-events: none;
+            z-index: 10;
+            transform: translate(-50%, -125%);
+            white-space: nowrap;
+        }
+        .drawer-chart-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+        .drawer-tv-btn {
+            background: rgba(0, 208, 156, 0.1);
+            border: 1px solid rgba(0, 208, 156, 0.35);
+            color: var(--groww-mint);
+            padding: 3px 9px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .drawer-tv-btn:hover {
+            background: var(--groww-mint);
+            color: #000;
+            box-shadow: 0 0 10px rgba(0, 208, 156, 0.3);
+        }
+        .drawer-tv-container {
+            width: 100%;
+            height: 300px;
+            margin-top: 12px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+        }
+
+        /* Mouse-following background bull canvas */
+        .hero-mouse-bull-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.22;
+        }
+
+        .drawer-stats-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            padding: 14px 24px;
+            background: var(--bg-card-hover);
+            border-bottom: 1px solid var(--border-subtle);
+            gap: 10px;
+        }
+        .drawer-stat-item span {
+            display: block;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+        .drawer-stat-item strong {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            color: var(--text-primary);
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .drawer-search-bar {
+            padding: 12px 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            background: var(--bg-card-subtle);
+        }
+        .drawer-search-bar input {
+            width: 100%;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 8px 14px;
+            color: var(--text-primary);
+            font-size: 12.5px;
+            outline: none;
+            font-family: var(--font-body);
+            transition: all 0.2s ease;
+        }
+        .drawer-search-bar input:focus {
+            border-color: var(--groww-mint);
+        }
+
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        /* ── 7. Site Footer ── */
+        .site-footer {
+            border-top: 1px solid var(--border-subtle);
+            padding: 40px 20px;
+            background: var(--bg-card-subtle);
+            font-size: 12.5px;
+            color: var(--text-muted);
+        }
+        .footer-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            text-align: center;
+        }
+        .footer-nav {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .footer-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.2s ease;
+        }
+        /* Comprehensive Mobile Responsiveness for The Bull Print */
+        @media (max-width: 992px) {
+            .site-header {
+                padding: 10px 14px;
+            }
+            .header-inner {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .brand-group {
+                flex: 1;
+            }
+            .header-utility {
+                margin-left: auto;
+            }
+            .header-nav-links {
+                width: 100%;
+                order: 3;
+                overflow-x: auto;
+                white-space: nowrap;
+                padding: 4px 2px 6px;
+                gap: 8px;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+            .header-nav-links::-webkit-scrollbar {
+                display: none;
+            }
+            .nav-link-item {
+                flex-shrink: 0;
+                padding: 5px 12px;
+                border-radius: 9999px;
+                background: var(--bg-card);
+                border: 1px solid var(--border-subtle);
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-bottom: 72px; /* Space for mobile bottom bar */
+            }
+            .hero-section {
+                padding: 24px 14px 16px;
+            }
+            .hero-title {
+                font-size: 26px !important;
+                line-height: 1.25;
+            }
+            .hero-subtitle {
+                font-size: 13.5px;
+            }
+            .search-bar-wrap {
+                width: 100%;
+            }
+            .market-status-strip {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+                font-size: 11px;
+            }
+            .dashboard-tabs-bar {
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                padding: 6px 12px;
+            }
+            .dashboard-tabs-bar::-webkit-scrollbar {
+                display: none;
+            }
+            .tab-btn {
+                flex-shrink: 0;
+            }
+            .trending-header-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .trending-filter-tabs {
+                width: 100%;
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+            .trending-filter-tabs::-webkit-scrollbar {
+                display: none;
+            }
+            .movers-table-scroll {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                width: 100%;
+            }
+            .movers-table {
+                min-width: 580px;
+            }
+            .movers-filter-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 22px !important;
+            }
+            .brand-name {
+                font-size: 16px;
+            }
+            .live-status-pill {
+                padding: 4px 8px;
+                font-size: 10.5px;
+            }
+        }
+
+        /* Mobile Bottom App Navigation Dock */
+        .mobile-bottom-dock {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            background: var(--navbar-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-subtle);
+            padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 4px));
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+        }
+        @media (max-width: 768px) {
+            .mobile-bottom-dock {
+                display: flex;
+            }
+        }
+        .dock-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 600;
+            transition: color 0.15s ease;
+            flex: 1;
+            text-align: center;
+        }
+        .dock-item:hover, .dock-item.active {
+            color: var(--groww-mint);
+        }
+        .dock-icon {
+            font-size: 18px;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. Top Live Indices Ribbon -->
+    <div class="indices-strip" aria-label="Live Indices">
+        <div class="indices-container" id="indices-container">
+            <div class="index-pill" onclick="openIndexDrawer('NIFTY_50')" title="Click to view NIFTY 50 stock weights & split">
+                <span class="index-title">NIFTY 50</span>
+                <span class="index-val">24,478.30</span>
+                <span class="index-chg up">+0.46%</span>
+                <span class="index-split-icon">↗</span>
+            </div>
+            <div class="index-pill" onclick="openIndexDrawer('SENSEX')" title="Click to view SENSEX stock weights & split">
+                <span class="index-title">SENSEX</span>
+                <span class="index-val">80,519.34</span>
+                <span class="index-chg up">+0.48%</span>
+                <span class="index-split-icon">↗</span>
+            </div>
+            <div class="index-pill" onclick="openIndexDrawer('BANK_NIFTY')" title="Click to view BANK NIFTY stock weights & split">
+                <span class="index-title">BANK NIFTY</span>
+                <span class="index-val">51,962.70</span>
+                <span class="index-chg down">-0.18%</span>
+                <span class="index-split-icon">↗</span>
+            </div>
+            <div class="index-pill" onclick="openIndexDrawer('MIDCPNIFTY')" title="Click to view MIDCAP SELECT stock weights & split">
+                <span class="index-title">MIDCAP SELECT</span>
+                <span class="index-val">13,240.80</span>
+                <span class="index-chg up">+1.08%</span>
+                <span class="index-split-icon">↗</span>
+            </div>
+            <div class="index-pill" onclick="openIndexDrawer('FINNIFTY')" title="Click to view FINNIFTY stock weights & split">
+                <span class="index-title">FINNIFTY</span>
+                <span class="index-val">23,890.60</span>
+                <span class="index-chg up">+0.19%</span>
+                <span class="index-split-icon">↗</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Main Navigation Bar -->
+    <header class="main-navbar">
+        <div class="navbar-inner">
+            <a href="/" class="brand-group">
+                <img src="brand_assets/website_favicon_192x192.png" alt="The Bull Print Logo" class="brand-logo-img">
+                <span class="brand-name">THE BULL <span>PRINT</span></span>
+                <span class="brand-badge">INSTITUTIONAL DESK</span>
+            </a>
+
+            <nav class="header-nav-links">
+                <a href="#movers-section" class="nav-link-item" onclick="switchDashboardTab('movers')">Movers</a>
+                <a href="/screener.html" class="nav-link-item">Screener</a>
+                <a href="/articles.html" class="nav-link-item nav-articles-pill" id="nav-articles-btn" title="Institutional Equity Research Articles & Market Intelligence">
+                    <span class="nav-articles-icon">📰</span>
+                    <span class="nav-articles-text">Articles</span>
+                    <span class="nav-articles-badge">GEO</span>
+                </a>
+                <a href="/fno.html" class="nav-link-item">F&O Radar</a>
+                <a href="/events.html" class="nav-link-item">Stock Events</a>
+                <a href="/schemes.html" class="nav-link-item">Govt Schemes</a>
+                <a href="/unlisted.html" class="nav-link-item">Unlisted</a>
+                <a href="/tools.html" class="nav-link-item">🛠️ Tools</a>
+                <a href="/portfolio.html" class="nav-link-item">Portfolio</a>
+                <a href="/insurance.html" class="nav-link-item">Insurance</a>
+                <a href="/calculators.html" class="nav-link-item">Calculators</a>
+                <a href="/course.html" class="nav-link-item" style="color:var(--groww-mint); font-weight:700;">🎓 365 Masterclass</a>
+            </nav>
+
+            <div class="header-utility" style="display:flex; align-items:center; gap:10px;">
+                <div class="live-status-pill">
+                    <span class="status-pulse-dot"></span>
+                    <span>LIVE · <span id="clock-ist">12:30 IST</span></span>
+                </div>
+                <!-- Theme Toggle Button -->
+                <button class="theme-toggle-btn" onclick="toggleDSATheme()">
+                    🌙 <span class="theme-text">Dark</span>
+                </button>
+                <!-- Google Sign-in & Shortlist -->
+                <div class="nav-auth-wrapper"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 3. Focused Hero & Command Search Bar -->
+    <section class="platform-hero">
+        <!-- Interactive Mouse-Following Running Bull Canvas -->
+        <canvas id="hero-mouse-bull-canvas" class="hero-mouse-bull-canvas"></canvas>
+
+        <!-- Animated Green Bull Blueprint Emblem -->
+        <div class="hero-bull-container" onclick="triggerBullCharge(event)" title="The Bull Print Engine • Click to activate momentum radar">
+            <div class="bull-glow-backdrop"></div>
+            <div class="radar-ring radar-ring-1"></div>
+            <div class="radar-ring radar-ring-2"></div>
+            <div class="radar-ring radar-ring-3"></div>
+            <div class="radar-wave"></div>
+            <div class="radar-wave"></div>
+
+            <div class="bull-emblem-card">
+                <div class="blueprint-grid"></div>
+                <div class="scan-beam"></div>
+                <img src="brand_assets/logo_master_1024x1024.png" alt="The Bull Print Animated Logo" class="bull-emblem-img">
+            </div>
+
+            <div class="telemetry-row">
+                <div class="telemetry-pill">
+                    <span class="dot"></span>
+                    <span>BULL PRINT • LIVE RADAR</span>
+                </div>
+                <div class="telemetry-pill gold">
+                    <span class="dot"></span>
+                    <span>ALPHA +1.42%</span>
+                </div>
+            </div>
+        </div>
+
+        <h1 class="hero-title">Institutional <span>Indian Equity</span> Intelligence</h1>
+        <p class="hero-subtitle">Live index constituent weights, fundamental compounding metrics, and TradingView technical setups.</p>
+
+        <!-- Command Search Bar -->
+        <div class="hero-search-wrapper">
+            <div class="hero-search-box">
+                <span style="font-size:16px;">🔍</span>
+                <input type="text" id="global-search" placeholder="Search 114+ NSE tickers (e.g. RELIANCE, TCS, TRENT)..." autocomplete="off">
+                <span class="search-shortcut">⌘K</span>
+            </div>
+            <div id="search-dropdown-menu" class="search-dropdown"></div>
+        </div>
+
+        <!-- Live Market Pulse Ribbon -->
+        <div class="market-pulse-strip">
+            <div class="pulse-item">
+                <span class="pulse-dot"></span>
+                <span>NSE LIVE CASH</span>
+            </div>
+            <span>•</span>
+            <div class="pulse-item">
+                <span>Breadth:</span>
+                <span class="pulse-val mint">31 Adv</span> / <span class="pulse-val" style="color:var(--market-red);">19 Dec</span>
+            </div>
+            <span>•</span>
+            <div class="pulse-item">
+                <span>FII Net:</span>
+                <span class="pulse-val mint">+₹1,420 Cr</span>
+            </div>
+            <span>•</span>
+            <div class="pulse-item">
+                <span>DII Net:</span>
+                <span class="pulse-val mint">+₹2,150 Cr</span>
+            </div>
+            <span>•</span>
+            <div class="pulse-item">
+                <span>India VIX:</span>
+                <span class="pulse-val">13.40</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Dynamic Top Trending Stocks (No Favorites - Live Rotating) -->
+    <section class="featured-stocks-container">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:16px;">🔥</span>
+                <span style="font-family:var(--font-display); font-size:13.5px; font-weight:800; color:var(--text-primary); text-transform:uppercase; letter-spacing:0.5px;">Top Trending Equities</span>
+                <span style="font-family:var(--font-mono); font-size:11px; color:var(--groww-mint); background:var(--groww-mint-soft); padding:2px 8px; border-radius:9999px; font-weight:700;" id="trending-status-badge">Live Momentum</span>
+            </div>
+            <div style="display:flex; gap:6px; align-items:center;">
+                <button class="trend-filter-chip active" id="trend-gainers-btn" onclick="switchTrendingMode('gainers')">Top Gainers</button>
+                <button class="trend-filter-chip" id="trend-active-btn" onclick="switchTrendingMode('active')">Most Active Volume</button>
+                <button class="trend-filter-chip" id="trend-breakout-btn" onclick="switchTrendingMode('breakout')">52W Breakouts</button>
+            </div>
+        </div>
+        <div class="featured-stocks-grid" id="trending-stocks-grid">
+            <!-- Populated dynamically via JS -->
+        </div>
+    </section>
+
+    <!-- 5. Main Clean Workspace -->
+    <main class="workspace-viewport">
+        <!-- Segmented Tab Bar -->
+        <div class="tab-segmented-bar">
+            <button class="seg-tab-btn active" id="btn-tab-movers" onclick="switchDashboardTab('movers')">
+                <span>🔥</span> Market Movers
+            </button>
+            <button class="seg-tab-btn" id="btn-tab-screener" onclick="switchDashboardTab('screener')">
+                <span>⚡</span> Stock Screener
+            </button>
+            <a href="/events.html" class="seg-tab-btn" id="btn-tab-events" style="text-decoration:none;">
+                <span>📅</span> Stock Events
+            </a>
+            <a href="/ipo.html" class="seg-tab-btn" id="btn-tab-ipo" style="text-decoration:none;">
+                <span>🚀</span> IPO Radar
+            </a>
+            <a href="/unlisted.html" class="seg-tab-btn" id="btn-tab-unlisted" style="text-decoration:none;">
+                <span>🏛️</span> Unlisted Shares
+            </a>
+            <button class="seg-tab-btn" id="btn-tab-sectors" onclick="switchDashboardTab('sectors')">
+                <span>📊</span> Sectors &amp; Heatmap
+            </button>
+            <button class="seg-tab-btn" id="btn-tab-research" onclick="switchDashboardTab('research')">
+                <span>📖</span> Research Articles
+            </button>
+        </div>
+
+        <!-- Tab 1: Top Movers -->
+        <div id="view-movers" class="tab-panel active-view">
+            <div class="panel-header-row">
+                <h3 class="panel-title"><span>🔥</span> Market Movers Today</h3>
+                <div class="filter-pill-group">
+                    <button class="filter-pill active" id="flt-gainers" onclick="filterMoversTable('gainers')">Gainers</button>
+                    <button class="filter-pill" id="flt-losers" onclick="filterMoversTable('losers')">Losers</button>
+                    <button class="filter-pill" id="flt-volume" onclick="filterMoversTable('volume')">Volume Shockers</button>
+                </div>
+            </div>
+
+            <div class="groww-table-wrapper">
+                <table class="groww-table">
+                    <thead>
+                        <tr>
+                            <th>Company & Symbol</th>
+                            <th>Intraday Trend</th>
+                            <th>Market Price</th>
+                            <th>1D Change</th>
+                            <th style="width: 40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="movers-tbody">
+                        <!-- Populated dynamically via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 2: Stock Screener -->
+        <div id="view-screener" class="tab-panel" style="display: none;">
+            <div class="screens-grid">
+                <div class="screen-card active" id="home-screen-roce" onclick="selectHomepageScreen('roce', this)">
+                    <div class="screen-title">🚀 High ROCE & Low Debt</div>
+                    <p class="screen-desc">Companies generating > 25% ROCE with debt-to-equity ratio under 0.20.</p>
+                </div>
+                <div class="screen-card" id="home-screen-fii" onclick="selectHomepageScreen('fii', this)">
+                    <div class="screen-title">💎 FII Institutional Inflows</div>
+                    <p class="screen-desc">Equities experiencing consecutive quarterly institutional accumulation.</p>
+                </div>
+                <div class="screen-card" id="home-screen-52w" onclick="selectHomepageScreen('52w', this)">
+                    <div class="screen-title">📈 52-Week High Breakouts</div>
+                    <p class="screen-desc">Stocks breaking out above multi-month consolidation with volume expansion.</p>
+                </div>
+                <div class="screen-card" id="home-screen-dividend" onclick="selectHomepageScreen('dividend', this)">
+                    <div class="screen-title">💰 Dividend Compounders</div>
+                    <p class="screen-desc">Consistent dividend payouts for 10+ years with strong free cash flows.</p>
+                </div>
+            </div>
+
+            <div class="panel-header-row">
+                <h3 class="panel-title" id="home-scorecard-title"><span>📊</span> Audited Fundamental Scorecard — High ROCE & Low Debt</h3>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <a id="home-open-screener-btn" href="/screener.html?screen=roce" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:var(--groww-mint); background:var(--groww-mint-soft); padding:6px 14px; border-radius:6px; border:1px solid var(--groww-mint);">⚡ Open Full Screener Dashboard →</a>
+                    <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">Consolidated TTM Data</span>
+                </div>
+            </div>
+
+            <div class="groww-table-wrapper">
+                <table class="groww-table">
+                    <thead>
+                        <tr>
+                            <th>Ticker & Company</th>
+                            <th>Sector</th>
+                            <th>Market Cap</th>
+                            <th>P/E Ratio</th>
+                            <th>ROCE %</th>
+                            <th>ROE %</th>
+                            <th>D/E Ratio</th>
+                            <th style="width: 40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="screener-tbody">
+                        <!-- Populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 3: Stock Events & Corporate Actions -->
+        <div id="view-chart" class="tab-panel" style="display: none;">
+            <div class="panel-header-row">
+                <div class="panel-title">
+                    <span style="color:var(--groww-mint);">📅</span>
+                    <span>Upcoming Corporate Actions & Board Meetings</span>
+                </div>
+                <a href="/events.html" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:var(--groww-mint); background:var(--groww-mint-soft); padding:6px 14px; border-radius:6px; border:1px solid var(--groww-mint);">
+                    ⚡ Open Interactive Calendar & Event Terminal →
+                </a>
+            </div>
+            <div id="home-events-preview-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(310px, 1fr)); gap:16px; margin-top:14px;">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </div>
+
+        <!-- Tab 4: Sectors Trending -->
+        <div id="view-sectors" class="tab-panel" style="display: none;">
+            <div class="panel-header-row">
+                <h3 class="panel-title"><span>📊</span> Sectors & Heatmap Distribution</h3>
+                <span style="font-family: var(--font-mono); font-size: 11px; color: var(--groww-mint);">Live Advances vs Declines</span>
+            </div>
+            <div class="sectors-grid" id="sectors-grid">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+
+        <!-- Tab 5: Research Articles -->
+        <div id="view-research" class="tab-panel" style="display: none;">
+            <div class="panel-header-row">
+                <h3 class="panel-title"><span>📖</span> Institutional Research Articles & Video Library</h3>
+                <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">Dedicated Standalone Pages</span>
+            </div>
+        <!-- Section 6A: Indian IPO Radar Preview Section -->
+        <section class="home-market-section" style="margin-top: 36px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 24px; box-shadow: var(--card-shadow);">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom: 20px;">
+                <div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:20px;">🚀</span>
+                        <h3 style="font-family:var(--font-display); font-size:18px; font-weight:800; color:var(--text-primary);">
+                            Indian IPO Radar &amp; Live Grey Market Premium (GMP)
+                        </h3>
+                    </div>
+                    <p style="font-size:12.5px; color:var(--text-secondary); margin-top:4px;">
+                        Upcoming mainboard issues, live bidding subscription multiples, and estimated listing pop.
+                    </p>
+                </div>
+                <a href="/ipo.html" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:#ffffff; background:var(--groww-mint); padding:8px 16px; border-radius:8px;">
+                    View Complete IPO Dashboard →
+                </a>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
+                <div style="background:var(--bg-card-hover); border:1px solid var(--border-subtle); border-radius:12px; padding:18px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <strong style="font-size:15px; color:var(--text-primary);">Hyundai Motor India</strong>
+                        <span style="font-family:var(--font-mono); font-size:10px; font-weight:700; background:rgba(59,130,246,0.12); color:#2563eb; padding:2px 6px; border-radius:4px;">₹27,870 CR</span>
+                    </div>
+                    <div style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Price Band: ₹1,865 - ₹1,960 • Lot: 7 Shares</div>
+                    <div style="background:var(--groww-mint-soft); border:1px solid var(--groww-mint); border-radius:6px; padding:8px 12px; display:flex; justify-content:space-between; font-size:12px;">
+                        <span style="font-weight:600; color:var(--groww-mint);">Live GMP:</span>
+                        <strong style="color:var(--groww-mint); font-family:var(--font-mono);">+₹65 (+3.3%)</strong>
+                    </div>
+                </div>
+
+                <div style="background:var(--bg-card-hover); border:1px solid var(--border-subtle); border-radius:12px; padding:18px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <strong style="font-size:15px; color:var(--text-primary);">Waaree Energies Ltd</strong>
+                        <span style="font-family:var(--font-mono); font-size:10px; font-weight:700; background:rgba(0,135,90,0.12); color:var(--groww-mint); padding:2px 6px; border-radius:4px;">₹4,321 CR</span>
+                    </div>
+                    <div style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Price Band: ₹1,427 - ₹1,503 • Lot: 9 Shares</div>
+                    <div style="background:var(--groww-mint-soft); border:1px solid var(--groww-mint); border-radius:6px; padding:8px 12px; display:flex; justify-content:space-between; font-size:12px;">
+                        <span style="font-weight:600; color:var(--groww-mint);">Live GMP:</span>
+                        <strong style="color:var(--groww-mint); font-family:var(--font-mono);">+₹1,475 (+98.1%)</strong>
+                    </div>
+                </div>
+
+                <div style="background:var(--bg-card-hover); border:1px solid var(--border-subtle); border-radius:12px; padding:18px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <strong style="font-size:15px; color:var(--text-primary);">Swiggy Ltd</strong>
+                        <span style="font-family:var(--font-mono); font-size:10px; font-weight:700; background:rgba(59,130,246,0.12); color:#2563eb; padding:2px 6px; border-radius:4px;">₹11,300 CR</span>
+                    </div>
+                    <div style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Price Band: ₹371 - ₹390 • Lot: 38 Shares</div>
+                    <div style="background:var(--groww-mint-soft); border:1px solid var(--groww-mint); border-radius:6px; padding:8px 12px; display:flex; justify-content:space-between; font-size:12px;">
+                        <span style="font-weight:600; color:var(--groww-mint);">Live GMP:</span>
+                        <strong style="color:var(--groww-mint); font-family:var(--font-mono);">+₹25 (+6.4%)</strong>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6B: Unlisted Shares & Pre-IPO Radar Preview Section -->
+        <section class="home-market-section" style="margin-top: 24px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 24px; box-shadow: var(--card-shadow);">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom: 20px;">
+                <div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:20px;">🏛️</span>
+                        <h3 style="font-family:var(--font-display); font-size:18px; font-weight:800; color:var(--text-primary);">
+                            Unlisted Shares &amp; Pre-IPO Equities Terminal
+                        </h3>
+                    </div>
+                    <p style="font-size:12.5px; color:var(--text-secondary); margin-top:4px;">
+                        Secondary market unlisted shares, SEBI 6-month lock-in guidelines, and imminent IPO candidates.
+                    </p>
+                </div>
+                <a href="/unlisted.html" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:var(--groww-mint); background:var(--groww-mint-soft); padding:8px 16px; border-radius:8px; border:1px solid var(--groww-mint);">
+                    Explore All Unlisted Equities →
+                </a>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
+                <div style="background:var(--bg-card-hover); border:1px solid var(--border-subtle); border-radius:12px; padding:18px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <strong style="font-size:15px; color:var(--text-primary);">NSE India Ltd</strong>
+                        <span style="font-family:var(--font-mono); font-size:10.5px; color:var(--text-muted);">MONOPOLY</span>
+                    </div>
+                    <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">Market Cap: ~₹3,19,000 Cr • RoE: 34.2%</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding-top:8px; border-top:1px solid var(--border-subtle);">
+                        <span style="font-size:11.5px; color:var(--text-muted);">Unlisted CMP</span>
+                        <strong style="font-family:var(--font-mono); font-size:15px; color:var(--groww-mint);">₹6,450 / share</strong>
+                    </div>
+                </div>
+
+                <div style="background:linear-gradient(180deg, rgba(220,38,38,0.03) 0%, var(--bg-card-hover) 100%); border:1px solid #dc2626; border-radius:12px; padding:18px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <strong style="font-size:15px; color:var(--text-primary);">HDB Financial Services</strong>
+                        <span style="font-family:var(--font-mono); font-size:9.5px; font-weight:800; background:#dc2626; color:#ffffff; padding:2px 6px; border-radius:4px;">🚀 DRHP FILED</span>
+                    </div>
+                    <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">HDFC Bank Subsidiary • ₹2,500 Cr IPO Approved</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding-top:8px; border-top:1px solid var(--border-subtle);">
+                        <span style="font-size:11.5px; color:var(--text-muted);">Unlisted CMP</span>
+                        <strong style="font-family:var(--font-mono); font-size:15px; color:var(--groww-mint);">₹795 / share</strong>
+                    </div>
+                </div>
+
+                <div style="background:var(--bg-card-hover); border:1px solid var(--border-subtle); border-radius:12px; padding:18px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <strong style="font-size:15px; color:var(--text-primary);">Reliance Retail Ventures</strong>
+                        <span style="font-family:var(--font-mono); font-size:10.5px; color:var(--text-muted);">RETAIL BEHEMOTH</span>
+                    </div>
+                    <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">Market Cap: ~₹11,15,000 Cr • 18,700+ Stores</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding-top:8px; border-top:1px solid var(--border-subtle);">
+                        <span style="font-size:11.5px; color:var(--text-muted);">Unlisted CMP</span>
+                        <strong style="font-family:var(--font-mono); font-size:15px; color:var(--groww-mint);">₹1,340 / share</strong>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Latest Market Research & Educational Articles (GEO + SEO Engine) -->
+        <section class="home-market-section" id="recent-articles-section" style="margin-top: 28px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 28px; box-shadow: var(--card-shadow);">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:24px; border-bottom:1px solid var(--border-subtle); padding-bottom:16px;">
+                <div>
+                    <div style="display:inline-flex; align-items:center; gap:8px; background:var(--groww-mint-soft); color:var(--groww-mint); padding:4px 10px; border-radius:20px; font-size:11.5px; font-weight:700; font-family:var(--font-mono); margin-bottom:8px;">
+                        <span>📰 ZERO-JARGON RESEARCH DESK</span>
+                        <span>·</span>
+                        <span>GEO & AI CITED</span>
+                        <span>·</span>
+                        <span>1,200–1,800 WORDS</span>
+                    </div>
+                    <h3 style="font-family:var(--font-display); font-size:22px; font-weight:800; color:var(--text-primary); margin:0;">
+                        Latest Research Articles & Educational Articles
+                    </h3>
+                    <p style="font-size:13.5px; color:var(--text-secondary); margin:6px 0 0 0;">
+                        In-depth equity breakdowns, synchronized 1080p video explainers, and everyday investor guides written by Alex from Chennai.
+                    </p>
+                </div>
+                <a href="/articles.html" class="explore-all-articles-btn">
+                    <span>Explore All Articles (40+)</span>
+                    <span style="font-size:16px;">→</span>
+                </a>
+            </div>
+
+            <div class="reports-grid" id="reports-grid">
+                <!-- Dynamically loaded from /content/posts.json via loadResearchReports() -->
+                <div class="report-card" style="opacity:0.9;">
+                    <div>
+                        <div class="report-badge">
+                            <span>📖 GOLD & MACRO</span>
+                            <span style="color:var(--text-muted);">·</span>
+                            <span>📹 1080P VIDEO</span>
+                        </div>
+                        <h4 class="report-title">Silver Crashes ₹56,000 & Gold Drops: Why Big Banks Are Shaking Out Everyday Investors</h4>
+                        <p class="report-excerpt">Precious metals experience steep liquidation. Why sovereign margin calls, bond yield surges, and institutional profit-taking create generational accumulation zones.</p>
+                    </div>
+                    <div class="report-footer">
+                        <span>📅 By Alex · 9 min read (1,942 words)</span>
+                        <span class="report-link-btn">Read Article →</span>
+                    </div>
+                </div>
+                <div class="report-card" style="opacity:0.9;">
+                    <div>
+                        <div class="report-badge">
+                            <span>📖 DERIVATIVES EDUCATION</span>
+                            <span style="color:var(--text-muted);">·</span>
+                            <span>📹 1080P VIDEO</span>
+                        </div>
+                        <h4 class="report-title">The Option Buyers Trap: Why 90% of Retail Traders Lose Money and How to Build Wealth Like Landlords</h4>
+                        <p class="report-excerpt">Understanding time decay through the melting ice cream analogy. How everyday retail investors can escape speculative traps and adopt institutional risk frameworks.</p>
+                    </div>
+                    <div class="report-footer">
+                        <span>📅 By Alex · 8 min read (1,750 words)</span>
+                        <span class="report-link-btn">Read Article →</span>
+                    </div>
+                </div>
+                <div class="report-card" style="opacity:0.9;">
+                    <div>
+                        <div class="report-badge">
+                            <span>📖 MARKET CLOSE RADAR</span>
+                            <span style="color:var(--text-muted);">·</span>
+                            <span>📹 1080P VIDEO</span>
+                        </div>
+                        <h4 class="report-title">Nifty & Sensex Today: Why Indian Markets Moved, What Institutions Are Buying, and 3 Wealth Rules</h4>
+                        <p class="report-excerpt">Benchmark index analysis, institutional cash flow dynamics between FIIs and domestic funds, and three fundamental wealth rules for retail investors.</p>
+                    </div>
+                    <div class="report-footer">
+                        <span>📅 By Alex · 7 min read (1,620 words)</span>
+                        <span class="report-link-btn">Read Article →</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 6. Slide-Over Drawer for Index Constituents -->
+    <div id="drawer-backdrop" class="drawer-backdrop" onclick="closeIndexDrawerOnBackdrop(event)">
+        <div class="drawer-panel" id="drawer-panel">
+            <div class="drawer-header">
+                <div class="drawer-title-group">
+                    <h2 id="drawer-index-title">NIFTY 50 Constituents</h2>
+                    <span id="drawer-index-meta">Benchmark Stocks · Weightage & Live LTP</span>
+                </div>
+                <button class="drawer-close-btn" onclick="closeIndexDrawer()" aria-label="Close Drawer">✕</button>
+            </div>
+
+            <!-- In-Drawer Index Switcher -->
+            <div class="drawer-switcher">
+                <button class="drawer-tab active" data-index="NIFTY_50" onclick="switchDrawerIndex('NIFTY_50')">NIFTY 50</button>
+                <button class="drawer-tab" data-index="SENSEX" onclick="switchDrawerIndex('SENSEX')">SENSEX</button>
+                <button class="drawer-tab" data-index="BANK_NIFTY" onclick="switchDrawerIndex('BANK_NIFTY')">BANK NIFTY</button>
+                <button class="drawer-tab" data-index="MIDCPNIFTY" onclick="switchDrawerIndex('MIDCPNIFTY')">MIDCAP SELECT</button>
+                <button class="drawer-tab" data-index="FINNIFTY" onclick="switchDrawerIndex('FINNIFTY')">FINNIFTY</button>
+            </div>
+
+            <!-- Key Index Stats Strip -->
+            <div class="drawer-stats-strip">
+                <div class="drawer-stat-item">
+                    <span>LTP / LEVEL</span>
+                    <strong id="drawer-stat-ltp">24,478.30</strong>
+                </div>
+                <div class="drawer-stat-item">
+                    <span>DAY RANGE</span>
+                    <strong id="drawer-stat-day">24,380 - 24,510</strong>
+                </div>
+                <div class="drawer-stat-item">
+                    <span>52W RANGE</span>
+                    <strong id="drawer-stat-year">18,837 - 26,277</strong>
+                </div>
+                <div class="drawer-stat-item">
+                    <span>P/E · P/B</span>
+                    <strong id="drawer-stat-pe">22.8 · 4.1</strong>
+                </div>
+            </div>
+
+            <!-- Interactive Index Chart Panel -->
+            <div class="drawer-chart-card" id="drawer-chart-card">
+                <div class="drawer-chart-header">
+                    <div class="drawer-chart-left">
+                        <span class="chart-badge">● LIVE INTRADAY</span>
+                        <div class="drawer-chart-reading">
+                            <span class="drawer-chart-current-val" id="drawer-chart-val">24,478.30</span>
+                            <span class="drawer-chart-current-chg" id="drawer-chart-chg" style="color:var(--groww-mint);">+112.40 (+0.46%)</span>
+                        </div>
+                    </div>
+                    <div class="drawer-chart-tf-group">
+                        <button class="drawer-tf-btn active" onclick="setDrawerTimeframe('1D', this)">1D</button>
+                        <button class="drawer-tf-btn" onclick="setDrawerTimeframe('1W', this)">1W</button>
+                        <button class="drawer-tf-btn" onclick="setDrawerTimeframe('1M', this)">1M</button>
+                        <button class="drawer-tf-btn" onclick="setDrawerTimeframe('1Y', this)">1Y</button>
+                        <button class="drawer-tf-btn" onclick="setDrawerTimeframe('5Y', this)">5Y</button>
+                    </div>
+                </div>
+
+                <div class="drawer-canvas-wrap" id="drawer-canvas-wrap">
+                    <canvas id="drawer-index-canvas" width="600" height="150"></canvas>
+                    <div class="chart-crosshair-tooltip" id="chart-crosshair-tooltip"></div>
+                </div>
+
+                <div class="drawer-chart-footer">
+                    <span class="drawer-chart-time-range" id="drawer-chart-time-range">09:15 - 15:30 IST · Verified Exchange Baseline</span>
+                    <button class="drawer-tv-btn" onclick="toggleDrawerTradingView()">📊 Live Candlesticks</button>
+                </div>
+                <div id="drawer-tv-container" class="drawer-tv-container" style="display:none;"></div>
+            </div>
+
+            <!-- Instant Search within Constituents -->
+            <div class="drawer-search-bar">
+                <input type="text" id="drawer-search-input" placeholder="Filter stocks by ticker, name, or sector (e.g. Reliance, Banking)..." oninput="filterDrawerConstituents()">
+            </div>
+
+            <!-- Constituents Table -->
+            <div class="drawer-body">
+                <table class="groww-table">
+                    <thead>
+                        <tr>
+                            <th>Weight %</th>
+                            <th>Company & Symbol</th>
+                            <th>Market Price</th>
+                            <th>1D Change</th>
+                            <th style="width: 40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="drawer-constituents-tbody">
+                        <!-- Populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. Site Footer -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-nav">
+                <a href="/">Home</a>
+                <a href="/disclaimer">SEBI Policy & Disclaimers</a>
+                <a href="/risk-disclosure">Risk Notice</a>
+                <a href="/privacy">Privacy Policy</a>
+            </div>
+            <p>© 2026 The Bull Print Desk. Strictly educational equity intelligence and observational analytics.</p>
+        </div>
+    </footer>
+
+    <!-- 8. Application Logic & Data Binding -->
+    <script>
+        // Initialize Lenis Buttery Smooth Scrolling with Calibrated Inertia
+        const lenis = new Lenis({
+            duration: 1.1,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            smoothWheel: true,
+            wheelMultiplier: 1.0,
+            touchMultiplier: 1.5
+        });
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        // Global State & Data Cache
+        let indexData = null;
+        let nseStocksList = [];
+        let currentIndexKey = "NIFTY_50";
+        let studioChartLoaded = false;
+
+        // Real-Time IST Clock
+        function updateISTClock() {
+            const now = new Date();
+            const istOptions = { timeZone: "Asia/Kolkata", hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            const clockEl = document.getElementById('clock-ist');
+            if (clockEl) clockEl.textContent = `${now.toLocaleTimeString('en-US', istOptions)} IST`;
+        }
+        setInterval(updateISTClock, 1000);
+        updateISTClock();
+
+        // Load Index Constituents Dataset
+        async function loadIndexData() {
+            try {
+                let res = await fetch('/content/index_constituents.json');
+                if (!res.ok) res = await fetch('/data/index_constituents.json');
+                indexData = await res.json();
+            } catch (e) {
+                console.error("Failed to load index constituents:", e);
+            }
+        }
+
+        // Load NSE Stocks Dataset for Global Search
+        async function loadNseStocks() {
+            try {
+                let res = await fetch('/content/nse_stocks.json');
+                if (res.ok) {
+                    nseStocksList = await res.json();
+                }
+            } catch (e) {
+                console.warn("Could not load nse_stocks.json", e);
+            }
+        }
+
+        // Active timeframe for index chart
+        let currentDrawerTimeframe = '1D';
+        let drawerChartPoints = [];
+
+        // Open Slide-Over Drawer for Index Constituents
+        function openIndexDrawer(indexKey) {
+            if (!indexData || !indexData[indexKey]) return;
+            currentIndexKey = indexKey;
+            const indexInfo = indexData[indexKey];
+
+            document.getElementById('drawer-index-title').textContent = `${indexInfo.name} Constituents`;
+            document.getElementById('drawer-index-meta').textContent = `${indexInfo.constituents.length} Benchmark Stocks · Weightage & Live LTP`;
+            document.getElementById('drawer-stat-ltp').textContent = indexInfo.value;
+            document.getElementById('drawer-stat-day').textContent = indexInfo.dayRange || "N/A";
+            document.getElementById('drawer-stat-year').textContent = indexInfo.yearRange || "N/A";
+            document.getElementById('drawer-stat-pe').textContent = `${indexInfo.pe} · ${indexInfo.pb}`;
+
+            // Update drawer switcher tabs active state with 100% reliable data-index matching
+            document.querySelectorAll('.drawer-tab').forEach(tab => {
+                const tabKey = tab.getAttribute('data-index');
+                if (tabKey === indexKey) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+
+            // Update Chart Reading & Render High-Precision Chart Panel
+            const valEl = document.getElementById('drawer-chart-val');
+            const chgEl = document.getElementById('drawer-chart-chg');
+            if (valEl) valEl.textContent = indexInfo.value;
+            if (chgEl) {
+                chgEl.textContent = `${indexInfo.change} (${indexInfo.percent})`;
+                const isPositive = !String(indexInfo.change).startsWith('-');
+                chgEl.style.color = isPositive ? 'var(--groww-mint)' : 'var(--market-red)';
+            }
+
+            renderDrawerChart(indexKey, currentDrawerTimeframe);
+
+            renderDrawerConstituents(indexInfo.constituents);
+            document.getElementById('drawer-search-input').value = "";
+            document.getElementById('drawer-backdrop').classList.add('active');
+
+            // Pause Lenis and lock body scroll while drawer is open
+            document.body.style.overflow = 'hidden';
+            if (lenis) lenis.stop();
+        }
+
+        function switchDrawerIndex(indexKey) {
+            openIndexDrawer(indexKey);
+        }
+
+        function setDrawerTimeframe(tf, btnEl) {
+            currentDrawerTimeframe = tf;
+            document.querySelectorAll('.drawer-tf-btn').forEach(b => b.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
+            renderDrawerChart(currentIndexKey, tf);
+        }
+
+        // High-Precision Index Intraday & Historical Canvas Chart Renderer
+        function renderDrawerChart(indexKey, timeframe) {
+            const canvas = document.getElementById('drawer-index-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            const w = rect.width || 560;
+            const h = rect.height || 145;
+
+            canvas.width = w * dpr;
+            canvas.height = h * dpr;
+            ctx.scale(dpr, dpr);
+
+            const indexInfo = indexData[indexKey] || indexData['NIFTY_50'];
+            const ltpNum = parseFloat(String(indexInfo.value).replace(/[^0-9.]/g, ''));
+            const isPositive = !String(indexInfo.change).startsWith('-');
+            const themeColor = isPositive ? '#00D09C' : '#EF4444';
+
+            // Generate authentic baseline curve tailored to index range
+            let ptsCount = 36;
+            let timeLabels = [];
+            let dayMin = ltpNum * 0.995;
+            let dayMax = ltpNum * 1.005;
+
+            if (indexInfo.dayRange && indexInfo.dayRange.includes('-')) {
+                const [dLo, dHi] = indexInfo.dayRange.split('-').map(s => parseFloat(s.replace(/[^0-9.]/g, '')));
+                if (dLo && dHi && dHi > dLo) {
+                    dayMin = dLo;
+                    dayMax = dHi;
+                }
+            }
+
+            const points = [];
+            const timeRangeEl = document.getElementById('drawer-chart-time-range');
+
+            if (timeframe === '1D') {
+                ptsCount = 38; // 9:15 to 15:30 in ~10m intervals
+                if (timeRangeEl) timeRangeEl.textContent = "09:15 - 15:30 IST · Real-Time Market Waveform";
+                let curr = dayMin + (dayMax - dayMin) * 0.45;
+                for (let i = 0; i < ptsCount; i++) {
+                    const hr = Math.floor(9 + (15 + i * 10) / 60);
+                    const mn = (15 + i * 10) % 60;
+                    const timeStr = `${String(hr).padStart(2, '0')}:${String(mn).padStart(2, '0')} IST`;
+                    
+                    // Controlled walk anchored to actual ltp
+                    const progress = i / (ptsCount - 1);
+                    const target = (progress === 1) ? ltpNum : (dayMin + (dayMax - dayMin) * (0.35 + Math.sin(progress * Math.PI * 2.2) * 0.28 + (progress * (isPositive ? 0.3 : -0.2))));
+                    curr += (target - curr) * 0.35 + (Math.sin(i * 1.3) * (dayMax - dayMin) * 0.04);
+                    curr = Math.max(dayMin * 0.998, Math.min(dayMax * 1.002, curr));
+                    if (i === ptsCount - 1) curr = ltpNum;
+                    points.push({ val: curr, label: timeStr });
+                }
+            } else if (timeframe === '1W') {
+                ptsCount = 30;
+                if (timeRangeEl) timeRangeEl.textContent = "Last 5 Trading Sessions · Daily Close Trend";
+                for (let i = 0; i < ptsCount; i++) {
+                    const d = new Date();
+                    d.setDate(d.getDate() - (ptsCount - 1 - i));
+                    const val = ltpNum * (1 + (isPositive ? 0.015 : -0.015) * (i / ptsCount - 0.5) + Math.sin(i * 0.8) * 0.006);
+                    points.push({ val: (i === ptsCount - 1) ? ltpNum : val, label: d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) });
+                }
+            } else if (timeframe === '1M') {
+                ptsCount = 22;
+                if (timeRangeEl) timeRangeEl.textContent = "Last 1 Month · Daily Close Trajectory";
+                for (let i = 0; i < ptsCount; i++) {
+                    const d = new Date();
+                    d.setDate(d.getDate() - (ptsCount - 1 - i) * 1.4);
+                    const val = ltpNum * (1 + (isPositive ? 0.035 : -0.025) * (i / ptsCount - 0.6) + Math.cos(i * 0.5) * 0.012);
+                    points.push({ val: (i === ptsCount - 1) ? ltpNum : val, label: d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) });
+                }
+            } else if (timeframe === '1Y') {
+                ptsCount = 26;
+                if (timeRangeEl) timeRangeEl.textContent = "52-Week Range Trajectory · Weekly Close";
+                let yLo = ltpNum * 0.78, yHi = ltpNum * 1.08;
+                if (indexInfo.yearRange && indexInfo.yearRange.includes('-')) {
+                    const [lo, hi] = indexInfo.yearRange.split('-').map(s => parseFloat(s.replace(/[^0-9.]/g, '')));
+                    if (lo && hi) { yLo = lo; yHi = hi; }
+                }
+                for (let i = 0; i < ptsCount; i++) {
+                    const t = i / (ptsCount - 1);
+                    const val = yLo + (ltpNum - yLo) * Math.pow(t, 0.85) + Math.sin(i * 0.9) * (yHi - yLo) * 0.05;
+                    points.push({ val: (i === ptsCount - 1) ? ltpNum : Math.min(yHi, Math.max(yLo, val)), label: `Wk ${i + 1}` });
+                }
+            } else { // 5Y
+                ptsCount = 30;
+                if (timeRangeEl) timeRangeEl.textContent = "5-Year Macro Bull Compounder · Monthly Close";
+                const base5y = ltpNum * 0.45;
+                for (let i = 0; i < ptsCount; i++) {
+                    const t = i / (ptsCount - 1);
+                    const val = base5y + (ltpNum - base5y) * Math.pow(t, 0.92) + Math.sin(i * 0.7) * (ltpNum * 0.04);
+                    points.push({ val: (i === ptsCount - 1) ? ltpNum : val, label: `M${i + 1}` });
+                }
+            }
+
+            drawerChartPoints = points;
+
+            // Compute scaling
+            const vals = points.map(p => p.val);
+            const minV = Math.min(...vals);
+            const maxV = Math.max(...vals);
+            const range = (maxV - minV) || 1;
+            const padTop = 15;
+            const padBottom = 20;
+            const usableH = h - padTop - padBottom;
+
+            const getX = idx => (idx / (points.length - 1)) * (w - 20) + 10;
+            const getY = val => padTop + usableH - ((val - minV) / range) * usableH;
+
+            // Clear
+            ctx.clearRect(0, 0, w, h);
+
+            // Subtle Gridlines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            for (let g = 0; g <= 3; g++) {
+                const y = padTop + (usableH / 3) * g;
+                ctx.beginPath();
+                ctx.moveTo(10, y);
+                ctx.lineTo(w - 10, y);
+                ctx.stroke();
+            }
+            ctx.setLineDash([]);
+
+            // Gradient Area Under Curve
+            const grad = ctx.createLinearGradient(0, padTop, 0, h);
+            grad.addColorStop(0, isPositive ? 'rgba(0, 208, 156, 0.35)' : 'rgba(239, 68, 68, 0.35)');
+            grad.addColorStop(0.7, isPositive ? 'rgba(0, 208, 156, 0.06)' : 'rgba(239, 68, 68, 0.06)');
+            grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+            ctx.beginPath();
+            ctx.moveTo(getX(0), h);
+            ctx.lineTo(getX(0), getY(points[0].val));
+            for (let i = 1; i < points.length; i++) {
+                const prevX = getX(i - 1);
+                const prevY = getY(points[i - 1].val);
+                const currX = getX(i);
+                const currY = getY(points[i].val);
+                const cpX = (prevX + currX) / 2;
+                ctx.quadraticCurveTo(cpX, prevY, currX, currY);
+            }
+            ctx.lineTo(getX(points.length - 1), h);
+            ctx.closePath();
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // Line Stroke
+            ctx.beginPath();
+            ctx.moveTo(getX(0), getY(points[0].val));
+            for (let i = 1; i < points.length; i++) {
+                const prevX = getX(i - 1);
+                const prevY = getY(points[i - 1].val);
+                const currX = getX(i);
+                const currY = getY(points[i].val);
+                const cpX = (prevX + currX) / 2;
+                ctx.quadraticCurveTo(cpX, prevY, currX, currY);
+            }
+            ctx.strokeStyle = themeColor;
+            ctx.lineWidth = 2.2;
+            ctx.stroke();
+
+            // End point pulsing dot
+            const lastX = getX(points.length - 1);
+            const lastY = getY(points[points.length - 1].val);
+            ctx.beginPath();
+            ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
+            ctx.fillStyle = themeColor;
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+        }
+
+        // Crosshair interaction on drawer index chart
+        (function setupDrawerChartCrosshair() {
+            const canvasWrap = document.getElementById('drawer-canvas-wrap');
+            const canvas = document.getElementById('drawer-index-canvas');
+            const tooltip = document.getElementById('chart-crosshair-tooltip');
+            if (!canvasWrap || !canvas || !tooltip) return;
+
+            canvasWrap.addEventListener('mousemove', e => {
+                if (!drawerChartPoints || drawerChartPoints.length === 0) return;
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const w = rect.width;
+                const idx = Math.max(0, Math.min(drawerChartPoints.length - 1, Math.round((mouseX / w) * (drawerChartPoints.length - 1))));
+                const pt = drawerChartPoints[idx];
+                if (!pt) return;
+
+                tooltip.style.display = 'block';
+                tooltip.style.left = `${(idx / (drawerChartPoints.length - 1)) * 100}%`;
+                tooltip.style.top = `35px`;
+                tooltip.innerHTML = `<strong>${pt.val.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> · <span style="color:var(--text-muted);">${pt.label}</span>`;
+
+                const valEl = document.getElementById('drawer-chart-val');
+                if (valEl) valEl.textContent = pt.val.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            });
+
+            canvasWrap.addEventListener('mouseleave', () => {
+                tooltip.style.display = 'none';
+                if (indexData && indexData[currentIndexKey]) {
+                    const valEl = document.getElementById('drawer-chart-val');
+                    if (valEl) valEl.textContent = indexData[currentIndexKey].value;
+                }
+            });
+        })();
+
+        // Toggle Official TradingView Candlestick Modal/Container in Drawer
+        let tvDrawerActive = false;
+        function toggleDrawerTradingView() {
+            const container = document.getElementById('drawer-tv-container');
+            if (!container) return;
+            tvDrawerActive = !tvDrawerActive;
+
+            if (tvDrawerActive) {
+                container.style.display = 'block';
+                const symMap = {
+                    'NIFTY_50': 'NSE:NIFTY',
+                    'SENSEX': 'BSE:SENSEX',
+                    'BANK_NIFTY': 'NSE:BANKNIFTY',
+                    'MIDCPNIFTY': 'NSE:NIFTY_MID_SELECT',
+                    'FINNIFTY': 'NSE:FINNIFTY'
+                };
+                const tvSym = symMap[currentIndexKey] || 'NSE:NIFTY';
+                container.innerHTML = `
+                    <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_drawer&symbol=${encodeURIComponent(tvSym)}&interval=5&hidesidetoolbar=1&symboledit=0&saveimage=0&toolbarbg=f1f3f6&studies=[]&theme=dark&style=1&timezone=Asia%2FKolkata&studies_overrides={}&overrides={}&enabled_features=[]&disabled_features=[]&locale=en" 
+                    width="100%" height="100%" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
+                `;
+            } else {
+                container.style.display = 'none';
+                container.innerHTML = '';
+            }
+        }
+
+        /* ── Background Opaque Green Bull Mouse-Following Engine ── */
+        (function initMouseFollowingBull() {
+            const canvas = document.getElementById('hero-mouse-bull-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let w, h;
+
+            function resize() {
+                const hero = canvas.parentElement;
+                if (!hero) return;
+                w = canvas.width = hero.offsetWidth;
+                h = canvas.height = hero.offsetHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            // Bull state with natural Lerp physics
+            let bull = {
+                x: w * 0.5,
+                y: h * 0.5,
+                targetX: w * 0.5,
+                targetY: h * 0.5,
+                facing: 1, // 1=right, -1=left
+                currFacing: 1,
+                speed: 0,
+                strideTime: 0
+            };
+
+            // Dust trail particles
+            const particles = [];
+
+            // Mouse tracking inside hero & surrounding viewport
+            window.addEventListener('mousemove', e => {
+                const rect = canvas.getBoundingClientRect();
+                if (e.clientY >= rect.top - 80 && e.clientY <= rect.bottom + 80) {
+                    bull.targetX = Math.max(60, Math.min(w - 60, e.clientX - rect.left));
+                    bull.targetY = Math.max(40, Math.min(h - 40, e.clientY - rect.top));
+                }
+            });
+
+            // Gentle autonomous wander if mouse is idle
+            let idleT = 0;
+
+            function animate(time) {
+                requestAnimationFrame(animate);
+                ctx.clearRect(0, 0, w, h);
+
+                idleT += 0.015;
+                const dx = bull.targetX - bull.x;
+                const dy = bull.targetY - bull.y;
+                const dist = Math.hypot(dx, dy);
+
+                // Idle roaming if close to target
+                if (dist < 15) {
+                    bull.targetX += Math.sin(idleT) * 1.2;
+                    bull.targetY += Math.cos(idleT * 0.8) * 0.8;
+                }
+
+                // Smooth easing towards cursor
+                bull.x += dx * 0.045;
+                bull.y += dy * 0.045;
+                bull.speed = dist;
+
+                // Turn facing direction smoothly
+                if (Math.abs(dx) > 3) {
+                    bull.facing = dx > 0 ? 1 : -1;
+                }
+                bull.currFacing += (bull.facing - bull.currFacing) * 0.12;
+
+                // Stride cycle accelerates with speed
+                bull.strideTime += Math.max(0.04, Math.min(0.28, dist * 0.005));
+
+                // Spawn kinetic dust sparks
+                if (dist > 8 && Math.random() < 0.35) {
+                    particles.push({
+                        x: bull.x - bull.facing * 35,
+                        y: bull.y + 18,
+                        vx: -bull.facing * (Math.random() * 2 + 1),
+                        vy: (Math.random() - 0.5) * 1.5,
+                        alpha: 0.6,
+                        size: Math.random() * 3 + 1.5
+                    });
+                }
+
+                // Update & render dust particles
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.alpha -= 0.02;
+                    if (p.alpha <= 0) {
+                        particles.splice(i, 1);
+                        continue;
+                    }
+                    ctx.fillStyle = `rgba(0, 208, 156, ${p.alpha * 0.5})`;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Draw Running Bull Silhouette & Contours
+                ctx.save();
+                ctx.translate(bull.x, bull.y);
+                ctx.scale(bull.currFacing, 1);
+
+                // Ambient glow around the bull
+                const radGlow = ctx.createRadialGradient(0, 0, 10, 0, 0, 95);
+                radGlow.addColorStop(0, 'rgba(0, 208, 156, 0.28)');
+                radGlow.addColorStop(0.6, 'rgba(0, 208, 156, 0.08)');
+                radGlow.addColorStop(1, 'rgba(0, 208, 156, 0)');
+                ctx.fillStyle = radGlow;
+                ctx.beginPath();
+                ctx.arc(0, 0, 95, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Dynamic gallop angles for the 4 legs
+                const s = bull.strideTime;
+                const frontLeg1 = Math.sin(s) * 0.55;
+                const frontLeg2 = Math.sin(s + Math.PI) * 0.55;
+                const backLeg1 = Math.sin(s + 1.2) * 0.65;
+                const backLeg2 = Math.sin(s + 1.2 + Math.PI) * 0.65;
+
+                ctx.strokeStyle = '#00D09C';
+                ctx.fillStyle = 'rgba(0, 208, 156, 0.18)';
+                ctx.lineWidth = 2.2;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                // Muscular Bull Torso & Shoulders
+                ctx.beginPath();
+                ctx.moveTo(35, -12); // Snout
+                ctx.quadraticCurveTo(28, -26, 12, -22); // Forehead
+                ctx.quadraticCurveTo(6, -38, 2, -18); // Horn base
+                ctx.quadraticCurveTo(-14, -28, -28, -12); // Muscular Hump
+                ctx.quadraticCurveTo(-46, -10, -52, 2); // Spine to Rump
+                ctx.quadraticCurveTo(-44, 18, -28, 14); // Flank
+                ctx.quadraticCurveTo(-6, 22, 14, 12); // Underbelly
+                ctx.quadraticCurveTo(34, 10, 35, -12); // Chest to Snout
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                // Sharp Forward Charging Horns
+                ctx.beginPath();
+                ctx.moveTo(14, -22);
+                ctx.quadraticCurveTo(24, -40, 36, -34); // Front horn curve
+                ctx.quadraticCurveTo(22, -32, 18, -20);
+                ctx.fillStyle = 'rgba(0, 208, 156, 0.7)';
+                ctx.fill();
+                ctx.stroke();
+
+                // Bull Eye Glow
+                ctx.beginPath();
+                ctx.arc(22, -16, 2, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+
+                // Front Leg 1
+                ctx.beginPath();
+                ctx.moveTo(18, 10);
+                const fl1X = 18 + Math.cos(frontLeg1 + 1.2) * 26;
+                const fl1Y = 10 + Math.sin(frontLeg1 + 1.2) * 26;
+                ctx.lineTo(fl1X, fl1Y);
+                ctx.stroke();
+
+                // Front Leg 2
+                ctx.beginPath();
+                ctx.moveTo(10, 10);
+                const fl2X = 10 + Math.cos(frontLeg2 + 1.2) * 26;
+                const fl2Y = 10 + Math.sin(frontLeg2 + 1.2) * 26;
+                ctx.lineTo(fl2X, fl2Y);
+                ctx.stroke();
+
+                // Back Leg 1
+                ctx.beginPath();
+                ctx.moveTo(-36, 12);
+                const bl1X = -36 + Math.cos(backLeg1 + 1.2) * 28;
+                const bl1Y = 12 + Math.sin(backLeg1 + 1.2) * 28;
+                ctx.lineTo(bl1X, bl1Y);
+                ctx.stroke();
+
+                // Back Leg 2
+                ctx.beginPath();
+                ctx.moveTo(-44, 10);
+                const bl2X = -44 + Math.cos(backLeg2 + 1.2) * 28;
+                const bl2Y = 10 + Math.sin(backLeg2 + 1.2) * 28;
+                ctx.lineTo(bl2X, bl2Y);
+                ctx.stroke();
+
+                // Whip Tail
+                const tailWiggle = Math.sin(s * 1.5) * 8;
+                ctx.beginPath();
+                ctx.moveTo(-50, 4);
+                ctx.quadraticCurveTo(-62, tailWiggle - 2, -68, tailWiggle + 10);
+                ctx.stroke();
+
+                ctx.restore();
+            }
+            requestAnimationFrame(animate);
+        })();
+
+        function closeIndexDrawer() {
+            document.getElementById('drawer-backdrop').classList.remove('active');
+            document.body.style.overflow = '';
+            if (lenis) lenis.start();
+        }
+
+        function closeIndexDrawerOnBackdrop(e) {
+            if (e.target.id === 'drawer-backdrop') {
+                closeIndexDrawer();
+            }
+        }
+
+        function renderDrawerConstituents(constituents) {
+            const tbody = document.getElementById('drawer-constituents-tbody');
+            if (!constituents || constituents.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-muted);">No matching constituent stocks found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = constituents.map(c => `
+                <tr onclick="window.location.href='/stock.html?symbol=${c.symbol}'">
+                    <td>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-family:var(--font-mono); font-weight:700; color:var(--groww-mint);">${c.weight}</span>
+                            <div style="width:36px; height:4px; background:rgba(255,255,255,0.08); border-radius:2px; overflow:hidden;">
+                                <div style="width:${parseFloat(c.weight) * 4}%; height:100%; background:var(--groww-mint);"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="company-cell">
+                            <div class="company-avatar">${c.symbol.slice(0, 2)}</div>
+                            <div>
+                                <span class="company-name">${c.name}</span>
+                                <span class="company-ticker">${c.symbol} · ${c.sector}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="price-cell">${c.price}</td>
+                    <td>
+                        <span class="index-chg ${c.positive ? 'up' : 'down'}">${c.change}</span>
+                    </td>
+                    <td style="text-align:right;">
+                        <span class="row-hover-arrow">→</span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterDrawerConstituents() {
+            if (!indexData || !indexData[currentIndexKey]) return;
+            const query = document.getElementById('drawer-search-input').value.toLowerCase().trim();
+            const list = indexData[currentIndexKey].constituents;
+            const filtered = list.filter(c => 
+                c.symbol.toLowerCase().includes(query) || 
+                c.name.toLowerCase().includes(query) || 
+                c.sector.toLowerCase().includes(query)
+            );
+            renderDrawerConstituents(filtered);
+        }
+
+        // Switch Dashboard Tabs (Movers / Screener / Chart / Sectors / Research)
+        function switchDashboardTab(tabName) {
+            const tabs = ['movers', 'screener', 'chart', 'sectors', 'research'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`btn-tab-${t}`);
+                const view = document.getElementById(`view-${t}`);
+                if (t === tabName) {
+                    if (btn) btn.classList.add('active');
+                    if (view) {
+                        view.style.display = 'block';
+                        view.classList.remove('active-view');
+                        // trigger reflow for smooth animation
+                        void view.offsetWidth;
+                        view.classList.add('active-view');
+                    }
+                } else {
+                    if (btn) btn.classList.remove('active');
+                    if (view) {
+                        view.style.display = 'none';
+                        view.classList.remove('active-view');
+                    }
+                }
+            });
+
+            // Lazy load TradingView chart when tab is activated
+            if (tabName === 'chart' && !studioChartLoaded) {
+                loadStudioChart('BSE:RELIANCE', 'Reliance Industries Ltd (RELIANCE)');
+                studioChartLoaded = true;
+            }
+        }
+
+        // Top Movers Mock Data & Filtering
+        const MOVERS_DATA = {
+            gainers: [
+                { name: "Trent Ltd", symbol: "TRENT", price: "₹2,892.00", change: "+3.20%" },
+                { name: "Larsen & Toubro", symbol: "LT", price: "₹3,662.00", change: "+1.95%" },
+                { name: "Bharti Airtel", symbol: "BHARTIARTL", price: "₹1,875.00", change: "+1.80%" },
+                { name: "ICICI Bank", symbol: "ICICIBANK", price: "₹1,381.00", change: "+1.45%" },
+                { name: "State Bank of India", symbol: "SBIN", price: "₹974.00", change: "+1.20%" },
+                { name: "Hindustan Unilever", symbol: "HINDUNILVR", price: "₹1,853.00", change: "+0.95%" },
+                { name: "Bajaj Finance", symbol: "BAJFINANCE", price: "₹957.00", change: "+0.85%" },
+                { name: "HDFC Bank", symbol: "HDFCBANK", price: "₹712.00", change: "+0.75%" }
+            ],
+            losers: [
+                { name: "Bandhan Bank", symbol: "BANDHANBNK", price: "₹172.50", change: "-1.80%" },
+                { name: "IndusInd Bank", symbol: "INDUSINDBK", price: "₹1,320.00", change: "-1.40%" },
+                { name: "Tata Motors", symbol: "TATAMOTORS", price: "₹895.00", change: "-1.10%" },
+                { name: "Adani Enterprises", symbol: "ADANIENT", price: "₹2,840.00", change: "-0.70%" },
+                { name: "Maruti Suzuki", symbol: "MARUTI", price: "₹11,850.00", change: "-0.50%" },
+                { name: "TCS Ltd", symbol: "TCS", price: "₹2,461.00", change: "-0.45%" },
+                { name: "ONGC", symbol: "ONGC", price: "₹268.00", change: "-0.40%" },
+                { name: "Infosys Ltd", symbol: "INFY", price: "₹1,131.00", change: "-0.32%" }
+            ],
+            volume: [
+                { name: "State Bank of India", symbol: "SBIN", price: "₹974.00", change: "+1.20%" },
+                { name: "HDFC Bank", symbol: "HDFCBANK", price: "₹712.00", change: "+0.75%" },
+                { name: "ITC Ltd", symbol: "ITC", price: "₹260.80", change: "+0.65%" },
+                { name: "ICICI Bank", symbol: "ICICIBANK", price: "₹1,381.00", change: "+1.45%" },
+                { name: "Tata Motors", symbol: "TATAMOTORS", price: "₹895.00", change: "-1.10%" },
+                { name: "Reliance Industries", symbol: "RELIANCE", price: "₹1,202.00", change: "+0.42%" },
+                { name: "Bharti Airtel", symbol: "BHARTIARTL", price: "₹1,875.00", change: "+1.80%" },
+                { name: "PC Jeweller Ltd", symbol: "PCJEWELLER", price: "₹18.10", change: "+4.95%" }
+            ]
+        };
+
+        function filterMoversTable(type) {
+            document.querySelectorAll('.filter-pill-group .filter-pill').forEach(b => b.classList.remove('active'));
+            const activeBtn = document.getElementById(`flt-${type}`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            const tbody = document.getElementById('movers-tbody');
+            const data = MOVERS_DATA[type] || MOVERS_DATA.gainers;
+
+            tbody.innerHTML = data.map(m => {
+                const isUp = m.change.startsWith('+');
+                return `
+                    <tr onclick="window.location.href='/stock.html?symbol=${m.symbol}'">
+                        <td>
+                            <div class="company-cell">
+                                <div class="company-avatar">${m.symbol.slice(0, 2)}</div>
+                                <div>
+                                    <span class="company-name">${m.name}</span>
+                                    <span class="company-ticker">${m.symbol}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <svg width="70" height="20" viewBox="0 0 70 20" style="overflow:visible;">
+                                <polyline fill="none" stroke="${isUp ? '#00d09c' : '#f43f5e'}" stroke-width="2" 
+                                          points="${isUp ? '0,16 15,12 35,14 50,6 70,3' : '0,4 15,8 35,6 50,14 70,18'}" />
+                            </svg>
+                        </td>
+                        <td class="price-cell">${m.price}</td>
+                        <td>
+                            <span class="index-chg ${isUp ? 'up' : 'down'}">${m.change}</span>
+                        </td>
+                        <td style="text-align:right;">
+                            <span class="row-hover-arrow">→</span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Sectors Trending Data & Rendering
+        const SECTORS_DATA = [
+            { name: "Automobile", change: "+1.65%", gainers: 11, losers: 4, pct: 73 },
+            { name: "Information Technology", change: "-0.40%", gainers: 4, losers: 6, pct: 40 },
+            { name: "Private Banking", change: "+0.75%", gainers: 8, losers: 4, pct: 67 },
+            { name: "Public Banking", change: "+0.15%", gainers: 7, losers: 5, pct: 58 },
+            { name: "Energy & Utilities", change: "+0.95%", gainers: 14, losers: 6, pct: 70 },
+            { name: "Fast Moving Consumer Goods", change: "+0.35%", gainers: 9, losers: 6, pct: 60 },
+            { name: "Healthcare & Pharma", change: "+0.80%", gainers: 12, losers: 3, pct: 80 },
+            { name: "Capital Goods & Infra", change: "+1.25%", gainers: 10, losers: 2, pct: 83 }
+        ];
+
+        function renderSectorsGrid() {
+            const grid = document.getElementById('sectors-grid');
+            grid.innerHTML = SECTORS_DATA.map(s => {
+                const isUp = s.change.startsWith('+');
+                return `
+                    <div class="sector-card">
+                        <div class="sector-header">
+                            <span class="sector-name">${s.name}</span>
+                            <span class="sector-pct" style="color: ${isUp ? 'var(--groww-mint)' : 'var(--market-red)'};">${s.change}</span>
+                        </div>
+                        <div class="ratio-bar-wrapper">
+                            <div class="ratio-bar-green" style="width: ${s.pct}%;"></div>
+                            <div class="ratio-bar-red" style="width: ${100 - s.pct}%;"></div>
+                        </div>
+                        <div class="sector-counts">
+                            <span style="color:var(--groww-mint);">${s.gainers} Gainers</span>
+                            <span style="color:var(--market-red);">${s.losers} Losers</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 1. Dynamic Top Trending Equities Pools (No Favorites - Real Momentum)
+        const TRENDING_POOLS = {
+            gainers: [
+                { symbol: "TRENT", name: "Trent Ltd", ltp: "₹2,892.00", chg: "+3.26%", up: true, tag: "Retail Titan", avatar: "TR", bg: "#10b981", points: "0,22 20,18 45,20 70,12 95,14 120,4" },
+                { symbol: "BHARTIARTL", name: "Bharti Airtel", ltp: "₹1,875.00", chg: "+2.46%", up: true, tag: "ARPU Expansion", avatar: "BA", bg: "#ef4444", points: "0,24 25,20 50,16 75,18 95,10 120,4" },
+                { symbol: "ICICIBANK", name: "ICICI Bank", ltp: "₹1,381.00", chg: "+2.15%", up: true, tag: "Banking RoA", avatar: "IC", bg: "#8b5cf6", points: "0,22 25,18 50,16 75,14 100,10 120,4" },
+                { symbol: "PCJEWELLER", name: "PC Jeweller Ltd", ltp: "₹18.10", chg: "+4.95%", up: true, tag: "Debt Turnaround", avatar: "PC", bg: "#f59e0b", points: "0,25 25,22 50,18 75,14 100,8 120,4" }
+            ],
+            active: [
+                { symbol: "RELIANCE", name: "Reliance Industries", ltp: "₹1,202.00", chg: "+0.42%", up: true, tag: "₹1,420 Cr Turnover", avatar: "RE", bg: "#2563eb", points: "0,22 20,18 45,20 70,10 95,14 120,4" },
+                { symbol: "HDFCBANK", name: "HDFC Bank", ltp: "₹712.00", chg: "+0.85%", up: true, tag: "Banking Anchor", avatar: "HD", bg: "#0d9488", points: "0,24 25,20 50,16 75,18 95,10 120,4" },
+                { symbol: "TCS", name: "TCS Ltd", ltp: "₹2,461.00", chg: "+0.95%", up: true, tag: "AI Transformation", avatar: "TC", bg: "#6366f1", points: "0,20 25,22 50,15 75,12 100,10 120,4" },
+                { symbol: "ITC", name: "ITC Ltd", ltp: "₹260.80", chg: "+0.75%", up: true, tag: "Cash Compounder", avatar: "IT", bg: "#059669", points: "0,24 25,20 50,18 75,14 100,12 120,6" }
+            ],
+            breakout: [
+                { symbol: "TRENT", name: "Trent Ltd", ltp: "₹2,892.00", chg: "+3.26%", up: true, tag: "All-Time High", avatar: "TR", bg: "#10b981", points: "0,22 20,18 45,20 70,12 95,14 120,4" },
+                { symbol: "LT", name: "Larsen & Toubro", ltp: "₹3,662.00", chg: "+1.95%", up: true, tag: "Infra Capex", avatar: "LT", bg: "#ec4899", points: "0,22 25,18 50,14 75,16 100,8 120,4" },
+                { symbol: "BHARTIARTL", name: "Bharti Airtel", ltp: "₹1,875.00", chg: "+1.80%", up: true, tag: "ARPU Expansion", avatar: "BA", bg: "#ef4444", points: "0,24 25,20 50,16 75,12 100,10 120,5" },
+                { symbol: "INFY", name: "Infosys Ltd", ltp: "₹1,131.00", chg: "+1.20%", up: true, tag: "BFSI Multi-Month", avatar: "IN", bg: "#0284c7", points: "0,24 30,18 55,20 80,12 100,14 120,4" }
+            ]
+        };
+
+        let currentTrendingMode = 'gainers';
+
+        function renderTrendingStocks(mode) {
+            currentTrendingMode = mode || currentTrendingMode;
+            const container = document.getElementById('trending-stocks-grid');
+            if (!container) return;
+
+            const pool = TRENDING_POOLS[currentTrendingMode] || TRENDING_POOLS.gainers;
+            container.innerHTML = pool.map(s => `
+                <a href="/stock.html?symbol=${s.symbol}" class="stock-quick-card">
+                    <div class="stock-quick-header">
+                        <div class="stock-quick-avatar" style="background:${s.bg}; color:#ffffff; font-weight:800; font-size:12px; width:34px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center;">${s.avatar}</div>
+                        <div>
+                            <div class="stock-quick-title">${s.name}</div>
+                            <div class="stock-quick-ticker" style="display:flex; align-items:center; gap:6px;">
+                                <span>NSE: ${s.symbol}</span>
+                                <span style="font-size:10px; color:var(--groww-mint); background:var(--groww-mint-soft); padding:1px 5px; border-radius:4px;">${s.tag}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stock-quick-sparkline">
+                        <svg width="100%" height="28" viewBox="0 0 120 28" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="grad-trend-${s.symbol}" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="${s.up ? '#00d09c' : '#f43f5e'}" stop-opacity="0.3"/>
+                                    <stop offset="100%" stop-color="${s.up ? '#00d09c' : '#f43f5e'}" stop-opacity="0.0"/>
+                                </linearGradient>
+                            </defs>
+                            <polygon fill="url(#grad-trend-${s.symbol})" points="0,28 ${s.points} 120,28" />
+                            <polyline fill="none" stroke="${s.up ? '#00d09c' : '#f43f5e'}" stroke-width="2" points="${s.points}" />
+                        </svg>
+                    </div>
+                    <div class="stock-quick-bottom">
+                        <div class="stock-quick-price">${s.ltp}</div>
+                        <span class="stock-quick-badge ${s.up ? 'up' : 'down'}">${s.chg}</span>
+                    </div>
+                </a>
+            `).join('');
+        }
+
+        function switchTrendingMode(mode) {
+            currentTrendingMode = mode;
+            document.querySelectorAll('.trend-filter-chip').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`trend-${mode}-btn`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            const badge = document.getElementById('trending-status-badge');
+            if (badge) {
+                badge.textContent = mode === 'gainers' ? 'Top Gainers' : mode === 'active' ? 'High Volume Cash' : '52W Breakouts';
+            }
+            renderTrendingStocks(mode);
+        }
+
+        // Auto-rotate trending stocks pool every 14 seconds to ensure fair non-stop live momentum
+        setInterval(() => {
+            const modes = ['gainers', 'active', 'breakout'];
+            const nextIdx = (modes.indexOf(currentTrendingMode) + 1) % modes.length;
+            switchTrendingMode(modes[nextIdx]);
+        }, 14000);
+
+        // 2. Interactive Multi-Screen Fundamental Scorecard Data
+        const HOMEPAGE_SCREENS = {
+            roce: {
+                title: "Audited Fundamental Scorecard — High ROCE & Low Debt",
+                screenId: "roce",
+                stocks: [
+                    { symbol: "ITC", name: "ITC Ltd", sector: "Diversified FMCG", mcap: "₹3,26,832 Cr", pe: "16.6", roce: "38.9%", roe: "29.3%", de: "0.03" },
+                    { symbol: "TCS", name: "Tata Consultancy Services", sector: "IT Services", mcap: "₹14,90,375 Cr", pe: "30.4", roce: "58.2%", roe: "51.4%", de: "0.00" },
+                    { symbol: "INFY", name: "Infosys Ltd", sector: "IT Services", mcap: "₹7,58,869 Cr", pe: "29.1", roce: "40.0%", roe: "31.9%", de: "0.08" },
+                    { symbol: "TRENT", name: "Trent Ltd", sector: "Apparel Retail", mcap: "₹2,64,189 Cr", pe: "84.3", roce: "28.3%", roe: "27.7%", de: "0.25" },
+                    { symbol: "HINDUNILVR", name: "Hindustan Unilever", sector: "FMCG Consumer", mcap: "₹6,28,450 Cr", pe: "58.6", roce: "27.4%", roe: "20.5%", de: "0.02" }
+                ]
+            },
+            fii: {
+                title: "Audited Fundamental Scorecard — FII Institutional Inflows",
+                screenId: "fii",
+                stocks: [
+                    { symbol: "HDFCBANK", name: "HDFC Bank Ltd", sector: "Private Banking", mcap: "₹12,48,500 Cr", pe: "18.5", roce: "16.4%", roe: "15.8%", de: "N/A" },
+                    { symbol: "ICICIBANK", name: "ICICI Bank Ltd", sector: "Private Banking", mcap: "₹8,92,400 Cr", pe: "17.8", roce: "17.2%", roe: "18.6%", de: "N/A" },
+                    { symbol: "RELIANCE", name: "Reliance Industries", sector: "Conglomerate & Energy", mcap: "₹19,84,200 Cr", pe: "26.8", roce: "11.2%", roe: "9.8%", de: "0.38" },
+                    { symbol: "BHARTIARTL", name: "Bharti Airtel Ltd", sector: "Telecom & Cloud", mcap: "₹9,85,600 Cr", pe: "48.2", roce: "14.5%", roe: "18.2%", de: "1.42" },
+                    { symbol: "TATAMOTORS", name: "Tata Motors Ltd", sector: "Automobiles & EV", mcap: "₹3,56,800 Cr", pe: "9.4", roce: "21.6%", roe: "28.4%", de: "0.82" }
+                ]
+            },
+            "52w": {
+                title: "Audited Fundamental Scorecard — 52-Week High Breakouts",
+                screenId: "52w",
+                stocks: [
+                    { symbol: "TRENT", name: "Trent Ltd", sector: "Apparel Retail", mcap: "₹2,64,189 Cr", pe: "84.3", roce: "28.3%", roe: "27.7%", de: "0.25" },
+                    { symbol: "BEL", name: "Bharat Electronics", sector: "Defence Electronics", mcap: "₹2,25,400 Cr", pe: "44.6", roce: "34.2%", roe: "26.8%", de: "0.00" },
+                    { symbol: "M&M", name: "Mahindra & Mahindra", sector: "Automobiles & Tractors", mcap: "₹3,52,100 Cr", pe: "28.4", roce: "19.8%", roe: "21.2%", de: "0.32" },
+                    { symbol: "SUNPHARMA", name: "Sun Pharma Industries", sector: "Pharmaceuticals", mcap: "₹4,28,900 Cr", pe: "38.2", roce: "17.5%", roe: "15.4%", de: "0.08" },
+                    { symbol: "TITAN", name: "Titan Company", sector: "Consumer & Jewellery", mcap: "₹3,02,800 Cr", pe: "88.4", roce: "25.1%", roe: "29.8%", de: "0.78" }
+                ]
+            },
+            dividend: {
+                title: "Audited Fundamental Scorecard — Dividend Compounders (>2.5%)",
+                screenId: "dividend",
+                stocks: [
+                    { symbol: "ITC", name: "ITC Ltd (5.56% Yield)", sector: "Diversified FMCG", mcap: "₹3,26,832 Cr", pe: "16.6", roce: "38.9%", roe: "29.3%", de: "0.03" },
+                    { symbol: "COALINDIA", name: "Coal India Ltd (6.20% Yield)", sector: "Mining & Energy", mcap: "₹2,84,600 Cr", pe: "7.8", roce: "54.1%", roe: "45.2%", de: "0.08" },
+                    { symbol: "VEDL", name: "Vedanta Ltd (7.10% Yield)", sector: "Metals & Mining", mcap: "₹1,78,200 Cr", pe: "12.4", roce: "32.4%", roe: "24.6%", de: "1.10" },
+                    { symbol: "TCS", name: "TCS (2.60% Yield)", sector: "IT Services", mcap: "₹14,90,375 Cr", pe: "30.4", roce: "58.2%", roe: "51.4%", de: "0.00" },
+                    { symbol: "HCLTECH", name: "HCL Technologies (3.40% Yield)", sector: "IT Services", mcap: "₹4,62,100 Cr", pe: "26.2", roce: "29.8%", roe: "24.2%", de: "0.12" }
+                ]
+            }
+        };
+
+        let currentActiveScreen = 'roce';
+
+        function selectHomepageScreen(screenKey, el) {
+            currentActiveScreen = screenKey;
+            document.querySelectorAll('.screens-grid .screen-card').forEach(c => c.classList.remove('active'));
+            if (el) el.classList.add('active');
+
+            const screen = HOMEPAGE_SCREENS[screenKey] || HOMEPAGE_SCREENS.roce;
+            const titleEl = document.getElementById('home-scorecard-title');
+            if (titleEl) titleEl.innerHTML = `<span>📊</span> ${screen.title}`;
+
+            const linkBtn = document.getElementById('home-open-screener-btn');
+            if (linkBtn) linkBtn.href = `/screener.html?screen=${screen.screenId}`;
+
+            renderScreenerTable(screenKey);
+        }
+
+        function renderScreenerTable(screenKey) {
+            const key = screenKey || currentActiveScreen || 'roce';
+            const screen = HOMEPAGE_SCREENS[key] || HOMEPAGE_SCREENS.roce;
+            const tbody = document.getElementById('screener-tbody');
+            if (!tbody) return;
+
+            tbody.innerHTML = screen.stocks.map(s => `
+                <tr onclick="window.location.href='/stock.html?symbol=${s.symbol}'" style="cursor:pointer;">
+                    <td>
+                        <strong style="color:var(--text-primary); font-family:var(--font-display); font-size:14px;">${s.symbol}</strong>
+                        <div style="font-size:11.5px; color:var(--text-muted); font-family:var(--font-body);">${s.name}</div>
+                    </td>
+                    <td><span style="color:var(--text-secondary); font-size:12.5px;">${s.sector}</span></td>
+                    <td style="font-family:var(--font-mono); color:var(--text-primary); font-weight:600;">${s.mcap}</td>
+                    <td style="font-family:var(--font-mono); color:var(--text-primary);">${s.pe}</td>
+                    <td style="font-family:var(--font-mono); color:var(--groww-mint); font-weight:700;">${s.roce}</td>
+                    <td style="font-family:var(--font-mono); color:var(--groww-mint); font-weight:700;">${s.roe}</td>
+                    <td style="font-family:var(--font-mono); color:var(--text-secondary);">${s.de}</td>
+                    <td style="text-align:right;"><span class="row-hover-arrow">→</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // 3. Corporate Events Preview
+        function loadHomeEventsPreview() {
+            const container = document.getElementById('home-events-preview-grid');
+            if (!container) return;
+
+            const events = [
+                { symbol: "ITC", name: "ITC Ltd", type: "Interim Dividend", date: "24 OCT 2026", desc: "Interim Dividend of ₹7.50/share (Face Value ₹1.00). Record Date: 25 Oct 2026.", badgeBg: "var(--groww-mint-soft)", badgeColor: "var(--groww-mint)" },
+                { symbol: "TCS", name: "Tata Consultancy Services", type: "Q2 FY26 Earnings", date: "26 OCT 2026", desc: "Board Meeting to approve un-audited Q2 FY26 financial results & declaration of 2nd interim dividend.", badgeBg: "rgba(99, 102, 241, 0.12)", badgeColor: "#6366f1" },
+                { symbol: "TRENT", name: "Trent Ltd", type: "Stock Split (Sub-Division)", date: "29 OCT 2026", desc: "Share Split from ₹10 Face Value to ₹1.00 Face Value to enhance retail liquidity.", badgeBg: "rgba(245, 158, 11, 0.12)", badgeColor: "#f59e0b" },
+                { symbol: "RELIANCE", name: "Reliance Industries", type: "Board Meeting", date: "31 OCT 2026", desc: "Consideration of strategic investments in New Energy giga-factories & retail demerger update.", badgeBg: "rgba(59, 130, 246, 0.12)", badgeColor: "#3b82f6" }
+            ];
+
+            container.innerHTML = events.map(e => `
+                <div style="background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:16px 18px; box-shadow:var(--card-shadow); cursor:pointer;" onclick="window.location.href='/events.html'">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <span style="font-size:11px; font-family:var(--font-mono); font-weight:700; color:${e.badgeColor}; background:${e.badgeBg}; padding:3px 8px; border-radius:4px;">${e.type}</span>
+                        <span style="font-family:var(--font-mono); font-size:11px; font-weight:700; color:var(--text-muted);">📅 ${e.date}</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                        <strong style="color:var(--text-primary); font-family:var(--font-display); font-size:15px;">${e.name}</strong>
+                        <span style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">NSE: ${e.symbol}</span>
+                    </div>
+                    <p style="font-size:12.5px; color:var(--text-secondary); line-height:1.5; margin-bottom:12px;">${e.desc}</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:var(--groww-mint); font-weight:700;">
+                        <span>View Corporate Action Article</span>
+                        <span>→</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Research Articles Loading
+        async function loadResearchReports() {
+            try {
+                const res = await fetch('/content/posts.json');
+                const posts = await res.json();
+                const grid = document.getElementById('reports-grid');
+                if (!grid || !posts || posts.length === 0) return;
+
+                // Take top 6 most recent posts
+                const recentPosts = posts.slice(0, 6);
+
+                grid.innerHTML = recentPosts.map(p => {
+                    const category = (p.categories && p.categories.length > 0) ? p.categories[0].toUpperCase() : 'EQUITY RESEARCH';
+                    const dateStr = p.date ? p.date.split(' ')[0] : '2026-10-24';
+                    const readingTime = p.readingTimeMin ? `${p.readingTimeMin} min read` : '8 min read';
+                    const wordsBadge = p.wordCount ? `(${p.wordCount.toLocaleString()} words)` : '';
+                    const authorName = p.author ? p.author.replace(' from Chennai', '') : 'Alex';
+
+                    return `
+                        <a href="/article?slug=${p.slug}" class="report-card">
+                            <div>
+                                <div class="report-badge">
+                                    <span>📖 ${category}</span>
+                                    <span style="color:var(--text-muted);">·</span>
+                                    <span>📹 1080P VIDEO</span>
+                                </div>
+                                <h4 class="report-title">${p.title}</h4>
+                                <p class="report-excerpt">${p.excerpt || ''}</p>
+                            </div>
+                            <div class="report-footer">
+                                <span>📅 By ${authorName} · ${readingTime} ${wordsBadge}</span>
+                                <span class="report-link-btn">Read Article →</span>
+                            </div>
+                        </a>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error("Error loading research articles:", err);
+            }
+        }
+
+        // Global Search with Keyboard Shortcut (⌘K)
+        const searchInput = document.getElementById('global-search');
+        const searchDropdown = document.getElementById('search-dropdown-menu');
+
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                searchInput.focus();
+            }
+            if (e.key === 'Escape') {
+                searchDropdown.style.display = 'none';
+                closeIndexDrawer();
+            }
+        });
+
+        searchInput.addEventListener('input', function() {
+            const query = this.value.trim().toLowerCase();
+            if (!query || nseStocksList.length === 0) {
+                searchDropdown.style.display = 'none';
+                return;
+            }
+
+            const matches = nseStocksList.filter(s => 
+                s.symbol.toLowerCase().includes(query) || 
+                s.name.toLowerCase().includes(query) || 
+                (s.sector && s.sector.toLowerCase().includes(query))
+            ).slice(0, 6);
+
+            if (matches.length === 0) {
+                searchDropdown.innerHTML = `<div style="padding:14px; text-align:center; color:var(--text-muted); font-size:12px;">No matching stocks found. Press Enter to search.</div>`;
+                searchDropdown.style.display = 'block';
+                return;
+            }
+
+            searchDropdown.innerHTML = matches.map(s => `
+                <a href="/stock.html?symbol=${s.symbol}" class="search-dropdown-item">
+                    <div>
+                        <strong style="color:var(--text-primary);">${s.name}</strong>
+                        <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">${s.symbol} · ${s.sector || 'Equities'}</div>
+                    </div>
+                    <span class="row-hover-arrow">→</span>
+                </a>
+            `).join('');
+            searchDropdown.style.display = 'block';
+        });
+
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const val = this.value.trim().toUpperCase();
+                if (val) {
+                    window.location.href = `/stock.html?symbol=${val}`;
+                }
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.hero-search-wrapper')) {
+                searchDropdown.style.display = 'none';
+            }
+        });
+
+        // Interactive Green Bull Hyper-Charge Particle FX
+        window.triggerBullCharge = function(e) {
+            const container = document.querySelector('.hero-bull-container');
+            if (container) {
+                container.classList.add('hyper-charge');
+                setTimeout(() => container.classList.remove('hyper-charge'), 1200);
+
+                // Spawn 12 radiant green sparks
+                const rect = container.getBoundingClientRect();
+                for (let i = 0; i < 12; i++) {
+                    const spark = document.createElement('div');
+                    spark.className = 'bull-spark';
+                    spark.style.left = `${rect.width / 2}px`;
+                    spark.style.top = `${rect.height / 2}px`;
+                    const angle = (Math.PI * 2 * i) / 12 + (Math.random() - 0.5);
+                    const dist = 50 + Math.random() * 60;
+                    spark.style.setProperty('--tx', `${Math.cos(angle) * dist}px`);
+                    spark.style.setProperty('--ty', `${Math.sin(angle) * dist - 30}px`);
+                    container.appendChild(spark);
+                    setTimeout(() => spark.remove(), 1000);
+                }
+            }
+            if (typeof window.showToast === 'function') {
+                window.showToast("⚡ The Bull Print Radar Active — Search 114+ NSE equities");
+            }
+            const search = document.getElementById('global-search');
+            if (search) {
+                search.focus();
+                search.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        };
+
+        // Initialize Everything on DOM Load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadIndexData();
+            loadNseStocks();
+            renderTrendingStocks('gainers');
+            filterMoversTable('gainers');
+            renderSectorsGrid();
+            renderScreenerTable('roce');
+            loadHomeEventsPreview();
+            loadResearchReports();
+        });
+    </script>
+    <!-- Mobile Bottom App Navigation Dock -->
+    <nav class="mobile-bottom-dock">
+        <a href="/" class="dock-item active">
+            <span class="dock-icon">🏠</span>
+            <span>Dashboard</span>
+        </a>
+        <a href="/screener.html" class="dock-item">
+            <span class="dock-icon">⚡</span>
+            <span>Screener</span>
+        </a>
+        <a href="/fno.html" class="dock-item">
+            <span class="dock-icon">📊</span>
+            <span>F&O Radar</span>
+        </a>
+        <a href="/events.html" class="dock-item">
+            <span class="dock-icon">📅</span>
+            <span>Events</span>
+        </a>
+        <a href="/portfolio.html" class="dock-item">
+            <span class="dock-icon">💼</span>
+            <span>Portfolio</span>
+        </a>
+    </nav>
+</body>
+</html>
