@@ -2125,6 +2125,32 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
     _send_telegram(alert_msg)
 
 
+def render_all_and_publish(bundle_dir: Path, output_dir: Optional[Path] = None):
+    """
+    Single-Runner Mode (for YouTube Shorts):
+    Sequentially renders all segments locally on a single machine (~2.5 min),
+    then immediately concatenates, mixes audio, runs QC gate, and publishes to YouTube.
+    Bypasses the 20-runner matrix and eliminates artifact download handshakes entirely.
+    """
+    manifest_path = bundle_dir / "session_manifest.json"
+    if not manifest_path.exists():
+        raise FileNotFoundError(f"Session manifest missing: {manifest_path}")
+
+    with open(manifest_path, "r") as f:
+        manifest = json.load(f)
+
+    total_segments = manifest.get("total_segments", 20)
+    segments_dir = bundle_dir / "rendered_segments"
+    segments_dir.mkdir(parents=True, exist_ok=True)
+
+    logger.info(f"🚀 [Single Runner Engine] Rendering all {total_segments} segments sequentially on one Ubuntu machine...")
+    for idx in range(total_segments):
+        render_segment(segment_index=idx, bundle_dir=bundle_dir, output_dir=segments_dir)
+
+    logger.success(f"✓ [Single Runner Engine] All {total_segments} segments rendered successfully! Aggregating and publishing...")
+    aggregate_and_publish(bundle_dir=bundle_dir, segments_dir=segments_dir, output_dir=output_dir)
+
+
 # ─────────────────────────────────────────────────────────────
 # CLI ENTRYPOINT
 # ─────────────────────────────────────────────────────────────
@@ -2142,7 +2168,7 @@ def str2bool(v):
 
 def main():
     parser = argparse.ArgumentParser(description="Cloud Parallel Video Engine")
-    parser.add_argument("--mode", choices=["prepare", "render_segment", "aggregate_and_publish", "dispatch_kaggle_overflow"], required=True)
+    parser.add_argument("--mode", choices=["prepare", "render_segment", "render_all_and_publish", "aggregate_and_publish", "dispatch_kaggle_overflow"], required=True)
     parser.add_argument("--topic", default=None, help="Specific financial topic. Required for prepare mode.")
     parser.add_argument("--vertical", default="stock_market", help="Market vertical (e.g. stock_market, crypto, commodities, forex, banking, insurance)")
     parser.add_argument("--duration-sec", type=int, default=60)
@@ -2174,6 +2200,8 @@ def main():
         )
     elif args.mode == "render_segment":
         render_segment(segment_index=args.segment_index, bundle_dir=args.bundle_dir, output_dir=args.output_dir)
+    elif args.mode == "render_all_and_publish":
+        render_all_and_publish(bundle_dir=args.bundle_dir, output_dir=args.output_dir)
     elif args.mode == "aggregate_and_publish":
         aggregate_and_publish(bundle_dir=args.bundle_dir, segments_dir=args.segments_dir, output_dir=args.output_dir)
     elif args.mode == "dispatch_kaggle_overflow":

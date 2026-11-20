@@ -154,10 +154,11 @@ jobs:
           retention-days: 1
 
   # ─────────────────────────────────────────────────────────────
-  # JOB 2: PARALLEL SEGMENT RENDERING (Up to 20 Ubuntu Runners)
+  # JOB 2: PARALLEL SEGMENT RENDERING (Documentaries Only)
   # ─────────────────────────────────────────────────────────────
   render_segment_matrix:
     needs: prepare_session
+    if: needs.prepare_session.outputs.is_short != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
@@ -298,7 +299,8 @@ jobs:
           name: session-bundle
           path: output/session_bundle/
 
-      - name: 📥 Download All Rendered Segment Artifacts
+      - name: 📥 Download All Rendered Segment Artifacts (Documentaries Only)
+        if: needs.prepare_session.outputs.is_short != 'true'
         uses: actions/download-artifact@v4
         with:
           pattern: segment-*
@@ -333,7 +335,7 @@ jobs:
             echo "✓ Restored Slot 2 YouTube OAuth token"
           fi
 
-      - name: 🚀 Concatenate, Mix Ducked BGM, Upload to YouTube & Publish Article
+      - name: 🚀 Render & Publish Video (Single-Runner for Shorts, Aggregator for Documentaries)
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -350,11 +352,20 @@ jobs:
           YT_CLIENT_SECRET_2: ${{ secrets.YT_CLIENT_SECRET_2 }}
           YT_REFRESH_TOKEN_2: ${{ secrets.YT_REFRESH_TOKEN_2 }}
         run: |
-          python scripts/cloud_parallel_video_engine.py \
-            --mode aggregate_and_publish \
-            --bundle-dir output/session_bundle \
-            --segments-dir output/downloaded_segments \
-            --output-dir output/final_broadcast
+          if [ "${{ needs.prepare_session.outputs.is_short }}" = "true" ]; then
+            echo "⚡ [Single-Runner Engine] Executing in-process segment renders + publish for Short..."
+            python scripts/cloud_parallel_video_engine.py \
+              --mode render_all_and_publish \
+              --bundle-dir output/session_bundle \
+              --output-dir output/final_broadcast
+          else
+            echo "⚡ [Matrix Aggregator Engine] Stitching pre-rendered parallel segments for Documentary..."
+            python scripts/cloud_parallel_video_engine.py \
+              --mode aggregate_and_publish \
+              --bundle-dir output/session_bundle \
+              --segments-dir output/downloaded_segments \
+              --output-dir output/final_broadcast
+          fi
 
       - name: 📤 Upload Master Broadcast Video Artifact
         if: always()
@@ -386,4 +397,16 @@ jobs:
               echo "Push rejected due to concurrent race condition. Retrying in ${JITTER}s (attempt ${retry}/5)..."
               sleep $JITTER
             done
+          fi
+
+      - name: 📡 Dispatch Completion Ping to n8n Webhook
+        if: always()
+        env:
+          N8N_WEBHOOK_URL: ${{ secrets.N8N_WEBHOOK_URL }}
+        run: |
+          if [ -n "$N8N_WEBHOOK_URL" ]; then
+            echo "Notifying n8n orchestrator of workflow status: ${{ job.status }}..."
+            curl -s -X POST "$N8N_WEBHOOK_URL" \
+              -H "Content-Type: application/json" \
+              -d "{\"run_id\":\"${{ github.run_id }}\",\"topic\":\"${{ needs.prepare_session.outputs.topic }}\",\"slug\":\"${{ needs.prepare_session.outputs.slug }}\",\"status\":\"${{ job.status }}\",\"is_short\":\"${{ needs.prepare_session.outputs.is_short }}\"}" || true
           fi
