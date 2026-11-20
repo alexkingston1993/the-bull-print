@@ -88,13 +88,22 @@ jobs:
 
       - name: ⚙️ Setup Kaggle GPU Credentials
         env:
+          KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
           PYTHONUNBUFFERED: "1"
         run: |
           mkdir -p ~/.kaggle
-          echo "{\"username\":\"$KAGGLE_USERNAME\",\"key\":\"$KAGGLE_KEY\"}" > ~/.kaggle/kaggle.json
-          chmod 600 ~/.kaggle/kaggle.json
+          if [ -n "$KAGGLE_API_TOKEN" ]; then
+            echo "$KAGGLE_API_TOKEN" > ~/.kaggle/access_token
+            chmod 600 ~/.kaggle/access_token
+            echo "KAGGLE_API_TOKEN=$KAGGLE_API_TOKEN" >> $GITHUB_ENV
+            echo "✓ Restored Kaggle Bearer API Token"
+          fi
+          if [ -n "$KAGGLE_USERNAME" ] && [ -n "$KAGGLE_KEY" ]; then
+            echo "{\"username\":\"$KAGGLE_USERNAME\",\"key\":\"$KAGGLE_KEY\"}" > ~/.kaggle/kaggle.json
+            chmod 600 ~/.kaggle/kaggle.json
+          fi
 
       - name: 🚀 Prepare Session & Compute Parallel Matrix
         id: prep
@@ -107,6 +116,7 @@ jobs:
           INPUT_DURATION_MIN: ${{ github.event.inputs.duration_min || github.event.client_payload.duration_min || '12' }}
           INPUT_SHORTS_ONLY: ${{ github.event.inputs.shorts_only || github.event.client_payload.shorts_only || 'true' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
           PYTHONUNBUFFERED: "1"

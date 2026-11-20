@@ -39,20 +39,22 @@ class KaggleImageWorker:
         self.stage_dir.mkdir(parents=True, exist_ok=True)
 
     def _detect_username(self) -> str:
+        if os.getenv("KAGGLE_API_TOKEN"):
+            return os.getenv("KAGGLE_USERNAME", "alexkingston")
         cfg = Path.home() / ".kaggle" / "kaggle.json"
         if cfg.exists():
             try:
                 with open(cfg) as f:
                     data = json.load(f)
-                    return data.get("username", "alexytcreative")
+                    return data.get("username", "alexkingston")
             except Exception:
                 pass
-        return os.getenv("KAGGLE_USERNAME", "alexytcreative")
+        return os.getenv("KAGGLE_USERNAME", "alexkingston")
 
     def _get_kaggle_cmd(self) -> str:
         return shutil.which("kaggle") or str(BASE_DIR / ".venv" / "bin" / "kaggle")
 
-    def wait_for_queue_lock(self, timeout_sec: int = 2700) -> bool:
+    def wait_for_queue_lock(self, timeout_sec: int = 600) -> bool:
         """
         API-Level Queue Lock:
         Polls Kaggle kernel status before pushing to prevent concurrency collisions.
