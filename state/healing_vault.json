@@ -1,9 +1,20 @@
 {
   "version": "2.0.0",
   "engine_name": "Aria Cognitive Self-Healing & Continuous Learning Engine",
-  "last_synced": "2026-11-20T17:15:00Z",
-  "total_learned_rules": 39,
+  "last_synced": "2026-11-20T22:05:00Z",
+  "total_learned_rules": 40,
   "learned_rules": [
+    {
+      "rule_id": "BUG-50-COMPLIANCE-GATE-TOPIC-OVERLAP",
+      "signature_pattern": "(compliance gate freshness overlap|violates 30-day freshness rule)",
+      "domain": "content_authenticity",
+      "failed_component": "ComplianceGate & prepare_session Topic Auditor",
+      "severity": "HIGH",
+      "root_cause": "Dispatched topic shared >= 5 core keywords with video published in past 30 days.",
+      "action_plan": "Engage Compliance Auto-Healer to dynamically query ViralTopicScanner and pivot to the next 100% compliant topic with zero manual intervention.",
+      "auto_executable": null,
+      "learned_from": "Run 44751727110 forensic analysis"
+    },
     {
       "rule_id": "BUG-48-PROMPT-DIVERSITY-QC-REJECTION",
       "signature_pattern": "(prompt repetition detected|unique prompt ratio is .* strictly below required)",

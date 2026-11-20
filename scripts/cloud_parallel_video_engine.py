@@ -1025,10 +1025,22 @@ def prepare_session(
 
     logger.info(f"🛡️ [Compliance Gate] Auditing topic '{topic}' against 30-day history and regulatory safe harbor...")
     if not ComplianceGate._check_30_day_freshness(topic):
-        raise RuntimeError(
-            f"⛔ COMPLIANCE GATE REJECTION: Topic '{topic}' violates 30-day freshness rule. "
-            f"Semantic clones and duplicate topics are strictly prohibited."
-        )
+        logger.warning(f"⚠️ [Compliance Gate] Topic '{topic}' violates 30-day freshness rule. Activating Compliance Auto-Healer to pivot to a fresh topic...")
+        try:
+            from app.services.viral_topic_scanner import ViralTopicScanner
+            scanner = ViralTopicScanner()
+            manifest = scanner.scan_past_24h_topics()
+            candidates = [s["title"] for s in manifest.get("shorts" if is_short else "documentaries", [])]
+            fresh_topic = next((c for c in candidates if ComplianceGate._check_30_day_freshness(c)), None)
+            if fresh_topic:
+                logger.success(f"✓ [Compliance Auto-Heal] Successfully pivoted from overlapping topic to fresh compliant topic: '{fresh_topic}'")
+                topic = fresh_topic
+            else:
+                raise RuntimeError(f"⛔ COMPLIANCE GATE REJECTION: Topic '{topic}' violates 30-day freshness and no fresh candidates were found.")
+        except Exception as heal_err:
+            raise RuntimeError(
+                f"⛔ COMPLIANCE GATE REJECTION: Topic '{topic}' violates 30-day freshness rule: {heal_err}"
+            )
 
     published_titles = check_duplicate_before_prep(topic)
 
