@@ -163,32 +163,50 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: 20
-      matrix: ${{ fromJson(needs.prepare_session.outputs.matrix) }}
+      matrix:
+        index: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
 
     steps:
+      - name: ⚡ Check Bounds
+        id: check
+        run: |
+          TOTAL="${{ needs.prepare_session.outputs.total_segments }}"
+          if [ -n "$TOTAL" ] && [ "${{ matrix.index }}" -ge "$TOTAL" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "Skipping runner ${{ matrix.index }} (total segments: $TOTAL)"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: 📥 Checkout Repository
+        if: steps.check.outputs.skip != 'true'
         uses: actions/checkout@v4
         timeout-minutes: 5
 
       - name: 🎥 Install FFmpeg & Fonts
+        if: steps.check.outputs.skip != 'true'
         run: |
           sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core
 
       - name: 🐍 Setup Python 3.11
+        if: steps.check.outputs.skip != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: 📦 Install Lightweight Render Libs
+        if: steps.check.outputs.skip != 'true'
         run: pip install --no-cache-dir Pillow loguru requests
 
       - name: 📥 Download Session Bundle
+        if: steps.check.outputs.skip != 'true'
         uses: actions/download-artifact@v4
         with:
           name: session-bundle
           path: output/session_bundle/
 
       - name: ⚡ Render Discrete Segment ${{ matrix.index }}
+        if: steps.check.outputs.skip != 'true'
         run: |
           python scripts/cloud_parallel_video_engine.py \
             --mode render_segment \
@@ -197,6 +215,7 @@ jobs:
             --output-dir output/rendered_segments
 
       - name: 📤 Upload Rendered Segment Artifact
+        if: steps.check.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: segment-${{ matrix.index }}

@@ -1235,7 +1235,6 @@ def prepare_session(
             f.write(f"is_short={'true' if is_short else 'false'}\n")
             f.write(f"topic={topic}\n")
             f.write(f"slug={slug}\n")
-    print(f"\n::set-output name=matrix::{matrix_json}")
     print(f"Matrix JSON: {matrix_json}")
 
 
