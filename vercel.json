@@ -34,6 +34,10 @@
       "destination": "/api/mission-control/action.js"
     },
     {
+      "source": "/api/auth/tiktok/callback",
+      "destination": "/api/auth/tiktok/callback.js"
+    },
+    {
       "source": "/go/:broker",
       "destination": "/api/go?broker=:broker"
     },
