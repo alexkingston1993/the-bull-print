@@ -88,7 +88,7 @@ class ComplianceGate:
 
     @classmethod
     def _check_30_day_freshness(cls, topic: str, title: Optional[str] = None) -> bool:
-        """True when topic/title overlaps NO post published within the last 30 days."""
+        """True when topic/title overlaps NO post published within the last 180 days."""
         if not POSTS_MANIFEST.exists():
             return True
 
@@ -96,7 +96,7 @@ class ComplianceGate:
         alt_probe = cls._normalize(title)[:60] if title else ""
         try:
             posts = json.loads(POSTS_MANIFEST.read_text(encoding="utf-8"))
-            cutoff = datetime.now(timezone.utc) - timedelta(days=30)
+            cutoff = datetime.now(timezone.utc) - timedelta(days=180)
             STOPWORDS = {
                 "a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are",
                 "as", "at", "be", "because", "been", "before", "being", "below", "between", "both", "but",
@@ -532,8 +532,8 @@ INSTRUCTIONS:
         30-Day Thumbnail Uniqueness & Monetization Compliance Gate.
         Enforced right before ANY prompt is sent to the AI image generator (16:9 Long-Form & 9:16 Shorts).
 
-        1. 30-Day Rolling Memory: auto-prunes entries older than 30 days.
-        2. 100% Uniqueness: rejects candidate if line1/line2/badge has >40% word overlap with any entry in last 30 days.
+        1. 180-Day Rolling Memory: auto-prunes entries older than 180 days.
+        2. 100% Uniqueness: rejects candidate if line1/line2/badge has >40% word overlap with any entry in last 180 days.
         3. Buzzword Cap: bans repeating ('TRAP', 'EXPOSED', 'SHOCK', 'BLEED', 'LIE') if used >1 time in last 7 days.
         4. 30-Archetype 3D Visual Matrix Rotation: bans repeating hero object or color_palette in consecutive Shorts.
         5. Monetization & Ad-Suitability: strips yellow-dollar triggers and SEBI/IRDAI spam words ('SCAM', 'FRAUD', 'GUARANTEED', 'PONZI').
@@ -541,7 +541,7 @@ INSTRUCTIONS:
         """
         history_path = BASE_DIR / "state" / "thumbnail_prompt_history.json"
         now = datetime.now(timezone.utc)
-        thirty_days_ago = now - timedelta(days=30)
+        thirty_days_ago = now - timedelta(days=180)
         seven_days_ago = now - timedelta(days=7)
 
         # 30-Archetype 3D Visual Matrix

@@ -31,7 +31,7 @@ THUMB_HISTORY_FILE = BASE_DIR / "state" / "thumbnail_prompt_history.json"
 
 TRIGRAM_MAX_JACCARD = 0.18
 TITLE_CORE_OVERLAP_LIMIT = 3
-FRESHNESS_DAYS = 30
+FRESHNESS_DAYS = 180
 
 STOPWORDS = {
     "the", "and", "for", "with", "this", "that", "what", "how", "your", "you",
@@ -259,7 +259,7 @@ class ContentAuthenticityEngine:
                 "passed": False,
                 "action": "SCRAP_TOPIC",
                 "reason": f"Duplicate of post '{dupe['offender']}' ({dupe['reason']})",
-                "feedback": "Topic is too similar to content published in the last 30 days. Scrape this topic and select a fresh, distinctive macro theme.",
+                "feedback": "Topic is too similar to content published in the last 180 days. Scrape this topic and select a fresh, distinctive macro theme.",
             }
 
         # 2. Regulatory Sanitization (replace illegal promises)

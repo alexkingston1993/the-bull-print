@@ -5,7 +5,7 @@ app/services/viral_topic_scanner.py
 
 Responsibilities:
 1. Scans real-time financial market signals, FII/DII institutional data, and breaking 24h developments.
-2. Injects the last 30 days of published content as a strict negative blacklist to guarantee zero duplication.
+2. Injects the last 180 days of published content as a strict negative blacklist to guarantee zero duplication.
 3. Utilizes Gemini API to discover 10 viral Shorts topics and 2 deep-dive Documentary topics across 10 distinct macro sectors.
 4. Strictly verifies every candidate through ContentAuthenticityEngine (Gate 1) & SEBI Safe Harbor Shield.
 5. ZERO HARDCODED FALLBACKS & ZERO COMPROMISES.
@@ -84,9 +84,50 @@ class ViralTopicScanner:
                 pass
         self.authenticity_engine = ContentAuthenticityEngine()
 
-    def _get_recent_published_titles(self, days: int = 30) -> List[str]:
-        """Gathers all published titles from posts.json, ledger, and recent audits to prevent semantic clones."""
+    def _get_recent_published_titles(self, days: int = 180) -> List[str]:
+        """Gathers all published titles from YouTube, posts.json, ledger, and recent audits to prevent semantic clones over a 180-day window."""
         titles = set()
+
+        # 1. Check live YouTube uploads via OAuth service
+        try:
+            from app.services.youtube_uploader import get_uploader
+            uploader = get_uploader()
+            service = uploader._get_service("en")
+            if service:
+                channel_res = service.channels().list(mine=True, part="contentDetails").execute()
+                if channel_res and channel_res.get("items"):
+                    uploads_pl = channel_res["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+                    next_page = None
+                    cutoff_dt = datetime.now(timezone.utc) - timedelta(days=days)
+                    while True:
+                        pl_res = service.playlistItems().list(
+                            playlistId=uploads_pl,
+                            part="snippet",
+                            maxResults=50,
+                            pageToken=next_page
+                        ).execute()
+                        for itm in pl_res.get("items", []):
+                            snip = itm.get("snippet", {})
+                            pub_at = snip.get("publishedAt", "")
+                            t = snip.get("title", "")
+                            if pub_at:
+                                try:
+                                    dt = datetime.fromisoformat(pub_at.replace("Z", "+00:00"))
+                                    if dt < cutoff_dt:
+                                        next_page = None
+                                        break
+                                except Exception:
+                                    pass
+                            if t and t != "Deleted video":
+                                titles.add(t.strip())
+                        next_page = pl_res.get("nextPageToken")
+                        if not next_page or len(titles) >= 150:
+                            break
+                    logger.info(f"✓ [Scanner Deduplication] Retrieved {len(titles)} published titles from YouTube (last {days} days)")
+        except Exception as yt_err:
+            logger.debug(f"[Scanner Deduplication] Live YouTube query notice: {yt_err}")
+
+        # 2. Check posts.json
         posts_file = BASE_DIR / "content" / "posts.json"
         if posts_file.exists():
             try:
@@ -97,6 +138,7 @@ class ViralTopicScanner:
             except Exception:
                 pass
 
+        # 3. Check video SEO ledger
         ledger_file = BASE_DIR / "state" / "video_seo_ledger.json"
         if ledger_file.exists():
             try:
@@ -107,6 +149,7 @@ class ViralTopicScanner:
             except Exception:
                 pass
 
+        # 4. Check quarantine audits
         audit_dir = BASE_DIR / "output" / "quarantine_audit"
         for a_file in audit_dir.glob("**/*.json"):
             try:
@@ -133,8 +176,8 @@ class ViralTopicScanner:
         live_headlines = fetch_live_financial_rss_headlines()
         live_rss_sample = "\n".join(f"- {h}" for h in live_headlines)
 
-        recent_titles = self._get_recent_published_titles(days=30)
-        blacklist_sample = "\n".join(f"- {t}" for t in recent_titles[:40])
+        recent_titles = self._get_recent_published_titles(days=180)
+        blacklist_sample = "\n".join(f"- {t}" for t in recent_titles[:100])
 
         prompt = f"""
         You are the Chief Investigative Journalist & Media Director for 'The Bull Print' (in the style of Coffeezilla, James Jani, and MagnatesMedia).
@@ -157,7 +200,7 @@ class ViralTopicScanner:
         NEVER specify: obsidian monolith, golden crate on cables, red brick corridor, cybernetic bull, or generic floating pedestals.
         
         CRITICAL ZERO-DUPLICATION & ANTI-SAMENESS BLACKLIST:
-        The following {len(recent_titles)} titles/topics were ALREADY PRODUCED in the past 30 days. You are STRICTLY FORBIDDEN from generating these topics, repeating their titles, or creating semantic clones, synonyms, or paraphrases of them:
+        The following {len(recent_titles)} titles/topics were ALREADY PRODUCED in the past 180 days. You are STRICTLY FORBIDDEN from generating these topics, repeating their titles, or creating semantic clones, synonyms, or paraphrases of them:
 {blacklist_sample}
         
         MANDATORY 10-SECTOR DIVERSITY RULE:

@@ -52,9 +52,10 @@ def _send_telegram(msg: str):
 
 def check_duplicate_before_prep(topic: str) -> None:
     """
-    STRICT DEDUPLICATION GUARD:
+    STRICT DEDUPLICATION GUARD (180-DAY ENFORCEMENT):
     Prevents re-rendering identical visuals or re-uploading topics already published
-    in the last 30 days on YouTube or in local content/posts.
+    in the last 180 days on YouTube or in local content/posts.
+    Utilizes live YouTube Data API channel history and Gemini Flash Lite LLM semantic comparison.
     """
     topic_clean = topic.strip().lower()
     topic_words = set(re.sub(r"[^\w\s]", "", topic_clean).split())
@@ -64,13 +65,16 @@ def check_duplicate_before_prep(topic: str) -> None:
     if not core_words:
         raise ValueError(f"Topic '{topic}' does not contain sufficient meaningful keywords.")
 
-    logger.info(f"🔍 [Duplicate Guard] Checking topic integrity for: '{topic}' (core keywords: {core_words})")
+    logger.info(f"🔍 [Duplicate Guard] Checking 180-day topic integrity for: '{topic}' (core keywords: {core_words})")
+
+    published_titles = []
 
     # 1. Check local content/posts
     posts_dir = BASE_DIR / "content" / "posts"
     if posts_dir.exists():
         for p in posts_dir.glob("*.md"):
             name = p.stem.lower().replace("-", " ")
+            published_titles.append(name)
             name_words = set(re.sub(r"[^\w\s]", "", name).split()) - stop_words
             overlap = len(core_words & name_words)
             if len(core_words) > 0 and (overlap / len(core_words)) >= 0.7:
@@ -80,7 +84,7 @@ def check_duplicate_before_prep(topic: str) -> None:
                     f"Refusing to generate duplicate video or recycle old visual frames!"
                 )
 
-    # 2. Check live YouTube uploads via OAuth pool
+    # 2. Check live YouTube uploads via OAuth pool (180-day window)
     try:
         from app.services.youtube_uploader import get_uploader
         uploader = get_uploader()
@@ -89,30 +93,95 @@ def check_duplicate_before_prep(topic: str) -> None:
             channel_res = service.channels().list(mine=True, part="contentDetails").execute()
             if channel_res and channel_res.get("items"):
                 uploads_pl = channel_res["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
-                recent_items = service.playlistItems().list(
-                    playlistId=uploads_pl,
-                    part="snippet",
-                    maxResults=50,
-                ).execute().get("items", [])
-                for itm in recent_items:
-                    snip = itm.get("snippet", {})
-                    v_title = snip.get("title", "")
-                    v_words = set(re.sub(r"[^\w\s]", "", v_title.lower()).split()) - stop_words
-                    overlap = len(core_words & v_words)
-                    if len(core_words) > 0 and (overlap / len(core_words)) >= 0.65:
-                        v_id = snip.get("resourceId", {}).get("videoId")
-                        logger.error(f"⛔ Topic closely matches YouTube video: '{v_title}' ({v_id})")
-                        raise RuntimeError(
-                            f"⛔ [Duplicate Guard Triggered] Topic '{topic}' was already published on YouTube as: "
-                            f"'{v_title}' (https://youtu.be/{v_id}). "
-                            f"Refusing to upload duplicate video frames or recycle existing video!"
-                        )
+                next_page = None
+                cutoff_dt = datetime.now(timezone.utc) - timedelta(days=180)
+                while True:
+                    pl_res = service.playlistItems().list(
+                        playlistId=uploads_pl,
+                        part="snippet",
+                        maxResults=50,
+                        pageToken=next_page,
+                    ).execute()
+                    for itm in pl_res.get("items", []):
+                        snip = itm.get("snippet", {})
+                        v_title = snip.get("title", "")
+                        pub_at = snip.get("publishedAt", "")
+                        if pub_at:
+                            try:
+                                dt = datetime.fromisoformat(pub_at.replace("Z", "+00:00"))
+                                if dt < cutoff_dt:
+                                    next_page = None
+                                    break
+                            except Exception:
+                                pass
+                        if v_title and v_title != "Deleted video":
+                            clean_t = v_title.split("|")[0].split("#")[0].strip()
+                            published_titles.append(clean_t)
+                            v_words = set(re.sub(r"[^\w\s]", "", v_title.lower()).split()) - stop_words
+                            overlap = len(core_words & v_words)
+                            if len(core_words) > 0 and (overlap / len(core_words)) >= 0.65:
+                                v_id = snip.get("resourceId", {}).get("videoId")
+                                logger.error(f"⛔ Topic closely matches YouTube video: '{v_title}' ({v_id})")
+                                raise RuntimeError(
+                                    f"⛔ [Duplicate Guard Triggered] Topic '{topic}' was already published on YouTube as: "
+                                    f"'{v_title}' (https://youtu.be/{v_id}). "
+                                    f"Refusing to upload duplicate video frames or recycle existing video!"
+                                )
+                    next_page = pl_res.get("nextPageToken")
+                    if not next_page or len(published_titles) >= 150:
+                        break
     except RuntimeError:
         raise
     except Exception as e:
         logger.debug(f"[Duplicate Guard] Channel query notice: {e}")
 
-    logger.success(f"✅ [Duplicate Guard] Verified unique topic: '{topic}'")
+    # 3. LLM-Based Semantic Deduplication Gate (180-day catalog check)
+    api_key = os.getenv("GEMINI_API_KEY")
+    if api_key and published_titles:
+        try:
+            import requests
+            titles_text = "\n".join(f"- {t}" for t in published_titles[:100])
+            eval_prompt = f"""You are an institutional compliance deduplication auditor for The Bull Print.
+We enforce a STRICT ZERO-DUPLICATION POLICY across a 180-day window.
+
+CANDIDATE TOPIC: "{topic}"
+
+PUBLISHED TITLES (PAST 180 DAYS):
+{titles_text}
+
+TASK:
+Determine if the CANDIDATE TOPIC covers the same underlying news story, economic event, company scandal/controversy, or specific macro thesis as ANY published video in the list above.
+Even if the wording, phrasing, or synonyms are completely different (e.g. "Fed warns of rate shocks" vs "Fed's Waller threatens half-point rate hike", or "Big tech nuclear plants" vs "Atomic reactors for AI datacenters"), if the core underlying catalyst/story is the same, it is a DUPLICATE.
+
+OUTPUT STRICT JSON ONLY:
+{{
+  "is_duplicate": true or false,
+  "matching_title": "string of the matching title or empty",
+  "reason": "1-sentence forensic rationale"
+}}"""
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key={api_key}"
+            payload = {
+                "contents": [{"parts": [{"text": eval_prompt}]}],
+                "generationConfig": {"responseMimeType": "application/json"}
+            }
+            res = requests.post(url, json=payload, timeout=30)
+            if res.status_code == 200:
+                data = json.loads(res.json()["candidates"][0]["content"]["parts"][0]["text"])
+                if data.get("is_duplicate"):
+                    matching = data.get("matching_title", "Unknown")
+                    reason = data.get("reason", "Semantic topic clone")
+                    logger.error(f"⛔ [LLM Semantic Guard Triggered] Topic '{topic}' duplicates '{matching}': {reason}")
+                    raise RuntimeError(
+                        f"⛔ [LLM Semantic Guard Triggered] Topic '{topic}' duplicates published content '{matching}'. "
+                        f"Reason: {reason}. Halting to prevent duplicate video generation!"
+                    )
+                logger.success(f"✓ [LLM Semantic Guard Passed] Verified 100% unique against {len(published_titles)} past titles (180-day window)")
+        except RuntimeError:
+            raise
+        except Exception as llm_err:
+            logger.debug(f"[Duplicate Guard] LLM evaluation notice: {llm_err}")
+
+    logger.success(f"✅ [Duplicate Guard] Verified unique topic over 180-day window: '{topic}'")
 
 
 # ─────────────────────────────────────────────────────────────
