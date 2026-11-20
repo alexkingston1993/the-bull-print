@@ -398,15 +398,3 @@ jobs:
               sleep $JITTER
             done
           fi
-
-      - name: 📡 Dispatch Completion Ping to n8n Webhook
-        if: always()
-        env:
-          N8N_WEBHOOK_URL: ${{ secrets.N8N_WEBHOOK_URL }}
-        run: |
-          if [ -n "$N8N_WEBHOOK_URL" ]; then
-            echo "Notifying n8n orchestrator of workflow status: ${{ job.status }}..."
-            curl -s -X POST "$N8N_WEBHOOK_URL" \
-              -H "Content-Type: application/json" \
-              -d "{\"run_id\":\"${{ github.run_id }}\",\"topic\":\"${{ needs.prepare_session.outputs.topic }}\",\"slug\":\"${{ needs.prepare_session.outputs.slug }}\",\"status\":\"${{ job.status }}\",\"is_short\":\"${{ needs.prepare_session.outputs.is_short }}\"}" || true
-          fi
