@@ -22,7 +22,7 @@ import asyncio
 import subprocess
 import shutil
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageOps
@@ -182,6 +182,7 @@ OUTPUT STRICT JSON ONLY:
             logger.debug(f"[Duplicate Guard] LLM evaluation notice: {llm_err}")
 
     logger.success(f"✅ [Duplicate Guard] Verified unique topic over 180-day window: '{topic}'")
+    return published_titles
 
 
 # ─────────────────────────────────────────────────────────────
@@ -714,6 +715,27 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                     monologue = data.get("monologue", "").strip()
                     if len(g_secs) >= num_sections:
                         gemini_sections = g_secs[:num_sections]
+                    elif attempt >= 2 and len(g_secs) >= 6:
+                        # Auto-interpolate beats to exact target num_sections with distinct camera angles
+                        logger.info(f"⚡ [Script Studio] Subdividing {len(g_secs)} beats to exact target {num_sections} beats...")
+                        expanded = []
+                        ratio = num_sections / len(g_secs)
+                        for idx, sec in enumerate(g_secs):
+                            target_count = round((idx + 1) * ratio) - round(idx * ratio)
+                            for sub_i in range(target_count):
+                                new_sec = dict(sec)
+                                if sub_i > 0:
+                                    base_prompt = sec.get("visual_prompt", "")
+                                    angles = ["extreme close-up macro detail", "wide low-angle atmospheric shot", "over-the-shoulder dramatic tilt"]
+                                    alt_angle = angles[sub_i % len(angles)]
+                                    new_sec["visual_prompt"] = f"{alt_angle}, {base_prompt}"
+                                expanded.append(new_sec)
+                        gemini_sections = expanded[:num_sections]
+
+                    if gemini_sections:
+                        # Re-index section indices
+                        for s_i, sec_item in enumerate(gemini_sections):
+                            sec_item["section_index"] = s_i
                         if monologue:
                             # Attach continuous monologue slices across sections naturally
                             mono_words = monologue.split()
@@ -722,7 +744,7 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                                 start_w = s_i * step
                                 end_w = len(mono_words) if s_i == num_sections - 1 else (s_i + 1) * step
                                 sec_item["script"] = " ".join(mono_words[start_w:end_w])
-                        logger.success(f"✅ [Script Studio] Successfully generated {num_sections} custom investigative sections with continuous monologue ({len(monologue.split()) if monologue else 'N/A'} words)")
+                        logger.success(f"✅ [Script Studio] Successfully prepared {num_sections} custom investigative sections with continuous monologue ({len(monologue.split()) if monologue else 'N/A'} words)")
                         break
                 except Exception as parse_err:
                     logger.debug(f"JSON parse error on attempt {attempt+1}: {parse_err}")
@@ -911,7 +933,7 @@ def prepare_session(
             f"Semantic clones and duplicate topics are strictly prohibited."
         )
 
-    check_duplicate_before_prep(topic)
+    published_titles = check_duplicate_before_prep(topic)
 
     if output_dir is None:
         output_dir = BASE_DIR / "output" / "session_bundle"
@@ -1184,6 +1206,18 @@ def prepare_session(
         "words_file": str(words_file.relative_to(output_dir)),
         "sections": sections,
     }
+
+    # 3.5 Triple-Check Pre-Flight Forensic Audit (Title + Script + Visual Plates)
+    from app.services.compliance_gate import TripleCheckPreflightGate
+    full_monologue = " ".join(s.get("script", "") for s in sections)
+    TripleCheckPreflightGate.run_triple_check_preflight(
+        topic=topic,
+        monologue=full_monologue,
+        frames_dir=frames_dir,
+        expected_frames=len(sections),
+        is_short=is_short,
+        published_titles=published_titles if "published_titles" in locals() else None
+    )
 
     manifest_path = output_dir / "session_manifest.json"
     with open(manifest_path, "w") as f:
