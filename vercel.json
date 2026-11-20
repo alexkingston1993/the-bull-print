@@ -14,6 +14,18 @@
       "destination": "/security.txt"
     },
     {
+      "source": "/pipeline-dashboard",
+      "destination": "/pipeline-dashboard"
+    },
+    {
+      "source": "/pipeline",
+      "destination": "/pipeline-dashboard"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/pipeline-dashboard"
+    },
+    {
       "source": "/mission-control",
       "destination": "/mission-control"
     },
