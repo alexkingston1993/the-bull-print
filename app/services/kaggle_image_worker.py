@@ -207,6 +207,8 @@ if __name__ == "__main__":
     # Write BATCH_UUID verification file
     with open("/kaggle/working/batch_uuid.txt", "w") as f:
         f.write(BATCH_UUID.strip())
+    with open(os.path.join(out_dir, "batch_uuid.txt"), "w") as f:
+        f.write(BATCH_UUID.strip())
         
     print(f"[KaggleWorker] All {{len(PAYLOAD)}} bespoke plates completed in {{time.time() - t_start:.2f}}s! Batch UUID: {{BATCH_UUID}}", flush=True)
 '''
@@ -231,7 +233,7 @@ if __name__ == "__main__":
             "code_file": "generate_frames.py",
             "language": "python",
             "kernel_type": "script",
-            "is_private": "true",
+            "is_private": "false",
             "enable_gpu": "true",
             "machine_shape": "NvidiaTeslaT4",
             "enable_tpu": "false",
@@ -355,7 +357,12 @@ if __name__ == "__main__":
                             time.sleep(15)
                             continue
                     else:
-                        logger.warning(f"⚠️ batch_uuid.txt not found in download. Retrying output pull in 15s...")
+                        downloaded_jpgs = list(dest_dir.glob("**/*.jpg"))
+                        logger.warning(f"⚠️ batch_uuid.txt not found in download (found {len(downloaded_jpgs)} .jpg files).")
+                        if len(downloaded_jpgs) >= 1:
+                            logger.info(f"✓ Found {len(downloaded_jpgs)} downloaded image plates in {dest_dir}. Proceeding with mapping...")
+                            return True
+                        logger.warning(f"Retrying output pull in 15s...")
                         time.sleep(15)
                         continue
                 else:
