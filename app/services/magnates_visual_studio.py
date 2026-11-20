@@ -354,14 +354,34 @@ def draw_sliding_word_caption(
 
 
 def fetch_clean_photographic_plate(prompt: str, width: int = 1080, height: int = 1920, out_path: Optional[Path] = None) -> Image.Image:
-    """Acquires a 100% clean photographic plate exclusively via Kaggle Dual-T4 GPU diffusers with strict aspect ratio and zero baked-in text."""
+    """Acquires a 100% clean photographic plate exclusively via Cloudflare Serverless GPUs or Kaggle Dual-T4 GPU diffusers with strict aspect ratio and zero baked-in text."""
     import re
-    from app.services.kaggle_image_worker import KaggleImageWorker
+    from app.services.cloudflare_image_worker import CloudflareImageWorker
 
     clean_prompt = prompt.replace("clean plate", "").replace("zero text", "").replace("zero watermark", "").strip()
 
-    # Zero Compromise & Zero Reuse: Live Dispatch to Kaggle Dual-T4 GPU
+    # Tier 1 Priority: Live Dispatch to Cloudflare Serverless GPU (FLUX.1-schnell / SDXL)
     try:
+        cf_worker = CloudflareImageWorker()
+        aspect = "9:16" if height > width else "16:9"
+        out_f = out_path if out_path else Path("/tmp/cf_live_plate.jpg")
+        img = cf_worker.generate_single_plate(
+            prompt=clean_prompt,
+            width=width,
+            height=height,
+            out_path=out_f
+        )
+        if img is not None and out_f.exists():
+            if out_path and out_path != out_f:
+                img.save(out_path, quality=95)
+            logger.success(f"✓ [Cloudflare GPU Cloud] Fresh bespoke plate generated on Cloudflare: {out_f.name}")
+            return img
+    except Exception as cf_err:
+        logger.warning(f"⚠️ [Cloudflare Dispatch Notice]: {cf_err}. Falling back to Kaggle Dual-T4 GPU...")
+
+    # Tier 2 Fallback: Live Dispatch to Kaggle Dual-T4 GPU
+    try:
+        from app.services.kaggle_image_worker import KaggleImageWorker
         worker = KaggleImageWorker()
         aspect = "9:16" if height > width else "16:9"
         out_f = out_path if out_path else Path("/tmp/kaggle_live_plate.jpg")
@@ -377,11 +397,11 @@ def fetch_clean_photographic_plate(prompt: str, width: int = 1080, height: int =
             logger.success(f"✓ [Kaggle GPU Cloud] Fresh bespoke plate generated on Kaggle GPU: {out_f.name}")
             return img
     except Exception as e:
-        logger.error(f"[Kaggle GPU Dispatch Failed]: {e}")
+        logger.error(f"[Cloud GPU Dispatch Failed]: {e}")
         raise RuntimeError(
-            f"⛔ CRITICAL: Failed to acquire Kaggle Dual-T4 GPU photographic plate for prompt '{prompt[:60]}'. "
+            f"⛔ CRITICAL: Failed to acquire cloud GPU photographic plate for prompt '{prompt[:60]}'. "
             f"Per Standing Rule 1 & Zero Compromise Mandate, procedural placeholders, blank gradients, and web APIs are PERMANENTLY PROHIBITED. "
-            f"100% of plates must be generated via native CUDA diffusers on Kaggle GPU."
+            f"100% of plates must be generated via cloud GPUs (Cloudflare / Kaggle)."
         ) from e
 
     raise RuntimeError(

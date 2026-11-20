@@ -5,6 +5,7 @@
 
 export interface Env {
   DB: D1Database;
+  AI: any;
   VAULT?: R2Bucket;
   GITHUB_PAT?: string;
   GITHUB_REPO: string;
@@ -136,6 +137,11 @@ export default {
       return new Response(JSON.stringify(res), {
         headers: { "Content-Type": "application/json" }
       });
+    }
+
+    // High-Performance Cloudflare Workers AI Plate Generator
+    if (path === "/generate-plate" && request.method === "POST") {
+      return await handleGeneratePlate(request, env);
     }
 
     // Telegram Bot Webhook endpoint for ARIA
@@ -1744,4 +1750,70 @@ async function toolPublishOrCheckTikTok(action: string, env: Env): Promise<any> 
     next_up_candidates: nextCandidate || [],
     last_published: lastPublished && lastPublished[0] ? lastPublished[0] : null
   };
+}
+
+/**
+ * Cloudflare Workers AI Plate Generator Handler
+ * Exposes serverless zero-cold-start SDXL-Lightning & Flux image generation.
+ */
+async function handleGeneratePlate(request: Request, env: Env): Promise<Response> {
+  try {
+    const data = (await request.json()) as {
+      prompt: string;
+      model?: string;
+      num_steps?: number;
+    };
+
+    if (!data.prompt) {
+      return new Response(JSON.stringify({ error: "Missing prompt parameter" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
+    const prompt = data.prompt;
+    const model = data.model || "@cf/black-forest-labs/flux-1-schnell";
+
+    let result: any;
+    try {
+      const input: any = { prompt: prompt };
+      if (data.num_steps) input.steps = data.num_steps;
+      result = await env.AI.run(model, input);
+    } catch (modelErr: any) {
+      return new Response(JSON.stringify({ model, error: String(modelErr), stack: modelErr?.stack }), {
+        status: 502,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
+    if (result && typeof result === "object" && typeof result.image === "string") {
+      const binaryString = atob(result.image);
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      return new Response(bytes.buffer, {
+        status: 200,
+        headers: {
+          "Content-Type": "image/jpeg",
+          "Cache-Control": "public, max-age=86400"
+        }
+      });
+    }
+
+    return new Response(result, {
+      status: 200,
+      headers: {
+        "Content-Type": "image/jpeg",
+        "Cache-Control": "public, max-age=86400"
+      }
+    });
+  } catch (err: any) {
+    console.error("[Workers AI] Generation failed:", err);
+    return new Response(JSON.stringify({ error: String(err) }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
 }

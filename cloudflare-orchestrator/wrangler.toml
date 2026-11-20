@@ -16,6 +16,9 @@ database_id = "f54ea399-d524-45d9-8974-bf4edfb4741a"
 # binding = "VAULT"
 # bucket_name = "tbp-frame-vault"
 
+[ai]
+binding = "AI"
+
 [vars]
 GITHUB_REPO = "alexkingston1993/the-bull-print"
 MASTER_WORKFLOW = "daily_5am_production_master.yml"

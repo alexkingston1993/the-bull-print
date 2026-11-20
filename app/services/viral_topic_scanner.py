@@ -453,7 +453,8 @@ class ViralTopicScanner:
             other_tokens = _core_title_tokens(other_title)
             shared_batch = cand_tokens & other_tokens
             specific_shared = shared_batch - FINANCE_SECTOR_WORDS
-            if len(shared_batch) >= 3 or len(specific_shared) >= 2:
+            HIGH_IMPACT_TOPIC_WORDS = {"polymarket", "prediction", "anthropic", "coreweave", "nvidia", "annuity", "crude", "oil", "jpmorgan", "intuit"}
+            if len(shared_batch) >= 3 or len(specific_shared) >= 2 or (shared_batch & HIGH_IMPACT_TOPIC_WORDS):
                 logger.warning(f"🛡️ [Compliance Gate] Candidate '{title}' too similar to another topic in current batch: '{other_title}' (shared: {shared_batch})")
                 return False
 
