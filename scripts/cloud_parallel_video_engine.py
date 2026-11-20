@@ -50,13 +50,17 @@ def _send_telegram(msg: str):
 # 1. DUPLICATE DETECTION & TOPIC INTEGRITY GUARD
 # ─────────────────────────────────────────────────────────────
 
-def check_duplicate_before_prep(topic: str) -> None:
+_CACHED_PUBLISHED_TITLES: Optional[List[str]] = None
+
+def check_duplicate_before_prep(topic: str) -> List[str]:
     """
     STRICT DEDUPLICATION GUARD (180-DAY ENFORCEMENT):
     Prevents re-rendering identical visuals or re-uploading topics already published
     in the last 180 days on YouTube or in local content/posts.
     Utilizes live YouTube Data API channel history and Gemini Flash Lite LLM semantic comparison.
     """
+    global _CACHED_PUBLISHED_TITLES
+
     topic_clean = topic.strip().lower()
     topic_words = set(re.sub(r"[^\w\s]", "", topic_clean).split())
     stop_words = {"the", "a", "an", "and", "or", "how", "to", "in", "of", "for", "on", "with", "is", "at", "by", "what", "why"}
@@ -67,73 +71,87 @@ def check_duplicate_before_prep(topic: str) -> None:
 
     logger.info(f"🔍 [Duplicate Guard] Checking 180-day topic integrity for: '{topic}' (core keywords: {core_words})")
 
-    published_titles = []
-
-    # 1. Check local content/posts
-    posts_dir = BASE_DIR / "content" / "posts"
-    if posts_dir.exists():
-        for p in posts_dir.glob("*.md"):
-            name = p.stem.lower().replace("-", " ")
-            published_titles.append(name)
-            name_words = set(re.sub(r"[^\w\s]", "", name).split()) - stop_words
-            overlap = len(core_words & name_words)
-            if len(core_words) > 0 and (overlap / len(core_words)) >= 0.7:
-                logger.error(f"⛔ Topic matches published article: {p.name}")
+    if _CACHED_PUBLISHED_TITLES is not None:
+        published_titles = list(_CACHED_PUBLISHED_TITLES)
+        for prev_t in published_titles:
+            p_words = set(re.sub(r"[^\w\s]", "", prev_t.lower()).split()) - stop_words
+            overlap = len(core_words & p_words)
+            if len(core_words) > 0 and (overlap / len(core_words)) >= 0.65:
+                logger.error(f"⛔ Topic closely matches published title: '{prev_t}'")
                 raise RuntimeError(
-                    f"⛔ [Duplicate Guard Triggered] Topic '{topic}' matches already-published content in '{p.name}'. "
-                    f"Refusing to generate duplicate video or recycle old visual frames!"
+                    f"⛔ [Duplicate Guard Triggered] Topic '{topic}' was already published: '{prev_t}'. "
+                    f"Refusing to upload duplicate video frames or recycle existing video!"
                 )
+    else:
+        published_titles = []
 
-    # 2. Check live YouTube uploads via OAuth pool (180-day window)
-    try:
-        from app.services.youtube_uploader import get_uploader
-        uploader = get_uploader()
-        service = uploader._get_service("en")
-        if service:
-            channel_res = service.channels().list(mine=True, part="contentDetails").execute()
-            if channel_res and channel_res.get("items"):
-                uploads_pl = channel_res["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
-                next_page = None
-                cutoff_dt = datetime.now(timezone.utc) - timedelta(days=180)
-                while True:
-                    pl_res = service.playlistItems().list(
-                        playlistId=uploads_pl,
-                        part="snippet",
-                        maxResults=50,
-                        pageToken=next_page,
-                    ).execute()
-                    for itm in pl_res.get("items", []):
-                        snip = itm.get("snippet", {})
-                        v_title = snip.get("title", "")
-                        pub_at = snip.get("publishedAt", "")
-                        if pub_at:
-                            try:
-                                dt = datetime.fromisoformat(pub_at.replace("Z", "+00:00"))
-                                if dt < cutoff_dt:
-                                    next_page = None
-                                    break
-                            except Exception:
-                                pass
-                        if v_title and v_title != "Deleted video":
-                            clean_t = v_title.split("|")[0].split("#")[0].strip()
-                            published_titles.append(clean_t)
-                            v_words = set(re.sub(r"[^\w\s]", "", v_title.lower()).split()) - stop_words
-                            overlap = len(core_words & v_words)
-                            if len(core_words) > 0 and (overlap / len(core_words)) >= 0.65:
-                                v_id = snip.get("resourceId", {}).get("videoId")
-                                logger.error(f"⛔ Topic closely matches YouTube video: '{v_title}' ({v_id})")
-                                raise RuntimeError(
-                                    f"⛔ [Duplicate Guard Triggered] Topic '{topic}' was already published on YouTube as: "
-                                    f"'{v_title}' (https://youtu.be/{v_id}). "
-                                    f"Refusing to upload duplicate video frames or recycle existing video!"
-                                )
-                    next_page = pl_res.get("nextPageToken")
-                    if not next_page or len(published_titles) >= 150:
-                        break
-    except RuntimeError:
-        raise
-    except Exception as e:
-        logger.debug(f"[Duplicate Guard] Channel query notice: {e}")
+        # 1. Check local content/posts
+        posts_dir = BASE_DIR / "content" / "posts"
+        if posts_dir.exists():
+            for p in posts_dir.glob("*.md"):
+                name = p.stem.lower().replace("-", " ")
+                published_titles.append(name)
+                name_words = set(re.sub(r"[^\w\s]", "", name).split()) - stop_words
+                overlap = len(core_words & name_words)
+                if len(core_words) > 0 and (overlap / len(core_words)) >= 0.7:
+                    logger.error(f"⛔ Topic matches published article: {p.name}")
+                    raise RuntimeError(
+                        f"⛔ [Duplicate Guard Triggered] Topic '{topic}' matches already-published content in '{p.name}'. "
+                        f"Refusing to generate duplicate video or recycle old visual frames!"
+                    )
+
+        # 2. Check live YouTube uploads via OAuth pool (180-day window)
+        try:
+            from app.services.youtube_uploader import get_uploader
+            uploader = get_uploader()
+            service = uploader._get_service("en")
+            if service:
+                channel_res = service.channels().list(mine=True, part="contentDetails").execute()
+                if channel_res and channel_res.get("items"):
+                    uploads_pl = channel_res["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+                    next_page = None
+                    cutoff_dt = datetime.now(timezone.utc) - timedelta(days=180)
+                    while True:
+                        pl_res = service.playlistItems().list(
+                            playlistId=uploads_pl,
+                            part="snippet",
+                            maxResults=50,
+                            pageToken=next_page,
+                        ).execute()
+                        for itm in pl_res.get("items", []):
+                            snip = itm.get("snippet", {})
+                            v_title = snip.get("title", "")
+                            pub_at = snip.get("publishedAt", "")
+                            if pub_at:
+                                try:
+                                    dt = datetime.fromisoformat(pub_at.replace("Z", "+00:00"))
+                                    if dt < cutoff_dt:
+                                        next_page = None
+                                        break
+                                except Exception:
+                                    pass
+                            if v_title and v_title != "Deleted video":
+                                clean_t = v_title.split("|")[0].split("#")[0].strip()
+                                published_titles.append(clean_t)
+                                v_words = set(re.sub(r"[^\w\s]", "", v_title.lower()).split()) - stop_words
+                                overlap = len(core_words & v_words)
+                                if len(core_words) > 0 and (overlap / len(core_words)) >= 0.65:
+                                    v_id = snip.get("resourceId", {}).get("videoId")
+                                    logger.error(f"⛔ Topic closely matches YouTube video: '{v_title}' ({v_id})")
+                                    raise RuntimeError(
+                                        f"⛔ [Duplicate Guard Triggered] Topic '{topic}' was already published on YouTube as: "
+                                        f"'{v_title}' (https://youtu.be/{v_id}). "
+                                        f"Refusing to upload duplicate video frames or recycle existing video!"
+                                    )
+                        next_page = pl_res.get("nextPageToken")
+                        if not next_page or len(published_titles) >= 150:
+                            break
+        except RuntimeError:
+            raise
+        except Exception as e:
+            logger.debug(f"[Duplicate Guard] Channel query notice: {e}")
+
+        _CACHED_PUBLISHED_TITLES = list(published_titles)
 
     # 3. LLM-Based Semantic Deduplication Gate (180-day catalog check)
     api_key = os.getenv("GEMINI_API_KEY")
@@ -1019,30 +1037,100 @@ def prepare_session(
     if not topic or not topic.strip():
         raise ValueError("A valid non-empty topic must be provided for video generation.")
 
-    # 0. STRICT ZERO-COMPROMISE COMPLIANCE & 30-DAY ANTI-DUPLICATION GATE (GATE 1)
+    # 0. STRICT ZERO-COMPROMISE COMPLIANCE & DEDUPLICATION GATE (GATE 1) WITH AUTO-HEAL
     from app.services.content_authenticity_engine import ContentAuthenticityEngine
     from app.services.compliance_gate import ComplianceGate
 
     logger.info(f"🛡️ [Compliance Gate] Auditing topic '{topic}' against 30-day history and regulatory safe harbor...")
-    if not ComplianceGate._check_30_day_freshness(topic):
-        logger.warning(f"⚠️ [Compliance Gate] Topic '{topic}' violates 30-day freshness rule. Activating Compliance Auto-Healer to pivot to a fresh topic...")
+
+    def _verify_topic_integrity(t: str) -> tuple[bool, str, List[str]]:
+        if not ComplianceGate._check_30_day_freshness(t):
+            return False, "Failed ComplianceGate 30-day freshness rule", []
+        if skip_duplicate_check:
+            return True, "", []
+        try:
+            titles = check_duplicate_before_prep(t)
+            return True, "", titles
+        except RuntimeError as dup_err:
+            return False, str(dup_err), []
+        except Exception as err:
+            logger.warning(f"Non-fatal error in duplicate check: {err}")
+            return True, "", []
+
+    is_ok, reject_reason, published_titles = _verify_topic_integrity(topic)
+    if not is_ok:
+        logger.warning(
+            f"⚠️ [Topic Rejection] Candidate topic '{topic}' rejected: {reject_reason}. "
+            f"Activating Auto-Healer to pivot to a fresh compliant topic..."
+        )
+        fresh_topic = None
+        # 1. Try candidates from ViralTopicScanner
         try:
             from app.services.viral_topic_scanner import ViralTopicScanner
             scanner = ViralTopicScanner()
             manifest = scanner.scan_past_24h_topics()
-            candidates = [s["title"] for s in manifest.get("shorts" if is_short else "documentaries", [])]
-            fresh_topic = next((c for c in candidates if ComplianceGate._check_30_day_freshness(c)), None)
-            if fresh_topic:
-                logger.success(f"✓ [Compliance Auto-Heal] Successfully pivoted from overlapping topic to fresh compliant topic: '{fresh_topic}'")
-                topic = fresh_topic
-            else:
-                raise RuntimeError(f"⛔ COMPLIANCE GATE REJECTION: Topic '{topic}' violates 30-day freshness and no fresh candidates were found.")
-        except Exception as heal_err:
-            raise RuntimeError(
-                f"⛔ COMPLIANCE GATE REJECTION: Topic '{topic}' violates 30-day freshness rule: {heal_err}"
-            )
+            raw_candidates = manifest.get("shorts_topics" if is_short else "documentary_topics", [])
+            if not raw_candidates:
+                raw_candidates = manifest.get("shorts" if is_short else "documentaries", [])
+            candidates = [c["title"] if isinstance(c, dict) else str(c) for c in raw_candidates]
+            for cand in candidates:
+                cand_ok, cand_reason, titles = _verify_topic_integrity(cand)
+                if cand_ok:
+                    fresh_topic = cand
+                    published_titles = titles
+                    logger.success(f"✓ [Auto-Heal Scanner] Discovered compliant topic: '{fresh_topic}'")
+                    break
+                else:
+                    logger.info(f"Scanner candidate '{cand}' not viable ({cand_reason}), testing next...")
+        except Exception as scan_err:
+            logger.warning(f"Auto-Heal scanner query notice: {scan_err}")
 
-    published_titles = check_duplicate_before_prep(topic)
+        # 2. If scanner candidates did not yield a fresh topic, query Gemini LLM directly with explicit negative constraints
+        if not fresh_topic:
+            api_key = os.getenv("GEMINI_API_KEY")
+            if api_key:
+                try:
+                    import requests
+                    avoid_hints = reject_reason[:200]
+                    titles_summary = "\n".join(f"- {t}" for t in (published_titles or [])[:40])
+                    eval_prompt = f"""You are an executive editor for The Bull Print.
+Generate 5 viral, breaking financial macro topics for a {'60-second Short' if is_short else '12-minute deep-dive Documentary'}.
+CRITICAL CONSTRAINT: You MUST NOT cover anything already in this list:
+{titles_summary}
+
+Do NOT generate topics about: {avoid_hints}
+
+Instead, explore urgent breaking financial angles across:
+- Maritime logistics and crude tanker chokepoints
+- Big Tech AI datacenter energy deals and semiconductor constraints
+- Sovereign currency reserves or physical gold repatriation
+- Commercial real estate debt refinancing traps
+- Everyday consumer banking traps and hidden fee extraction
+
+OUTPUT STRICT JSON ONLY:
+{{"candidates": ["Topic 1", "Topic 2", "Topic 3", "Topic 4", "Topic 5"]}}"""
+                    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key={api_key}"
+                    r = requests.post(url, json={"contents": [{"parts": [{"text": eval_prompt}]}], "generationConfig": {"responseMimeType": "application/json"}}, timeout=30)
+                    if r.status_code == 200:
+                        llm_cands = json.loads(r.json()["candidates"][0]["content"]["parts"][0]["text"]).get("candidates", [])
+                        for lc in llm_cands:
+                            lc_ok, lc_reason, titles = _verify_topic_integrity(lc)
+                            if lc_ok:
+                                fresh_topic = lc
+                                published_titles = titles
+                                logger.success(f"✓ [Auto-Heal Direct LLM] Discovered compliant topic: '{fresh_topic}'")
+                                break
+                except Exception as gen_err:
+                    logger.warning(f"Direct LLM topic generation notice: {gen_err}")
+
+        if fresh_topic:
+            logger.success(f"✓ [Auto-Healer Success] Successfully pivoted from '{topic}' to fresh topic: '{fresh_topic}'")
+            topic = fresh_topic
+        else:
+            raise RuntimeError(
+                f"⛔ COMPLIANCE & DEDUP REJECTION: Topic '{topic}' is duplicate/non-compliant ({reject_reason}) "
+                f"and all auto-healed candidates were rejected."
+            )
 
     if output_dir is None:
         output_dir = BASE_DIR / "output" / "session_bundle"
