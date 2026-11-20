@@ -29,6 +29,10 @@ on:
       publish_at:
         description: 'ISO 8601 UTC timestamp for scheduled release (e.g. 2026-11-15T22:00:00Z)'
         required: false
+      kaggle_account:
+        description: 'Target Kaggle Account (alexkingston | alexytcreative | auto)'
+        required: false
+        default: 'auto'
 
   repository_dispatch:
     types: [trigger_parallel_video, trigger_media_engine]
@@ -86,23 +90,34 @@ jobs:
             echo "✓ Restored OAuth pool JSON"
           fi
 
-      - name: ⚙️ Setup Kaggle GPU Credentials
+      - name: ⚙️ Setup Kaggle GPU Credentials (Dual-Account Routing)
         env:
           KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+          TARGET_ACCOUNT: ${{ github.event.inputs.kaggle_account || github.event.client_payload.kaggle_account || 'auto' }}
+          IS_SHORT: ${{ github.event.inputs.shorts_only || github.event.client_payload.shorts_only || 'true' }}
           PYTHONUNBUFFERED: "1"
         run: |
           mkdir -p ~/.kaggle
-          if [ -n "$KAGGLE_API_TOKEN" ]; then
-            echo "$KAGGLE_API_TOKEN" > ~/.kaggle/access_token
-            chmod 600 ~/.kaggle/access_token
-            echo "KAGGLE_API_TOKEN=$KAGGLE_API_TOKEN" >> $GITHUB_ENV
-            echo "✓ Restored Kaggle Bearer API Token"
-          fi
-          if [ -n "$KAGGLE_USERNAME" ] && [ -n "$KAGGLE_KEY" ]; then
-            echo "{\"username\":\"$KAGGLE_USERNAME\",\"key\":\"$KAGGLE_KEY\"}" > ~/.kaggle/kaggle.json
+          if [ "$TARGET_ACCOUNT" = "alexytcreative" ] || { [ "$TARGET_ACCOUNT" = "auto" ] && [ "$IS_SHORT" = "false" ]; }; then
+            echo "⚡ [Kaggle Account Router] Routing to Account 2 (alexytcreative) for Documentaries..."
+            rm -f ~/.kaggle/access_token
+            echo "{\"username\":\"alexytcreative\",\"key\":\"$KAGGLE_KEY\"}" > ~/.kaggle/kaggle.json
             chmod 600 ~/.kaggle/kaggle.json
+            echo "KAGGLE_USERNAME=alexytcreative" >> $GITHUB_ENV
+            echo "KAGGLE_KEY=$KAGGLE_KEY" >> $GITHUB_ENV
+          else
+            echo "⚡ [Kaggle Account Router] Routing to Account 1 (alexkingston) for Shorts..."
+            if [ -n "$KAGGLE_API_TOKEN" ]; then
+              echo "$KAGGLE_API_TOKEN" > ~/.kaggle/access_token
+              chmod 600 ~/.kaggle/access_token
+              echo "KAGGLE_API_TOKEN=$KAGGLE_API_TOKEN" >> $GITHUB_ENV
+            fi
+            if [ -n "$KAGGLE_USERNAME" ] && [ -n "$KAGGLE_KEY" ]; then
+              echo "{\"username\":\"$KAGGLE_USERNAME\",\"key\":\"$KAGGLE_KEY\"}" > ~/.kaggle/kaggle.json
+              chmod 600 ~/.kaggle/kaggle.json
+            fi
           fi
 
       - name: 🚀 Prepare Session & Compute Parallel Matrix
