@@ -47,19 +47,19 @@
         <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-2.5">
           <div class="text-slate-400 text-[10px] uppercase tracking-wider">Shorts Target</div>
           <div class="text-base font-bold text-emerald-400 mt-0.5 flex items-baseline gap-1">
-            4 <span class="text-xs text-slate-500 font-normal">/ 10 Published</span>
+            5 <span class="text-xs text-slate-500 font-normal">/ 10 Published</span>
           </div>
           <div class="w-full bg-slate-800 h-1 rounded-full mt-1.5 overflow-hidden">
-            <div class="bg-emerald-500 h-full rounded-full" style="width: 40%"></div>
+            <div class="bg-emerald-500 h-full rounded-full" style="width: 50%"></div>
           </div>
         </div>
 
         <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-2.5">
           <div class="text-slate-400 text-[10px] uppercase tracking-wider">Documentaries</div>
           <div class="text-base font-bold text-amber-400 mt-0.5 flex items-baseline gap-1">
-            0 <span class="text-xs text-slate-500 font-normal">/ 2 Queued</span>
+            1 <span class="text-xs text-slate-500 font-normal">/ 2 In Production</span>
           </div>
-          <div class="text-[10px] text-slate-500 mt-1">Unlocks after Short #10</div>
+          <div class="text-[10px] text-amber-400 mt-1">Run #44817798379 Running</div>
         </div>
 
         <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-2.5">
@@ -357,27 +357,41 @@
         audio: "Master Continuous Monologue (Single-Runner Engine)"
       },
       5: {
-        id: null,
+        id: "e7bSJ_Hqohc",
         num: 5,
         title: "Berkshire's Cash Hoard: Why Buffett Bought $150B in Treasuries Instead of Stocks",
         sector: "Sovereign Debt & Treasury Tail Risk",
-        status: "queued",
+        status: "public",
+        duration: "58.2s",
+        plates: 20,
+        kaggle_time: "4m 20s",
+        render_time: "2m 55s",
+        run_id: "44817765149",
+        run_url: "https://github.com/alexkingston1993/the-bull-print/actions/runs/44817765149",
+        audio: "Master Continuous Monologue (Single-Runner Engine)"
+      },
+      6: {
+        id: null,
+        num: 6,
+        title: "401(k) Nvidia Concentration: Your Retirement's Single Point of Failure",
+        sector: "Institutional Index Weighting & Pension Risk",
+        status: "in_progress",
         duration: "60.0s",
         plates: 20,
-        kaggle_time: "Pending",
+        kaggle_time: "Generating...",
         render_time: "Pending",
-        run_id: null,
-        run_url: null,
-        audio: "Queued for Production"
+        run_id: "44819602974",
+        run_url: "https://github.com/alexkingston1993/the-bull-print/actions/runs/44819602974",
+        audio: "Single-Runner Synthesis Active"
       }
     };
 
-    let currentVideo = 4;
+    let currentVideo = 5;
 
     function renderVideoCards() {
       const grid = document.getElementById("video-cards-grid");
       grid.innerHTML = "";
-      [1, 2, 3, 4].forEach(n => {
+      [1, 2, 3, 4, 5].forEach(n => {
         const v = VIDEO_DATA[n];
         grid.innerHTML += `
           <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-lg hover:border-slate-700 transition">
