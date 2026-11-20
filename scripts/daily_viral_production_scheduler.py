@@ -203,7 +203,8 @@ def run_daily_production(dry_run: bool = False):
                 "-f", f"vertical={vertical}",
                 "-f", "shorts_only=true",
                 "-f", "duration_sec=60",
-                "-f", "privacy_status=private",
+                "-f", "privacy_status=public",
+                "-f", "kaggle_account=alexkingston",
                 "-f", f"publish_at={publish_at}"
             ]
 
@@ -270,7 +271,8 @@ def run_daily_production(dry_run: bool = False):
                 "-f", f"vertical={vertical}",
                 "-f", "shorts_only=false",
                 "-f", "duration_min=12",
-                "-f", "privacy_status=private",
+                "-f", "privacy_status=public",
+                "-f", "kaggle_account=alexytcreative",
                 "-f", f"publish_at={publish_at}"
             ]
 
