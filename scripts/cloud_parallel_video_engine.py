@@ -690,6 +690,10 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
              * MANDATORY PHYSICAL METAPHORS: Bank vaults sucking vortices, split cargo container ships in storms, gold bullion on dark marble, fighter jets flanking flags, passports locked in chains, robotic arms throwing sparks, distressed trader clutching head before giant red smartphone chart.
              * Suffix: "cinematic 35mm photograph, dark moody obsidian lighting, volumetric amber and gold rays, 8k hyper-detailed, clean plate, zero text, zero watermark"
 
+        CRITICAL ARCHITECTURAL SEPARATION:
+        - 'monologue': STRICTLY AND EXCLUSIVELY for the spoken narration audio. Write it as ONE unified, continuous, deeply human investigative story of exactly 5 to 7 rich sentences (130 to 140 words total).
+        - 'sections': STRICTLY AND EXCLUSIVELY for the 20 visual photographic plates and 3D kinetic typography. Each section defines the visual prompt for Kaggle GPU diffusers, headlines, and badges. Do NOT provide or slice spoken sentences into sections.
+
         Respond ONLY with a valid JSON object matching this structure:
         {{
           "monologue": "Full continuous unbroken narration script of exactly 5 to 7 human sentences (130 to 140 words total)...",
@@ -700,8 +704,7 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
               "headline_mid": "...",
               "badge_text": "...",
               "color_theme": "gold",
-              "visual_prompt": "...",
-              "spoken_phrase": "..."
+              "visual_prompt": "Cinematic 35mm photograph of concrete physical metaphor illustrating this moment..."
             }}
           ]
         }}
@@ -717,14 +720,12 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                     data = json.loads(raw_text)
                     g_secs = data.get("sections", [])
                     monologue = data.get("monologue", "").strip()
-                    if not monologue and g_secs:
-                        monologue = " ".join(sec.get("spoken_phrase", "") for sec in g_secs if sec.get("spoken_phrase")).strip()
 
                     if len(g_secs) >= num_sections:
                         gemini_sections = g_secs[:num_sections]
                     elif attempt >= 2 and len(g_secs) >= 6:
                         # Auto-interpolate beats to exact target num_sections with distinct camera angles
-                        logger.info(f"⚡ [Script Studio] Subdividing {len(g_secs)} beats to exact target {num_sections} beats...")
+                        logger.info(f"⚡ [Script Studio] Subdividing {len(g_secs)} visual beats to exact target {num_sections} beats...")
                         expanded = []
                         ratio = num_sections / len(g_secs)
                         for idx, sec in enumerate(g_secs):
@@ -745,14 +746,7 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                             sec_item["section_index"] = s_i
                         if monologue:
                             gemini_sections[0]["master_monologue"] = monologue
-                            # Distribute monologue text smoothly across sections without breaking sentences
-                            mono_words = monologue.split()
-                            step = max(1, len(mono_words) // num_sections)
-                            for s_i, sec_item in enumerate(gemini_sections):
-                                start_w = s_i * step
-                                end_w = len(mono_words) if s_i == num_sections - 1 else (s_i + 1) * step
-                                sec_item["script"] = " ".join(mono_words[start_w:end_w])
-                        logger.success(f"✅ [Script Studio] Successfully prepared {num_sections} custom investigative sections with human master monologue ({len(monologue.split()) if monologue else 'N/A'} words)")
+                        logger.success(f"✅ [Script Studio] Successfully prepared {num_sections} visual plates with master human monologue ({len(monologue.split()) if monologue else 'N/A'} words)")
                         break
                 except Exception as parse_err:
                     logger.debug(f"JSON parse error on attempt {attempt+1}: {parse_err}")
@@ -769,11 +763,13 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
         )
 
     # Clean script fields and sanitize identity references without breaking sentence flow
+    master_mono = ""
     if gemini_sections and "master_monologue" in gemini_sections[0]:
         clean_mono = str(gemini_sections[0]["master_monologue"]).strip()
         clean_mono = re.sub(r"\b(?:I am|I'm|this is|my name is)\s+Christopher\b", "I'm Alex", clean_mono, flags=re.IGNORECASE)
         clean_mono = re.sub(r"\bChristopher\b", "Alex", clean_mono, flags=re.IGNORECASE)
         gemini_sections[0]["master_monologue"] = clean_mono
+        master_mono = clean_mono
 
     for i in range(num_sections):
         start_t = round(i * interval, 2)
@@ -824,6 +820,8 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
             "method_c_hud": has_hud,
             "script": script_text,
         })
+    if sections and master_mono:
+        sections[0]["master_monologue"] = master_mono
     return sections
 
 
@@ -1190,15 +1188,15 @@ def prepare_session(
         "kaggle_indices": kaggle_indices,
         "audio_file": str(audio_file.relative_to(output_dir)),
         "words_file": str(words_file.relative_to(output_dir)),
+        "monologue": full_script,
         "sections": sections,
     }
 
     # 3.5 Triple-Check Pre-Flight Forensic Audit (Title + Script + Visual Plates)
     from app.services.compliance_gate import TripleCheckPreflightGate
-    full_monologue = " ".join(s.get("script", "") for s in sections)
     TripleCheckPreflightGate.run_triple_check_preflight(
         topic=topic,
-        monologue=full_monologue,
+        monologue=full_script,
         frames_dir=frames_dir,
         expected_frames=len(sections),
         is_short=is_short,
