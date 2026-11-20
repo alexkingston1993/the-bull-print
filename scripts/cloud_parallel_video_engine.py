@@ -665,16 +665,20 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
            - Opening MUST BE A VISCERAL, UNIGNORABLE HOOK: A direct threat, shocking accusation, or urgent mystery confronting the viewer's bank account.
 
         2. PERSONALIZE THE THREAT (EVERY STORY HAS A VILLAIN, A VICTIM, AND A CRIME):
-           - The victim is the everyday viewer working a 9-to-5 job.
+           - The victim is the everyday viewer working hard for their money.
            - The villain is the institutional desk, shadow banker, or predatory algorithm.
 
         3. ONE SINGLE INSANE FACT PER SHORT (NO ACADEMIC DATA DUMPS):
            - Focus on ONE shocking smoking gun. Build relentless tension for 40 seconds, then drop the jaw-dropping revelation in the final 15 seconds.
 
-        4. CONTINUOUS UNBROKEN NARRATIVE MONOLOGUE (ZERO ARTIFICIAL 4-SECOND AUDIO STOPS):
-           - The audio narration MUST be written as ONE continuous, free-flowing, breathless investigative monologue for the entire video (130-140 words total).
-           - Do NOT write disjointed 4-second sentence fragments. The monologue must flow with natural human conversational momentum from beginning to end.
-           - Spoken words do NOT stop or pause for plate changes. The visual photographic plates change every 3 to 4 seconds independently while the narrator speaks continuously.
+        4. MASTER CONTINUOUS HUMAN MONOLOGUE (ZERO ROBOTIC MICRO-BEAT CHECKLISTS):
+           - The audio narration MUST be written as ONE continuous, fluid, deeply human investigative monologue of 130 to 140 words total.
+           - NATURAL HUMAN SENTENCE CADENCE: Exactly 5 to 7 well-developed, complete human sentences.
+             * SENTENCE LENGTH: Each sentence MUST be between 18 and 26 words.
+             * STRICTLY FORBIDDEN: Choppy, robotic 4-to-6 word checklist bullet points (e.g. NEVER write 'The market crashed. Funds sold off. Retail bought. Prices dropped.').
+             * NATURAL PUNCTUATION & BREATHING: Use commas (',') for natural breath pauses within thoughts, em-dashes ('—') for dramatic investigative pivots, and periods ('.') ONLY at the conclusion of complete narrative thoughts.
+           - The voice track is synthesized as ONE uninterrupted, seamless human voice take. The audio is NEVER chopped into 3-second or 4-second intervals.
+           - Visual photographic plates (20 cuts) change every 3.0 seconds independently across this voice track, with captions synchronized via millisecond word alignments.
 
         5. PACING & BLOCKBUSTER 3D TYPOGRAPHY DIRECTIVES FOR EACH VISUAL PLATE:
            - 'headline_top': Exactly 1 to 2 words uppercase punchy hook (e.g. '$7 TRILLION', '1.3 MILLION', '2 CRORE', '₹85 LOW', 'H-1B', 'HAL & BEL').
@@ -688,7 +692,7 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
 
         Respond ONLY with a valid JSON object matching this structure:
         {{
-          "monologue": "Full continuous unbroken narration script of 130 to 140 words for the entire short...",
+          "monologue": "Full continuous unbroken narration script of exactly 5 to 7 human sentences (130 to 140 words total)...",
           "sections": [
             {{
               "section_index": 0,
@@ -713,6 +717,9 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                     data = json.loads(raw_text)
                     g_secs = data.get("sections", [])
                     monologue = data.get("monologue", "").strip()
+                    if not monologue and g_secs:
+                        monologue = " ".join(sec.get("spoken_phrase", "") for sec in g_secs if sec.get("spoken_phrase")).strip()
+
                     if len(g_secs) >= num_sections:
                         gemini_sections = g_secs[:num_sections]
                     elif attempt >= 2 and len(g_secs) >= 6:
@@ -737,14 +744,15 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                         for s_i, sec_item in enumerate(gemini_sections):
                             sec_item["section_index"] = s_i
                         if monologue:
-                            # Attach continuous monologue slices across sections naturally
+                            gemini_sections[0]["master_monologue"] = monologue
+                            # Distribute monologue text smoothly across sections without breaking sentences
                             mono_words = monologue.split()
                             step = max(1, len(mono_words) // num_sections)
                             for s_i, sec_item in enumerate(gemini_sections):
                                 start_w = s_i * step
                                 end_w = len(mono_words) if s_i == num_sections - 1 else (s_i + 1) * step
                                 sec_item["script"] = " ".join(mono_words[start_w:end_w])
-                        logger.success(f"✅ [Script Studio] Successfully prepared {num_sections} custom investigative sections with continuous monologue ({len(monologue.split()) if monologue else 'N/A'} words)")
+                        logger.success(f"✅ [Script Studio] Successfully prepared {num_sections} custom investigative sections with human master monologue ({len(monologue.split()) if monologue else 'N/A'} words)")
                         break
                 except Exception as parse_err:
                     logger.debug(f"JSON parse error on attempt {attempt+1}: {parse_err}")
@@ -760,20 +768,12 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
             f"Hardcoded scripts, generic modulo fallbacks, and canned text are PERMANENTLY PROHIBITED."
         )
 
-    # Clean script fields and enforce total monologue bounds naturally without robotic truncating
-    total_script_words = sum(len(str(g.get("script", "")).strip().split()) for g in gemini_sections)
-    if total_script_words > 145:
-        logger.warning(f"⚠️ Total Short script ({total_script_words} words) exceeds 145-word ceiling. Normalizing...")
-        accumulated = 0
-        for g in gemini_sections:
-            words = str(g.get("script", "")).strip().split()
-            if accumulated >= 140:
-                g["script"] = " ".join(words[:4])
-            elif accumulated + len(words) > 140:
-                allow = max(4, 140 - accumulated)
-                g["script"] = " ".join(words[:allow])
-            accumulated += len(str(g.get("script", "")).strip().split())
-            accumulated += len(str(g.get("script", "")).strip().split())
+    # Clean script fields and sanitize identity references without breaking sentence flow
+    if gemini_sections and "master_monologue" in gemini_sections[0]:
+        clean_mono = str(gemini_sections[0]["master_monologue"]).strip()
+        clean_mono = re.sub(r"\b(?:I am|I'm|this is|my name is)\s+Christopher\b", "I'm Alex", clean_mono, flags=re.IGNORECASE)
+        clean_mono = re.sub(r"\bChristopher\b", "Alex", clean_mono, flags=re.IGNORECASE)
+        gemini_sections[0]["master_monologue"] = clean_mono
 
     for i in range(num_sections):
         start_t = round(i * interval, 2)
@@ -948,7 +948,8 @@ def prepare_session(
     total_segments = len(sections)
 
     # Validate generated script with ContentAuthenticityEngine Gate 1
-    full_script = " ".join(s["script"] for s in sections)
+    master_mono = sections[0].get("master_monologue") if sections else None
+    full_script = master_mono if master_mono else " ".join(s["script"] for s in sections).strip()
     authenticity = ContentAuthenticityEngine()
     gate1_res = authenticity.gate_1_script_compliance(
         topic=topic,
@@ -1124,42 +1125,27 @@ def prepare_session(
     total_audio_words = len(words)
 
     if total_audio_words > 0:
-        curr_w_idx = 0
+        # Snap visual cuts to natural punctuation (commas, periods, em-dashes) with 180ms J-cut lead
+        cut_intervals = snap_beat_cuts_to_punctuation(
+            words_with_timings=words,
+            raw_script=full_script,
+            num_beats=total_segments,
+            total_dur=total_audio_dur,
+            j_cut_lead_sec=0.18
+        )
+
         for s_idx, s in enumerate(sections):
-            if s_idx == len(sections) - 1:
-                sec_words = words[curr_w_idx:]
-            else:
-                target_cnt = max(1, int(round(s_word_counts[s_idx] * (total_audio_words / max(total_script_words, 1)))))
-                end_w_idx = min(total_audio_words, curr_w_idx + target_cnt)
-                sec_words = words[curr_w_idx:end_w_idx]
-                curr_w_idx = end_w_idx
+            s_start, s_end = cut_intervals[s_idx]
+            s["start_sec"] = round(s_start, 2)
+            s["end_sec"] = round(s_end, 2)
+            s["duration"] = round(s_end - s_start, 2)
+
+            # Assign words that fall naturally within this visual plate's playback window
+            sec_words = [w for w in words if w["start"] >= s["start_sec"] and w["start"] < s["end_sec"]]
+            if not sec_words and words:
+                closest_w = min(words, key=lambda w: abs(w["start"] - s["start_sec"]))
+                sec_words = [closest_w]
             s["words"] = sec_words
-
-        # Compute dynamic section start_sec and end_sec matching the speech rhythm
-        for s_idx, s in enumerate(sections):
-            if s_idx == 0:
-                s["start_sec"] = 0.0
-            else:
-                s["start_sec"] = sections[s_idx - 1]["end_sec"]
-
-            if s_idx == len(sections) - 1:
-                s["end_sec"] = round(total_audio_dur, 2)
-            else:
-                this_words = s.get("words", [])
-                next_words = sections[s_idx + 1].get("words", [])
-                if this_words and next_words:
-                    mid = (this_words[-1]["end"] + next_words[0]["start"]) / 2.0
-                    s["end_sec"] = round(max(s["start_sec"] + 0.5, mid), 2)
-                elif this_words:
-                    s["end_sec"] = round(max(s["start_sec"] + 0.5, this_words[-1]["end"] + 0.2), 2)
-                else:
-                    s["end_sec"] = round(s["start_sec"] + (total_audio_dur / len(sections)), 2)
-            s["duration"] = round(s["end_sec"] - s["start_sec"], 2)
-
-            # Clamp word timestamps cleanly inside the section window
-            for w in s.get("words", []):
-                w["start"] = max(s["start_sec"], w.get("start", s["start_sec"]))
-                w["end"] = min(s["end_sec"], max(w["start"] + 0.1, w.get("end", s["end_sec"])))
     else:
         logger.warning("⚠️ Words list empty from transcription. Generating procedural millisecond word timestamps...")
         time_per_section = total_audio_dur / max(len(sections), 1)

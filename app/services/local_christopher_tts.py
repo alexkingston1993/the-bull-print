@@ -38,12 +38,24 @@ VOICE_PITCH = "+0Hz"
 
 def normalize_for_tts(text: str) -> str:
     """
-    Financial Pronunciation Normalizer:
-    Expands currency shorthand, percentages, and financial metrics so TTS engines
-    pronounce them like a seasoned Wall Street analyst, while display captions
-    retain their high-CTR raw format ($1.8B, 16%, DTCC).
+    Financial & Market Pronunciation Normalizer:
+    Expands currency shorthand, percentages, Indian market terms (₹, Cr, Lakh, Nifty, FII),
+    and financial metrics so TTS engines pronounce them with natural human authority,
+    while display captions retain their high-CTR raw format ($1.8B, ₹65,700 Cr, 16%, DTCC).
     """
-    # 1. Expand shorthand currency and numbers
+    # 0. Remove commas within numbers so e.g. 65,700 -> 65700 (avoids TTS saying 'sixty-five comma seven hundred')
+    text = re.sub(r"(\d+),(\d+)", r"\1\2", text)
+
+    # 1. Indian Currency, Rupee and Denominations
+    text = re.sub(r"₹\s*(\d+(?:\.\d+)?)\s*(?:Cr|Crore|crores?)\b", r"\1 crore rupees", text, flags=re.IGNORECASE)
+    text = re.sub(r"₹\s*(\d+(?:\.\d+)?)\s*(?:L|Lakh|lakhs?|Lac|lacs?)\b", r"\1 lakh rupees", text, flags=re.IGNORECASE)
+    text = re.sub(r"₹\s*(\d+(?:\.\d+)?)\s*K\b", r"\1 thousand rupees", text, flags=re.IGNORECASE)
+    text = re.sub(r"₹\s*(\d+(?:\.\d+)?)", r"\1 rupees", text)
+    text = re.sub(r"\bRs\.?\s*(\d+(?:\.\d+)?)\b", r"\1 rupees", text, flags=re.IGNORECASE)
+    text = re.sub(r"(\d+(?:\.\d+)?)\s*(?:Cr|Crore|crores?)\b", r"\1 crore", text, flags=re.IGNORECASE)
+    text = re.sub(r"(\d+(?:\.\d+)?)\s*(?:L|Lakh|lakhs?|Lac|lacs?)\b", r"\1 lakh", text, flags=re.IGNORECASE)
+
+    # 2. US & Global Currency
     text = re.sub(r"\$(\d+(?:\.\d+)?)\s*T\b", r"\1 trillion dollars", text, flags=re.IGNORECASE)
     text = re.sub(r"\$(\d+(?:\.\d+)?)\s*B\b", r"\1 billion dollars", text, flags=re.IGNORECASE)
     text = re.sub(r"\$(\d+(?:\.\d+)?)\s*M\b", r"\1 million dollars", text, flags=re.IGNORECASE)
@@ -53,8 +65,36 @@ def normalize_for_tts(text: str) -> str:
     text = re.sub(r"(\d+)\s*bps\b", r"\1 basis points", text, flags=re.IGNORECASE)
     text = re.sub(r"\bbps\b", "basis points", text, flags=re.IGNORECASE)
 
-    # 2. Financial acronyms & metric abbreviations
+    # 3. Market Acronyms & Natural Phonetic Expansions
     replacements = [
+        (r"\bFIIs?\b", "F-I-I"),
+        (r"\bDIIs?\b", "D-I-I"),
+        (r"\bSEBI\b", "Sebi"),
+        (r"\bRBI\b", "R-B-I"),
+        (r"\bNIFTY\s*50\b", "Nifty fifty"),
+        (r"\bNIFTY\b", "Nifty"),
+        (r"\bBANKNIFTY\b", "Bank Nifty"),
+        (r"\bSENSEX\b", "Sensex"),
+        (r"\bHNIs?\b", "H-N-I"),
+        (r"\bIPOs?\b", "I-P-O"),
+        (r"\bF&O\b", "F and O"),
+        (r"\bBSE\b", "B-S-E"),
+        (r"\bNSE\b", "N-S-E"),
+        (r"\bP/E\b", "P-E ratio"),
+        (r"\bP/B\b", "P-B ratio"),
+        (r"\bNAV\b", "N-A-V"),
+        (r"\bSIPs?\b", "S-I-P"),
+        (r"\bCAGR\b", "C-A-G-R"),
+        (r"\bEPS\b", "E-P-S"),
+        (r"\bRoE\b", "R-O-E"),
+        (r"\bROE\b", "R-O-E"),
+        (r"\bRoCE\b", "R-O-C-E"),
+        (r"\bROCE\b", "R-O-C-E"),
+        (r"\bAUM\b", "A-U-M"),
+        (r"\bSTT\b", "S-T-T"),
+        (r"\bLTCG\b", "L-T-C-G"),
+        (r"\bSTCG\b", "S-T-C-G"),
+        (r"\bH-1B\b", "H-1-B"),
         (r"\bYoY\b", "year over year"),
         (r"\bQoQ\b", "quarter over quarter"),
         (r"\bMoM\b", "month over month"),
@@ -62,6 +102,7 @@ def normalize_for_tts(text: str) -> str:
         (r"\bNASDAQ\b", "Nasdaq"),
         (r"\bBRICS\b", "Brics"),
         (r"\bOPEC\b", "Opec"),
+        (r"\bS&P\s*500\b", "S and P 500"),
         (r"\bS&P\b", "S and P"),
         (r"\bDTCC\b", "D-T-C-C"),
         (r"\bFDIC\b", "F-D-I-C"),
@@ -73,7 +114,7 @@ def normalize_for_tts(text: str) -> str:
         (r"\bFOMC\b", "F-O-M-C"),
     ]
     for pattern, rep in replacements:
-        text = re.sub(pattern, rep, text, flags=re.IGNORECASE if pattern.islower() else 0)
+        text = re.sub(pattern, rep, text)
     return text
 
 
@@ -191,14 +232,15 @@ async def synthesize_with_prosody_contours(
 
 def _apply_broadcast_mastering(in_path: Path, out_path: Path, sample_rate: int = 48000, stereo: bool = True):
     """
-    Applies The Bull Print signature broadcast audio chain with gentle silence trimming.
-    Preserves 100% of natural comma breaths (~0.25s), sentence periods (~0.38s), and soft trailing
-    consonants (s, t, f, th) by relaxing stop_duration to 0.42s and threshold to -50dB.
+    Applies The Bull Print signature broadcast audio chain with gentle head/tail trimming.
+    CRITICAL: Preserves 100% of intermediate sentence pauses, breathing intervals, and comma cadences
+    so speech flows like a natural human documentary narrator instead of a rushed robotic checklist.
+    Trims ONLY leading silence before speech begins and trailing dead air after narration ends.
     """
     ac_channels = "2" if stereo else "1"
     filter_chain = (
-        "silenceremove=start_periods=1:start_silence=0.03:start_threshold=-50dB:"
-        "stop_periods=-1:stop_duration=0.42:stop_threshold=-50dB,"
+        "silenceremove=start_periods=1:start_duration=0.02:start_threshold=-48dB,"
+        "areverse,silenceremove=start_periods=1:start_duration=0.02:start_threshold=-48dB,areverse,"
         "highpass=f=70,"
         "equalizer=f=110:width_type=q:w=1.2:g=2.2,"
         "equalizer=f=3200:width_type=q:w=1.5:g=1.5,"

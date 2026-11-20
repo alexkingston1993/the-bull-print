@@ -850,7 +850,17 @@ Respond ONLY with valid JSON:
             if re.search(pat, opening_clean):
                 return False, f"Robotic self-introduction detected: '{pat}' in opening sentence."
 
-        return True, f"Script verified compliant ({word_count} words, TTR={ttr:.2f})."
+        # 5. Natural Sentence Cadence & Anti-Checklist Barrier
+        sentences = [s.strip() for s in re.split(r'[.!?]+', monologue) if s.strip()]
+        if sentences:
+            sent_lens = [len(s.split()) for s in sentences]
+            avg_len = sum(sent_lens) / len(sent_lens)
+            if avg_len < 12.0:
+                return False, f"Robotic checklist detected: average sentence length is only {avg_len:.1f} words (< 12 words). Sentences must be full, natural human thoughts (18-26 words)."
+            if max(sent_lens) > 42:
+                return False, f"Run-on sentence detected ({max(sent_lens)} words). Split with proper punctuation for natural breathing."
+
+        return True, f"Script verified compliant ({word_count} words, {len(sentences)} sentences, avg {avg_len:.1f}w, TTR={ttr:.2f})."
 
     @staticmethod
     def audit_plates(frames_dir: Path, expected_frames: int, is_short: bool = True) -> Tuple[bool, str]:
