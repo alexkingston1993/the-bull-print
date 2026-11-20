@@ -1,9 +1,31 @@
 {
   "version": "2.0.0",
   "engine_name": "Aria Cognitive Self-Healing & Continuous Learning Engine",
-  "last_synced": "2026-11-04T16:20:00Z",
-  "total_learned_rules": 37,
+  "last_synced": "2026-11-20T17:15:00Z",
+  "total_learned_rules": 39,
   "learned_rules": [
+    {
+      "rule_id": "BUG-48-PROMPT-DIVERSITY-QC-REJECTION",
+      "signature_pattern": "(prompt repetition detected|unique prompt ratio is .* strictly below required)",
+      "domain": "content_authenticity",
+      "failed_component": "Pre-Upload QC Gate & Script Studio Prompt Auto-Healer",
+      "severity": "CRITICAL",
+      "root_cause": "Gemini generated fewer than 20 sections, and interpolation copied prompts with camera angle prefixes that normalized to identical strings (35% < 95% threshold).",
+      "action_plan": "Enforce Gemini generate exactly 20 distinct section prompts and activate PromptAutoHealer to synthesize unique concrete physical metaphors for all beats.",
+      "auto_executable": null,
+      "learned_from": "Run 44724455768 forensic analysis"
+    },
+    {
+      "rule_id": "BUG-49-DHASH-FFMPEG-SYNTAX",
+      "signature_pattern": "(fps=10/duration.*returned non-zero exit status 234)",
+      "domain": "content_authenticity",
+      "failed_component": "Pre-Upload QC Gate dHash Frame Extractor",
+      "severity": "HIGH",
+      "root_cause": "FFmpeg command passed unformatted string 'fps=10/duration' instead of evaluated float value.",
+      "action_plan": "Format fps filter with evaluated duration float (e.g. fps={10/dur:.4f}).",
+      "auto_executable": null,
+      "learned_from": "Run 44724455768 forensic analysis"
+    },
     {
       "rule_id": "BUG-47-KAGGLE-DEPENDENCY-SIX",
       "signature_pattern": "(modulenotfounderror: no module named 'six'|from \\.\\.models\\.upload_file import UploadFile)",

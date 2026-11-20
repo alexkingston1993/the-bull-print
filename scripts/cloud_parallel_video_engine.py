@@ -692,7 +692,8 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
 
         CRITICAL ARCHITECTURAL SEPARATION:
         - 'monologue': STRICTLY AND EXCLUSIVELY for the spoken narration audio. Write it as ONE unified, continuous, deeply human investigative story of exactly 5 to 7 rich sentences (130 to 140 words total).
-        - 'sections': STRICTLY AND EXCLUSIVELY for the 20 visual photographic plates and 3D kinetic typography. Each section defines the visual prompt for Kaggle GPU diffusers, headlines, and badges. Do NOT provide or slice spoken sentences into sections.
+        - 'sections': STRICTLY AND EXCLUSIVELY for the visual photographic plates and 3D kinetic typography. You MUST produce an array of EXACTLY {num_sections} numbered sections (from section_index 0 to {num_sections - 1}).
+          Each of the {num_sections} sections MUST illustrate its distinct 3-second beat with a 100% unique concrete physical metaphor in 'visual_prompt'. Never duplicate physical subjects across sections.
 
         Respond ONLY with a valid JSON object matching this structure:
         {{
@@ -704,11 +705,128 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
               "headline_mid": "...",
               "badge_text": "...",
               "color_theme": "gold",
-              "visual_prompt": "Cinematic 35mm photograph of concrete physical metaphor illustrating this moment..."
-            }}
+              "visual_prompt": "Cinematic 35mm photograph of concrete physical metaphor illustrating beat 0..."
+            }},
+            ... ({num_sections} total items, section_index 0 to {num_sections - 1})
           ]
         }}
         """
+
+        def _norm_qc_prompt(text: str) -> str:
+            t = text.lower()
+            t = re.sub(r"^cinematic 35mm photograph(?:,\s*visual metaphor of)?", "", t)
+            t = re.sub(r",?\s*(?:8k hyper-detailed|clean plate|zero text|zero watermark).*", "", t)
+            t = re.sub(r"[^\w\s]", "", t)
+            norm = " ".join(t.split())
+            return norm if norm else text.lower().strip()
+
+        METAPHOR_CATALOG = [
+            ("BANK VAULT", "CURRENCY DRAIN", "MARKET SHOCK", "fire", "Cinematic 35mm photograph, massive titanium bank vault door swinging wide ajar as swirling vortices of fiat currency notes are sucked into a dark abyssal drain, dark moody obsidian lighting, volumetric amber rays, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("CARGO SHIP", "SPLIT IN TWO", "SUPPLY CHOKE", "warning", "Cinematic 35mm photograph, colossal commercial cargo container ship sheared in half amidst towering violent ocean waves, secured by groaning rusted iron chains snapping under tension, dark moody obsidian lighting, volumetric teal rays, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("GOLD BULLION", "1KG BARS", "SAFE HAVEN", "gold", "Cinematic 35mm photograph, heavy 1kg Swiss 999.9 fine gold bullion bars stacked neatly on reflective cracked black obsidian marble, illuminated by sharp golden laser measurement grids, cinematic lighting, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("ALGO TRADER", "LIQUIDATION", "TIME BOMB", "fire", "Cinematic 35mm photograph, distressed algorithmic quantitative trader clutching head in pitch-black high-frequency server room before towering displays of cascading red liquidation candlestick charts, volumetric crimson glow, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("ROBOTIC ARM", "MOLTEN SPARKS", "AI CRACKDOWN", "cyan", "Cinematic 35mm photograph, high-precision industrial robotic fabrication arm welding intricate semiconductor microchips, throwing bright orange molten sparks across cold steel machinery, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("SHREDDED AUDIT", "BALANCE SHEET", "FORENSIC GATE", "emerald", "Cinematic 35mm photograph, forensic financial audit ledgers and shredded corporate debt contracts floating in dark shallow water under single harsh overhead tungsten inspection lamp, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("PASSPORTS", "CHAINED GATES", "CAPITAL FLIGHT", "warning", "Cinematic 35mm photograph, diplomatic passports locked behind heavy padlock and steel chains across an abandoned airport tarmac at dusk, dark atmospheric fog, volumetric amber rays, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("FIGHTER JET", "ESCORT PATROL", "DEFENSE TENSION", "cyan", "Cinematic 35mm photograph, twin stealth supersonic aerospace fighter jets banking steeply over stormy coastal waters, vapor trails cutting through dramatic dark purple storm clouds, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("CRACKED SAFE", "EMPTY DRAWERS", "LIQUIDITY RUN", "fire", "Cinematic 35mm photograph, antique cast-iron bank safe blown open from the inside, smoke drifting from empty deposit drawers, scattered gold dust on polished dark granite, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("TERMINAL DESK", "TICKER TAPE", "CRASH HORIZON", "gold", "Cinematic 35mm photograph, abandoned Wall Street trading desk littered with miles of paper ticker tape, solitary Bloomberg terminal flashing amber warnings in empty trading pit at night, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("CONTAINER CRANE", "SHADOW PORT", "TRADE EMBARGO", "warning", "Cinematic 35mm photograph, towering container crane frozen above silent container yard at foggy industrial harbor, sodium-vapor floodlights piercing dense ocean mist, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("SILICON WAFER", "LASER ETCHING", "TECH MONOPOLY", "cyan", "Cinematic 35mm photograph, pristine 300mm ultra-pure semiconductor silicon wafer reflecting holographic rainbow spectrum under purple ultraviolet laser lithography beam, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("CRUDE PIPELINE", "PRESSURE VALVE", "OIL SPIKE", "fire", "Cinematic 35mm photograph, massive industrial crude oil pipeline running across desolate desert dunes at dusk, heavy brass pressure gauge trembling in red danger zone, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("SOVEREIGN DEBT", "TIE BEAM", "DEBT CLIFF", "emerald", "Cinematic 35mm photograph, suspension bridge cables fraying under extreme tension high above a stormy sea gorge, single spotlight highlighting snapping steel strands, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("CENTRAL BANK", "BRONZE DOORS", "MONETARY TRAP", "gold", "Cinematic 35mm photograph, imposing neoclassical central bank facade with towering granite columns and monumental closed bronze doors, drenched in midnight rain, reflection in dark puddles, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("FIBER OPTIC", "SEVERED CABLE", "GLITCH RUN", "fire", "Cinematic 35mm photograph, severed undersea transatlantic telecommunications fiber-optic cable glowing with escaping pulses of blue and white laser light against dark ocean floor, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("COMMODITY PIT", "GRAIN SILO", "INFLATION RUN", "warning", "Cinematic 35mm photograph, massive industrial grain silo towering over golden wheat fields under bruised thunderhead skies, lightning flash illuminating towering steel elevator, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("ARMORED TRUCK", "DESERT HIGHWAY", "SHADOW ESCROW", "emerald", "Cinematic 35mm photograph, heavy matte-black armored bank bullion transport vehicle speeding along desolate desert highway under starry night sky, dust trail illuminated by rear red tail lights, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("CIRCUIT BOARD", "MOLTEN COPPER", "HARDWARE CRUNCH", "cyan", "Cinematic 35mm photograph, macro detail of high-performance GPU motherboard circuit traces glowing with molten liquid copper under intense microscope lighting, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("LEDGER VAULT", "ANALYST LOG", "FINAL RECKONING", "gold", "Cinematic 35mm photograph, heavy leather-bound confidential forensic ledger opened to handwritten audit figures, gold fountain pen resting on margins, warm amber study lamp on mahogany desk, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("RADAR DOME", "ARCTIC RIDGE", "SURVEILLANCE", "cyan", "Cinematic 35mm photograph, giant geodesic radar dome glowing on snowy mountain ridge at twilight, blizzard sweeping across satellite arrays, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("SHADOW DESK", "SECURITY CHIP", "BLACK BOX", "warning", "Cinematic 35mm photograph, glowing encrypted hardware security key plugged into dark ruggedized field laptop in dimly lit intelligence bunker, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("SMELTER PIT", "LIQUID STEEL", "RAW CAPACITY", "fire", "Cinematic 35mm photograph, industrial blast furnace pouring a river of bright white-hot molten steel into giant casting ladles, dramatic orange heat haze, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+            ("SATELLITE DISH", "ORBITAL NET", "SPACE DEFENSE", "emerald", "Cinematic 35mm photograph, commercial telecommunications satellite orbiting above Earth terminator line, golden solar arrays catching stark sunlight against deep starry space, 8k hyper-detailed, clean plate, zero text, zero watermark"),
+        ]
+
+        def _auto_heal_prompt_diversity(raw_secs: List[Dict[str, Any]], target_k: int) -> List[Dict[str, Any]]:
+            """Auto-heals prompt diversity by ensuring exactly target_k sections with >= 95% unique normalized prompts."""
+            seen_norms = set()
+            curated = []
+            cat_p = 0
+
+            # 1. Inspect existing raw sections
+            for sec in raw_secs:
+                vp = str(sec.get("visual_prompt") or sec.get("prompt") or sec.get("image_prompt") or sec.get("visual_description") or "").strip()
+                top = str(sec.get("headline_top", lead_word))[:24]
+                mid = str(sec.get("headline_mid", second_word))[:24]
+                badge = str(sec.get("badge_text", "MARKET SHOCK"))[:20]
+                color = str(sec.get("color_theme", "gold")).lower()
+
+                norm = _norm_qc_prompt(vp) if vp and len(vp) >= 20 else ""
+                if not norm or norm in seen_norms:
+                    while cat_p < len(METAPHOR_CATALOG) and _norm_qc_prompt(METAPHOR_CATALOG[cat_p][4]) in seen_norms:
+                        cat_p += 1
+                    if cat_p < len(METAPHOR_CATALOG):
+                        c_top, c_mid, c_badge, c_color, c_vp = METAPHOR_CATALOG[cat_p]
+                        cat_p += 1
+                        top = top if top != lead_word else c_top
+                        mid = mid if mid != second_word else c_mid
+                        badge = c_badge
+                        color = c_color
+                        vp = c_vp
+                        norm = _norm_qc_prompt(vp)
+                    else:
+                        vp = f"Cinematic 35mm photograph, concrete physical metaphor of {top} {mid} at beat {len(curated)+1}, dark obsidian lighting, amber rays, 8k hyper-detailed, clean plate, zero text, zero watermark"
+                        norm = _norm_qc_prompt(vp)
+
+                seen_norms.add(norm)
+                sec_copy = dict(sec)
+                sec_copy["headline_top"] = top
+                sec_copy["headline_mid"] = mid
+                sec_copy["badge_text"] = badge
+                sec_copy["color_theme"] = color
+                sec_copy["visual_prompt"] = vp
+                curated.append(sec_copy)
+                if len(curated) >= target_k:
+                    break
+
+            # 2. Expand if fewer than target_k
+            while len(curated) < target_k:
+                while cat_p < len(METAPHOR_CATALOG) and _norm_qc_prompt(METAPHOR_CATALOG[cat_p][4]) in seen_norms:
+                    cat_p += 1
+                if cat_p < len(METAPHOR_CATALOG):
+                    c_top, c_mid, c_badge, c_color, c_vp = METAPHOR_CATALOG[cat_p]
+                    cat_p += 1
+                    vp = c_vp
+                    top = c_top
+                    mid = c_mid
+                    badge = c_badge
+                    color = c_color
+                    norm = _norm_qc_prompt(vp)
+                else:
+                    top = lead_word
+                    mid = f"BEAT {len(curated) + 1}"
+                    badge = "MARKET SHOCK"
+                    color = "gold"
+                    vp = f"Cinematic 35mm photograph, concrete physical metaphor of {topic_clean} beat {len(curated)+1}, dark obsidian lighting, volumetric golden rays, 8k hyper-detailed, clean plate, zero text, zero watermark"
+                    norm = _norm_qc_prompt(vp)
+
+                seen_norms.add(norm)
+                curated.append({
+                    "section_index": len(curated),
+                    "headline_top": top,
+                    "headline_mid": mid,
+                    "badge_text": badge,
+                    "color_theme": color,
+                    "visual_prompt": vp,
+                })
+
+            for s_i, sec_item in enumerate(curated):
+                sec_item["section_index"] = s_i
+
+            ratio = len(seen_norms) / len(curated)
+            logger.info(f"🛡️ [Prompt Auto-Healer] Verified {len(curated)} sections with {len(seen_norms)} unique prompts ({ratio*100:.1f}% unique)")
+            return curated
+
         for attempt in range(4):
             raw_text = _query_gemini_smart(prompt, client, api_key, models_to_try)
             if raw_text:
@@ -721,31 +839,10 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                     g_secs = data.get("sections", [])
                     monologue = data.get("monologue", "").strip()
 
-                    if len(g_secs) >= num_sections:
-                        gemini_sections = g_secs[:num_sections]
-                    elif attempt >= 2 and len(g_secs) >= 6:
-                        # Auto-interpolate beats to exact target num_sections with distinct camera angles
-                        logger.info(f"⚡ [Script Studio] Subdividing {len(g_secs)} visual beats to exact target {num_sections} beats...")
-                        expanded = []
-                        ratio = num_sections / len(g_secs)
-                        for idx, sec in enumerate(g_secs):
-                            target_count = round((idx + 1) * ratio) - round(idx * ratio)
-                            for sub_i in range(target_count):
-                                new_sec = dict(sec)
-                                if sub_i > 0:
-                                    base_prompt = sec.get("visual_prompt", "")
-                                    angles = ["extreme close-up macro detail", "wide low-angle atmospheric shot", "over-the-shoulder dramatic tilt"]
-                                    alt_angle = angles[sub_i % len(angles)]
-                                    new_sec["visual_prompt"] = f"{alt_angle}, {base_prompt}"
-                                expanded.append(new_sec)
-                        gemini_sections = expanded[:num_sections]
-
-                    if gemini_sections:
-                        # Re-index section indices
-                        for s_i, sec_item in enumerate(gemini_sections):
-                            sec_item["section_index"] = s_i
+                    if g_secs:
+                        # Auto-heal prompt diversity and expand/deduplicate to exact target
+                        gemini_sections = _auto_heal_prompt_diversity(g_secs, num_sections)
                         if monologue:
-                            # Auto-expand if words are slightly below the 125-word floor
                             m_words = monologue.split()
                             if len(m_words) < 125 and len(m_words) >= 80:
                                 logger.info(f"⚡ [Script Studio] Monologue word count ({len(m_words)}) below 125 floor. Appending analytical consequence hook...")
@@ -794,11 +891,8 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
         script_text = re.sub(r"\bChristopher\b", "Alex", script_text, flags=re.IGNORECASE)
 
         if not visual_prompt or len(visual_prompt) < 15:
-            visual_prompt = (
-                f"Cinematic 35mm photograph, visual metaphor of {top} {mid}, "
-                f"massive concrete physical monuments, bank vaults, cargo ships, dark moody obsidian lighting, "
-                f"volumetric amber and gold rays, 8k hyper-detailed, clean plate, zero text, zero watermark"
-            )
+            cat_tuple = METAPHOR_CATALOG[i % len(METAPHOR_CATALOG)]
+            visual_prompt = cat_tuple[4]
 
         micro_beats = [{
             "beat_index": 0,
@@ -1572,7 +1666,19 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
                 if matches:
                     seg_file = matches[0]
                 else:
-                    raise FileNotFoundError(f"Missing rendered segment artifact: {cand1}")
+                    logger.warning(f"⚠️ [Aggregator Auto-Heal] Missing segment {i:02d}. Auto-rendering segment locally on-the-fly...")
+                    try:
+                        render_segment(bundle_dir, i, output_dir=segments_dir)
+                        cand1 = segments_dir / f"segment_{i:02d}.mp4"
+                        cand2 = segments_dir / f"segment_{i}.mp4"
+                        seg_file = cand1 if cand1.exists() else cand2
+                        if seg_file.exists():
+                            logger.success(f"✓ [Aggregator Auto-Heal] Self-healed segment_{i:02d}.mp4 successfully!")
+                        else:
+                            raise FileNotFoundError(f"Auto-heal failed to generate: {cand1}")
+                    except Exception as heal_err:
+                        logger.error(f"❌ [Aggregator Auto-Heal] Error self-healing segment {i}: {heal_err}")
+                        raise FileNotFoundError(f"Missing rendered segment artifact: {cand1}") from heal_err
             f.write(f"file '{seg_file.resolve()}'\n")
 
     # 1. Lossless Video Concatenation

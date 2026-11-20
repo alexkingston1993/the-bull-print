@@ -217,9 +217,10 @@ class PreUploadQCGate:
             with tempfile.TemporaryDirectory() as tmp_dir:
                 tmp_path = Path(tmp_dir)
                 # Sample 10 frames across the video
+                fps_val = max(10.0 / max(dur, 1.0), 0.01)
                 extract_cmd = [
                     ffmpeg_bin, "-i", str(video_path),
-                    "-vf", "fps=10/duration",
+                    "-vf", f"fps={fps_val:.4f}",
                     "-vframes", "10",
                     str(tmp_path / "sample_%02d.jpg")
                 ]

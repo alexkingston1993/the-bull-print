@@ -17,6 +17,8 @@ import json
 import time
 import shutil
 import subprocess
+from datetime import datetime, timezone, timedelta
+from typing import Optional
 from pathlib import Path
 from loguru import logger
 
@@ -25,6 +27,42 @@ if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
 from app.services.viral_topic_scanner import ViralTopicScanner
+
+
+STATUS_FILE = BASE_DIR / "state" / "daily_production_status.json"
+
+
+def update_production_status(item_type: str, num: int, title: str, status: str, run_id: Optional[int] = None, attempt: int = 1, error: Optional[str] = None):
+    """Persists real-time video production state to state/daily_production_status.json for audit and monitoring."""
+    STATUS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    ledger = {}
+    if STATUS_FILE.exists():
+        try:
+            ledger = json.loads(STATUS_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            ledger = {}
+    
+    key = f"{item_type}_{num:02d}"
+    entry = ledger.get(key, {})
+    entry.update({
+        "type": item_type,
+        "index": num,
+        "title": title,
+        "status": status,
+        "attempt": attempt,
+        "last_updated": datetime.now(timezone.utc).isoformat(),
+    })
+    if run_id:
+        entry["run_id"] = run_id
+        entry["run_url"] = f"https://github.com/alexkingston1993/the-bull-print/actions/runs/{run_id}"
+    if error:
+        entry["last_error"] = error
+    ledger[key] = entry
+
+    try:
+        STATUS_FILE.write_text(json.dumps(ledger, indent=2), encoding="utf-8")
+    except Exception as e:
+        logger.debug(f"Failed to write production status: {e}")
 
 
 def find_latest_dispatched_run(gh_bin: str, max_wait: int = 45):
@@ -149,34 +187,63 @@ def run_daily_production(dry_run: bool = False):
         topic = data["title"]
         vertical = data.get("vertical", "stock_market")
         publish_at = item["publish_at"]
+        num = item["num"]
 
-        print(f"\n[Short {item['num']:02d}/10] 🚀 Dispatching Short: {topic} (Scheduled: {publish_at} UTC)")
-        cmd = [
-            gh_bin, "workflow", "run",
-            "parallel_video_matrix.yml",
-            "-f", f"topic={topic}",
-            "-f", f"vertical={vertical}",
-            "-f", "shorts_only=true",
-            "-f", "duration_sec=60",
-            "-f", "privacy_status=private",
-            "-f", f"publish_at={publish_at}"
-        ]
+        max_attempts = 3
+        short_success = False
 
-        if not dry_run:
+        for attempt in range(1, max_attempts + 1):
+            print(f"\n[Short {num:02d}/10 | Attempt {attempt}/{max_attempts}] 🚀 Dispatching Short: {topic} (Scheduled: {publish_at} UTC)")
+            update_production_status(item_type="short", num=num, title=topic, status="IN_PROGRESS", attempt=attempt)
+
+            cmd = [
+                gh_bin, "workflow", "run",
+                "parallel_video_matrix.yml",
+                "-f", f"topic={topic}",
+                "-f", f"vertical={vertical}",
+                "-f", "shorts_only=true",
+                "-f", "duration_sec=60",
+                "-f", "privacy_status=private",
+                "-f", f"publish_at={publish_at}"
+            ]
+
+            if dry_run:
+                short_success = True
+                update_production_status(item_type="short", num=num, title=topic, status="DRY_RUN_COMPLETED", attempt=attempt)
+                break
+
             try:
-                res = subprocess.run(cmd, check=True, stdin=subprocess.DEVNULL, capture_output=True, text=True)
-                logger.success(f"✓ Dispatched Short {item['num']}: {topic[:40]}... (PublishAt: {publish_at})")
+                subprocess.run(cmd, check=True, stdin=subprocess.DEVNULL, capture_output=True, text=True)
+                logger.success(f"✓ Dispatched Short {num}: {topic[:40]}... (Attempt {attempt})")
+                time.sleep(10)
 
-                # Wait up to 30 mins for Short prepare_session to complete and release Kaggle GPU
                 poll_ceiling = 1800  # 30m max per Short
                 dispatched_run_id = find_latest_dispatched_run(gh_bin)
                 if dispatched_run_id:
-                    wait_for_prepare_session_completion(gh_bin, dispatched_run_id, is_short=True, timeout_sec=poll_ceiling)
+                    update_production_status(item_type="short", num=num, title=topic, status="PREPARING_SESSION", run_id=dispatched_run_id, attempt=attempt)
+                    prep_ok = wait_for_prepare_session_completion(gh_bin, dispatched_run_id, is_short=True, timeout_sec=poll_ceiling)
+                    if prep_ok:
+                        logger.success(f"✓ Short {num} prepare_session completed! Kaggle GPU released. Matrix rendering in background.")
+                        update_production_status(item_type="short", num=num, title=topic, status="RENDERING_MATRIX", run_id=dispatched_run_id, attempt=attempt)
+                        short_success = True
+                        break
+                    else:
+                        logger.warning(f"⚠️ Short {num} prepare_session failed on attempt {attempt}. Cooling down for 30s before retry...")
+                        update_production_status(item_type="short", num=num, title=topic, status="RETRYING", run_id=dispatched_run_id, attempt=attempt, error="prepare_session failed")
+                        time.sleep(30)
                 else:
-                    logger.warning("Could not identify dispatched run ID. Applying 120s safety buffer...")
+                    logger.warning(f"Could not identify dispatched run ID for Short {num}. Applying 120s buffer...")
                     time.sleep(120)
+                    short_success = True
+                    break
             except Exception as e:
-                logger.error(f"Failed to dispatch Short {topic}: {e}")
+                logger.error(f"Failed to dispatch Short {topic} on attempt {attempt}: {e}")
+                update_production_status(item_type="short", num=num, title=topic, status="RETRYING", attempt=attempt, error=str(e))
+                time.sleep(30)
+
+        if not short_success:
+            logger.error(f"❌ Short {num} ({topic[:30]}) failed after {max_attempts} attempts.")
+            update_production_status(item_type="short", num=num, title=topic, status="FAILED", attempt=max_attempts)
 
     print("\n" + "=" * 70)
     print("🎬 PHASE 2: ALL 10 SHORTS COMPLETE. DISPATCHING 2 MASTER DOCUMENTARIES (>12 MIN)")
@@ -187,34 +254,63 @@ def run_daily_production(dry_run: bool = False):
         topic = data["title"]
         vertical = data.get("vertical", "stock_market")
         publish_at = item["publish_at"]
+        num = item["num"]
 
-        print(f"\n[Doc {item['num']:02d}/02] 🎬 Dispatching Master Documentary (16:9, 12-Min Masterclass): {topic} (Scheduled: {publish_at} UTC)")
-        cmd = [
-            gh_bin, "workflow", "run",
-            "parallel_video_matrix.yml",
-            "-f", f"topic={topic}",
-            "-f", f"vertical={vertical}",
-            "-f", "shorts_only=false",
-            "-f", "duration_min=12",
-            "-f", "privacy_status=private",
-            "-f", f"publish_at={publish_at}"
-        ]
+        max_attempts = 3
+        doc_success = False
 
-        if not dry_run:
+        for attempt in range(1, max_attempts + 1):
+            print(f"\n[Doc {num:02d}/02 | Attempt {attempt}/{max_attempts}] 🎬 Dispatching Master Documentary (16:9, 12-Min Masterclass): {topic} (Scheduled: {publish_at} UTC)")
+            update_production_status(item_type="doc", num=num, title=topic, status="IN_PROGRESS", attempt=attempt)
+
+            cmd = [
+                gh_bin, "workflow", "run",
+                "parallel_video_matrix.yml",
+                "-f", f"topic={topic}",
+                "-f", f"vertical={vertical}",
+                "-f", "shorts_only=false",
+                "-f", "duration_min=12",
+                "-f", "privacy_status=private",
+                "-f", f"publish_at={publish_at}"
+            ]
+
+            if dry_run:
+                doc_success = True
+                update_production_status(item_type="doc", num=num, title=topic, status="DRY_RUN_COMPLETED", attempt=attempt)
+                break
+
             try:
-                res = subprocess.run(cmd, check=True, stdin=subprocess.DEVNULL, capture_output=True, text=True)
-                logger.success(f"✓ Dispatched Doc {item['num']}: {topic[:40]}... (PublishAt: {publish_at})")
+                subprocess.run(cmd, check=True, stdin=subprocess.DEVNULL, capture_output=True, text=True)
+                logger.success(f"✓ Dispatched Doc {num}: {topic[:40]}... (Attempt {attempt})")
+                time.sleep(15)
 
-                # Wait up to 60 mins for Documentary prepare_session to release Kaggle GPU
                 poll_ceiling = 3600  # 60m max per Doc
                 dispatched_run_id = find_latest_dispatched_run(gh_bin)
                 if dispatched_run_id:
-                    wait_for_prepare_session_completion(gh_bin, dispatched_run_id, is_short=False, timeout_sec=poll_ceiling)
+                    update_production_status(item_type="doc", num=num, title=topic, status="PREPARING_SESSION", run_id=dispatched_run_id, attempt=attempt)
+                    prep_ok = wait_for_prepare_session_completion(gh_bin, dispatched_run_id, is_short=False, timeout_sec=poll_ceiling)
+                    if prep_ok:
+                        logger.success(f"✓ Doc {num} prepare_session completed! Kaggle GPU released. Matrix rendering in background.")
+                        update_production_status(item_type="doc", num=num, title=topic, status="RENDERING_MATRIX", run_id=dispatched_run_id, attempt=attempt)
+                        doc_success = True
+                        break
+                    else:
+                        logger.warning(f"⚠️ Doc {num} prepare_session failed on attempt {attempt}. Cooling down for 45s before retry...")
+                        update_production_status(item_type="doc", num=num, title=topic, status="RETRYING", run_id=dispatched_run_id, attempt=attempt, error="prepare_session failed")
+                        time.sleep(45)
                 else:
-                    logger.warning("Could not identify dispatched run ID. Applying 180s safety buffer...")
+                    logger.warning(f"Could not identify dispatched run ID for Doc {num}. Applying 180s buffer...")
                     time.sleep(180)
+                    doc_success = True
+                    break
             except Exception as e:
-                logger.error(f"Failed to dispatch Doc {topic}: {e}")
+                logger.error(f"Failed to dispatch Doc {topic} on attempt {attempt}: {e}")
+                update_production_status(item_type="doc", num=num, title=topic, status="RETRYING", attempt=attempt, error=str(e))
+                time.sleep(45)
+
+        if not doc_success:
+            logger.error(f"❌ Doc {num} ({topic[:30]}) failed after {max_attempts} attempts.")
+            update_production_status(item_type="doc", num=num, title=topic, status="FAILED", attempt=max_attempts)
 
     print("\n" + "=" * 70)
     print("🎉 ALL 12 CLOUD PRODUCTIONS SUCCESSFULLY DISPATCHED!")

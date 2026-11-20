@@ -263,8 +263,53 @@ if __name__ == "__main__":
         logger.error(f"Kaggle push failed after 3 attempts: {res.stderr}")
         return False
 
+    def _failover_account(self) -> bool:
+        """Auto-heals quota or authorization blocks by failing over to secondary Kaggle account."""
+        if self.username == "alexkingston":
+            legacy_key = os.getenv("KAGGLE_KEY")
+            if legacy_key:
+                logger.warning("🔄 [Kaggle Auto-Failover] Switching from alexkingston to secondary account (alexytcreative)...")
+                self.username = "alexytcreative"
+                kaggle_dir = Path.home() / ".kaggle"
+                kaggle_dir.mkdir(parents=True, exist_ok=True)
+                token_file = kaggle_dir / "access_token"
+                if token_file.exists():
+                    token_file.unlink(missing_ok=True)
+                cfg = kaggle_dir / "kaggle.json"
+                with open(cfg, "w") as f:
+                    json.dump({"username": "alexytcreative", "key": legacy_key}, f)
+                cfg.chmod(0o600)
+                return True
+        elif self.username == "alexytcreative":
+            bearer_token = os.getenv("KAGGLE_API_TOKEN")
+            if bearer_token:
+                logger.warning("🔄 [Kaggle Auto-Failover] Switching from alexytcreative to primary account (alexkingston)...")
+                self.username = "alexkingston"
+                kaggle_dir = Path.home() / ".kaggle"
+                token_file = kaggle_dir / "access_token"
+                token_file.write_text(bearer_token.strip())
+                token_file.chmod(0o600)
+                cfg = kaggle_dir / "kaggle.json"
+                if cfg.exists():
+                    cfg.unlink(missing_ok=True)
+                return True
+        return False
+
     def generate_batch(self, prompts: List[Dict[str, Any]], aspect_ratio: str = "9:16", max_retries: int = 3) -> bool:
-        """Dispatches a batch with unique BATCH_UUID, polls, and verifies before mapping output with auto-retries."""
+        """Dispatches batch with auto-chunking (<=20 plates per chunk) and auto-failover."""
+        if len(prompts) > 20:
+            chunk_size = 20
+            logger.info(f"⚡ [Kaggle Auto-Chunking] Slicing {len(prompts)} frames into chunks of {chunk_size} to guarantee sub-60s execution per batch...")
+            for c_i in range(0, len(prompts), chunk_size):
+                sub_prompts = prompts[c_i : c_i + chunk_size]
+                logger.info(f"📦 [Kaggle Chunk {c_i // chunk_size + 1}] Processing frames {c_i + 1} to {c_i + len(sub_prompts)}...")
+                if not self._generate_single_batch(sub_prompts, aspect_ratio=aspect_ratio, max_retries=max_retries):
+                    return False
+            return True
+        return self._generate_single_batch(prompts, aspect_ratio=aspect_ratio, max_retries=max_retries)
+
+    def _generate_single_batch(self, prompts: List[Dict[str, Any]], aspect_ratio: str = "9:16", max_retries: int = 3) -> bool:
+        """Dispatches a single batch with unique BATCH_UUID, polls, and verifies before mapping output with auto-retries and account failover."""
         is_vert = aspect_ratio in ("9:16", "vertical")
         
         for attempt in range(1, max_retries + 1):
@@ -280,9 +325,12 @@ if __name__ == "__main__":
                     "height": 1344 if is_vert else 768,
                 })
 
-            logger.info(f"🚀 [Kaggle Batch Attempt {attempt}/{max_retries}] Dispatching {len(segments)} frames with UUID: {batch_uuid}")
+            logger.info(f"🚀 [Kaggle Batch Attempt {attempt}/{max_retries}] Account: {self.username} | Dispatching {len(segments)} frames with UUID: {batch_uuid}")
             if not self.dispatch(segments, batch_uuid=batch_uuid):
-                logger.warning(f"Dispatch attempt {attempt} failed to acquire lock or push. Retrying in 15s...")
+                logger.warning(f"Dispatch attempt {attempt} failed to acquire lock or push.")
+                if attempt < max_retries and self._failover_account():
+                    time.sleep(10)
+                    continue
                 time.sleep(15)
                 continue
 
@@ -292,7 +340,8 @@ if __name__ == "__main__":
                 shutil.rmtree(out_dest, ignore_errors=True)
             out_dest.mkdir(parents=True, exist_ok=True)
 
-            if self.poll_and_download(out_dest, batch_uuid=batch_uuid, timeout_sec=600):
+            timeout_calc = max(600, len(prompts) * 15)
+            if self.poll_and_download(out_dest, batch_uuid=batch_uuid, timeout_sec=timeout_calc):
                 mapped_count = 0
                 for idx, p in enumerate(prompts, 1):
                     candidates = [
@@ -313,7 +362,10 @@ if __name__ == "__main__":
                 else:
                     logger.warning(f"Only {mapped_count}/{len(prompts)} mapped. Retrying batch in 15s...")
             else:
-                logger.warning(f"Batch {batch_uuid} failed download/UUID check. Retrying in 15s...")
+                logger.warning(f"Batch {batch_uuid} failed download/UUID check.")
+                if attempt < max_retries and self._failover_account():
+                    time.sleep(10)
+                    continue
             
             time.sleep(15)
 
