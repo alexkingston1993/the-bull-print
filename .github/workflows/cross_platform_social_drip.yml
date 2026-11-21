@@ -1,0 +1,59 @@
+name: "Cross-Platform Social Drip Engine (Instagram & Facebook)"
+
+on:
+  schedule:
+    # 02:30 UTC = 08:00 IST (Morning Slot)
+    # 08:30 UTC = 14:00 IST (Afternoon Slot)
+    # 15:00 UTC = 20:30 IST (Evening Slot)
+    - cron: '30 2,8,15 * * *'
+  workflow_dispatch:
+    inputs:
+      count:
+        description: "Number of videos to drip in this run"
+        required: false
+        default: "1"
+      video_id:
+        description: "Specific YouTube video ID to drip (optional)"
+        required: false
+        default: ""
+
+jobs:
+  drip_social_reels:
+    name: "Drip Short to Instagram & Facebook"
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: "📥 Checkout Repository"
+        uses: actions/checkout@v4
+
+      - name: "🐍 Setup Python 3.11"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: "📦 Install Dependencies"
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests loguru yt-dlp
+
+      - name: "🚀 Execute Cross-Platform Social Drip"
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_ACCOUNT_ID: ${{ secrets.INSTAGRAM_ACCOUNT_ID }}
+          FACEBOOK_PAGE_ACCESS_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
+          FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
+        run: |
+          if [ -n "${{ github.event.inputs.video_id }}" ]; then
+            python scripts/cross_platform_social_drip.py --video-id "${{ github.event.inputs.video_id }}"
+          else
+            COUNT="${{ github.event.inputs.count || '1' }}"
+            python scripts/cross_platform_social_drip.py --count "$COUNT"
+          fi
