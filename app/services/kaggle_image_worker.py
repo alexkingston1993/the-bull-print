@@ -39,14 +39,14 @@ class KaggleImageWorker:
         self.stage_dir.mkdir(parents=True, exist_ok=True)
 
     def _detect_username(self) -> str:
-        if os.getenv("KAGGLE_API_TOKEN"):
-            return os.getenv("KAGGLE_USERNAME", "alexkingston")
         cfg = Path.home() / ".kaggle" / "kaggle.json"
         if cfg.exists():
             try:
                 with open(cfg) as f:
                     data = json.load(f)
-                    return data.get("username", "alexkingston")
+                    u = data.get("username")
+                    if u:
+                        return u
             except Exception:
                 pass
         return os.getenv("KAGGLE_USERNAME", "alexkingston")

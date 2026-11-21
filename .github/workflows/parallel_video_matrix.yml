@@ -133,9 +133,6 @@ jobs:
           INPUT_DURATION_MIN: ${{ github.event.inputs.duration_min || github.event.client_payload.duration_min || '12' }}
           INPUT_SHORTS_ONLY: ${{ github.event.inputs.shorts_only || github.event.client_payload.shorts_only || 'true' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
-          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
-          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
           PYTHONUNBUFFERED: "1"
         run: |
           if [ -z "$INPUT_TOPIC" ]; then
@@ -272,10 +269,18 @@ jobs:
         env:
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+          KAGGLE_KEY_ALEXYTCREATIVE: ${{ secrets.KAGGLE_KEY_ALEXYTCREATIVE }}
+          TARGET_ACCOUNT: ${{ github.event.inputs.kaggle_account || github.event.client_payload.kaggle_account || 'auto' }}
+          IS_SHORT: ${{ github.event.inputs.shorts_only || github.event.client_payload.shorts_only || 'true' }}
           PYTHONUNBUFFERED: "1"
         run: |
           mkdir -p ~/.kaggle
-          echo "{\"username\":\"$KAGGLE_USERNAME\",\"key\":\"$KAGGLE_KEY\"}" > ~/.kaggle/kaggle.json
+          if [ "$TARGET_ACCOUNT" = "alexytcreative" ] || { [ "$TARGET_ACCOUNT" = "auto" ] && [ "$IS_SHORT" = "false" ]; }; then
+            KEY="${KAGGLE_KEY_ALEXYTCREATIVE:-$KAGGLE_KEY}"
+            echo "{\"username\":\"alexytcreative\",\"key\":\"$KEY\"}" > ~/.kaggle/kaggle.json
+          else
+            echo "{\"username\":\"$KAGGLE_USERNAME\",\"key\":\"$KAGGLE_KEY\"}" > ~/.kaggle/kaggle.json
+          fi
           chmod 600 ~/.kaggle/kaggle.json
           python scripts/cloud_parallel_video_engine.py \
             --mode dispatch_kaggle_overflow \
