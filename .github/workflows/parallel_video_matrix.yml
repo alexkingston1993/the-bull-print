@@ -95,6 +95,7 @@ jobs:
           KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+          KAGGLE_KEY_ALEXYTCREATIVE: ${{ secrets.KAGGLE_KEY_ALEXYTCREATIVE }}
           TARGET_ACCOUNT: ${{ github.event.inputs.kaggle_account || github.event.client_payload.kaggle_account || 'auto' }}
           IS_SHORT: ${{ github.event.inputs.shorts_only || github.event.client_payload.shorts_only || 'true' }}
           PYTHONUNBUFFERED: "1"
@@ -103,10 +104,11 @@ jobs:
           if [ "$TARGET_ACCOUNT" = "alexytcreative" ] || { [ "$TARGET_ACCOUNT" = "auto" ] && [ "$IS_SHORT" = "false" ]; }; then
             echo "⚡ [Kaggle Account Router] Routing to Account 2 (alexytcreative) for Documentaries..."
             rm -f ~/.kaggle/access_token
-            echo "{\"username\":\"alexytcreative\",\"key\":\"$KAGGLE_KEY\"}" > ~/.kaggle/kaggle.json
+            KEY="${KAGGLE_KEY_ALEXYTCREATIVE:-$KAGGLE_KEY}"
+            echo "{\"username\":\"alexytcreative\",\"key\":\"$KEY\"}" > ~/.kaggle/kaggle.json
             chmod 600 ~/.kaggle/kaggle.json
             echo "KAGGLE_USERNAME=alexytcreative" >> $GITHUB_ENV
-            echo "KAGGLE_KEY=$KAGGLE_KEY" >> $GITHUB_ENV
+            echo "KAGGLE_KEY=$KEY" >> $GITHUB_ENV
           else
             echo "⚡ [Kaggle Account Router] Routing to Account 1 (alexkingston) for Shorts..."
             if [ -n "$KAGGLE_API_TOKEN" ]; then

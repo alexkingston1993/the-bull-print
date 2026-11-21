@@ -70,6 +70,10 @@ class KaggleImageWorker:
             res = subprocess.run([str(kaggle_bin), "kernels", "status", ref], capture_output=True, text=True)
             status_line = (res.stdout or "").strip().lower()
 
+            if any(k in status_line for k in ["denied", "unauthorized", "permission 'kernels.get' was denied"]):
+                logger.error(f"❌ [Kaggle Auth Failure] Access denied on '{ref}': {res.stdout.strip()}. Aborting lock wait immediately.")
+                return False
+
             is_done = any(k in status_line for k in ["complete", "error", "failed", "cancel"]) and len(status_line) > 0
             is_busy = any(k in status_line for k in ["running", "queued", "saving", "starting"]) or not status_line
 
