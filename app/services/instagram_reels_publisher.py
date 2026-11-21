@@ -40,13 +40,19 @@ def get_instagram_credentials() -> Dict[str, str]:
     return {"account_id": account_id, "access_token": access_token}
 
 
+QUARANTINED_VIDEO_IDS = {"Z6LEnQyhuvw", "quarantined"}
+
+
 def build_instagram_seo_caption(title: str, synopsis: str = "", youtube_video_id: str = "", tags: Optional[list] = None) -> str:
     """
     Constructs an AI & SEO-Optimized caption for Instagram Reels using Gemini (gemini-2.5-flash)
-    with a deterministic institutional template fallback.
+    with a deterministic institutional template fallback and clean UTM tracking.
     """
     clean_title = title.replace("| The Bull Print", "").strip()
     api_key = os.getenv("GEMINI_API_KEY")
+
+    yt_link = f"https://youtu.be/{youtube_video_id}?utm_source=instagram&utm_medium=reels&utm_campaign=thebullprint" if youtube_video_id else ""
+    portal_link = "https://thebullprint.com/links?utm_source=instagram&utm_medium=reels&utm_campaign=thebullprint"
 
     if api_key:
         prompt = f"""You are the social media director and SEO strategist for 'The Bull Print' (@thebullprint), an elite institutional macro finance media brand.
@@ -60,8 +66,8 @@ MANDATORY STRUCTURE:
 2. PARAGRAPH 2: 2–3 dense sentences explicitly naming primary institutions, central banks, tickers, dollar amounts, and macro catalysts for search indexers.
 3. PARAGRAPH 3: Exactly "Financial freedom for everyone through financial literacy. 💡"
 4. PARAGRAPH 4:
-📌 Watch the full 12-minute institutional breakdown on YouTube — tap the link in our bio (@thebullprint) or search "{clean_title}" on YouTube (youtu.be/{youtube_video_id or 'latest'}).
-🌐 Portal: thebullprint.com | 📘 Facebook: The Bull Print
+📌 Watch the full 12-minute institutional breakdown on YouTube — tap the link in our bio (@thebullprint) or search "{clean_title}" on YouTube ({yt_link or 'youtu.be/' + (youtube_video_id or 'latest')}).
+🌐 Portal: {portal_link} | 📘 Facebook: The Bull Print
 5. FOOTER: #TheBullPrint #MacroEconomics #FinancialLiteracy #InstitutionalTrading plus 3 to 4 hyper-relevant entity hashtags.
 
 Output ONLY the final caption text. Zero conversational meta-commentary, zero intro, zero markdown code fences."""
@@ -89,7 +95,7 @@ Output ONLY the final caption text. Zero conversational meta-commentary, zero in
             except Exception as e:
                 logger.debug(f"Gemini caption generation note ({model}): {e}")
 
-    # Deterministic Institutional Fallback Template
+    # Deterministic Institutional Fallback Template with clean UTM parameters
     upper_hook = clean_title.upper()
     summary_part = synopsis.strip() if synopsis else (
         f"Forensic breakdown of institutional capital flows, regulatory actions, "
@@ -99,8 +105,8 @@ Output ONLY the final caption text. Zero conversational meta-commentary, zero in
     cta_part = (
         f"📌 Watch the full 12-minute institutional breakdown on YouTube — "
         f"tap the link in our bio (@thebullprint) or search \"{clean_title}\" on YouTube"
-        + (f" (youtu.be/{youtube_video_id})." if youtube_video_id else ".")
-        + "\n🌐 Portal: thebullprint.com | 📘 Facebook: The Bull Print"
+        + (f" ({yt_link})." if yt_link else ".")
+        + f"\n🌐 Portal: {portal_link} | 📘 Facebook: The Bull Print"
     )
     save_cta = "Save this briefing for market open & drop your outlook below. 👇"
 
@@ -128,11 +134,32 @@ def publish_instagram_reel(
     cover_url: Optional[str] = None,
     account_id: Optional[str] = None,
     access_token: Optional[str] = None,
-    max_wait_sec: int = 300
+    max_wait_sec: int = 300,
+    video_id: str = "",
+    release_slot: str = "routine"
 ) -> Dict[str, Any]:
     """
-    Executes the 2-step Instagram Reels publishing pipeline via Meta Graph API v21.0.
+    Executes the 2-step Instagram Reels publishing pipeline via Meta Graph API v21.0
+    with strict quarantine blocking and Cloudflare D1 idempotency protection.
     """
+    # 1. Quarantine Guardrail
+    if video_id in QUARANTINED_VIDEO_IDS or "Z6LEnQyhuvw" in (caption or ""):
+        logger.warning(f"🚫 [Quarantine Gate] Video '{video_id}' is permanently quarantined. Aborting Instagram publish.")
+        return {"success": False, "error": "Blocked by quarantine guardrail", "quarantined": True}
+
+    # 2. Idempotency Check via Cloudflare D1
+    d1_client = None
+    if video_id:
+        try:
+            from app.services.cloudflare_r2_vault import CloudflareD1Client
+            d1_client = CloudflareD1Client()
+            existing = d1_client.check_cross_post_idempotency(video_id, "instagram", release_slot)
+            if existing and existing.get("status") == "SUCCESS":
+                logger.info(f"⏭️ [Idempotency Gate] Video '{video_id}' already published to Instagram for slot '{release_slot}'. Skipping duplicate.")
+                return {"success": True, "skipped": True, "permalink": existing.get("permalink")}
+        except Exception as de:
+            logger.debug(f"D1 idempotency check notice: {de}")
+
     creds = get_instagram_credentials()
     ig_id = account_id or creds["account_id"]
     token = access_token or creds["access_token"]
@@ -219,6 +246,12 @@ def publish_instagram_reel(
         pass
 
     logger.success(f"🎉 [Instagram Reel Published] ID: {media_id} | Permalink: {permalink}")
+    if d1_client and video_id:
+        try:
+            d1_client.record_cross_post_attempt(video_id, "instagram", release_slot, "SUCCESS", permalink=permalink)
+        except Exception as de:
+            logger.debug(f"D1 record success notice: {de}")
+
     return {
         "success": True,
         "media_id": media_id,
@@ -232,13 +265,33 @@ def publish_local_mp4_reel(
     caption: str,
     account_id: Optional[str] = None,
     access_token: Optional[str] = None,
-    max_wait_sec: int = 300
+    max_wait_sec: int = 300,
+    video_id: str = "",
+    release_slot: str = "routine"
 ) -> Dict[str, Any]:
     """
     Publishes a local .mp4 video file to Instagram Reels using the official
-    Meta Graph API Resumable Upload protocol (rupload.facebook.com).
-    Zero external hosting needed!
+    Meta Graph API Resumable Upload protocol (rupload.facebook.com)
+    with strict quarantine blocking and Cloudflare D1 idempotency protection.
     """
+    # 1. Quarantine Guardrail
+    if video_id in QUARANTINED_VIDEO_IDS or "Z6LEnQyhuvw" in (caption or "") or "Z6LEnQyhuvw" in video_path:
+        logger.warning(f"🚫 [Quarantine Gate] Video '{video_id}' is permanently quarantined. Aborting Instagram publish.")
+        return {"success": False, "error": "Blocked by quarantine guardrail", "quarantined": True}
+
+    # 2. Idempotency Check via Cloudflare D1
+    d1_client = None
+    if video_id:
+        try:
+            from app.services.cloudflare_r2_vault import CloudflareD1Client
+            d1_client = CloudflareD1Client()
+            existing = d1_client.check_cross_post_idempotency(video_id, "instagram", release_slot)
+            if existing and existing.get("status") == "SUCCESS":
+                logger.info(f"⏭️ [Idempotency Gate] Video '{video_id}' already published to Instagram for slot '{release_slot}'. Skipping duplicate.")
+                return {"success": True, "skipped": True, "permalink": existing.get("permalink")}
+        except Exception as de:
+            logger.debug(f"D1 idempotency check notice: {de}")
+
     import requests
     creds = get_instagram_credentials()
     ig_id = account_id or creds["account_id"]
@@ -319,6 +372,12 @@ def publish_local_mp4_reel(
         pass
 
     logger.success(f"🎉 [Instagram Reel Published] ID: {media_id} | Permalink: {permalink}")
+    if d1_client and video_id:
+        try:
+            d1_client.record_cross_post_attempt(video_id, "instagram", release_slot, "SUCCESS", permalink=permalink)
+        except Exception as de:
+            logger.debug(f"D1 record success notice: {de}")
+
     return {
         "success": True,
         "media_id": media_id,

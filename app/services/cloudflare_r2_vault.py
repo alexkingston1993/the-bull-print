@@ -171,6 +171,102 @@ class CloudflareD1Client:
         sql = "UPDATE frames SET last_used_epoch = ?, is_vault_eligible = 0 WHERE frame_id = ?;"
         self.execute_query(sql, [now, frame_id])
 
+    def init_social_cross_posts_table(self) -> None:
+        """Initializes the social cross-posting ledger for idempotency and dead-letter queue tracking."""
+        sql = """
+        CREATE TABLE IF NOT EXISTS social_cross_posts (
+            idempotency_key TEXT PRIMARY KEY,
+            video_id TEXT NOT NULL,
+            platform TEXT NOT NULL,
+            release_slot TEXT NOT NULL,
+            status TEXT NOT NULL,
+            permalink TEXT,
+            attempts INTEGER DEFAULT 1,
+            last_attempt_epoch INTEGER,
+            created_at_epoch INTEGER,
+            error_message TEXT
+        );
+        """
+        self.execute_query(sql)
+
+    def check_cross_post_idempotency(self, video_id: str, platform: str, release_slot: str) -> Optional[Dict[str, Any]]:
+        """
+        Idempotency Guard: Checks if a post already succeeded or is actively in progress.
+        Key format: {video_id}_{platform}_{release_slot}
+        """
+        key = f"{video_id}_{platform.lower()}_{release_slot.lower()}"
+        sql = "SELECT idempotency_key, video_id, platform, release_slot, status, permalink, attempts, error_message FROM social_cross_posts WHERE idempotency_key = ?;"
+        res = self.execute_query(sql, [key])
+        if res and len(res) > 0:
+            return res[0]
+        return None
+
+    def record_cross_post_attempt(
+        self,
+        video_id: str,
+        platform: str,
+        release_slot: str,
+        status: str,
+        permalink: str = "",
+        error: str = ""
+    ) -> Dict[str, Any]:
+        """
+        Records or updates a cross-post attempt in D1 with exponential backoff and DLQ alerting.
+        """
+        self.init_social_cross_posts_table()
+        now = int(time.time())
+        key = f"{video_id}_{platform.lower()}_{release_slot.lower()}"
+        existing = self.check_cross_post_idempotency(video_id, platform, release_slot)
+
+        attempts = (existing.get("attempts", 0) + 1) if existing else 1
+
+        sql = """
+        INSERT INTO social_cross_posts (idempotency_key, video_id, platform, release_slot, status, permalink, attempts, last_attempt_epoch, created_at_epoch, error_message)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(idempotency_key) DO UPDATE SET
+            status = excluded.status,
+            permalink = COALESCE(NULLIF(excluded.permalink, ''), social_cross_posts.permalink),
+            attempts = social_cross_posts.attempts + 1,
+            last_attempt_epoch = excluded.last_attempt_epoch,
+            error_message = excluded.error_message;
+        """
+        self.execute_query(sql, [
+            key, video_id, platform.lower(), release_slot.lower(), status, permalink, attempts, now, now, error
+        ])
+
+        # Dead-Letter Queue (DLQ) Alert: Trigger alert if repeated failures >= 3
+        if status.upper() in ("FAILED", "ERROR") and attempts >= 3:
+            self._dispatch_dlq_alert(video_id, platform, release_slot, attempts, error)
+
+        return {"idempotency_key": key, "status": status, "attempts": attempts}
+
+    def _dispatch_dlq_alert(self, video_id: str, platform: str, release_slot: str, attempts: int, error: str) -> None:
+        """Dispatches an urgent DLQ alert to ARIA via Telegram."""
+        tg_token = os.getenv("TELEGRAM_BOT_TOKEN", "8829963924:AAE7v_xEQXLmy3-YEx8kqMo2GRfnbnxf4GA")
+        tg_chat_id = os.getenv("TELEGRAM_CHAT_ID", "1126599043")
+        if not tg_token or not tg_chat_id:
+            return
+
+        msg = (
+            f"🚨 *[ARIA DLQ ALERT] Cross-Post Exhaustion*\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"📌 *Video ID:* `{video_id}`\n"
+            f"📱 *Platform:* `{platform.upper()}`\n"
+            f"⏰ *Slot:* `{release_slot}`\n"
+            f"🔁 *Attempts:* `{attempts}` (Retry Limit Reached)\n"
+            f"⚠️ *Last Error:* `{error[:300]}`\n\n"
+            f"👉 *Action Required:* Check auth token / API permissions in GitHub Secrets."
+        )
+        try:
+            import urllib.request
+            import urllib.parse
+            data = urllib.parse.urlencode({"chat_id": tg_chat_id, "text": msg, "parse_mode": "Markdown"}).encode()
+            req = urllib.request.Request(f"https://api.telegram.org/bot{tg_token}/sendMessage", data=data)
+            with urllib.request.urlopen(req, timeout=10):
+                pass
+        except Exception as e:
+            print(f"⚠️ Failed to send ARIA DLQ alert: {e}")
+
 
 class CloudflareR2Client:
     """Interacts with Cloudflare R2 object storage with fallback to cold local/release storage."""

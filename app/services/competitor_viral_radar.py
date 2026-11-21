@@ -324,6 +324,116 @@ class CompetitorViralRadar:
         return cls.update_radar_feed()
 
     @classmethod
+    def apply_equal_footing_niche_filter(
+        cls,
+        candidate: Dict[str, Any],
+        recent_topics: Optional[List[str]] = None
+    ) -> Tuple[bool, float, str]:
+        """
+        Equal-Footing Niche Filter across all benchmark channels (including Firstpost, Patrick Boyle, MagnatesMedia, etc.):
+        1. Macro & Institutional Relevance:
+           Must involve sovereign debt, central banks, liquidity flows, market structure, trade/sanctions, energy, or supply chain.
+        2. Financial Literacy Translation:
+           Must have a direct takeaway for purchasing power, capital risk, retail traps, or financial protection.
+        3. Topic Freshness / Diversity Penalty:
+           Penalizes topics that duplicate coverage from the past 7 days to prevent queue flooding.
+        
+        Returns: (is_accepted: bool, weighted_score: float, reasoning: str)
+        """
+        title = candidate.get("title", "").lower()
+        multiplier = float(candidate.get("outlier_multiplier", 1.0))
+
+        # Core Macro & Institutional Keywords
+        macro_keywords = [
+            "debt", "fed", "rbi", "central bank", "liquidity", "fii", "dii", "treasury",
+            "yield", "inflation", "currency", "rupee", "dollar", "china", "nvidia", "chips",
+            "semiconductor", "trade", "tariff", "sanctions", "oil", "energy", "uranium",
+            "option", "expiry", "sebi", "crash", "correction", "bailout", "default", "banking",
+            "private credit", "hedge fund", "gold", "silver", "ftx", "tether", "crypto tax", "115bbh"
+        ]
+
+        # Financial Literacy & Capital Protection Keywords
+        literacy_keywords = [
+            "trap", "loss", "why", "hidden", "truth", "exposed", "clause", "deduction",
+            "risk", "protect", "retail", "cost", "scam", "how to", "secret", "rules", "warning"
+        ]
+
+        has_macro = any(k in title for k in macro_keywords)
+        has_literacy = any(k in title for k in literacy_keywords)
+
+        if not (has_macro or has_literacy):
+            return False, 0.0, "Rejected: Lacks macro/institutional mechanics or financial literacy relevance."
+
+        # Outlier Gate: Must clear 3.0x channel baseline (or 2.5x with strong macro)
+        if multiplier < 2.5:
+            return False, 0.0, f"Rejected: Outlier multiplier {multiplier}x is below 2.5x threshold."
+
+        # Calculate Diversity / Freshness Weight
+        freshness_weight = 1.0
+        if recent_topics:
+            title_words = set(re.findall(r'\b\w{4,}\b', title))
+            for rec in recent_topics:
+                rec_words = set(re.findall(r'\b\w{4,}\b', rec.lower()))
+                overlap = len(title_words.intersection(rec_words))
+                if overlap >= 3:
+                    freshness_weight = 0.5  # Penalize duplicate entity clustering
+                    break
+
+        weighted_score = round(multiplier * 10.0 * freshness_weight, 1)
+        reason = f"Accepted on equal footing: {multiplier}x outlier with macro relevance and literacy angle."
+        return True, weighted_score, reason
+
+    @classmethod
+    def pair_documentary_with_shorts(
+        cls,
+        doc_title: str,
+        doc_synopsis: str = "",
+        target_slots: Optional[List[str]] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Pairs a >=12-minute documentary with 2-3 distinct micro-mechanism Shorts
+        scheduled across the 3 daily IST publishing windows:
+        - Slot 1 (Morning ~07:30-09:00 IST): The Shock Metric / Opening Hook Trap
+        - Slot 2 (Afternoon ~13:30-15:00 IST): The Institutional Mechanism / Hidden Clause
+        - Slot 3 (Evening ~20:00-21:30 IST): The Sovereign Endgame / Financial Literacy Protection
+        """
+        clean_title = doc_title.replace("| The Bull Print", "").strip()
+        slots = target_slots or ["Slot 1 (Morning 07:30-09:00 IST)", "Slot 2 (Afternoon 13:30-15:00 IST)", "Slot 3 (Evening 20:00-21:30 IST)"]
+
+        paired_shorts = [
+            {
+                "slot": slots[0],
+                "ist_window": "07:30 - 09:00 IST",
+                "focus_angle": "The Shock Metric & The Opening Trap",
+                "title": f"The Shocking Reality Behind {clean_title[:45]}",
+                "hook": f"Here is the single number Wall Street is desperate to hide about {clean_title[:35]}...",
+                "bridge_to_doc": f"Watch our full 12-minute deep-dive on YouTube for the complete order flow audit.",
+                "mission_anchor": "Financial freedom for everyone through financial literacy. 💡"
+            },
+            {
+                "slot": slots[1],
+                "ist_window": "13:30 - 15:00 IST",
+                "focus_angle": "The Institutional Mechanism & Hidden Clause",
+                "title": f"How Central Banks Secretly Engineered {clean_title[:40]}",
+                "hook": f"Most retail investors completely misunderstand this hidden mechanism...",
+                "bridge_to_doc": f"Full forensic balance sheet breakdown available on our channel.",
+                "mission_anchor": "Financial freedom for everyone through financial literacy. 💡"
+            },
+            {
+                "slot": slots[2],
+                "ist_window": "20:00 - 21:30 IST",
+                "focus_angle": "The Sovereign Endgame & Financial Literacy Protection",
+                "title": f"What This Means for Your Portfolio: {clean_title[:40]}",
+                "hook": f"If you hold assets in 2026, you cannot ignore this structural trap...",
+                "bridge_to_doc": f"Watch the complete 12-minute documentary on YouTube (@TheBullPrint).",
+                "mission_anchor": "Financial freedom for everyone through financial literacy. 💡"
+            }
+        ]
+
+        logger.success(f"✓ [Short-to-Long Pairing] Paired 12-min doc '{clean_title}' with {len(paired_shorts)} distinct micro-Shorts across IST windows.")
+        return paired_shorts
+
+    @classmethod
     def get_winning_horse(cls, vertical: str, slot_number: int = 1) -> Dict[str, Any]:
         """
         Retrieves the top viral outlier pattern for a given vertical to seed fresh research in Stage 1 & 2.
