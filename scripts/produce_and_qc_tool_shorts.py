@@ -269,7 +269,7 @@ TOOLS_SPECS = [
             "Get your exact month-by-month debt freedom calendar.",
             "Watch your total interest liability melt to zero.",
             "Break free from the banking interest trap.",
-            "Reclaim your hard-earned salary starting today.",
+            "Reclaim your monthly salary starting today.",
             "Stop making credit card companies rich.",
             "Take control of your financial destiny right now.",
             "Execute the quantitative debt elimination system.",

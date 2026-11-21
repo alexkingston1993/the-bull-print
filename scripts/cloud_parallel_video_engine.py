@@ -446,6 +446,10 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                 STRICT ANTI-CLICHE & BANNED MOTIFS MANDATE:
                 The following visual motifs are PERMANENTLY FORBIDDEN (Do NOT use or reference any of these):
                 [{banned_str}]
+                OUTLAWED REPETITIVE PHRASES (STRICT PERMANENT EXCLUSION):
+                - NEVER use 'hard-earned money', 'hard earned money', or 'money is vanishing'.
+                - NEVER use 'predatory', 'predatory algorithms', or 'predatory practices'.
+                - NEVER mention 'Alex and the team', 'Alex', 'the team', or any host persona.
                 You MUST explore fresh physical metaphors, varied lighting, and concrete real-world objects.
 
                 SEGMENT STRUCTURE (20 Seconds each):
@@ -576,6 +580,22 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                     if extra:
                         g["script"] = f"{g['script']} {extra}".strip()
 
+        def scrub_banned_cliches(text: str) -> str:
+            if not text:
+                return text
+            t = text
+            t = re.sub(r"\b(?:your\s+)?hard[- ]earned money(?:\s+is\s+vanishing)?\b", "family savings", t, flags=re.IGNORECASE)
+            t = re.sub(r"\bhard[- ]earned money\b", "invested capital", t, flags=re.IGNORECASE)
+            t = re.sub(r"\bhard[- ]earned\b", "core", t, flags=re.IGNORECASE)
+            t = re.sub(r"\bpredatory algorithms?\b", "high-frequency algorithmic models", t, flags=re.IGNORECASE)
+            t = re.sub(r"\bpredatory\b", "institutional", t, flags=re.IGNORECASE)
+            t = re.sub(r"\b(?:from\s+)?alex and (?:the|his) team[.,!]?\b", "", t, flags=re.IGNORECASE)
+            t = re.sub(r"\b(?:the team and alex|from the team)[.,!]?\b", "", t, flags=re.IGNORECASE)
+            t = re.sub(r"\b(?:I am|I'm|this is|my name is)\s+Alex[.,!]?\b", "", t, flags=re.IGNORECASE)
+            t = re.sub(r"\b(?:I am|I'm|this is|my name is)\s+Christopher[.,!]?\b", "", t, flags=re.IGNORECASE)
+            t = re.sub(r"\bChristopher\b", "", t, flags=re.IGNORECASE)
+            return " ".join(t.split())
+
         for i in range(target_segments):
             start_t = round(i * 20.0, 2)
             end_t = round((i + 1) * 20.0, 2)
@@ -586,11 +606,7 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
             mid = str(g.get("headline_mid", second_word))[:24]
             badge = str(g.get("badge_text", "MARKET SHOCK"))[:20]
             color_theme = str(g.get("color_theme", "gold")).lower()
-            script_text = str(g.get("script", "")).strip()
-
-            # Strict zero identity leak guardrail: Scrub any accidental self-introduction or Christopher references
-            script_text = re.sub(r"\b(?:I am|I'm|this is|my name is)\s+Christopher\b", "I'm Alex", script_text, flags=re.IGNORECASE)
-            script_text = re.sub(r"\bChristopher\b", "Alex", script_text, flags=re.IGNORECASE)
+            script_text = scrub_banned_cliches(str(g.get("script", "")).strip())
 
             # Ensure micro_beats contains exactly 5 bespoke items
             raw_beats = g.get("micro_beats", [])
@@ -668,10 +684,13 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
         prompt = f"""
         You are an investigative financial journalist and thriller documentary director (in the style of Coffeezilla, James Jani, and MagnatesMedia).
         Tone: Dark, authoritative, forensic, breathless investigative thriller exposing high-stakes financial crimes and institutional traps.
-        STRICT IDENTITY MANDATE:
+        STRICT IDENTITY & ANTI-CLICHÉ MANDATES (ZERO TOLERANCE):
         - The narrator must NEVER state their name, introduce themselves, or say 'I am [Name]' or 'This is [Name]'.
-        - Zero self-identification. Jump straight into the story from the very first syllable.
-        - If an identity is ever referenced anywhere, it must ONLY be 'Alex' (Founder & Chief Analyst). Never mention or use the name 'Christopher'.
+        - Zero self-identification or team signoffs. Jump straight into the forensic investigation from the very first syllable.
+        - OUTLAWED REPETITIVE PHRASES (STRICT PERMANENT EXCLUSION):
+          * NEVER use 'hard-earned money', 'hard earned money', or 'money is vanishing'.
+          * NEVER use 'predatory', 'predatory algorithms', or 'predatory practices'.
+          * NEVER mention 'Alex and the team', 'Alex', 'the team', or any host persona.
         Topic: {topic_clean}
         Vertical: {vertical}
         Format: 60-Second Viral Short (9:16 Vertical)
@@ -680,11 +699,12 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
         CRITICAL DIRECTIVES FOR HIGH-RETENTION HUMAN STORYTELLING (AVD >= 70%):
         1. ZERO FINANCIAL JARGON IN THE FIRST 5 SECONDS:
            - STRICTLY FORBIDDEN WORDS in Hook: 'liquidity', 'absorption', 'VWAP', 'delta', 'correlation', 'fiscal deficit', 'implied volatility', 'order book', 'macroeconomic', 'consolidation'.
-           - Opening MUST BE A VISCERAL, UNIGNORABLE HOOK: A direct threat, shocking accusation, or urgent mystery confronting the viewer's bank account.
+           - Opening MUST BE A VISCERAL, UNIGNORABLE HOOK: A concrete corporate scandal, shocking balance sheet discrepancy, or direct supply chain collapse.
 
-        2. PERSONALIZE THE THREAT (EVERY STORY HAS A VILLAIN, A VICTIM, AND A CRIME):
-           - The victim is the everyday viewer working hard for their money.
-           - The villain is the institutional desk, shadow banker, or predatory algorithm.
+        2. FORENSIC ASYMMETRY (EVERY STORY EXPOSES AN INSTITUTIONAL MECHANISM):
+           - Highlight the mechanical asymmetry between high-frequency market-makers and retail order flow.
+           - Focus on the balance sheet, derivative exposure, or regulatory filings driving the price distortion.
+           - Zero cheap clichés or emotional victim tropes. Focus on ruthless mathematical and operational facts.
 
         3. ONE SINGLE INSANE FACT PER SHORT (NO ACADEMIC DATA DUMPS):
            - Focus on ONE shocking smoking gun. Build relentless tension for 40 seconds, then drop the jaw-dropping revelation in the final 15 seconds.
@@ -882,12 +902,10 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
             f"Hardcoded scripts, generic modulo fallbacks, and canned text are PERMANENTLY PROHIBITED."
         )
 
-    # Clean script fields and sanitize identity references without breaking sentence flow
+    # Clean script fields and sanitize outlawed cliches & identity references
     master_mono = ""
     if gemini_sections and "master_monologue" in gemini_sections[0]:
-        clean_mono = str(gemini_sections[0]["master_monologue"]).strip()
-        clean_mono = re.sub(r"\b(?:I am|I'm|this is|my name is)\s+Christopher\b", "I'm Alex", clean_mono, flags=re.IGNORECASE)
-        clean_mono = re.sub(r"\bChristopher\b", "Alex", clean_mono, flags=re.IGNORECASE)
+        clean_mono = scrub_banned_cliches(str(gemini_sections[0]["master_monologue"]).strip())
         gemini_sections[0]["master_monologue"] = clean_mono
         master_mono = clean_mono
 
@@ -902,11 +920,7 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
         badge = str(g.get("badge_text", "MARKET SHOCK"))[:20]
         color_theme = str(g.get("color_theme", "gold")).lower()
         visual_prompt = str(g.get("visual_prompt", "")).strip()
-        script_text = str(g.get("script", "")).strip()
-
-        # Strict zero identity leak guardrail
-        script_text = re.sub(r"\b(?:I am|I'm|this is|my name is)\s+Christopher\b", "I'm Alex", script_text, flags=re.IGNORECASE)
-        script_text = re.sub(r"\bChristopher\b", "Alex", script_text, flags=re.IGNORECASE)
+        script_text = scrub_banned_cliches(str(g.get("script", "")).strip())
 
         if not visual_prompt or len(visual_prompt) < 15:
             cat_tuple = METAPHOR_CATALOG[i % len(METAPHOR_CATALOG)]

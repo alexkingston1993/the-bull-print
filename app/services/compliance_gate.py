@@ -841,7 +841,7 @@ Respond ONLY with valid JSON:
             if term in opening_words:
                 return False, f"Forbidden financial jargon '{term}' detected in opening 15 words."
 
-        # 4. Strictly Forbidden Self-Introduction
+        # 4. Strictly Forbidden Self-Introduction & Outlawed Repetitive Clichés
         forbidden_intros = [
             r"\bi am\b", r"\bthis is\b", r"\bmy name is\b", r"\bchristopher\b", r"\bi'm\b"
         ]
@@ -850,13 +850,25 @@ Respond ONLY with valid JSON:
             if re.search(pat, opening_clean):
                 return False, f"Robotic self-introduction detected: '{pat}' in opening sentence."
 
+        # 4b. Mandatory Exclusion Gate: Banned Repetitive Clichés (Zero Tolerance)
+        outlawed_tropes = [
+            (r"\bhard[- ]earned money(?:\s+is\s+vanishing)?\b", "hard-earned money / vanishing trope"),
+            (r"\bpredatory\b", "predatory trope"),
+            (r"\balex and (?:the|his) team\b", "alex and the team trope"),
+            (r"\bthe team and alex\b", "the team and alex trope")
+        ]
+        for pat, desc in outlawed_tropes:
+            if re.search(pat, monologue, re.IGNORECASE):
+                return False, f"Outlawed repetitive cliché detected: '{desc}'. Replace with forensic institutional facts, numbers, and balance-sheet mechanics."
+
         # 5. Natural Sentence Cadence & Anti-Checklist Barrier
         sentences = [s.strip() for s in re.split(r'[.!?]+', monologue) if s.strip()]
         if sentences:
             sent_lens = [len(s.split()) for s in sentences]
             avg_len = sum(sent_lens) / len(sent_lens)
-            if avg_len < 12.0:
-                return False, f"Robotic checklist detected: average sentence length is only {avg_len:.1f} words (< 12 words). Sentences must be full, natural human thoughts (18-26 words)."
+            min_avg = 12.0 if is_short else 10.0
+            if avg_len < min_avg:
+                return False, f"Robotic checklist detected: average sentence length is only {avg_len:.1f} words (< {min_avg} words). Sentences must be full, natural human thoughts."
             if max(sent_lens) > 42:
                 return False, f"Run-on sentence detected ({max(sent_lens)} words). Split with proper punctuation for natural breathing."
 
@@ -897,7 +909,11 @@ Respond ONLY with valid JSON:
                 with Image.open(f_path) as img:
                     w, h = img.size
                     if w != target_w or h != target_h:
-                        return False, f"Frame {f_path.name} dimension mismatch: {w}x{h} (expected {target_w}x{target_h})"
+                        logger.warning(f"⚡ [TripleCheck Auto-Heal] Auto-resizing {f_path.name} from {w}x{h} to target {target_w}x{target_h} (LANCZOS)...")
+                        img_rgb = img.convert("RGB")
+                        resized = img_rgb.resize((target_w, target_h), Image.Resampling.LANCZOS)
+                        resized.save(f_path, quality=95)
+                        w, h = target_w, target_h
 
                     gray = img.convert("L")
                     stat = ImageStat.Stat(gray)

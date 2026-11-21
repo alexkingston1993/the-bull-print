@@ -719,7 +719,8 @@ Everything must be in simple, crystal-clear, everyday words.
 4. NEVER use "order flow", "dark pools", "POC", or "VWAP". Instead say "massive buying and selling moves by giant global banks".
 5. NEVER use "liquidity sweep" or "liquidity trap". Instead say "big banks pushing prices down temporarily so everyday beginners panic and sell their shares at a discount".
 6. NEVER mention "FII and DII" without immediately clarifying: "big foreign funds and our Indian mutual funds like LIC".
-7. NEVER use "F&O" without clarifying: "short-term gambling contracts where 93 percent of beginners lose their hard-earned money".
+7. NEVER use "F&O" without clarifying: "short-term gambling contracts where 93 percent of beginners lose their invested capital".
+8. STRICT PHRASE BANS: NEVER write 'hard-earned money', 'hard earned money', 'money is vanishing', 'predatory', 'Alex and the team', or 'the team'. Speak with calm analytical authority.
 8. Explain market events with everyday analogies: fruit markets, vegetable wholesale prices, household grocery bills, buying during rainstorms, and saving for family emergencies.
 9. Channel inspiration: Speak with the grounded, protective wisdom of Anand Srinivasan (Money Pechu) — always advocate for family safety, keeping cash buffers, holding physical gold, and avoiding quick-money gambling traps.
 

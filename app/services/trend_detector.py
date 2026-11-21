@@ -256,7 +256,7 @@ class ViralTrendDetector:
             subject = "Why 93 Percent of Everyday People Lose Money in Quick Trading Bets"
             script = (
                 f"The official report from India's market regulator SEBI confirmed a shocking reality: "
-                f"93 percent of everyday people lose their hard-earned money in short-term trading within 90 days. "
+                f"93 percent of everyday people lose their invested capital in short-term trading within 90 days. "
                 f"This happens because short-term trading contracts are like ice cubes left out in the hot afternoon sun. "
                 f"Every single minute that passes, their time value melts away into thin air, and that melted money goes straight into the pockets of giant investment banks. "
                 f"Stop treating the stock market like a gambling casino. "

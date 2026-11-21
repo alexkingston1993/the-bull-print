@@ -197,7 +197,7 @@ class PipelineOrchestrator:
                 f"Here is the exact trap everyday investors need to watch out for today. "
                 f"Early morning indicators might look green, but behind the scenes, large institutions are quietly exiting expensive hype stocks and shifting their money into steady giants like HDFC Bank and Reliance near {nifty_str}. "
                 f"When big banks sell, everyday people often rush in thinking it is a quick bargain, only to see prices drop further. "
-                f"Protect your hard-earned money and do not rush into impulsive morning buys. "
+                f"Protect your invested capital and do not rush into impulsive morning buys. "
                 f"Follow The Bull Print for daily honest market updates. Strictly educational market study."
             )
             terms = ["stock candlestick chart", "forex trading screen", "financial data analytics", "stock exchange trading floor", "reliance"]
@@ -270,7 +270,7 @@ class PipelineOrchestrator:
         elif slot_name == "options_trap":
             subject = "Warning for Beginners: Why 90% of Everyday People Lose in Options"
             script = (
-                f"Did you know that according to official SEBI government data, over 90 percent of everyday people who trade in options lose their hard-earned money? "
+                f"Did you know that according to official SEBI government data, over 90 percent of everyday people who trade in options lose their invested capital? "
                 f"Here is the simple truth financial influencers never tell you. "
                 f"Trading short-term options is not investing. It is buying an expiring lottery ticket. "
                 f"Every single hour that passes, the value of that contract melts away like an ice cube left out in the sun. "
