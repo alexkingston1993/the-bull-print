@@ -2056,6 +2056,36 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
             if vid_id:
                 yt_url = res.get("url") or f"https://youtu.be/{vid_id}"
                 logger.success(f"🚀 [YouTube Upload] Broadcast Live: {yt_url}")
+
+                # Cross-post Short to Instagram Reels (if credentials present)
+                ig_token = os.getenv("INSTAGRAM_ACCESS_TOKEN")
+                ig_id = os.getenv("INSTAGRAM_ACCOUNT_ID")
+                if ig_token and ig_id:
+                    try:
+                        from app.services.instagram_reels_publisher import publish_local_mp4_reel, build_instagram_seo_caption
+                        ig_caption = build_instagram_seo_caption(title=title, synopsis=title, youtube_video_id=vid_id, tags=tags)
+                        logger.info(f"📸 [Instagram Cross-Post] Publishing Short to Instagram Reels...")
+                        ig_res = publish_local_mp4_reel(video_path=str(final_video_mp4), caption=ig_caption, account_id=ig_id, access_token=ig_token)
+                        if ig_res.get("success"):
+                            logger.success(f"✓ [Instagram Cross-Post] Reel published: {ig_res.get('permalink')}")
+                        else:
+                            logger.warning(f"⚠️ [Instagram Cross-Post] Notice: {ig_res.get('error')}")
+                    except Exception as ig_err:
+                        logger.warning(f"⚠️ [Instagram Cross-Post] Non-fatal notice: {ig_err}")
+
+                # Cross-post Short to TikTok (if credentials present)
+                tiktok_token = os.getenv("TIKTOK_ACCESS_TOKEN")
+                if tiktok_token:
+                    try:
+                        from app.services.tiktok_publisher import publish_local_tiktok_video
+                        logger.info(f"🎵 [TikTok Cross-Post] Publishing Short to TikTok...")
+                        tk_res = publish_local_tiktok_video(video_path=str(final_video_mp4), title=title, synopsis=title, tags=tags)
+                        if tk_res.get("success"):
+                            logger.success(f"✓ [TikTok Cross-Post] TikTok video published: {tk_res.get('publish_id')}")
+                        else:
+                            logger.warning(f"⚠️ [TikTok Cross-Post] Notice: {tk_res.get('error')}")
+                    except Exception as tk_err:
+                        logger.warning(f"⚠️ [TikTok Cross-Post] Non-fatal notice: {tk_err}")
         if res and isinstance(res, dict) and not res.get("success"):
             err_msg = str(res.get("error") or "")
             if any(k in err_msg.lower() for k in ["quota", "limit", "pool"]):

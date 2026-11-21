@@ -335,6 +335,11 @@ jobs:
           YT_CLIENT_ID_2: ${{ secrets.YT_CLIENT_ID_2 }}
           YT_CLIENT_SECRET_2: ${{ secrets.YT_CLIENT_SECRET_2 }}
           YT_REFRESH_TOKEN_2: ${{ secrets.YT_REFRESH_TOKEN_2 }}
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_ACCOUNT_ID: ${{ secrets.INSTAGRAM_ACCOUNT_ID }}
+          FACEBOOK_APP_ID: ${{ secrets.FACEBOOK_APP_ID }}
+          FACEBOOK_APP_SECRET: ${{ secrets.FACEBOOK_APP_SECRET }}
+          TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
         run: |
           mkdir -p data/youtube_tokens
           if [ -n "$YOUTUBE_TOKEN_EN" ]; then
@@ -366,6 +371,11 @@ jobs:
           YT_CLIENT_ID_2: ${{ secrets.YT_CLIENT_ID_2 }}
           YT_CLIENT_SECRET_2: ${{ secrets.YT_CLIENT_SECRET_2 }}
           YT_REFRESH_TOKEN_2: ${{ secrets.YT_REFRESH_TOKEN_2 }}
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_ACCOUNT_ID: ${{ secrets.INSTAGRAM_ACCOUNT_ID }}
+          FACEBOOK_APP_ID: ${{ secrets.FACEBOOK_APP_ID }}
+          FACEBOOK_APP_SECRET: ${{ secrets.FACEBOOK_APP_SECRET }}
+          TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
         run: |
           if [ "${{ needs.prepare_session.outputs.is_short }}" = "true" ]; then
             echo "⚡ [Single-Runner Engine] Executing in-process segment renders + publish for Short..."
