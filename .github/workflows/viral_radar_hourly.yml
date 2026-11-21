@@ -1,9 +1,8 @@
 name: Real-Time Hourly Viral Radar (Ad-Hoc Breaking News)
 
 on:
-  # Temporarily paused until 1:30 PM IST (08:00 UTC) YouTube API quota reset to conserve quota
-  # schedule:
-  #   - cron: '0 * * * *'
+  schedule:
+    - cron: '0 * * * *'
   workflow_dispatch:
 
 permissions:

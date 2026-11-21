@@ -203,6 +203,24 @@ OUTPUT STRICT JSON ONLY:
     return published_titles
 
 
+def scrub_banned_cliches(text: str) -> str:
+    """Sanitizes outlawed clichés, emotional tropes, and unauthorized personas from narration scripts."""
+    if not text:
+        return text
+    t = text
+    t = re.sub(r"\b(?:your\s+)?hard[- ]earned money(?:\s+is\s+vanishing)?\b", "family savings", t, flags=re.IGNORECASE)
+    t = re.sub(r"\bhard[- ]earned money\b", "invested capital", t, flags=re.IGNORECASE)
+    t = re.sub(r"\bhard[- ]earned\b", "core", t, flags=re.IGNORECASE)
+    t = re.sub(r"\bpredatory algorithms?\b", "high-frequency algorithmic models", t, flags=re.IGNORECASE)
+    t = re.sub(r"\bpredatory\b", "institutional", t, flags=re.IGNORECASE)
+    t = re.sub(r"\b(?:from\s+)?alex and (?:the|his) team[.,!]?\b", "", t, flags=re.IGNORECASE)
+    t = re.sub(r"\b(?:the team and alex|from the team)[.,!]?\b", "", t, flags=re.IGNORECASE)
+    t = re.sub(r"\b(?:I am|I'm|this is|my name is)\s+Alex[.,!]?\b", "", t, flags=re.IGNORECASE)
+    t = re.sub(r"\b(?:I am|I'm|this is|my name is)\s+Christopher[.,!]?\b", "", t, flags=re.IGNORECASE)
+    t = re.sub(r"\bChristopher\b", "", t, flags=re.IGNORECASE)
+    return " ".join(t.split())
+
+
 # ─────────────────────────────────────────────────────────────
 # 2. SESSION PREPARATION & DYNAMIC MATRIX PARTITIONING
 # ─────────────────────────────────────────────────────────────
@@ -580,22 +598,6 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                     if extra:
                         g["script"] = f"{g['script']} {extra}".strip()
 
-        def scrub_banned_cliches(text: str) -> str:
-            if not text:
-                return text
-            t = text
-            t = re.sub(r"\b(?:your\s+)?hard[- ]earned money(?:\s+is\s+vanishing)?\b", "family savings", t, flags=re.IGNORECASE)
-            t = re.sub(r"\bhard[- ]earned money\b", "invested capital", t, flags=re.IGNORECASE)
-            t = re.sub(r"\bhard[- ]earned\b", "core", t, flags=re.IGNORECASE)
-            t = re.sub(r"\bpredatory algorithms?\b", "high-frequency algorithmic models", t, flags=re.IGNORECASE)
-            t = re.sub(r"\bpredatory\b", "institutional", t, flags=re.IGNORECASE)
-            t = re.sub(r"\b(?:from\s+)?alex and (?:the|his) team[.,!]?\b", "", t, flags=re.IGNORECASE)
-            t = re.sub(r"\b(?:the team and alex|from the team)[.,!]?\b", "", t, flags=re.IGNORECASE)
-            t = re.sub(r"\b(?:I am|I'm|this is|my name is)\s+Alex[.,!]?\b", "", t, flags=re.IGNORECASE)
-            t = re.sub(r"\b(?:I am|I'm|this is|my name is)\s+Christopher[.,!]?\b", "", t, flags=re.IGNORECASE)
-            t = re.sub(r"\bChristopher\b", "", t, flags=re.IGNORECASE)
-            return " ".join(t.split())
-
         for i in range(target_segments):
             start_t = round(i * 20.0, 2)
             end_t = round((i + 1) * 20.0, 2)
@@ -682,8 +684,9 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
 
     if client:
         prompt = f"""
-        You are an investigative financial journalist and thriller documentary director (in the style of Coffeezilla, James Jani, and MagnatesMedia).
-        Tone: Dark, authoritative, forensic, breathless investigative thriller exposing high-stakes financial crimes and institutional traps.
+        You are an elite investigative thriller documentary director and viral storyteller (in the master style of Coffeezilla, James Jani, and MagnatesMedia).
+        Your mission is to produce an electrifying, jaw-dropping 60-second investigative Short that hooks the viewer instantly, grips them with high-stakes tension, and leaves them stunned.
+
         STRICT IDENTITY & ANTI-CLICHÉ MANDATES (ZERO TOLERANCE):
         - The narrator must NEVER state their name, introduce themselves, or say 'I am [Name]' or 'This is [Name]'.
         - Zero self-identification or team signoffs. Jump straight into the forensic investigation from the very first syllable.
@@ -691,34 +694,42 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
           * NEVER use 'hard-earned money', 'hard earned money', or 'money is vanishing'.
           * NEVER use 'predatory', 'predatory algorithms', or 'predatory practices'.
           * NEVER mention 'Alex and the team', 'Alex', 'the team', or any host persona.
+
         Topic: {topic_clean}
         Vertical: {vertical}
         Format: 60-Second Viral Short (9:16 Vertical)
         Number of discrete sections: {num_sections}
 
-        CRITICAL DIRECTIVES FOR HIGH-RETENTION HUMAN STORYTELLING (AVD >= 70%):
-        1. ZERO FINANCIAL JARGON IN THE FIRST 5 SECONDS:
-           - STRICTLY FORBIDDEN WORDS in Hook: 'liquidity', 'absorption', 'VWAP', 'delta', 'correlation', 'fiscal deficit', 'implied volatility', 'order book', 'macroeconomic', 'consolidation'.
-           - Opening MUST BE A VISCERAL, UNIGNORABLE HOOK: A concrete corporate scandal, shocking balance sheet discrepancy, or direct supply chain collapse.
+        THE 4-ACT HIGH-VIRALITY RETENTION FORMULA (AVD >= 75%):
+        1. ACT 1: THE JAW-DROPPING HOOK (0 to 5s - First 15-20 Words):
+           - Start in medias res with an irresistible mystery, forbidden secret, or shocking financial smoking gun.
+           - FORBIDDEN OPENINGS: Never start with generic macroeconomic summaries, definitions, or broad statements like 'The market is shifting' or 'Interest rates are rising'.
+           - WINNING PATTERNS (Choose the strongest fit):
+             * THE HIDDEN CRIME: "In the next 72 hours, an obscure footnote in a Swiss bank filing could quietly erase $14 billion..."
+             * THE SYSTEM GLITCH: "A single automated server in New Jersey just triggered 300,000 sell orders in six milliseconds..."
+             * THE ASYMMETRIC CONSPIRACY: "While retail investors were told everything was stable, two sovereign wealth funds quietly moved 40 tons of gold out of London..."
+             * THE FORBIDDEN LEDGER: "Wall Street desperately hopes nobody reads page 112 of this regulatory audit, because what is buried inside proves..."
 
-        2. FORENSIC ASYMMETRY (EVERY STORY EXPOSES AN INSTITUTIONAL MECHANISM):
-           - Highlight the mechanical asymmetry between high-frequency market-makers and retail order flow.
-           - Focus on the balance sheet, derivative exposure, or regulatory filings driving the price distortion.
-           - Zero cheap clichés or emotional victim tropes. Focus on ruthless mathematical and operational facts.
+        2. ACT 2: THE HIDDEN SIPHON & CONFLICT (5 to 25s):
+           - Expose the asymmetric mechanism: how institutional insiders, dark pools, or algorithmic market-makers exploit the system.
+           - Explain the mechanism using vivid, intuitive physical dynamics (rehypothecation, routing front-runs, collateral squeeze).
+           - High tension: make the stakes personal, urgent, and tangible.
 
-        3. ONE SINGLE INSANE FACT PER SHORT (NO ACADEMIC DATA DUMPS):
-           - Focus on ONE shocking smoking gun. Build relentless tension for 40 seconds, then drop the jaw-dropping revelation in the final 15 seconds.
+        3. ACT 3: THE SMOKING GUN EVIDENCE (25 to 45s):
+           - Introduce the irrefutable forensic proof: the specific transaction, the satellite image discrepancy, the customs manifest mismatch, or the mathematical impossibility on the balance sheet.
+           - Build relentless momentum toward the climax.
 
-        4. MASTER CONTINUOUS HUMAN MONOLOGUE (ZERO ROBOTIC MICRO-BEAT CHECKLISTS):
-           - The audio narration MUST be written as ONE continuous, fluid, deeply human investigative monologue of 130 to 140 words total.
-           - NATURAL HUMAN SENTENCE CADENCE: Exactly 5 to 7 well-developed, complete human sentences.
-             * SENTENCE LENGTH: Each sentence MUST be between 18 and 26 words.
-             * STRICTLY FORBIDDEN: Choppy, robotic 4-to-6 word checklist bullet points (e.g. NEVER write 'The market crashed. Funds sold off. Retail bought. Prices dropped.').
-             * NATURAL PUNCTUATION & BREATHING: Use commas (',') for natural breath pauses within thoughts, em-dashes ('—') for dramatic investigative pivots, and periods ('.') ONLY at the conclusion of complete narrative thoughts.
-           - The voice track is synthesized as ONE uninterrupted, seamless human voice take. The audio is NEVER chopped into 3-second or 4-second intervals.
-           - Visual photographic plates (20 cuts) change every 3.0 seconds independently across this voice track, with captions synchronized via millisecond word alignments.
+        4. ACT 4: THE SYSTEMIC TWIST & SHOCKWAVE (45 to 60s):
+           - Drop the final shocking realization: what this means for the broader global financial architecture.
+           - End on a lingering, unforgettable punchline that triggers instant comments, shares, and loop replays.
 
-        5. PACING & BLOCKBUSTER 3D TYPOGRAPHY DIRECTIVES FOR EACH VISUAL PLATE:
+        MASTER SCRIPT MONOLOGUE RULES:
+        - Written as ONE continuous, cinematic, deeply compelling human monologue of 125 to 140 words total.
+        - Exactly 5 to 7 rich, naturally phrased human sentences.
+        - Sentence lengths should vary naturally (e.g. blend punchy 4-8 word dramatic punches with 16-24 word narrative explanations).
+        - Use em-dashes ('—') for dramatic pauses and shifts in tension, and commas for natural breathing.
+
+        5. BLOCKBUSTER 3D TYPOGRAPHY DIRECTIVES FOR EACH VISUAL PLATE:
            - 'headline_top': Exactly 1 to 2 words uppercase punchy hook (e.g. '$7 TRILLION', '1.3 MILLION', '2 CRORE', '₹85 LOW', 'H-1B', 'HAL & BEL').
            - 'headline_mid': Exactly 1 to 2 words uppercase anchor (e.g. 'DEBT TRAP', 'TROOPS', 'TRAPPED', 'CRASH', 'CRACKDOWN', 'SURGE').
            - 'badge_text': High-friction tactical alert stamp (e.g. 'MARKET SHOCK', 'TIME-BOMB', 'CRACKDOWN', 'OVERPRICED', 'TOP SECRET').
@@ -729,7 +740,7 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
              * Suffix: "cinematic 35mm photograph, dark moody obsidian lighting, volumetric amber and gold rays, 8k hyper-detailed, clean plate, zero text, zero watermark"
 
         CRITICAL ARCHITECTURAL SEPARATION:
-        - 'monologue': STRICTLY AND EXCLUSIVELY for the spoken narration audio. Write it as ONE unified, continuous, deeply human investigative story of exactly 5 to 7 rich sentences (130 to 140 words total).
+        - 'monologue': STRICTLY AND EXCLUSIVELY for the spoken narration audio. Write it as ONE unified, continuous, deeply human investigative story of exactly 5 to 7 rich sentences (125 to 140 words total).
         - 'sections': STRICTLY AND EXCLUSIVELY for the visual photographic plates and 3D kinetic typography. You MUST produce an array of EXACTLY {num_sections} numbered sections (from section_index 0 to {num_sections - 1}).
           Each of the {num_sections} sections MUST illustrate its distinct 3-second beat with a 100% unique concrete physical metaphor in 'visual_prompt'. Never duplicate physical subjects across sections.
 

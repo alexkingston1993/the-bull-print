@@ -128,6 +128,13 @@ deploy_scheduler_job \
   "daily_135pm_deferred_publisher.yml" \
   "Publishes quota-deferred videos 5 minutes after YouTube API daily quota reset"
 
+# Job 4: Real-Time Hourly Breaking News Viral Radar (Every Hour at :00)
+deploy_scheduler_job \
+  "tbp-hourly-viral-radar" \
+  "0 * * * *" \
+  "viral_radar_hourly.yml" \
+  "Hourly Breaking News Viral Radar: scans macro shocks & dispatches urgent Ad-Hoc Shorts"
+
 # ──────────────────────────────────────────────────────────────────────────────
 # 3. Optional Additional Jobs ($0.10/mo each beyond first 3 jobs)
 # ──────────────────────────────────────────────────────────────────────────────

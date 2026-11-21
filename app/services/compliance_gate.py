@@ -861,18 +861,23 @@ Respond ONLY with valid JSON:
             if re.search(pat, monologue, re.IGNORECASE):
                 return False, f"Outlawed repetitive cliché detected: '{desc}'. Replace with forensic institutional facts, numbers, and balance-sheet mechanics."
 
-        # 5. Natural Sentence Cadence & Anti-Checklist Barrier
+        # 5. Natural Rhythmic Cadence & Anti-Slop / Anti-Checklist Barrier
         sentences = [s.strip() for s in re.split(r'[.!?]+', monologue) if s.strip()]
         if sentences:
             sent_lens = [len(s.split()) for s in sentences]
             avg_len = sum(sent_lens) / len(sent_lens)
-            min_avg = 12.0 if is_short else 10.0
-            if avg_len < min_avg:
-                return False, f"Robotic checklist detected: average sentence length is only {avg_len:.1f} words (< {min_avg} words). Sentences must be full, natural human thoughts."
-            if max(sent_lens) > 42:
-                return False, f"Run-on sentence detected ({max(sent_lens)} words). Split with proper punctuation for natural breathing."
+            max_len = max(sent_lens)
+            # Rhythmic human prose blends short dramatic punches (e.g. 3-6w) with rich narrative thoughts (e.g. 15-28w).
+            # We strictly prevent low-effort robotic staccato bullet points (avg < 7.0w or max < 12w)
+            # WITHOUT penalizing high-tension cinematic pacing or forcing filler 'AI slop'.
+            has_developed_thoughts = max_len >= (16 if is_short else 14)
+            is_staccato_checklist = avg_len < 7.0 or (avg_len < (9.5 if is_short else 8.0) and not has_developed_thoughts)
+            if is_staccato_checklist:
+                return False, f"Robotic checklist detected: average sentence length is only {avg_len:.1f} words without developed narrative thoughts. Vary sentence rhythm naturally."
+            if max_len > 42:
+                return False, f"Run-on sentence detected ({max_len} words). Split with proper punctuation for natural breathing."
 
-        return True, f"Script verified compliant ({word_count} words, {len(sentences)} sentences, avg {avg_len:.1f}w, TTR={ttr:.2f})."
+        return True, f"Script verified compliant ({word_count} words, {len(sentences)} sentences, avg {avg_len:.1f}w, max {max_len}w, TTR={ttr:.2f})."
 
     @staticmethod
     def audit_plates(frames_dir: Path, expected_frames: int, is_short: bool = True) -> Tuple[bool, str]:
