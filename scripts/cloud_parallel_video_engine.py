@@ -2084,6 +2084,22 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
                     except Exception as ig_err:
                         logger.warning(f"⚠️ [Instagram Cross-Post] Non-fatal notice: {ig_err}")
 
+                # Cross-post Short to Facebook Page Reels (if credentials present)
+                fb_token = os.getenv("FACEBOOK_PAGE_ACCESS_TOKEN")
+                fb_id = os.getenv("FACEBOOK_PAGE_ID")
+                if fb_token and fb_id:
+                    try:
+                        from app.services.facebook_reels_publisher import publish_local_facebook_reel, build_facebook_seo_caption
+                        fb_caption = build_facebook_seo_caption(title=title, synopsis=title, youtube_video_id=vid_id, tags=tags)
+                        logger.info(f"📘 [Facebook Cross-Post] Publishing Short to Facebook Page Reels...")
+                        fb_res = publish_local_facebook_reel(video_path=str(final_video_mp4), caption=fb_caption, page_id=fb_id, access_token=fb_token)
+                        if fb_res.get("success"):
+                            logger.success(f"✓ [Facebook Cross-Post] Reel published: {fb_res.get('permalink')}")
+                        else:
+                            logger.warning(f"⚠️ [Facebook Cross-Post] Notice: {fb_res.get('error')}")
+                    except Exception as fb_err:
+                        logger.warning(f"⚠️ [Facebook Cross-Post] Non-fatal notice: {fb_err}")
+
                 # Cross-post Short to TikTok (if credentials present)
                 tiktok_token = os.getenv("TIKTOK_ACCESS_TOKEN")
                 if tiktok_token:
