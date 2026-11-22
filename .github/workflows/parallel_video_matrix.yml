@@ -32,7 +32,7 @@ on:
       kaggle_account:
         description: 'Target Kaggle Account (Single Account Pinned)'
         required: false
-        default: 'alexkingston'
+        default: 'alexytcreative'
 
   repository_dispatch:
     types: [trigger_parallel_video, trigger_media_engine]

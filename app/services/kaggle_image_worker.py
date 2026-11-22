@@ -49,7 +49,7 @@ class KaggleImageWorker:
                         return u
             except Exception:
                 pass
-        return os.getenv("KAGGLE_USERNAME", "alexkingston")
+        return os.getenv("KAGGLE_USERNAME", "alexytcreative")
 
     def _get_kaggle_cmd(self) -> str:
         return shutil.which("kaggle") or str(BASE_DIR / ".venv" / "bin" / "kaggle")

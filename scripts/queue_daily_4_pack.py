@@ -3,7 +3,7 @@
 scripts/queue_daily_4_pack.py
 Sequential Cloud Dispatcher for The Bull Print (1 Documentary + 3 Micro-Shorts)
 
-Guarantees 100% Kaggle GPU collision prevention on single account (alexkingston):
+Guarantees 100% Kaggle GPU collision prevention on single account (alexytcreative):
 1. Monitors active 12-minute documentary run until Kaggle plates complete.
 2. Dispatches Short 1 (Morning Slot 07:30-09:00 IST), waits for plates.
 3. Dispatches Short 2 (Afternoon Slot 13:30-15:00 IST), waits for plates.
@@ -98,7 +98,7 @@ def dispatch_short(item: dict) -> int:
         "-f", "shorts_only=true",
         "-f", "duration_sec=60",
         "-f", "privacy_status=public",
-        "-f", "kaggle_account=alexkingston",
+        "-f", "kaggle_account=alexytcreative",
         "-f", f"publish_at={pub_at}"
     ]
     subprocess.run(cmd, check=True)
