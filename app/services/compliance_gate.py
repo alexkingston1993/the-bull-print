@@ -750,7 +750,7 @@ class TripleCheckPreflightGate:
     """
 
     @staticmethod
-    def audit_title(topic: str, published_titles: List[str], api_key: Optional[str] = None) -> Tuple[bool, str]:
+    def audit_title(topic: str, published_titles: List[str], api_key: Optional[str] = None, is_short: bool = True) -> Tuple[bool, str]:
         """Tier 1: Semantic Deduplication against YouTube 180-day catalog."""
         if not published_titles:
             return True, "No published titles to compare."
@@ -766,7 +766,7 @@ class TripleCheckPreflightGate:
             pt_clean = re.sub(r"[^\w\s]", "", pt.lower()).strip()
             pt_words = set(pt_clean.split()) - stop_words
             overlap = topic_words & pt_words
-            if len(topic_words) > 0 and (len(overlap) / len(topic_words)) >= 0.65:
+            if len(topic_words) > 0 and (len(overlap) / len(topic_words)) >= 0.75:
                 return False, f"Deterministic title overlap ({len(overlap)} shared keywords) with: '{pt}'"
 
         # 2. LLM Semantic Evaluation
@@ -775,14 +775,21 @@ class TripleCheckPreflightGate:
             try:
                 import urllib.request
                 titles_text = "\n".join(f"- {t}" for t in published_titles[:100])
+                format_label = "60-SECOND SHORT" if is_short else "12-MINUTE INVESTIGATIVE DOCUMENTARY"
                 eval_prompt = f"""You are an institutional compliance deduplication auditor for The Bull Print.
 We enforce a STRICT ZERO-DUPLICATION POLICY across a 180-day window.
 Evaluate if candidate topic covers the same economic catalyst, company event, or news story as any past video:
 
 Candidate Topic: "{topic}"
+Format: {format_label}
 
 Past Published Videos (Past 180 Days):
 {titles_text}
+
+AUDIT RULES:
+1. Format & Depth Separation: A 12-minute long-form documentary analyzing macroeconomic supply chains, systemic crises, or structural industry mechanics is NOT a duplicate of a quick 45-second news short simply because they reference the same entity (e.g. Nvidia, Fed, RBI, US Treasury).
+2. True Collisions Only: ONLY flag is_duplicate = true if the candidate video covers the EXACT SAME specific news event and the SAME analytical thesis as an existing video.
+3. If the angle or scope is distinct (e.g. geopolitical Taiwan/TSMC supply chain war vs retail stock dump), is_duplicate MUST be false.
 
 Respond ONLY with valid JSON:
 {{
@@ -959,7 +966,7 @@ Respond ONLY with valid JSON:
 
         # Tier 1: Title
         if published_titles:
-            t_ok, t_msg = cls.audit_title(topic, published_titles)
+            t_ok, t_msg = cls.audit_title(topic, published_titles, is_short=is_short)
             if not t_ok:
                 logger.error(f"❌ [TripleCheck Tier 1 FAILED] {t_msg}")
                 raise RuntimeError(f"Pre-Flight Tier 1 Rejection: {t_msg}")

@@ -94,7 +94,7 @@ def check_cloudflare_d1() -> Dict[str, Any]:
         return {"passed": False, "error": str(e)}
 
 
-def check_kaggle_status(account: str = "alexytcreative") -> Dict[str, Any]:
+def check_kaggle_status(account: str = "alexkingston") -> Dict[str, Any]:
     """Verifies that the target Kaggle GPU kernel is idle and ready (not queued/running)."""
     logger.info(f"🔍 [Preflight 3/4] Checking Kaggle kernel status for '{account}'...")
     kernel_slug = f"{account}/tbp-gpu-frame-generator"
@@ -179,7 +179,7 @@ def verify_narration_coverage(
     }
 
 
-def run_full_preflight(is_documentary: bool = True, kaggle_account: str = "alexytcreative") -> bool:
+def run_full_preflight(is_documentary: bool = True, kaggle_account: str = "alexkingston") -> bool:
     """Executes all preflight checks and prints a clean pass/fail summary."""
     print("=" * 65)
     print("🚀 THE BULL PRINT — PREFLIGHT SMOKE VERIFICATION GATE")
@@ -203,7 +203,7 @@ def run_full_preflight(is_documentary: bool = True, kaggle_account: str = "alexy
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="The Bull Print Preflight Smoke Verification")
     parser.add_argument("--mode", choices=["documentary", "shorts", "all"], default="documentary")
-    parser.add_argument("--kaggle-account", default="alexytcreative")
+    parser.add_argument("--kaggle-account", default="alexkingston")
     args = parser.parse_args()
 
     success = run_full_preflight(

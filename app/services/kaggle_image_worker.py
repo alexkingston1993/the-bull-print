@@ -242,7 +242,7 @@ if __name__ == "__main__":
             "machine_shape": "NvidiaTeslaT4",
             "enable_tpu": "false",
             "enable_internet": "true",
-            "dataset_sources": ["alexytcreative/sdxl-lightning-weights"],
+            "dataset_sources": [],
             "competition_sources": [],
             "kernel_sources": []
         }
@@ -268,35 +268,8 @@ if __name__ == "__main__":
         return False
 
     def _failover_account(self) -> bool:
-        """Auto-heals quota or authorization blocks by failing over to secondary Kaggle account."""
-        if self.username == "alexkingston":
-            legacy_key = os.getenv("KAGGLE_KEY")
-            if legacy_key:
-                logger.warning("🔄 [Kaggle Auto-Failover] Switching from alexkingston to secondary account (alexytcreative)...")
-                self.username = "alexytcreative"
-                kaggle_dir = Path.home() / ".kaggle"
-                kaggle_dir.mkdir(parents=True, exist_ok=True)
-                token_file = kaggle_dir / "access_token"
-                if token_file.exists():
-                    token_file.unlink(missing_ok=True)
-                cfg = kaggle_dir / "kaggle.json"
-                with open(cfg, "w") as f:
-                    json.dump({"username": "alexytcreative", "key": legacy_key}, f)
-                cfg.chmod(0o600)
-                return True
-        elif self.username == "alexytcreative":
-            bearer_token = os.getenv("KAGGLE_API_TOKEN")
-            if bearer_token:
-                logger.warning("🔄 [Kaggle Auto-Failover] Switching from alexytcreative to primary account (alexkingston)...")
-                self.username = "alexkingston"
-                kaggle_dir = Path.home() / ".kaggle"
-                token_file = kaggle_dir / "access_token"
-                token_file.write_text(bearer_token.strip())
-                token_file.chmod(0o600)
-                cfg = kaggle_dir / "kaggle.json"
-                if cfg.exists():
-                    cfg.unlink(missing_ok=True)
-                return True
+        """Single account mode: Alexytcreative is reserved for other projects."""
+        logger.info("ℹ️ Single Kaggle account mode active. Leaving secondary account untouched.")
         return False
 
     def generate_batch(self, prompts: List[Dict[str, Any]], aspect_ratio: str = "9:16", max_retries: int = 3) -> bool:
