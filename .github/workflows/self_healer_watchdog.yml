@@ -1,14 +1,8 @@
 name: Relentless Autonomous Supervisor (16 Videos Quota Enforcer)
 
 on:
-  # Automated schedule and workflow_run triggers disabled per emergency stop
-  # schedule:
-  #   - cron: '*/30 * * * *'
-  # workflow_run:
-  #   workflows:
-  #     - "Master Autonomous Scheduler (Market Pulse + Bull Print Video Engine)"
-  #   types:
-  #     - completed
+  schedule:
+    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 permissions:

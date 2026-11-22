@@ -90,20 +90,23 @@ jobs:
             echo "✓ Restored OAuth pool JSON"
           fi
 
-      - name: ⚙️ Setup Kaggle GPU Credentials (Single Account Pinned)
+      - name: ⚙️ Setup Kaggle GPU Credentials (Primary alexytcreative Engine)
         env:
           KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+          KAGGLE_KEY_ALEXYTCREATIVE: ${{ secrets.KAGGLE_KEY_ALEXYTCREATIVE }}
           PYTHONUNBUFFERED: "1"
         run: |
           mkdir -p ~/.kaggle
-          if [ -n "$KAGGLE_API_TOKEN" ]; then
-            echo "$KAGGLE_API_TOKEN" > ~/.kaggle/access_token
-            chmod 600 ~/.kaggle/access_token
-            echo "KAGGLE_API_TOKEN=$KAGGLE_API_TOKEN" >> $GITHUB_ENV
-          fi
-          if [ -n "$KAGGLE_USERNAME" ] && [ -n "$KAGGLE_KEY" ]; then
+          # Prioritize verified working GPU kernel owner (alexytcreative)
+          if [ -n "$KAGGLE_KEY_ALEXYTCREATIVE" ]; then
+            echo "⚡ Setting up Kaggle credentials for verified GPU kernel (alexytcreative)..."
+            echo "{\"username\":\"alexytcreative\",\"key\":\"$KAGGLE_KEY_ALEXYTCREATIVE\"}" > ~/.kaggle/kaggle.json
+            chmod 600 ~/.kaggle/kaggle.json
+            echo "KAGGLE_USERNAME=alexytcreative" >> $GITHUB_ENV
+            echo "KAGGLE_KEY=$KAGGLE_KEY_ALEXYTCREATIVE" >> $GITHUB_ENV
+          elif [ -n "$KAGGLE_USERNAME" ] && [ -n "$KAGGLE_KEY" ]; then
             echo "{\"username\":\"$KAGGLE_USERNAME\",\"key\":\"$KAGGLE_KEY\"}" > ~/.kaggle/kaggle.json
             chmod 600 ~/.kaggle/kaggle.json
             echo "KAGGLE_USERNAME=$KAGGLE_USERNAME" >> $GITHUB_ENV
@@ -256,10 +259,15 @@ jobs:
         env:
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+          KAGGLE_KEY_ALEXYTCREATIVE: ${{ secrets.KAGGLE_KEY_ALEXYTCREATIVE }}
           PYTHONUNBUFFERED: "1"
         run: |
           mkdir -p ~/.kaggle
-          echo "{\"username\":\"$KAGGLE_USERNAME\",\"key\":\"$KAGGLE_KEY\"}" > ~/.kaggle/kaggle.json
+          if [ -n "$KAGGLE_KEY_ALEXYTCREATIVE" ]; then
+            echo "{\"username\":\"alexytcreative\",\"key\":\"$KAGGLE_KEY_ALEXYTCREATIVE\"}" > ~/.kaggle/kaggle.json
+          else
+            echo "{\"username\":\"$KAGGLE_USERNAME\",\"key\":\"$KAGGLE_KEY\"}" > ~/.kaggle/kaggle.json
+          fi
           chmod 600 ~/.kaggle/kaggle.json
           python scripts/cloud_parallel_video_engine.py \
             --mode dispatch_kaggle_overflow \

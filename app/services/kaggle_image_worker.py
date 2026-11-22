@@ -250,7 +250,7 @@ if __name__ == "__main__":
             "machine_shape": "NvidiaTeslaT4",
             "enable_tpu": "false",
             "enable_internet": "true",
-            "dataset_sources": [],
+            "dataset_sources": ["alexytcreative/sdxl-lightning-weights"],
             "competition_sources": [],
             "kernel_sources": []
         }
