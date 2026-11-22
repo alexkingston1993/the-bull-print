@@ -60,18 +60,39 @@ def get_unsynced_public_shorts(limit: int = 10) -> List[Dict[str, Any]]:
     Finds public YouTube Shorts that have not yet been posted to Instagram or Facebook.
     Cross-references channel videos against Cloudflare D1 idempotency records.
     """
-    channel_json = BASE_DIR / "data" / "channel_all_videos.json"
-    if not channel_json.exists():
-        logger.warning("data/channel_all_videos.json not found.")
-        return []
-
-    try:
-        videos = json.loads(channel_json.read_text(encoding="utf-8"))
-    except Exception as e:
-        logger.error(f"Failed to read channel videos: {e}")
-        return []
-
     d1 = CloudflareD1Client()
+    videos = []
+
+    channel_json = BASE_DIR / "data" / "channel_all_videos.json"
+    if channel_json.exists():
+        try:
+            videos = json.loads(channel_json.read_text(encoding="utf-8"))
+        except Exception as e:
+            logger.error(f"Failed to read channel videos: {e}")
+            videos = []
+
+    if not videos:
+        logger.info("channel_all_videos.json not found locally; querying Cloudflare D1 indexed videos...")
+        try:
+            d1_rows = d1.get_indexed_videos()
+            videos = [
+                {
+                    "id": r.get("video_id"),
+                    "title": r.get("title", ""),
+                    "status": r.get("privacy_status", "public"),
+                    "description": ""
+                }
+                for r in d1_rows if r.get("video_id")
+            ]
+            logger.info(f"Retrieved {len(videos)} videos from Cloudflare D1.")
+        except Exception as e:
+            logger.error(f"Failed to query Cloudflare D1: {e}")
+            videos = []
+
+    if not videos:
+        logger.warning("No videos found to inspect for social drip.")
+        return []
+
     unsynced = []
 
     for v in videos:
