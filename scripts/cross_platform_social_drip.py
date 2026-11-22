@@ -152,11 +152,28 @@ def download_youtube_short(video_id: str) -> Optional[Path]:
 
     try:
         res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=90)
-        if res.returncode == 0 and out_path.exists():
+        if out_path.exists() and out_path.stat().st_size > 1024 * 50:
             logger.success(f"✓ Downloaded {video_id}.mp4 ({out_path.stat().st_size // 1024} KB)")
             return out_path
+        
+        # Fallback to single-stream best
+        logger.warning(f"Initial yt-dlp format muxing failed for {video_id}; falling back to single stream 'best'...")
+        fallback_cmd = [
+            sys.executable,
+            "-m",
+            "yt_dlp",
+            "-f",
+            "best/mp4",
+            "-o",
+            str(out_path),
+            url
+        ]
+        res2 = subprocess.run(fallback_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=90)
+        if out_path.exists() and out_path.stat().st_size > 1024 * 50:
+            logger.success(f"✓ Downloaded {video_id}.mp4 via fallback ({out_path.stat().st_size // 1024} KB)")
+            return out_path
         else:
-            logger.warning(f"yt-dlp download note for {video_id}: {res.stderr[:200]}")
+            logger.error(f"Failed to download video {video_id}: {res2.stderr[:300]}")
             return None
     except Exception as e:
         logger.error(f"Failed to download YouTube Short {video_id}: {e}")
