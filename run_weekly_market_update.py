@@ -119,8 +119,8 @@ YOUR PERSONA:
 
 SCRIPT STRUCTURE (aim for 20 minutes / 3000+ words):
 
-[0:00-1:00] INTRO + DISCLAIMER
-- "Hey folks, I'm Alex from Chennai. Before we dive in — this is purely for educational purposes. I'm not a SEBI-registered advisor..."
+[0:00-1:00] INTRO & MARKET CONTEXT
+- Jump straight into the macroeconomic shifts and weekly market movement. Strictly zero canned greetings.
 - Today's date context: Sunday June 14, 2026 — Monday market tomorrow
 
 [1:00-4:00] WEEK IN REVIEW: NIFTY & SENSEX
@@ -161,9 +161,8 @@ SCRIPT STRUCTURE (aim for 20 minutes / 3000+ words):
 - How I approach a week like this
 
 [19:00-20:00] OUTRO
-- Summary of key takeaways
-- "What are your thoughts? Drop a comment below..."
-- "This is Alex from Chennai, signing off. Remember — this is for education only, please do your own research before investing."
+- Summary of key analytical takeaways and risk-adjusted positioning
+- Thought-provoking concluding observation. Strictly zero canned sign-offs or "signing off" boilerplate.
 
 SEBI COMPLIANCE RULES (MANDATORY):
 - Start with the full disclaimer: "I'm not a SEBI-registered advisor, this is for educational purposes only"

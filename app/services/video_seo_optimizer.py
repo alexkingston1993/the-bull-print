@@ -175,12 +175,52 @@ class VideoSEOOptimizer:
                     unique_tags.append(ct)
                     total_len += len(ct) + 1
 
-        # 4. Construct Description with Tripled Keywords & Backlinks
-        # First 200 chars MUST contain kw1, kw2, kw3
-        opening_hook = (
-            f"{clean_title} — Forensic analysis on {kw1}, {kw2}, and {kw3} for Indian and global investors.\n"
-            f"In this data-backed breakdown, The Bull Print uncovers institutional liquidity shifts, market microstructure, and actionable risk management principles."
-        )
+        # 4. Construct Description with Tripled Keywords & Backlinks (Bespoke Dynamic Synthesis)
+        # First 200 chars MUST contain kw1, kw2, kw3 while rotating across diverse syntactic architectures
+        desc_templates = [
+            (
+                f"{clean_title} — Investigative deep-dive examining {kw1}, {kw2}, and {kw3} across institutional balance sheets.\n"
+                f"This data-backed breakdown dissects structural order flows, regulatory filings, and systemic risk factors driving market volatility."
+            ),
+            (
+                f"{clean_title} — Forensic analysis uncovering {kw1}, {kw2}, and structural {kw3} dynamics.\n"
+                f"We dissect institutional transaction data, macro liquidity imbalances, and risk-adjusted positioning metrics for investors."
+            ),
+            (
+                f"{clean_title} — Unpacking the critical mechanics behind {kw1}, {kw2}, and {kw3} across modern markets.\n"
+                f"A data-driven investigation into off-balance-sheet exposures, capital flows, and empirical valuation anomalies."
+            ),
+            (
+                f"{clean_title} — Behind the scenes of {kw1}, {kw2}, and {kw3}: how institutional desks position ahead of systemic shocks.\n"
+                f"Examining transaction telemetry, regulatory disclosures, and market microstructure."
+            ),
+            (
+                f"{clean_title} — Quantitative investigation into {kw1}, {kw2}, and {kw3} across global and domestic markets.\n"
+                f"Tracking institutional positioning, derivatives pressure points, and capital preservation protocols."
+            ),
+            (
+                f"{clean_title} — Forensic research breakdown on {kw1}, {kw2}, and {kw3}.\n"
+                f"Evaluating balance sheet fragility, institutional accumulation patterns, and macro catalysts shaping the current regime."
+            ),
+            (
+                f"{clean_title} — Critical breakdown of {kw1}, {kw2}, and {kw3}.\n"
+                f"Tracing order flow imbalances, custodial filings, and historical precedents to decode today's market structure."
+            ),
+            (
+                f"{clean_title} — Forensic audit investigating {kw1}, {kw2}, and {kw3}.\n"
+                f"Revealing the underlying institutional mechanics, liquidity cycles, and systemic risks impacting capital allocation."
+            ),
+        ]
+        seed_idx = abs(hash(clean_title)) % len(desc_templates)
+        opening_hook = desc_templates[seed_idx]
+
+        value_bridges = [
+            f"This breakdown connects directly to how institutional capital cycles and liquidity regimes dictate market momentum.",
+            f"Essential context on how large-scale balance sheet adjustments ripple into broader market structure.",
+            f"Deepens the forensic picture by exposing the underlying transaction mechanics and counterparty risks.",
+            f"Provides actionable analytical depth into the macroeconomic catalysts and volatility drivers highlighted here.",
+        ]
+        bridge_text = value_bridges[abs(hash(clean_title + "bridge")) % len(value_bridges)]
 
         full_description = f"""{opening_hook}
 
@@ -190,7 +230,7 @@ class VideoSEOOptimizer:
 🎬 Recommended Next Watch (Interlinked Deep-Dive):
 {interlink['title']}
 👉 Watch here: {interlink_url}
-💡 Why watch this next: This breakdown connects directly to how smart money and institutional liquidity dictate market momentum.
+💡 Why watch this next: {bridge_text}
 
 📊 Key Market Takeaways:
 • Quantitative data and institutional order flow breakdown.

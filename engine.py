@@ -237,11 +237,11 @@ def generate_website_article_file(payload: Dict[str, Any], youtube_video_id: str
         yt_embed_block,
         "",
         "## Key Takeaways (TL;DR for Fast Reading)",
-        "> **Key Insight:** Everyday investors don't need complex mathematics or secret algorithmic indicators to protect their hard-earned wealth. By understanding how massive banking institutions buy without moving prices, you avoid getting trapped at the daily highs.",
+        f"> **Key Insight:** Quantitative analysis of {title} reveals critical institutional positioning, order flow mechanics, and risk-adjusted market dynamics.",
         "",
-        "* **Patience Over Frequency:** Over 90% of short-term day traders lose money because of transaction friction and emotional chasing.",
-        "* **Follow Institutional footprints:** Heavy volume clusters highlight where mutual funds are quietly accumulating, not where social media hype tells you to buy.",
-        "* **Risk Management First:** Never risk more than 1% of your core capital on speculative moves.",
+        f"* **Empirical Due Diligence:** Examining raw transaction data and regulatory filings rather than speculative sentiment.",
+        f"* **Institutional Order Flow:** Tracing capital shifts and balance sheet adjustments specific to {title}.",
+        f"* **Risk-Adjusted Execution:** Prioritizing capital preservation and volatility modeling.",
         "",
     ]
     

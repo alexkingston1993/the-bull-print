@@ -146,8 +146,27 @@ for idx, v in enumerate(public_videos):
     article_url = f"https://bullprintmedia.com/article/{best_post['slug']}"
     related_vid_url = f"https://youtu.be/{rel_video['id']}"
 
-    new_description = f"""{clean_t} — Forensic analysis on {kw1}, {kw2}, and {kw3} for Indian and global investors.
-In this data-backed breakdown, The Bull Print uncovers institutional liquidity shifts, market microstructure, and actionable risk management principles.
+    desc_templates = [
+        f"{clean_t} — Investigative deep-dive examining {kw1}, {kw2}, and {kw3} across institutional balance sheets.\nThis data-backed breakdown dissects structural order flows, regulatory filings, and systemic risk factors driving market volatility.",
+        f"{clean_t} — Forensic analysis uncovering {kw1}, {kw2}, and structural {kw3} dynamics.\nWe dissect institutional transaction data, macro liquidity imbalances, and risk-adjusted positioning metrics for investors.",
+        f"{clean_t} — Unpacking the critical mechanics behind {kw1}, {kw2}, and {kw3} across modern markets.\nA data-driven investigation into off-balance-sheet exposures, capital flows, and empirical valuation anomalies.",
+        f"{clean_t} — Behind the scenes of {kw1}, {kw2}, and {kw3}: how institutional desks position ahead of systemic shocks.\nExamining transaction telemetry, regulatory disclosures, and market microstructure.",
+        f"{clean_t} — Quantitative investigation into {kw1}, {kw2}, and {kw3} across global and domestic markets.\nTracking institutional positioning, derivatives pressure points, and capital preservation protocols.",
+        f"{clean_t} — Forensic research breakdown on {kw1}, {kw2}, and {kw3}.\nEvaluating balance sheet fragility, institutional accumulation patterns, and macro catalysts shaping the current regime.",
+        f"{clean_t} — Critical breakdown of {kw1}, {kw2}, and {kw3}.\nTracing order flow imbalances, custodial filings, and historical precedents to decode today's market structure.",
+        f"{clean_t} — Forensic audit investigating {kw1}, {kw2}, and {kw3}.\nRevealing the underlying institutional mechanics, liquidity cycles, and systemic risks impacting capital allocation.",
+    ]
+    opening_hook = desc_templates[abs(hash(clean_t)) % len(desc_templates)]
+
+    value_bridges = [
+        "This breakdown connects directly to how institutional capital cycles and liquidity regimes dictate market momentum.",
+        "Essential context on how large-scale balance sheet adjustments ripple into broader market structure.",
+        "Deepens the forensic picture by exposing the underlying transaction mechanics and counterparty risks.",
+        "Provides actionable analytical depth into the macroeconomic catalysts and volatility drivers highlighted here.",
+    ]
+    bridge_text = value_bridges[abs(hash(clean_t + "bridge")) % len(value_bridges)]
+
+    new_description = f"""{opening_hook}
 
 📖 Read our full forensic investigation & charts on our website:
 {article_url}
@@ -155,7 +174,7 @@ In this data-backed breakdown, The Bull Print uncovers institutional liquidity s
 🎬 Recommended Next Watch (Interlinked Deep-Dive):
 {rel_video['title']}
 👉 Watch here: {related_vid_url}
-💡 Why watch this next: This breakdown connects directly to how smart money and institutional liquidity dictate market momentum.
+💡 Why watch this next: {bridge_text}
 
 📊 Key Market Takeaways:
 • Quantitative data and institutional order flow breakdown.

@@ -58,9 +58,7 @@ FOLLOW_UP_DISCLAIMERS = re.compile(
     re.IGNORECASE,
 )
 
-MANDATORY_CLOSING_DISCLAIMER = (
-    "Strictly educational market study. Follow The Bull Print for daily market updates made simple."
-)
+MANDATORY_CLOSING_DISCLAIMER = ""
 
 
 
@@ -253,16 +251,8 @@ def auto_sanitize_script(script: str) -> str:
     clean = re.sub(r"\bVWAP\b", "average buying price", clean)
     clean = re.sub(r"\bcyclicals?\b", "manufacturing companies", clean, flags=re.IGNORECASE)
 
-    # 3. Ensure educational study qualification exists
-    has_edu = re.search(r"(educational|study|research|due diligence|own research|SEBI)", clean, re.IGNORECASE)
-
-    if not has_edu:
-        clean = clean.strip()
-        if not clean.endswith("."):
-            clean += "."
-        clean += f" {MANDATORY_CLOSING_DISCLAIMER}"
-
-    return clean
+    # 3. Spoken audio should remain bespoke; statutory disclosures are handled via on-screen graphics & description
+    return clean.strip()
 
 
 def enforce_strict_compliance(script: str) -> str:

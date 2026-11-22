@@ -204,7 +204,7 @@ OUTPUT STRICT JSON ONLY:
 
 
 def scrub_banned_cliches(text: str) -> str:
-    """Sanitizes outlawed clichés, emotional tropes, and unauthorized personas from narration scripts."""
+    """Sanitizes outlawed clichés, emotional tropes, formulaic intro/outro patterns, and unauthorized personas from narration scripts."""
     if not text:
         return text
     t = text
@@ -218,6 +218,14 @@ def scrub_banned_cliches(text: str) -> str:
     t = re.sub(r"\b(?:I am|I'm|this is|my name is)\s+Alex[.,!]?\b", "", t, flags=re.IGNORECASE)
     t = re.sub(r"\b(?:I am|I'm|this is|my name is)\s+Christopher[.,!]?\b", "", t, flags=re.IGNORECASE)
     t = re.sub(r"\bChristopher\b", "", t, flags=re.IGNORECASE)
+    # Eradicate canned semantic intro & outro clichés
+    t = re.sub(r"\bwhile you were sleeping[.,]?\b", "", t, flags=re.IGNORECASE)
+    t = re.sub(r"\byou call it investing[.,]? wall street calls it prey[.,]?\b", "", t, flags=re.IGNORECASE)
+    t = re.sub(r"\bthe fuse is already burning[.,]?\b", "", t, flags=re.IGNORECASE)
+    t = re.sub(r"\bcheck your portfolio (?:today|now)[.,!]?\b", "", t, flags=re.IGNORECASE)
+    t = re.sub(r"\bif institutional liquidity continues draining at this velocity.*?[.,!]", "", t, flags=re.IGNORECASE)
+    t = re.sub(r"\bstrictly educational market study[.,]?\b", "", t, flags=re.IGNORECASE)
+    t = re.sub(r"\bfollow the bull print for daily market updates made simple[.,]?\b", "", t, flags=re.IGNORECASE)
     return " ".join(t.split())
 
 
@@ -702,13 +710,11 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
 
         THE 4-ACT HIGH-VIRALITY RETENTION FORMULA (AVD >= 75%):
         1. ACT 1: THE JAW-DROPPING HOOK (0 to 5s - First 15-20 Words):
-           - Start in medias res with an irresistible mystery, forbidden secret, or shocking financial smoking gun.
-           - FORBIDDEN OPENINGS: Never start with generic macroeconomic summaries, definitions, or broad statements like 'The market is shifting' or 'Interest rates are rising'.
-           - WINNING PATTERNS (Choose the strongest fit):
-             * THE HIDDEN CRIME: "In the next 72 hours, an obscure footnote in a Swiss bank filing could quietly erase $14 billion..."
-             * THE SYSTEM GLITCH: "A single automated server in New Jersey just triggered 300,000 sell orders in six milliseconds..."
-             * THE ASYMMETRIC CONSPIRACY: "While retail investors were told everything was stable, two sovereign wealth funds quietly moved 40 tons of gold out of London..."
-             * THE FORBIDDEN LEDGER: "Wall Street desperately hopes nobody reads page 112 of this regulatory audit, because what is buried inside proves..."
+           - Start in medias res directly on the raw empirical catalyst of {topic_clean}.
+           - STRICTLY FORBIDDEN OPENINGS:
+             * NEVER begin with "While you were sleeping", "While retail investors were told", "In the next 72 hours", "A single automated server", "You call it investing", "Wall Street calls it prey", "Wall Street desperately hopes", or "Did you know".
+             * NEVER start with generic macroeconomic summaries, definitions, or broad statements like 'The market is shifting' or 'Interest rates are rising'.
+           - Every single video opening MUST be 100% unique, naming the exact filing, dollar sum, contract clause, or physical asset specific to {topic_clean}.
 
         2. ACT 2: THE HIDDEN SIPHON & CONFLICT (5 to 25s):
            - Expose the asymmetric mechanism: how institutional insiders, dark pools, or algorithmic market-makers exploit the system.
@@ -721,7 +727,9 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
 
         4. ACT 4: THE SYSTEMIC TWIST & SHOCKWAVE (45 to 60s):
            - Drop the final shocking realization: what this means for the broader global financial architecture.
-           - End on a lingering, unforgettable punchline that triggers instant comments, shares, and loop replays.
+           - STRICTLY FORBIDDEN OUTROS:
+             * NEVER end with "The fuse is burning", "Check your portfolio today", "You are sitting in their crosshairs", "The clock is ticking", "Follow The Bull Print", or generic call-to-actions.
+           - End on a sharp, bespoke analytical deduction specific to {topic_clean} that triggers organic discussion and loop replays.
 
         MASTER SCRIPT MONOLOGUE RULES:
         - Written as ONE continuous, cinematic, deeply compelling human monologue of 125 to 140 words total.
@@ -893,9 +901,17 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                         gemini_sections = _auto_heal_prompt_diversity(g_secs, num_sections)
                         if monologue:
                             m_words = monologue.split()
-                            if len(m_words) < 125 and len(m_words) >= 80:
-                                logger.info(f"⚡ [Script Studio] Monologue word count ({len(m_words)}) below 125 floor. Appending analytical consequence hook...")
-                                monologue += f" If institutional liquidity continues draining at this velocity, the ripple effects across derivatives and sovereign debt will trigger an unavoidable repricing event before this quarter closes."
+                            if len(m_words) < 125 and len(m_words) >= 70:
+                                logger.info(f"⚡ [Script Studio] Monologue word count ({len(m_words)}) below 125 floor. Querying Gemini for bespoke analytical conclusion...")
+                                ext_prompt = (
+                                    f"Topic: {topic_clean}\n"
+                                    f"Current narration:\n\"{monologue}\"\n\n"
+                                    f"Write exactly 1 or 2 forensic analytical closing sentences (strictly 25 to 35 words) that organically conclude this exact topic without generic cliches, without saying 'check your portfolio', and without repetitive boilerplate. Return ONLY the closing sentences."
+                                )
+                                ext_text = _query_gemini_smart(ext_prompt, client, api_key, models_to_try)
+                                if ext_text and len(ext_text.split()) >= 8:
+                                    clean_ext = scrub_banned_cliches(ext_text.strip().replace('\"', ''))
+                                    monologue += f" {clean_ext}"
                             gemini_sections[0]["master_monologue"] = monologue
                         logger.success(f"✅ [Script Studio] Successfully prepared {num_sections} visual plates with master human monologue ({len(monologue.split()) if monologue else 'N/A'} words)")
                         break

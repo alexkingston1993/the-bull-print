@@ -731,8 +731,8 @@ Everything must be in simple, crystal-clear, everyday words.
 4. NEVER promise returns or use words like "guaranteed", "sure-shot", "double your money"
 5. Every "I would buy/sell/hold" MUST be followed by "But please do your own research before investing in this or any stock"
 6. Use only historical data (90+ days old). No live prices.
-7. Start the script with: "Hey, I'm Alex from Chennai. Before we dive in, this is for educational purposes only. I am not a SEBI registered advisor."
-8. End with: "This is Alex from Chennai, signing off."
+7. Start the script in medias res directly on the core market event, metric, or empirical catalyst. NEVER start with canned greetings, persona introductions, or "Hey, I'm Alex".
+8. End with an objective analytical takeaway or thought-provoking observation. NEVER use canned sign-offs like "signing off" or "This is Alex".
 9. Keep language simple enough for a middle-school student to understand
 10. Include BOTH positives and risks when discussing any stock
 11. NEVER mention future price movements or predictions
