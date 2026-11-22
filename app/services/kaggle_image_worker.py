@@ -59,7 +59,6 @@ class KaggleImageWorker:
         API-Level Queue Lock:
         Polls Kaggle kernel status before pushing to prevent concurrency collisions.
         If a batch is already running/queued, waits with jittered sleep until it completes.
-        Strict check: an empty status or buffering response is treated as BUSY.
         """
         kaggle_bin = self._get_kaggle_cmd()
         ref = f"{self.username}/{self.kernel_slug}"
@@ -68,23 +67,32 @@ class KaggleImageWorker:
 
         while time.time() - start_time < timeout_sec:
             res = subprocess.run([str(kaggle_bin), "kernels", "status", ref], capture_output=True, text=True)
-            status_line = (res.stdout or "").strip().lower()
+            output_all = f"{res.stdout or ''} {res.stderr or ''}".strip()
+            status_line = output_all.lower()
 
-            if any(k in status_line for k in ["denied", "unauthorized", "permission 'kernels.get' was denied"]):
-                logger.error(f"❌ [Kaggle Auth Failure] Access denied on '{ref}': {res.stdout.strip()}. Aborting lock wait immediately.")
+            if any(k in status_line for k in ["denied", "unauthorized", "permission 'kernels.get' was denied", "not found"]):
+                logger.error(f"❌ [Kaggle Auth Failure] Cannot access kernel '{ref}': {output_all}")
+                if self.username != "alexytcreative":
+                    logger.info("Retrying with primary notebook owner 'alexytcreative'...")
+                    self.username = "alexytcreative"
+                    ref = f"alexytcreative/{self.kernel_slug}"
+                    continue
                 return False
 
             is_done = any(k in status_line for k in ["complete", "error", "failed", "cancel"]) and len(status_line) > 0
-            is_busy = any(k in status_line for k in ["running", "queued", "saving", "starting"]) or not status_line
+            is_busy = any(k in status_line for k in ["running", "queued", "saving", "starting"])
 
-            if is_busy or not is_done:
+            if is_busy:
                 wait_t = random.uniform(20, 40)
-                raw_status = res.stdout.strip() or res.stderr.strip() or "Empty/API buffering"
-                logger.info(f"⏳ Kaggle GPU busy (Status: {raw_status}). Waiting {wait_t:.1f}s for queue slot...")
+                logger.info(f"⏳ Kaggle GPU busy (Status: {output_all}). Waiting {wait_t:.1f}s for queue slot...")
                 time.sleep(wait_t)
-            else:
+            elif is_done:
                 logger.success(f"✓ Kaggle GPU slot available (Status: {res.stdout.strip()})")
                 return True
+            else:
+                wait_t = random.uniform(15, 25)
+                logger.info(f"⏳ Kaggle GPU status indeterminate ({output_all}). Waiting {wait_t:.1f}s...")
+                time.sleep(wait_t)
 
         logger.error(f"Timed out after {timeout_sec}s waiting for Kaggle GPU queue lock.")
         return False
