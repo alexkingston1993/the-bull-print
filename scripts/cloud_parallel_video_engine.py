@@ -1252,34 +1252,21 @@ OUTPUT STRICT JSON ONLY:
                 })
             frame_id += 1
 
-    # Dispatch missing frames via Cloudflare Serverless GPU (FLUX.1-schnell) or Kaggle Dual-T4 GPU
+    # Dispatch missing frames: 100% Kaggle Dual-T4 GPU diffusers per Standing Rule 1
     if missing_frame_prompts:
         aspect = "9:16" if is_short else "16:9"
-        logger.info(f"⚡ [Session Prep] Dispatching {len(missing_frame_prompts)} bespoke plates ({aspect}) to Cloudflare Serverless GPUs...")
-        cf_success = False
+        logger.info(f"⚡ [Session Prep] Dispatching {len(missing_frame_prompts)} bespoke plates ({aspect}) to Kaggle Dual-T4 GPU (alexytcreative)...")
         try:
-            from app.services.cloudflare_image_worker import CloudflareImageWorker
-            cf_worker = CloudflareImageWorker()
-            cf_success = cf_worker.generate_batch(
+            from app.services.kaggle_image_worker import KaggleImageWorker
+            worker = KaggleImageWorker()
+            k_success = worker.generate_batch(
                 prompts=[{"prompt": m["prompt"], "output_path": m["output_path"]} for m in missing_frame_prompts],
                 aspect_ratio=aspect
             )
-        except Exception as cf_err:
-            logger.warning(f"⚠️ [Session Prep] Cloudflare batch error: {cf_err}")
-
-        if not cf_success:
-            logger.info("⚡ [Session Prep] Falling back to Kaggle Dual-T4 GPU diffusers...")
-            try:
-                from app.services.kaggle_image_worker import KaggleImageWorker
-                worker = KaggleImageWorker()
-                k_success = worker.generate_batch(
-                    prompts=[{"prompt": m["prompt"], "output_path": m["output_path"]} for m in missing_frame_prompts],
-                    aspect_ratio=aspect
-                )
-                if not k_success:
-                    logger.error(f"❌ [Session Prep] Kaggle GPU batch dispatch failed.")
-            except Exception as k_err:
-                logger.error(f"❌ [Session Prep] Kaggle batch dispatch error: {k_err}")
+            if not k_success:
+                logger.error(f"❌ [Session Prep] Kaggle GPU batch dispatch failed.")
+        except Exception as k_err:
+            logger.error(f"❌ [Session Prep] Kaggle batch dispatch error: {k_err}")
 
     # Ensure every single frame exists exclusively from Kaggle GPU (zero procedural compromise)
     for s in sections:

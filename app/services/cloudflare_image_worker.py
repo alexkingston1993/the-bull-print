@@ -92,6 +92,8 @@ class CloudflareImageWorker:
             except urllib.error.HTTPError as e:
                 err_body = e.read().decode("utf-8", errors="ignore")
                 logger.warning(f"⚠️ [Cloudflare Plate] HTTP {e.code} on attempt {attempt}: {err_body[:200]}")
+                if e.code in (404, 401, 403):
+                    return None
             except Exception as e:
                 logger.warning(f"⚠️ [Cloudflare Plate] Error on attempt {attempt}: {e}")
 
