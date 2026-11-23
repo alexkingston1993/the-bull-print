@@ -371,6 +371,21 @@ def audit_and_enforce_daily_quota() -> Dict[str, Any]:
                     pass
 
         if active_match:
+            # Check for hung/stalled runs (> 45 min)
+            try:
+                c_dt = datetime.fromisoformat(active_match["created_at"].replace("Z", "+00:00"))
+                age_mins = (datetime.now(timezone.utc) - c_dt).total_seconds() / 60
+                if age_mins > 45:
+                    logger.warning(f"🚨 Slot {slot_id} Run #{active_match['id']} has been stuck for {age_mins:.1f}m (>45m threshold)! Auto-cancelling and recovering...")
+                    try:
+                        requests.post(f"https://api.github.com/repos/{GH_REPO}/actions/runs/{active_match['id']}/cancel", headers=get_headers(), timeout=10)
+                    except Exception:
+                        pass
+                    active_match = None
+            except Exception:
+                pass
+
+        if active_match:
             slot_statuses[slot_id] = {
                 "status": "IN-FLIGHT ⚡",
                 "details": f"Active Cloud Run #{active_match['id']} ({active_match.get('status')})",

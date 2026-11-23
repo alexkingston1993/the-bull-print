@@ -208,6 +208,7 @@ if __name__ == "__main__":
         p1 = ctx.Process(target=run_render_worker, args=(1, items_gpu1, out_dir))
         
         p0.start()
+        time.sleep(20)  # Stagger worker 1 to allow worker 0 to populate HuggingFace cache without lock contention
         p1.start()
         
         p0.join()
@@ -229,7 +230,7 @@ if __name__ == "__main__":
     def dispatch(self, segments: List[Dict[str, Any]], batch_uuid: str) -> bool:
         """Acquires queue lock, prepares metadata, and pushes the kernel to Kaggle."""
         # 1. Wait for queue lock to prevent concurrent kernel abortions
-        if not self.wait_for_queue_lock(timeout_sec=2700):
+        if not self.wait_for_queue_lock(timeout_sec=900):
             return False
 
         logger.info(f"Preparing Kaggle GPU Kernel for {len(segments)} frames (Batch UUID: {batch_uuid})...")
