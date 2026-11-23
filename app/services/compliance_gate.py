@@ -835,8 +835,9 @@ Respond ONLY with valid JSON:
         clean_words = [re.sub(r"[^\w]", "", w.lower()) for w in words if len(w) > 2]
         if clean_words:
             ttr = len(set(clean_words)) / len(clean_words)
-            if ttr < 0.55:
-                return False, f"Low vocabulary diversity (TTR = {ttr:.2f} < 0.55). Script contains repetitive loops."
+            min_ttr = 0.50 if is_short else 0.35
+            if ttr < min_ttr:
+                return False, f"Low vocabulary diversity (TTR = {ttr:.2f} < {min_ttr:.2f}). Script contains repetitive loops."
 
         # 3. Forbidden Jargon in First 15 Words
         opening_words = " ".join(words[:15]).lower()
