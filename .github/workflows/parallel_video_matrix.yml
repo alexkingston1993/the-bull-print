@@ -46,7 +46,7 @@ jobs:
   # ─────────────────────────────────────────────────────────────
   prepare_session:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 90
     concurrency:
       group: kaggle-gpu-prep-${{ github.event.inputs.kaggle_account || 'alexytcreative' }}
       cancel-in-progress: false

@@ -54,7 +54,7 @@ class KaggleImageWorker:
     def _get_kaggle_cmd(self) -> str:
         return shutil.which("kaggle") or str(BASE_DIR / ".venv" / "bin" / "kaggle")
 
-    def wait_for_queue_lock(self, timeout_sec: int = 600) -> bool:
+    def wait_for_queue_lock(self, timeout_sec: int = 180) -> bool:
         """
         API-Level Queue Lock:
         Polls Kaggle kernel status before pushing to prevent concurrency collisions.
@@ -63,7 +63,7 @@ class KaggleImageWorker:
         kaggle_bin = self._get_kaggle_cmd()
         ref = f"{self.username}/{self.kernel_slug}"
         start_time = time.time()
-        logger.info(f"Checking Kaggle GPU queue lock for '{ref}'...")
+        logger.info(f"Checking Kaggle GPU queue lock for '{ref}' (timeout {timeout_sec}s)...")
 
         while time.time() - start_time < timeout_sec:
             res = subprocess.run([str(kaggle_bin), "kernels", "status", ref], capture_output=True, text=True)
@@ -229,8 +229,8 @@ if __name__ == "__main__":
 
     def dispatch(self, segments: List[Dict[str, Any]], batch_uuid: str) -> bool:
         """Acquires queue lock, prepares metadata, and pushes the kernel to Kaggle."""
-        # 1. Wait for queue lock to prevent concurrent kernel abortions
-        if not self.wait_for_queue_lock(timeout_sec=900):
+        # 1. Wait for queue lock to prevent concurrent kernel abortions (fast 180s ceiling)
+        if not self.wait_for_queue_lock(timeout_sec=180):
             return False
 
         logger.info(f"Preparing Kaggle GPU Kernel for {len(segments)} frames (Batch UUID: {batch_uuid})...")
@@ -264,14 +264,21 @@ if __name__ == "__main__":
         
         for push_try in range(1, 4):
             res = subprocess.run([str(kaggle_bin), "kernels", "push", "-p", str(self.stage_dir)], capture_output=True, text=True)
-            if res.returncode == 0:
+            push_out = f"{res.stdout or ''} {res.stderr or ''}".strip()
+            
+            # Fail fast if Kaggle accounts have reached the hard 2-batch GPU limit
+            if "maximum batch gpu session count" in push_out.lower():
+                logger.error(f"❌ [Kaggle GPU Session Limit] Max concurrent batch GPU sessions (2) reached on {self.username}. Failing fast to allow backup engine.")
+                return False
+
+            if res.returncode == 0 and "error" not in push_out.lower():
                 logger.info(f"✓ Kernel pushed successfully! Batch UUID: {batch_uuid}. Sleeping 25s for Kaggle status transition...")
                 time.sleep(25)
                 return True
             
-            logger.warning(f"Kaggle push attempt {push_try}/3 notice: {res.stderr.strip() or res.stdout.strip()}. Backing off 30s...")
-            time.sleep(30)
-            self.wait_for_queue_lock(timeout_sec=300)
+            logger.warning(f"Kaggle push attempt {push_try}/3 notice: {push_out}. Backing off 20s...")
+            time.sleep(20)
+            self.wait_for_queue_lock(timeout_sec=120)
 
         logger.error(f"Kaggle push failed after 3 attempts: {res.stderr}")
         return False
