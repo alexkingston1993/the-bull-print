@@ -97,7 +97,7 @@ def check_cloudflare_d1() -> Dict[str, Any]:
 def check_kaggle_status(account: str = "alexytcreative") -> Dict[str, Any]:
     """Verifies that the target Kaggle GPU kernel is idle and ready (not queued/running)."""
     logger.info(f"🔍 [Preflight 3/4] Checking Kaggle kernel status for '{account}'...")
-    kernel_slug = f"{account}/tbp-gpu-frame-generator"
+    kernel_slug = f"{account}/tbp-gpu-worker-v2"
     cmd = [
         sys.executable,
         "-m",

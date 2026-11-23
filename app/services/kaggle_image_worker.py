@@ -34,7 +34,7 @@ class KaggleImageWorker:
 
     def __init__(self, username: Optional[str] = None):
         self.username = username or self._detect_username()
-        self.kernel_slug = "tbp-gpu-frame-generator"
+        self.kernel_slug = "tbp-gpu-worker-v2"
         self.stage_dir = BASE_DIR / "kaggle_stage_image"
         self.stage_dir.mkdir(parents=True, exist_ok=True)
 
