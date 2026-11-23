@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
 scripts/max_out_public_vidiq_seo_and_interlinks.py
-Audits and updates all 61 PUBLIC videos on The Bull Print channel:
+Audits and updates all PUBLIC and SCHEDULED videos on The Bull Print channel:
 1. Maxes out vidIQ Actionable SEO Score (Tag Count, Tag Volume, Keywords in Title/Desc, Tripled Keywords) -> 48-50/50.
 2. Contextually interlinks related YouTube videos with a custom note ("Watch Next" Binge Loop).
 3. Adds exact canonical website article backlink to https://bullprintmedia.com/article/:slug.
-4. Uses OAuth Slot 2 to preserve primary upload quota.
+4. Adds platform tools links (/fno, /screener, /calculators) and Key Market Takeaways for AI search.
+5. Uses OAuth Slot 2 to preserve primary upload quota.
+6. Safely skips already fully optimized videos to conserve API quota.
 """
 
 import os
@@ -16,7 +18,9 @@ import re
 import pickle
 from difflib import SequenceMatcher
 from googleapiclient.discovery import build
+from google.auth.transport.requests import Request
 
+# 1. Setup YouTube Client with auto-refresh
 TOKEN_PATH = 'data/youtube_tokens/youtube_token_slot_2.pickle'
 if not os.path.exists(TOKEN_PATH):
     TOKEN_PATH = 'data/youtube_tokens/youtube_token_en.pickle'
@@ -24,8 +28,15 @@ if not os.path.exists(TOKEN_PATH):
 with open(TOKEN_PATH, 'rb') as f:
     creds = pickle.load(f)
 
+if creds and creds.expired and creds.refresh_token:
+    print("Refreshing OAuth credentials...")
+    creds.refresh(Request())
+    with open(TOKEN_PATH, 'wb') as f:
+        pickle.dump(creds, f)
+
 youtube = build('youtube', 'v3', credentials=creds)
 
+# 2. Load articles
 with open('content/posts.json', 'r', encoding='utf-8') as f:
     posts = json.load(f)
 
@@ -43,12 +54,16 @@ def clean_words(text):
     stop = {'what', 'with', 'this', 'that', 'your', 'from', 'have', 'more', 'shorts', 'short', 'about', 'when', 'will', 'make', 'into', 'after'}
     return [w for w in clean.split() if len(w) > 3 and w not in stop]
 
-# 1. Fetch all public videos from channel
-playlist_id = 'UUwe4D4M4i9aaHdi2ZBlbUmA'
-public_videos = []
+# 3. Dynamically discover uploads playlist
+ch_res = youtube.channels().list(part='contentDetails', mine=True).execute()
+playlist_id = ch_res['items'][0]['contentDetails']['relatedPlaylists']['uploads']
+print(f"Discovered channel uploads playlist: {playlist_id}")
+
+# 4. Fetch all videos from uploads playlist
+all_channel_videos = []
 next_page_token = None
 
-print("Fetching all public videos from uploads playlist...")
+print("Fetching all videos from uploads playlist...")
 while True:
     res = youtube.playlistItems().list(
         playlistId=playlist_id,
@@ -57,33 +72,49 @@ while True:
         pageToken=next_page_token
     ).execute()
     for item in res.get('items', []):
-        if item['status'].get('privacyStatus') == 'public':
-            public_videos.append({
-                'id': item['snippet']['resourceId']['videoId'],
-                'title': item['snippet']['title']
-            })
+        all_channel_videos.append({
+            'id': item['snippet']['resourceId']['videoId'],
+            'title': item['snippet']['title'],
+            'privacy': item['status'].get('privacyStatus')
+        })
     next_page_token = res.get('nextPageToken')
     if not next_page_token:
         break
 
-print(f"Total Public Videos to Optimize: {len(public_videos)}")
+print(f"Total Videos on Channel: {len(all_channel_videos)}")
 
-# 2. Fetch full snippet for all public videos
+# 5. Fetch full snippets in batches of 50
 detailed_videos = {}
-for i in range(0, len(public_videos), 50):
-    b = [v['id'] for v in public_videos[i:i+50]]
+for i in range(0, len(all_channel_videos), 50):
+    b = [v['id'] for v in all_channel_videos[i:i+50]]
     r = youtube.videos().list(id=','.join(b), part='snippet').execute()
     for it in r.get('items', []):
         detailed_videos[it['id']] = it['snippet']
 
-# 3. Matching and Optimization Engine
+# 6. Audit & Determine Candidates Needing Upgrade
 updates = []
-for idx, v in enumerate(public_videos):
+skipped_count = 0
+
+for idx, v in enumerate(all_channel_videos):
     vid_id = v['id']
-    old_snip = detailed_videos[vid_id]
+    old_snip = detailed_videos.get(vid_id)
+    if not old_snip:
+        continue
     orig_title = old_snip['title']
+    old_desc = old_snip.get('description', '')
+    old_tags = old_snip.get('tags', [])
     cat_id = old_snip.get('categoryId', '27')
     v_words = clean_words(orig_title)
+
+    has_backlink = ('bullprintmedia.com/article/' in old_desc) or ('bullprintmedia.com/posts/' in old_desc)
+    has_interlink = ('youtu.be/' in old_desc) or ('youtube.com/watch' in old_desc)
+    has_tools = ('bullprintmedia.com/fno' in old_desc) and ('bullprintmedia.com/calculators' in old_desc)
+    has_sufficient_tags = len(old_tags) >= 15
+
+    # Safe Skip: If video already meets full 6-layer standard, don't overwrite
+    if has_backlink and has_interlink and has_tools and has_sufficient_tags:
+        skipped_count += 1
+        continue
 
     # A. Best Article Match
     best_post = None
@@ -98,14 +129,13 @@ for idx, v in enumerate(public_videos):
             best_score = score
             best_post = p
 
-    # Fallback to high-authority beginner post if no match
     if not best_post:
         best_post = posts[0]
 
     # B. Best Related Video Interlink (different video, same theme)
     rel_video = None
     best_rel_score = -1
-    for other_v in public_videos:
+    for other_v in all_channel_videos:
         if other_v['id'] == vid_id:
             continue
         o_words = clean_words(other_v['title'])
@@ -115,7 +145,7 @@ for idx, v in enumerate(public_videos):
             rel_video = other_v
 
     if not rel_video:
-        rel_video = public_videos[(idx + 1) % len(public_videos)]
+        rel_video = all_channel_videos[(idx + 1) % len(all_channel_videos)]
 
     # C. Extract primary entities for Tripled Keywords
     clean_t = re.sub(r'#\w+', '', orig_title).strip()
@@ -124,7 +154,7 @@ for idx, v in enumerate(public_videos):
         primary_kws += ['stock', 'market', 'nifty']
     kw1, kw2, kw3 = primary_kws[0].capitalize(), primary_kws[1].capitalize(), primary_kws[2].capitalize()
 
-    # D. Tags construction (Target: 18-20 tags, < 500 chars total)
+    # D. Tags construction (Target: 18-20 tags, < 480 chars total)
     video_specific_tags = [w.capitalize() for w in v_words if len(w) > 3][:6]
     candidate_tags = [
         orig_title.split(':')[0].strip(),
@@ -142,7 +172,7 @@ for idx, v in enumerate(public_videos):
                 unique_tags.append(clean_tag)
                 total_len += len(clean_tag) + 1
 
-    # E. Contextual Description with Exact Tripled Keywords, Article Backlink, and Interlink
+    # E. Contextual Description with Tripled Keywords, Article Backlink, and Interlink
     article_url = f"https://bullprintmedia.com/article/{best_post['slug']}"
     related_vid_url = f"https://youtu.be/{rel_video['id']}"
 
@@ -203,8 +233,14 @@ This content is published strictly for educational and informational purposes un
         'related_id': rel_video['id']
     })
 
-print(f"\nPrepared {len(updates)} video optimizations.")
-print("Executing YouTube Data API metadata updates across all 61 public videos...\n")
+print(f"\nAudit Results: {skipped_count} videos already fully optimized.")
+print(f"Queued for vidIQ & Interlink Upgrade: {len(updates)} legacy videos.\n")
+
+if not updates:
+    print("✅ All videos on the channel are already 100% fully optimized!")
+    sys.exit(0)
+
+print(f"Executing YouTube Data API metadata updates across {len(updates)} legacy videos...\n")
 
 success_count = 0
 failed_count = 0
@@ -223,9 +259,16 @@ for i, u in enumerate(updates):
         res = youtube.videos().update(part='snippet', body=body).execute()
         success_count += 1
         print(f"[{i+1}/{len(updates)}] [OK] {u['id']} | Tags: {len(u['tags'])} | Matched Article: {u['article_slug'][:35]} | Next: {u['related_id']}")
-        time.sleep(0.4) # Safe API pacing
+        time.sleep(0.5)  # Safe API pacing to respect rate limits
     except Exception as e:
         failed_count += 1
         print(f"[{i+1}/{len(updates)}] [ERR] {u['id']} Error: {e}")
 
-print(f"\nUpdate Complete: {success_count} succeeded, {failed_count} failed.")
+print(f"\n{'='*60}")
+print(f"🎉 Batch Optimization Complete!")
+print(f"✓ Successfully upgraded: {success_count} videos")
+if failed_count > 0:
+    print(f"⚠️ Failed: {failed_count} videos")
+print(f"✓ Already optimized: {skipped_count} videos")
+print(f"✓ Total catalog optimized: {skipped_count + success_count}/{len(all_channel_videos)}")
+print(f"{'='*60}")
