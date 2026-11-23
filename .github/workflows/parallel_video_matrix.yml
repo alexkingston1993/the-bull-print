@@ -154,11 +154,13 @@ jobs:
             --bundle-dir output/session_bundle
 
       - name: 📤 Upload Session Bundle Artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: session-bundle
           path: output/session_bundle/
-          retention-days: 1
+          retention-days: 7
+          if-no-files-found: ignore
 
   # ─────────────────────────────────────────────────────────────
   # JOB 2: PARALLEL SEGMENT RENDERING (Documentaries Only)

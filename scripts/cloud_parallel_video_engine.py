@@ -1235,7 +1235,12 @@ OUTPUT STRICT JSON ONLY:
     # 1. Synthesize 100% Offline Cloned Voice & Extract Word Timestamps
     audio_file = audio_dir / "speech.mp3"
     words_file = audio_dir / "words.json"
-    words = _synthesize_local_christopher_audio(full_script, audio_file, words_file, total_duration_sec=float(duration_sec), is_short=is_short)
+    if audio_file.exists() and words_file.exists() and audio_file.stat().st_size > 1000:
+        logger.info(f"⚡ [Resume Checkpoint] Found existing verified audio ({audio_file.stat().st_size} bytes) in {audio_dir}. Reusing without re-synthesis.")
+        with open(words_file, "r") as wf:
+            words = json.load(wf)
+    else:
+        words = _synthesize_local_christopher_audio(full_script, audio_file, words_file, total_duration_sec=float(duration_sec), is_short=is_short)
 
     # 2. Generate High-CTR Background Frames for each section (Batch-Aware & Aspect-Ratio Strict)
     rules = VideoFormatConfig.get_rules(float(duration_sec), is_short=is_short)
