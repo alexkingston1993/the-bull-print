@@ -52,7 +52,7 @@ def _send_telegram(msg: str):
 
 _CACHED_PUBLISHED_TITLES: Optional[List[str]] = None
 
-def check_duplicate_before_prep(topic: str) -> List[str]:
+def check_duplicate_before_prep(topic: str, is_short: bool = True) -> List[str]:
     """
     STRICT DEDUPLICATION GUARD (180-DAY ENFORCEMENT):
     Prevents re-rendering identical visuals or re-uploading topics already published
@@ -69,7 +69,7 @@ def check_duplicate_before_prep(topic: str) -> List[str]:
     if not core_words:
         raise ValueError(f"Topic '{topic}' does not contain sufficient meaningful keywords.")
 
-    logger.info(f"🔍 [Duplicate Guard] Checking 180-day topic integrity for: '{topic}' (core keywords: {core_words})")
+    logger.info(f"🔍 [Duplicate Guard] Checking 180-day topic integrity for: '{topic}' (core keywords: {core_words}, is_short: {is_short})")
 
     if _CACHED_PUBLISHED_TITLES is not None:
         published_titles = list(_CACHED_PUBLISHED_TITLES)
@@ -77,6 +77,9 @@ def check_duplicate_before_prep(topic: str) -> List[str]:
             p_words = set(re.sub(r"[^\w\s]", "", prev_t.lower()).split()) - stop_words
             overlap = len(core_words & p_words)
             if len(core_words) > 0 and (overlap / len(core_words)) >= 0.65:
+                if not is_short and ("#short" in prev_t.lower() or "short" in prev_t.lower()):
+                    logger.info(f"ℹ️ [Duplicate Guard] Allowing companion 12-minute documentary for short: '{prev_t}'")
+                    continue
                 logger.error(f"⛔ Topic closely matches published title: '{prev_t}'")
                 raise RuntimeError(
                     f"⛔ [Duplicate Guard Triggered] Topic '{topic}' was already published: '{prev_t}'. "
@@ -94,6 +97,9 @@ def check_duplicate_before_prep(topic: str) -> List[str]:
                 name_words = set(re.sub(r"[^\w\s]", "", name).split()) - stop_words
                 overlap = len(core_words & name_words)
                 if len(core_words) > 0 and (overlap / len(core_words)) >= 0.7:
+                    if not is_short and ("short" in p.name.lower()):
+                        logger.info(f"ℹ️ [Duplicate Guard] Allowing companion 12-minute documentary for short article: '{p.name}'")
+                        continue
                     logger.error(f"⛔ Topic matches published article: {p.name}")
                     raise RuntimeError(
                         f"⛔ [Duplicate Guard Triggered] Topic '{topic}' matches already-published content in '{p.name}'. "
@@ -136,6 +142,9 @@ def check_duplicate_before_prep(topic: str) -> List[str]:
                                 v_words = set(re.sub(r"[^\w\s]", "", v_title.lower()).split()) - stop_words
                                 overlap = len(core_words & v_words)
                                 if len(core_words) > 0 and (overlap / len(core_words)) >= 0.65:
+                                    if not is_short and ("#short" in v_title.lower() or "short" in v_title.lower()):
+                                        logger.info(f"ℹ️ [Duplicate Guard] Allowing companion 12-minute documentary for short video: '{v_title}'")
+                                        continue
                                     v_id = snip.get("resourceId", {}).get("videoId")
                                     logger.error(f"⛔ Topic closely matches YouTube video: '{v_title}' ({v_id})")
                                     raise RuntimeError(
@@ -162,14 +171,14 @@ def check_duplicate_before_prep(topic: str) -> List[str]:
             eval_prompt = f"""You are an institutional compliance deduplication auditor for The Bull Print.
 We enforce a STRICT ZERO-DUPLICATION POLICY across a 180-day window.
 
-CANDIDATE TOPIC: "{topic}"
+CANDIDATE TOPIC: "{topic}" (Format: {"Vertical 9:16 Short" if is_short else "12-Minute Masterpiece Documentary (16:9)"})
 
 PUBLISHED TITLES (PAST 180 DAYS):
 {titles_text}
 
 TASK:
 Determine if the CANDIDATE TOPIC covers the same underlying news story, economic event, company scandal/controversy, or specific macro thesis as ANY published video in the list above.
-Even if the wording, phrasing, or synonyms are completely different (e.g. "Fed warns of rate shocks" vs "Fed's Waller threatens half-point rate hike", or "Big tech nuclear plants" vs "Atomic reactors for AI datacenters"), if the core underlying catalyst/story is the same, it is a DUPLICATE.
+NOTE: If this candidate topic is a 12-Minute Landscape Documentary (is_short=False), and a matching title above is merely a 50-60 second #Shorts teaser or vertical highlight of the same series, that is an intentional companion funnel and is NOT a duplicate. Only flag true duplicate standalone videos of the same format or recycled stories.
 
 OUTPUT STRICT JSON ONLY:
 {{
@@ -901,7 +910,7 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                         gemini_sections = _auto_heal_prompt_diversity(g_secs, num_sections)
                         if monologue:
                             m_words = monologue.split()
-                            if len(m_words) < 125 and len(m_words) >= 70:
+                            if len(m_words) < 125 and len(m_words) >= 60:
                                 logger.info(f"⚡ [Script Studio] Monologue word count ({len(m_words)}) below 125 floor. Querying Gemini for bespoke analytical conclusion...")
                                 ext_prompt = (
                                     f"Topic: {topic_clean}\n"
@@ -912,6 +921,13 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                                 if ext_text and len(ext_text.split()) >= 8:
                                     clean_ext = scrub_banned_cliches(ext_text.strip().replace('\"', ''))
                                     monologue += f" {clean_ext}"
+
+                            # Safety gate: if monologue is still severely truncated (<100 words), retry generation
+                            if len(monologue.split()) < 100 and attempt < 3:
+                                logger.warning(f"⚠️ Monologue word count ({len(monologue.split())}) still below 100 floor. Retrying generation attempt {attempt + 2}...")
+                                gemini_sections = []
+                                continue
+
                             gemini_sections[0]["master_monologue"] = monologue
                         logger.success(f"✅ [Script Studio] Successfully prepared {num_sections} visual plates with master human monologue ({len(monologue.split()) if monologue else 'N/A'} words)")
                         break
@@ -1090,7 +1106,7 @@ def prepare_session(
         if skip_duplicate_check:
             return True, "", []
         try:
-            titles = check_duplicate_before_prep(t)
+            titles = check_duplicate_before_prep(t, is_short=is_short)
             return True, "", titles
         except RuntimeError as dup_err:
             return False, str(dup_err), []

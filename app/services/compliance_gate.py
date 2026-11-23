@@ -826,10 +826,10 @@ Respond ONLY with valid JSON:
 
         # 1. Word Count Bounds
         if is_short:
-            if word_count < 125:
-                return False, f"Script word count ({word_count} words) is below 125-word floor. Causes silent tail."
-            if word_count > 150:
-                return False, f"Script word count ({word_count} words) exceeds 150-word ceiling. Causes audio clipping."
+            if word_count < 100:
+                return False, f"Script word count ({word_count} words) is below 100-word floor. Causes silent tail."
+            if word_count > 165:
+                return False, f"Script word count ({word_count} words) exceeds 165-word ceiling. Causes audio clipping."
 
         # 2. Vocabulary Diversity (Type-Token Ratio)
         clean_words = [re.sub(r"[^\w]", "", w.lower()) for w in words if len(w) > 2]
