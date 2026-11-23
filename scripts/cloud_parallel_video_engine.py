@@ -919,8 +919,14 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
                                 )
                                 ext_text = _query_gemini_smart(ext_prompt, client, api_key, models_to_try)
                                 if ext_text and len(ext_text.split()) >= 8:
-                                    clean_ext = scrub_banned_cliches(ext_text.strip().replace('\"', ''))
-                                    monologue += f" {clean_ext}"
+                                    clean_ext = ext_text.strip()
+                                    clean_ext = re.sub(r"^```(?:json)?", "", clean_ext)
+                                    clean_ext = re.sub(r"```$", "", clean_ext)
+                                    clean_ext = re.sub(r"^\{?\s*(?:\"?[a-zA-Z0-9_-]+\"?\s*:\s*)?", "", clean_ext.strip())
+                                    clean_ext = clean_ext.replace("{", "").replace("}", "").replace('\"', '').strip()
+                                    clean_ext = scrub_banned_cliches(clean_ext)
+                                    if clean_ext:
+                                        monologue += f" {clean_ext}"
 
                             # Safety gate: if monologue is still severely truncated (<100 words), retry generation
                             if len(monologue.split()) < 100 and attempt < 3:
@@ -948,7 +954,11 @@ def _generate_dynamic_sections(topic: str, vertical: str, duration_sec: float, i
     # Clean script fields and sanitize outlawed cliches & identity references
     master_mono = ""
     if gemini_sections and "master_monologue" in gemini_sections[0]:
-        clean_mono = scrub_banned_cliches(str(gemini_sections[0]["master_monologue"]).strip())
+        raw_m = str(gemini_sections[0]["master_monologue"]).strip()
+        # Strip any leaked JSON keys/braces or formatting debris from monologue
+        raw_m = re.sub(r"\{?\s*(?:closing_sentences|conclusion|script)\s*:\s*", "", raw_m, flags=re.IGNORECASE)
+        raw_m = raw_m.replace("{", "").replace("}", "").strip()
+        clean_mono = scrub_banned_cliches(raw_m)
         gemini_sections[0]["master_monologue"] = clean_mono
         master_mono = clean_mono
 
@@ -1093,6 +1103,13 @@ def prepare_session(
     """
     if not topic or not topic.strip():
         raise ValueError("A valid non-empty topic must be provided for video generation.")
+
+    # MANDATORY DRIP-FEED ENFORCEMENT: All Shorts must be drip-fed to the channel
+    if is_short and not publish_at:
+        from datetime import datetime, timezone, timedelta
+        auto_slot = datetime.now(timezone.utc) + timedelta(hours=2)
+        publish_at = auto_slot.strftime("%Y-%m-%dT%H:%M:%SZ")
+        logger.info(f"⏰ [Auto Drip-Feed Mandate] No publish_at provided for Short. Automatically scheduled for: {publish_at} (2h Drip-Feed)")
 
     # 0. STRICT ZERO-COMPROMISE COMPLIANCE & DEDUPLICATION GATE (GATE 1) WITH AUTO-HEAL
     from app.services.content_authenticity_engine import ContentAuthenticityEngine
