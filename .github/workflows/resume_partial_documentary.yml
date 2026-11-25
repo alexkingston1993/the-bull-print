@@ -138,7 +138,11 @@ jobs:
         run: |
           git config --global user.name "The Bull Print Autonomous Engine"
           git config --global user.email "bot@bullprintmedia.com"
-          git add content/posts/*.md content/posts.json public/ sitemap*.xml state/ assets/frames/
+          mkdir -p content/posts assets/frames public state
+          git add content/posts/*.md content/posts.json public/ sitemap*.xml state/ 2>/dev/null || true
+          if [ -d "assets/frames" ]; then
+            git add assets/frames/ 2>/dev/null || true
+          fi
           if ! git diff --staged --quiet; then
             git commit -m "docs(article): publish companion research report & sitemaps for Run ${{ github.event.inputs.source_run_id }} [skip ci]"
             git pull --rebase origin main

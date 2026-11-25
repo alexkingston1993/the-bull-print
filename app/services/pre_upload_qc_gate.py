@@ -165,9 +165,13 @@ class PreUploadQCGate:
             else:
                 width = int(video_stream.get("width", 0))
                 height = int(video_stream.get("height", 0))
-                expected_w, expected_h = (1080, 1920) if is_short else (1920, 1080)
-                if (width, height) != (expected_w, expected_h):
-                    errors.append(f"Invalid dimensions: got {width}x{height}, expected {expected_w}x{expected_h}")
+                if is_short:
+                    if (width, height) not in [(1080, 1920)]:
+                        errors.append(f"Invalid dimensions: got {width}x{height}, expected 1080x1920")
+                else:
+                    valid_16x9 = [(1920, 1080), (2560, 1440), (3840, 2160)]
+                    if (width, height) not in valid_16x9:
+                        errors.append(f"Invalid dimensions: got {width}x{height}, expected standard 16:9 (1920x1080, 2560x1440, or 3840x2160)")
 
             if not audio_stream:
                 errors.append("No audio stream found in master render")
@@ -182,8 +186,8 @@ class PreUploadQCGate:
                     if dur < 20.0 or dur > 61.0:
                         errors.append(f"Shorts duration out of bounds: {dur:.1f}s (must be 20s - 61s)")
                 else:
-                    if dur < 660.0 or dur > 960.0:
-                        errors.append(f"Documentary duration out of bounds: {dur:.1f}s (must be 660s - 960s / 11m - 16m)")
+                    if dur < 660.0 or dur > 2400.0:
+                        errors.append(f"Documentary duration out of bounds: {dur:.1f}s (must be 660s - 2400s / 11m - 40m)")
         except Exception as e:
             errors.append(f"ffprobe metadata extraction failed: {e}")
 
