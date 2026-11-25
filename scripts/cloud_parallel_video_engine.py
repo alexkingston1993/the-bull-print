@@ -1945,10 +1945,9 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
         
         act_w = int(v_stream.get("width", 0))
         act_h = int(v_stream.get("height", 0))
-        exp_w = 1080 if is_short else 1920
-        exp_h = 1920 if is_short else 1080
-        if (act_w, act_h) != (exp_w, exp_h):
-            raise ValueError(f"Pre-Upload QC Failed: Video aspect ratio distorted! Got {act_w}x{act_h}, expected {exp_w}x{exp_h}.")
+        valid_resolutions = [(1080, 1920)] if is_short else [(2560, 1440), (1920, 1080)]
+        if (act_w, act_h) not in valid_resolutions:
+            raise ValueError(f"Pre-Upload QC Failed: Video aspect ratio distorted! Got {act_w}x{act_h}, expected one of {valid_resolutions}.")
         
         dur = float(probe_data.get("format", {}).get("duration", 0))
         if dur < 10.0:
