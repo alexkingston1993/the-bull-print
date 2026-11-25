@@ -1976,22 +1976,43 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
         _send_telegram(f"🚨 Pre-Upload QC Failed on {manifest.get('topic')}: {qc_err}. Video upload permanently halted.")
         raise
 
-    # Extract High-CTR Thumbnail from segment 0 (0.45s after 3D typography slam pop-in)
+    # Look for dedicated high-CTR custom thumbnail first
     thumb_path = output_dir / "high_ctr_thumbnail.jpg"
-    first_seg = segments_dir / "segment_00.mp4"
-    if not first_seg.exists():
-        matches = list(segments_dir.rglob("segment_00.mp4")) + list(segments_dir.rglob("segment_0.mp4"))
-        if matches:
-            first_seg = matches[0]
-    if first_seg.exists():
-        subprocess.run([
-            "ffmpeg", "-y", "-ss", "0.45", "-i", str(first_seg),
-            "-vframes", "1", "-q:v", "2", str(thumb_path)
-        ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    if not thumb_path.exists() or thumb_path.stat().st_size < 1000:
-        fallback_frame = bundle_dir / "frames" / "frame_00.jpg"
-        if fallback_frame.exists():
-            thumb_path = fallback_frame
+    custom_thumb = None
+    if (bundle_dir / "thumbnail.jpg").exists():
+        custom_thumb = bundle_dir / "thumbnail.jpg"
+    elif (bundle_dir / "thumbnail.png").exists():
+        custom_thumb = bundle_dir / "thumbnail.png"
+    else:
+        topic_lower = manifest.get("topic", "").lower()
+        slug_lower = manifest.get("slug", "").lower()
+        for cand in (BASE_DIR / "assets" / "thumbnails").glob("*.jpg"):
+            c_name = cand.name.lower()
+            if any(k in topic_lower or k in slug_lower for k in ["silicon", "micron"]) and "silicon" in c_name:
+                custom_thumb = cand
+                break
+            elif any(k in topic_lower or k in slug_lower for k in ["retirement", "pension"]) and "retirement" in c_name:
+                custom_thumb = cand
+                break
+
+    if custom_thumb and custom_thumb.exists():
+        logger.success(f"🎯 [Thumbnail] Found and locked verified master thumbnail: {custom_thumb.name}")
+        shutil.copy2(custom_thumb, thumb_path)
+    else:
+        first_seg = segments_dir / "segment_00.mp4"
+        if not first_seg.exists():
+            matches = list(segments_dir.rglob("segment_00.mp4")) + list(segments_dir.rglob("segment_0.mp4"))
+            if matches:
+                first_seg = matches[0]
+        if first_seg.exists():
+            subprocess.run([
+                "ffmpeg", "-y", "-ss", "0.45", "-i", str(first_seg),
+                "-vframes", "1", "-q:v", "2", str(thumb_path)
+            ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if not thumb_path.exists() or thumb_path.stat().st_size < 1000:
+            fallback_frame = bundle_dir / "frames" / "frame_00.jpg"
+            if fallback_frame.exists():
+                thumb_path = fallback_frame
 
     # Gate 2 Multi-Asset Compliance Check
     from app.services.content_authenticity_engine import ContentAuthenticityEngine
