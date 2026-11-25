@@ -22,15 +22,18 @@ jobs:
     timeout-minutes: 5
 
     steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
       - name: 📥 Download Session Bundles
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p b1 b2 out
           echo "⚡ Downloading Doc 1 bundle..."
-          gh run download ${{ github.event.inputs.doc1_run_id }} -n session-bundle -D b1
+          gh run download ${{ github.event.inputs.doc1_run_id }} -n session-bundle -D b1 -R alexkingston1993/the-bull-print
           echo "⚡ Downloading Doc 2 bundle..."
-          gh run download ${{ github.event.inputs.doc2_run_id }} -n session-bundle -D b2
+          gh run download ${{ github.event.inputs.doc2_run_id }} -n session-bundle -D b2 -R alexkingston1993/the-bull-print
 
       - name: 📜 Parse and Dump Complete Narrative Scripts
         run: |
