@@ -90,7 +90,15 @@
       "destination": "/calculators"
     },
     {
-      "source": "/article/:slug",
+      "source": "/posts/:slug*",
+      "destination": "/article"
+    },
+    {
+      "source": "/posts",
+      "destination": "/articles"
+    },
+    {
+      "source": "/article/:slug*",
       "destination": "/article"
     },
     {

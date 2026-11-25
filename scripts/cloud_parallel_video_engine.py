@@ -2028,11 +2028,12 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
     # 4. Upload to YouTube with 20,000 quota pool
     yt_url = ""
     try:
+        clean_slug = re.sub(r'[^a-z0-9\-]', '', manifest['slug'].lower().replace(',', '-')).strip('-')
         title = f"{manifest['topic']} | The Bull Print"
         description = (
             f"Forensic breakdown of {manifest['topic']}.\n\n"
             f"Read the full verified research report & real-time market data on our portal:\n"
-            f"https://bullprintmedia.com/posts/{manifest['slug']}\n\n"
+            f"https://bullprintmedia.com/posts/{clean_slug}\n\n"
             f"#trading #finance #investing #algotrading #wealth"
         )
 
@@ -2245,12 +2246,45 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
             timestamps_log=timestamps
         )
         logger.success(f"📰 [Website Article] Published: {article_path}")
+
+        # Synchronize article into content/posts.json and public/content/posts.json
+        try:
+            posts_json_path = BASE_DIR / "content" / "posts.json"
+            if posts_json_path.exists():
+                posts_data = json.loads(posts_json_path.read_text(encoding="utf-8"))
+                clean_slug = re.sub(r'[^a-z0-9\-]', '', manifest['slug'].lower().replace(',', '-')).strip('-')
+                new_entry = {
+                    "slug": clean_slug,
+                    "aliases": [manifest["slug"], clean_slug.strip("-")],
+                    "title": manifest["topic"],
+                    "date": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
+                    "excerpt": f"Forensic breakdown and institutional analysis of {manifest['topic']}.",
+                    "focusKeyword": manifest["topic"][:60],
+                    "categories": ["Feature Documentary", "Institutional Research"],
+                    "tags": ["StockMarket", "Finance", "Investing", "TheBullPrint"],
+                    "youtubeUrl": yt_url,
+                    "coverImage": f"/assets/thumbnails/{thumb_path.name}" if thumb_path.exists() else "/brand_assets/opengraph_social_card_1200x630.png",
+                    "html": article_path.read_text(encoding="utf-8") if article_path.exists() else "",
+                    "wordCount": 2000,
+                    "readingTime": 10,
+                    "author": "The Bull Print Research Desk"
+                }
+                posts_data = [p for p in posts_data if p.get("slug") != clean_slug]
+                posts_data.insert(0, new_entry)
+                posts_json_path.write_text(json.dumps(posts_data, indent=2, ensure_ascii=False), encoding="utf-8")
+                pub_p = BASE_DIR / "public" / "content" / "posts.json"
+                pub_p.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(posts_json_path, pub_p)
+                logger.success(f"✓ Registered article '{clean_slug}' into content/posts.json & public/content/posts.json")
+        except Exception as p_err:
+            logger.warning(f"posts.json registration notice: {p_err}")
     except Exception as a_err:
         logger.warning(f"Article generation notice: {a_err}")
 
     # Register video with Cloudflare Control Plane (D1 Database)
     if vid_id:
         try:
+            import urllib.request
             cf_worker_url = os.getenv("CLOUDFLARE_WORKER_URL", "https://tbp-cloudflare-orchestrator.cloudflare-orchestrator.workers.dev")
             reg_payload = json.dumps({
                 "video_id": vid_id,
