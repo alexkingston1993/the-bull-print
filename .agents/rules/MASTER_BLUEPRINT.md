@@ -77,11 +77,18 @@
 
 ## 4. Standing Autonomous Supervisor & Production Jobs
 
-To ensure 24/7 broadcast resilience, zero human babysitting, and real-time response to breaking global market disruptions:
+### Official Daily Production Cadence (Active Tomorrow Onward)
+- **Daily Volume**: Exactly **3 High-Impact Quality Shorts** (9:16 Vertical) + **1 Master Feature Documentary** (16:9 Landscape, 12+ Minutes, 36 Segments).
+- **Quality Standard**: Zero compromise on depth. Every Short has 10–20 bespoke Kaggle GPU plates; the Documentary has 180 bespoke plates, 3D kinetic typography, and Christopher narration.
+- **Staggered Drip Schedule**:
+  - **Short 1**: Morning Market Open (08:30 IST / 03:00 UTC)
+  - **Short 2**: Mid-Day Analysis (13:30 IST / 08:00 UTC)
+  - **Short 3**: Market Close Recap (17:30 IST / 12:00 UTC)
+  - **Documentary**: Prime Evening Broadcast (20:30 IST / 15:00 UTC)
 
 1. **Daily Production Supervisor (06:00 - 10:00 AM IST Hourly)**:
    - Workflow: `.github/workflows/daily_production_supervisor.yml`
-   - Checks YouTube uploads to verify today's 12-video quota (10 Shorts + 2 Master Documentaries).
+   - Checks YouTube uploads to verify today's 4-video quota (3 Shorts + 1 Master Documentary).
    - If any deficit exists, pulls logs, queries Aria's Cognitive Healing Vault (46 learned rules), auto-heals, and resumes sequential dispatch.
 
 2. **Social Media & Channel Auditor (Every 6 Hours)**:
@@ -94,5 +101,5 @@ To ensure 24/7 broadcast resilience, zero human babysitting, and real-time respo
 3. **Real-Time Hourly Viral Radar (Hourly 24/7)**:
    - Workflow: `.github/workflows/viral_radar_hourly.yml`
    - Scans breaking financial news and systemic macro tech shocks (e.g. Microsoft Outlook/365 outages, AWS downtime, banking halts).
-   - Uses Gemini AI for high-stakes editorial judgement (virality score $\ge 85/100$) and decides the exact number of emergency Ad-Hoc Shorts (1 to 3).
-   - Dispatches emergency productions through Kaggle GPU without counting toward the daily 12-video quota.
+   - Uses Gemini AI for high-stakes editorial judgement (virality score $\ge 85/100$) and decides the exact number of emergency Ad-Hoc Shorts (1 to 2).
+   - Dispatches emergency productions through Kaggle GPU without counting toward the daily quota.

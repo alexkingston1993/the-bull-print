@@ -32,9 +32,9 @@ if str(BASE_DIR) not in sys.path:
 from app.services.aria_healing import AriaSelfHealingEngine, FailureDomain
 from app.services.youtube_uploader import get_uploader
 
-TARGET_DAILY_VIDEOS = 12
-TARGET_SHORTS = 10
-TARGET_DOCS = 2
+TARGET_DAILY_VIDEOS = 4
+TARGET_SHORTS = 3
+TARGET_DOCS = 1
 
 TG_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN") or "8829963924:AAE7v_xEQXLmy3-YEx8kqMo2GRfnbnxf4GA"
 TG_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID") or "1126599043"

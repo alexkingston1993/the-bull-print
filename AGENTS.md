@@ -36,3 +36,12 @@
 - **Lower-Third Word-Level Captions**:
   - Safe zone $Y = 1480$ for 9:16 Shorts, $Y = 920$ for 16:9 Documentaries in glassmorphic pills with vibrant electric gold (`#FACC15`) active-word highlight.
   - Strict Zero Caption Overflow: When cluster text width exceeds maximum pill width, the engine MUST wrap into two balanced lines with dynamic pill height expansion. No text may ever touch or bleed outside the pill outline.
+
+### 4. Official Daily Production Cadence (Active Tomorrow Onward)
+- **Daily Target**: Exactly **3 High-Impact Quality Shorts** (9:16 Vertical) + **1 Feature Master Documentary** (16:9 Landscape, 12+ Minutes, 36 Segments).
+- **Execution**: 100% cloud rendering, zero frame reuse, bespoke Kaggle GPU plates, 3D kinetic typography, and companion website research articles with automated 50/50 vidIQ SEO and interlinks.
+- **Staggered Drip Schedule**:
+  - Short 1: 08:30 IST / 03:00 UTC (Market Open)
+  - Short 2: 13:30 IST / 08:00 UTC (Mid-Day)
+  - Short 3: 17:30 IST / 12:00 UTC (Market Close)
+  - Master Documentary: 20:30 IST / 15:00 UTC (Prime Evening Broadcast)

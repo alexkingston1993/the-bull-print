@@ -2035,6 +2035,23 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
             f"https://bullprintmedia.com/posts/{manifest['slug']}\n\n"
             f"#trading #finance #investing #algotrading #wealth"
         )
+
+        # Build Rich YouTube Chapters (at least 3 timestamps starting at 00:00)
+        chapter_lines = ["00:00 Introduction"]
+        curr_t = 0.0
+        for i, s in enumerate(manifest.get("sections", [])):
+            s_time = s.get("start_sec", curr_t)
+            m = int(s_time // 60)
+            sec = int(s_time % 60)
+            sec_name = s.get("section_name") or f"{s.get('headline_top', '')} {s.get('headline_mid', '')}".strip() or f"Part {i+1}"
+            if s_time >= 10.0:
+                chapter_lines.append(f"{m:02d}:{sec:02d} {sec_name}")
+            curr_t = s.get("end_sec", curr_t + s.get("duration", 20.0))
+
+        if len(chapter_lines) >= 3:
+            chapters_block = "TIMESTAMPS:\n" + "\n".join(chapter_lines)
+            description = f"{description}\n\n{chapters_block}"
+
         tags = ["stock market", "crypto", "trading", "finance", "the bull print"]
         privacy_status = manifest.get("privacy_status") or os.getenv("YOUTUBE_PRIVACY", "unlisted")
         publish_at = manifest.get("publish_at")
@@ -2075,7 +2092,12 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
         uploader = get_uploader()
 
         is_short = manifest.get("is_short", False)
-        if not is_short:
+        use_live_broadcast = (
+            not is_short
+            and os.getenv("ENABLE_LIVE_STREAM", "false").lower() in ("true", "1")
+            and not publish_at
+        )
+        if use_live_broadcast:
             logger.info("🔴 [Live Broadcast Engine] Formatting standard master documentary for YouTube Live Broadcast...")
             try:
                 from app.services.youtube_live_streamer import broadcast_documentary_as_live
@@ -2094,23 +2116,10 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
                     raise RuntimeError(f"Live broadcast creation returned no broadcast_id: {res}")
             except Exception as live_err:
                 logger.warning(f"Live broadcast stream encounter: {live_err}; executing scheduled institutional upload fallback...")
-                res = uploader.upload_video(
-                    language="en",
-                    video_path=str(final_video_mp4),
-                    title=title[:95],
-                    description=description,
-                    tags=tags,
-                    thumbnail_path=str(thumb_path) if thumb_path.exists() else None,
-                    category_id="27",
-                    privacy_status=privacy_status,
-                    publish_at=publish_at,
-                    is_short=False,
-                    force_upload=True,
-                )
-                vid_id = (res.get("video_id") or res.get("id")) if isinstance(res, dict) else None
-                if vid_id:
-                    yt_url = res.get("url") or f"https://youtu.be/{vid_id}"
-        else:
+                use_live_broadcast = False
+
+        if not use_live_broadcast:
+            logger.info("🚀 [YouTube Upload] Uploading master video via chunked Data API v3...")
             res = uploader.upload_video(
                 language="en",
                 video_path=str(final_video_mp4),
@@ -2121,7 +2130,7 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
                 category_id="27",
                 privacy_status=privacy_status,
                 publish_at=publish_at,
-                is_short=True,
+                is_short=is_short,
                 force_upload=True,
             )
             vid_id = (res.get("video_id") or res.get("id")) if isinstance(res, dict) else None
@@ -2129,51 +2138,52 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
                 yt_url = res.get("url") or f"https://youtu.be/{vid_id}"
                 logger.success(f"🚀 [YouTube Upload] Broadcast Live: {yt_url}")
 
-                # Cross-post Short to Instagram Reels (if credentials present)
-                ig_token = os.getenv("INSTAGRAM_ACCESS_TOKEN")
-                ig_id = os.getenv("INSTAGRAM_ACCOUNT_ID")
-                if ig_token and ig_id:
-                    try:
-                        from app.services.instagram_reels_publisher import publish_local_mp4_reel, build_instagram_seo_caption
-                        ig_caption = build_instagram_seo_caption(title=title, synopsis=title, youtube_video_id=vid_id, tags=tags)
-                        logger.info(f"📸 [Instagram Cross-Post] Publishing Short to Instagram Reels...")
-                        ig_res = publish_local_mp4_reel(video_path=str(final_video_mp4), caption=ig_caption, account_id=ig_id, access_token=ig_token)
-                        if ig_res.get("success"):
-                            logger.success(f"✓ [Instagram Cross-Post] Reel published: {ig_res.get('permalink')}")
-                        else:
-                            logger.warning(f"⚠️ [Instagram Cross-Post] Notice: {ig_res.get('error')}")
-                    except Exception as ig_err:
-                        logger.warning(f"⚠️ [Instagram Cross-Post] Non-fatal notice: {ig_err}")
+                if is_short:
+                    # Cross-post Short to Instagram Reels (if credentials present)
+                    ig_token = os.getenv("INSTAGRAM_ACCESS_TOKEN")
+                    ig_id = os.getenv("INSTAGRAM_ACCOUNT_ID")
+                    if ig_token and ig_id:
+                        try:
+                            from app.services.instagram_reels_publisher import publish_local_mp4_reel, build_instagram_seo_caption
+                            ig_caption = build_instagram_seo_caption(title=title, synopsis=title, youtube_video_id=vid_id, tags=tags)
+                            logger.info(f"📸 [Instagram Cross-Post] Publishing Short to Instagram Reels...")
+                            ig_res = publish_local_mp4_reel(video_path=str(final_video_mp4), caption=ig_caption, account_id=ig_id, access_token=ig_token)
+                            if ig_res.get("success"):
+                                logger.success(f"✓ [Instagram Cross-Post] Reel published: {ig_res.get('permalink')}")
+                            else:
+                                logger.warning(f"⚠️ [Instagram Cross-Post] Notice: {ig_res.get('error')}")
+                        except Exception as ig_err:
+                            logger.warning(f"⚠️ [Instagram Cross-Post] Non-fatal notice: {ig_err}")
 
-                # Cross-post Short to Facebook Page Reels (if credentials present)
-                fb_token = os.getenv("FACEBOOK_PAGE_ACCESS_TOKEN")
-                fb_id = os.getenv("FACEBOOK_PAGE_ID")
-                if fb_token and fb_id:
-                    try:
-                        from app.services.facebook_reels_publisher import publish_local_facebook_reel, build_facebook_seo_caption
-                        fb_caption = build_facebook_seo_caption(title=title, synopsis=title, youtube_video_id=vid_id, tags=tags)
-                        logger.info(f"📘 [Facebook Cross-Post] Publishing Short to Facebook Page Reels...")
-                        fb_res = publish_local_facebook_reel(video_path=str(final_video_mp4), caption=fb_caption, page_id=fb_id, access_token=fb_token)
-                        if fb_res.get("success"):
-                            logger.success(f"✓ [Facebook Cross-Post] Reel published: {fb_res.get('permalink')}")
-                        else:
-                            logger.warning(f"⚠️ [Facebook Cross-Post] Notice: {fb_res.get('error')}")
-                    except Exception as fb_err:
-                        logger.warning(f"⚠️ [Facebook Cross-Post] Non-fatal notice: {fb_err}")
+                    # Cross-post Short to Facebook Page Reels (if credentials present)
+                    fb_token = os.getenv("FACEBOOK_PAGE_ACCESS_TOKEN")
+                    fb_id = os.getenv("FACEBOOK_PAGE_ID")
+                    if fb_token and fb_id:
+                        try:
+                            from app.services.facebook_reels_publisher import publish_local_facebook_reel, build_facebook_seo_caption
+                            fb_caption = build_facebook_seo_caption(title=title, synopsis=title, youtube_video_id=vid_id, tags=tags)
+                            logger.info(f"📘 [Facebook Cross-Post] Publishing Short to Facebook Page Reels...")
+                            fb_res = publish_local_facebook_reel(video_path=str(final_video_mp4), caption=fb_caption, page_id=fb_id, access_token=fb_token)
+                            if fb_res.get("success"):
+                                logger.success(f"✓ [Facebook Cross-Post] Reel published: {fb_res.get('permalink')}")
+                            else:
+                                logger.warning(f"⚠️ [Facebook Cross-Post] Notice: {fb_res.get('error')}")
+                        except Exception as fb_err:
+                            logger.warning(f"⚠️ [Facebook Cross-Post] Non-fatal notice: {fb_err}")
 
-                # Cross-post Short to TikTok (if credentials present)
-                tiktok_token = os.getenv("TIKTOK_ACCESS_TOKEN")
-                if tiktok_token:
-                    try:
-                        from app.services.tiktok_publisher import publish_local_tiktok_video
-                        logger.info(f"🎵 [TikTok Cross-Post] Publishing Short to TikTok...")
-                        tk_res = publish_local_tiktok_video(video_path=str(final_video_mp4), title=title, synopsis=title, tags=tags)
-                        if tk_res.get("success"):
-                            logger.success(f"✓ [TikTok Cross-Post] TikTok video published: {tk_res.get('publish_id')}")
-                        else:
-                            logger.warning(f"⚠️ [TikTok Cross-Post] Notice: {tk_res.get('error')}")
-                    except Exception as tk_err:
-                        logger.warning(f"⚠️ [TikTok Cross-Post] Non-fatal notice: {tk_err}")
+                    # Cross-post Short to TikTok (if credentials present)
+                    tiktok_token = os.getenv("TIKTOK_ACCESS_TOKEN")
+                    if tiktok_token:
+                        try:
+                            from app.services.tiktok_publisher import publish_local_tiktok_video
+                            logger.info(f"🎵 [TikTok Cross-Post] Publishing Short to TikTok...")
+                            tk_res = publish_local_tiktok_video(video_path=str(final_video_mp4), title=title, synopsis=title, tags=tags)
+                            if tk_res.get("success"):
+                                logger.success(f"✓ [TikTok Cross-Post] TikTok video published: {tk_res.get('publish_id')}")
+                            else:
+                                logger.warning(f"⚠️ [TikTok Cross-Post] Notice: {tk_res.get('error')}")
+                        except Exception as tk_err:
+                            logger.warning(f"⚠️ [TikTok Cross-Post] Non-fatal notice: {tk_err}")
         if res and isinstance(res, dict) and not res.get("success"):
             err_msg = str(res.get("error") or "")
             if any(k in err_msg.lower() for k in ["quota", "limit", "pool"]):
@@ -2194,6 +2204,17 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
     # 4. Generate Companion Website Article & Alert Telegram
     try:
         from engine import generate_website_article_file
+
+        # Mirror session bundle frames into output/<slug>/frames so website generator injects high-res WebP frames
+        slug = manifest.get("slug", "default_slug")
+        slug_frames_dir = BASE_DIR / "output" / slug / "frames"
+        if not slug_frames_dir.exists():
+            bundle_frames = bundle_dir / "frames"
+            if bundle_frames.exists():
+                slug_frames_dir.mkdir(parents=True, exist_ok=True)
+                for f_img in bundle_frames.glob("*.jpg"):
+                    shutil.copy2(f_img, slug_frames_dir / f_img.name)
+
         article_payload = {
             "campaign_id": manifest["slug"],
             "topic": manifest["topic"],
@@ -2203,14 +2224,21 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
                 "meta_description": f"Comprehensive forensic analysis of {manifest['topic']} by The Bull Print.",
                 "article_sections": [
                     {
-                        "h2": s.get("section_name", f"Section {i+1}"),
+                        "h2": s.get("section_name") or f"{s.get('headline_top', '')} {s.get('headline_mid', '')}".strip() or f"Section {i+1}",
                         "p": s.get("script", "")
                     }
                     for i, s in enumerate(manifest.get("sections", []))
                 ]
             }
         }
-        timestamps = [f"{int(s['start_sec']//60):02d}:{int(s['start_sec']%60):02d} {s.get('section_name', '')}" for s in manifest.get("sections", [])]
+        timestamps = []
+        for i, s in enumerate(manifest.get("sections", [])):
+            s_time = s.get("start_sec", i * 20.0)
+            m = int(s_time // 60)
+            sec = int(s_time % 60)
+            sec_name = s.get("section_name") or f"{s.get('headline_top', '')} {s.get('headline_mid', '')}".strip() or f"Part {i+1}"
+            timestamps.append(f"{m:02d}:{sec:02d} {sec_name}")
+
         article_path = generate_website_article_file(
             payload=article_payload,
             youtube_video_id=vid_id or "",

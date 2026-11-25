@@ -4,8 +4,18 @@ on:
   workflow_dispatch:
     inputs:
       source_run_id:
-        description: 'GitHub Actions Run ID of the failed/partial documentary (e.g. 45522547207)'
+        description: 'GitHub Actions Run ID of the partial documentary (e.g. 45522547207)'
         required: true
+        type: string
+      publish_delay_hours:
+        description: 'Hours to delay YouTube release (0 for immediate/prime, 4 for staggered drip)'
+        required: false
+        default: '0'
+        type: string
+      privacy_status:
+        description: 'Privacy status (public, unlisted, private)'
+        required: false
+        default: 'public'
         type: string
 
 permissions:
@@ -15,7 +25,7 @@ permissions:
 jobs:
   resume_and_publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
 
     steps:
       - name: 📥 Checkout Repository
@@ -42,13 +52,43 @@ jobs:
         run: |
           mkdir -p output/session_bundle output/downloaded_segments output/master_broadcast
           echo "⚡ Downloading session bundle from Run ${{ github.event.inputs.source_run_id }}..."
-          gh run download ${{ github.event.inputs.source_run_id }} -n session-bundle -D output/session_bundle
+          gh run download ${{ github.event.inputs.source_run_id }} -n session-bundle -D output/session_bundle -R alexkingston1993/the-bull-print
           echo "⚡ Downloading segment artifacts from Run ${{ github.event.inputs.source_run_id }}..."
-          gh run download ${{ github.event.inputs.source_run_id }} -p "segment-*" -D output/downloaded_segments
+          gh run download ${{ github.event.inputs.source_run_id }} -p "segment-*" -D output/downloaded_segments -R alexkingston1993/the-bull-print
           # Flatten downloaded segments if nested by artifact name
           find output/downloaded_segments -type f -name "segment_*.mp4" -exec mv -f {} output/downloaded_segments/ \;
           echo "=== Downloaded Segments ==="
           ls -lh output/downloaded_segments/
+
+      - name: 📅 Configure Drip Feed & Publishing Schedule in Manifest
+        run: |
+          python3 -c "
+          import json, os, sys
+          from datetime import datetime, timezone, timedelta
+
+          delay = float('${{ github.event.inputs.publish_delay_hours || 0 }}')
+          priv = '${{ github.event.inputs.privacy_status || 'public' }}'
+
+          mf_path = 'output/session_bundle/session_manifest.json'
+          if os.path.exists(mf_path):
+              with open(mf_path, 'r', encoding='utf-8') as f:
+                  data = json.load(f)
+              
+              if delay > 0:
+                  pub_time = datetime.now(timezone.utc) + timedelta(hours=delay)
+                  data['publish_at'] = pub_time.strftime('%Y-%m-%dT%H:%M:%SZ')
+                  data['privacy_status'] = 'private'
+                  print(f'📅 [Drip Feed Scheduled] Video will release in {delay} hours at: {data[\"publish_at\"]}')
+              else:
+                  data['publish_at'] = None
+                  data['privacy_status'] = priv
+                  print(f'🚀 [Immediate Release] Video will publish as: {priv}')
+                  
+              with open(mf_path, 'w', encoding='utf-8') as f:
+                  json.dump(data, f, indent=2)
+          else:
+              print(f'⚠️ Warning: {mf_path} not found!')
+          "
 
       - name: 🔑 Materialize YouTube Quota Pool & Tokens
         env:
@@ -73,7 +113,7 @@ jobs:
         run: |
           mkdir -p data/youtube_tokens
           if [ -n "$YOUTUBE_TOKEN_EN" ]; then
-            echo "$YOUTUBE_TOKEN_EN" | base4 -d > data/youtube_tokens/youtube_token_en.pickle 2>/dev/null || echo "$YOUTUBE_TOKEN_EN" | base64 -d > data/youtube_tokens/youtube_token_en.pickle
+            echo "$YOUTUBE_TOKEN_EN" | base64 -d > data/youtube_tokens/youtube_token_en.pickle 2>/dev/null || echo "$YOUTUBE_TOKEN_EN" | base64 -D > data/youtube_tokens/youtube_token_en.pickle 2>/dev/null || true
             echo "✓ Restored primary YouTube OAuth token"
           fi
           if [ -n "$YT_OAUTH_POOL_JSON" ]; then
@@ -88,6 +128,25 @@ jobs:
             --bundle-dir output/session_bundle \
             --segments-dir output/downloaded_segments \
             --output-dir output/master_broadcast
+
+      - name: 🎯 Post-Publish SEO & Interlinks Booster
+        run: |
+          python scripts/max_out_public_vidiq_seo_and_interlinks.py || echo "⚠️ SEO booster notice, continuing..."
+
+      - name: 🌐 Commit & Push Published Companion Article & Sitemaps
+        if: always()
+        run: |
+          git config --global user.name "The Bull Print Autonomous Engine"
+          git config --global user.email "bot@bullprintmedia.com"
+          git add content/posts/*.md content/posts.json public/ sitemap*.xml state/ assets/frames/
+          if ! git diff --staged --quiet; then
+            git commit -m "docs(article): publish companion research report & sitemaps for Run ${{ github.event.inputs.source_run_id }} [skip ci]"
+            git pull --rebase origin main
+            git push origin main
+            echo "✅ Website companion article and sitemaps synced to main branch."
+          else
+            echo "ℹ️ No website content changes to commit."
+          fi
 
       - name: 📤 Upload Master Broadcast Video Artifact
         if: always()

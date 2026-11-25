@@ -127,17 +127,18 @@ def wait_for_prepare_session_completion(gh_bin: str, run_id: int, is_short: bool
 def run_daily_production(dry_run: bool = False):
     print("=" * 70)
     print("🌅 5:00 AM AUTONOMOUS VIDEO PRODUCTION ORCHESTRATOR")
-    print("🎯 Target: 10 Viral Shorts (9:16) + 2 Master Documentaries (16:9)")
+    print("🎯 Target: 3 High-Impact Shorts (9:16) + 1 Feature Master Documentary (16:9, 12+ Min)")
     print("=" * 70)
 
     # Stage 1: Discover Fresh Past 24h Viral Intelligence
     scanner = ViralTopicScanner()
     manifest = scanner.scan_past_24h_topics()
     
-    shorts = manifest.get("shorts", [])
-    docs = manifest.get("documentaries", [])
+    # User Mandate: Exactly 3 High-Impact Shorts + 1 Masterclass Documentary
+    shorts = manifest.get("shorts", [])[:3]
+    docs = manifest.get("documentaries", [])[:1]
 
-    logger.success(f"Discovered {len(shorts)} Shorts & {len(docs)} Documentaries from past 24h.")
+    logger.success(f"Discovered {len(shorts)} Shorts & {len(docs)} Documentary for today's high-impact quota.")
 
     # Save daily manifest for audit ledger
     out_dir = BASE_DIR / "output" / "daily_manifests"
@@ -150,36 +151,33 @@ def run_daily_production(dry_run: bool = False):
     candidates = ["/usr/local/bin/gh", "/usr/bin/gh", "/opt/homebrew/bin/gh"]
     gh_bin = next((c for c in candidates if Path(c).exists()), shutil.which("gh") or "gh")
 
-    # Stage 2: Calculate Staggered 24-Hour Drip Schedule
+    # Stage 2: Calculate Staggered Peak Audience Drip Schedule
     from datetime import datetime, timezone, timedelta
     now_utc = datetime.now(timezone.utc)
     base_publish_time = now_utc + timedelta(hours=1)
 
-    # Interleave 10 Shorts and 2 Documentaries across 12 two-hour slots for YouTube release
-    # Docs are scheduled at Slot 4 (+9h) and Slot 9 (+19h) for peak audience retention
+    # Staggered slots across peak hours:
+    # Short 1: +2h (Morning)
+    # Short 2: +6h (Afternoon)
+    # Short 3: +10h (Market Close)
+    # Documentary: +14h (Prime Evening Broadcast)
     scheduled_items = []
-    s_idx = 0
-    d_idx = 0
-    for slot in range(12):
-        slot_time = (base_publish_time + timedelta(hours=slot * 2)).strftime("%Y-%m-%dT%H:%M:%SZ")
-        if slot in (4, 9) and d_idx < len(docs):
-            scheduled_items.append({"type": "doc", "data": docs[d_idx], "slot": slot, "publish_at": slot_time, "num": d_idx + 1})
-            d_idx += 1
-        elif s_idx < len(shorts):
-            scheduled_items.append({"type": "short", "data": shorts[s_idx], "slot": slot, "publish_at": slot_time, "num": s_idx + 1})
-            s_idx += 1
-        elif d_idx < len(docs):
-            scheduled_items.append({"type": "doc", "data": docs[d_idx], "slot": slot, "publish_at": slot_time, "num": d_idx + 1})
-            d_idx += 1
+    short_hours = [2, 6, 10]
+    for s_i, s_data in enumerate(shorts):
+        h = short_hours[s_i] if s_i < len(short_hours) else (s_i + 1) * 3
+        slot_time = (base_publish_time + timedelta(hours=h)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        scheduled_items.append({"type": "short", "data": s_data, "slot": s_i, "publish_at": slot_time, "num": s_i + 1})
+
+    if docs:
+        doc_time = (base_publish_time + timedelta(hours=14)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        scheduled_items.append({"type": "doc", "data": docs[0], "slot": 3, "publish_at": doc_time, "num": 1})
 
     # Stage 3: Strictly Staged Cloud Matrix Dispatch
-    # STRICT USER MANDATE: All 10 Shorts MUST complete their prepare_session and plate generation
-    # ONE BY ONE first. The 2 Documentaries (12+ min) may ONLY begin after ALL 10 Shorts are completely done.
     shorts_queue = [item for item in scheduled_items if item["type"] == "short"]
     docs_queue = [item for item in scheduled_items if item["type"] == "doc"]
 
     print("\n" + "=" * 70)
-    print("⚡ PHASE 1: DISPATCHING 10 VIRAL SHORTS (ONE BY ONE)")
+    print("⚡ PHASE 1: DISPATCHING 3 HIGH-IMPACT VIRAL SHORTS (ONE BY ONE)")
     print("=" * 70)
 
     for item in shorts_queue:
