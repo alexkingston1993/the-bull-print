@@ -1,0 +1,56 @@
+name: Extract & Publish High-CTR Thumbnails
+
+on:
+  workflow_dispatch:
+    inputs:
+      doc1_run_id:
+        description: 'Run ID for Doc 1'
+        required: true
+        default: '45522547207'
+      doc2_run_id:
+        description: 'Run ID for Doc 2'
+        required: true
+        default: '45529929710'
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  extract_thumbnails:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🎥 Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: 📥 Download Segment 0 for Both Documentaries
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p doc1 doc2 output/thumbnails
+          echo "⚡ Downloading Segment 0 for Doc 1..."
+          gh run download ${{ github.event.inputs.doc1_run_id }} -n segment-0 -D doc1
+          echo "⚡ Downloading Segment 0 for Doc 2..."
+          gh run download ${{ github.event.inputs.doc2_run_id }} -n segment-0 -D doc2
+
+      - name: 📸 Extract High-CTR 3D Typography Thumbnails (0.45s Slam Hook)
+        run: |
+          # Doc 1
+          SEG1=$(find doc1 -name "*.mp4" | head -n 1)
+          ffmpeg -y -ss 0.45 -i "$SEG1" -vframes 1 -q:v 2 output/thumbnails/thumbnail_doc1_silicon_bubble.jpg
+          # Doc 2
+          SEG2=$(find doc2 -name "*.mp4" | head -n 1)
+          ffmpeg -y -ss 0.45 -i "$SEG2" -vframes 1 -q:v 2 output/thumbnails/thumbnail_doc2_retirement_mirage.jpg
+          ls -lh output/thumbnails/
+
+      - name: 📤 Upload Thumbnails Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentary-thumbnails
+          path: output/thumbnails/
+          retention-days: 14
