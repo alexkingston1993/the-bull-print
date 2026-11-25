@@ -1834,7 +1834,7 @@ def aggregate_and_publish(bundle_dir: Path, segments_dir: Path, output_dir: Opti
                 else:
                     logger.warning(f"⚠️ [Aggregator Auto-Heal] Missing segment {i:02d}. Auto-rendering segment locally on-the-fly...")
                     try:
-                        render_segment(bundle_dir, i, output_dir=segments_dir)
+                        render_segment(segment_index=i, bundle_dir=bundle_dir, output_dir=segments_dir)
                         cand1 = segments_dir / f"segment_{i:02d}.mp4"
                         cand2 = segments_dir / f"segment_{i}.mp4"
                         seg_file = cand1 if cand1.exists() else cand2

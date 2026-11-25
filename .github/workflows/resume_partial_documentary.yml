@@ -1,0 +1,99 @@
+name: Resume Partial Documentary (From Artifacts)
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: 'GitHub Actions Run ID of the failed/partial documentary (e.g. 45522547207)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  resume_and_publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🎥 Install FFmpeg & Audio Libs
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core
+
+      - name: 🐍 Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Install Publishing & YouTube Dependencies
+        run: |
+          pip install --no-cache-dir Pillow google-api-python-client google-auth google-auth-oauthlib google-auth-httplib2 requests loguru numpy scipy toml
+
+      - name: 📥 Download Artifacts from Source Run
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p output/session_bundle output/downloaded_segments output/master_broadcast
+          echo "⚡ Downloading session bundle from Run ${{ github.event.inputs.source_run_id }}..."
+          gh run download ${{ github.event.inputs.source_run_id }} -n session-bundle -D output/session_bundle
+          echo "⚡ Downloading segment artifacts from Run ${{ github.event.inputs.source_run_id }}..."
+          gh run download ${{ github.event.inputs.source_run_id }} -p "segment-*" -D output/downloaded_segments
+          # Flatten downloaded segments if nested by artifact name
+          find output/downloaded_segments -type f -name "segment_*.mp4" -exec mv -f {} output/downloaded_segments/ \;
+          echo "=== Downloaded Segments ==="
+          ls -lh output/downloaded_segments/
+
+      - name: 🔑 Materialize YouTube Quota Pool & Tokens
+        env:
+          YOUTUBE_TOKEN_EN: ${{ secrets.YOUTUBE_TOKEN_EN }}
+          YT_OAUTH_POOL_JSON: ${{ secrets.YT_OAUTH_POOL_JSON }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          YT_CLIENT_ID_1: ${{ secrets.YT_CLIENT_ID_1 }}
+          YT_CLIENT_SECRET_1: ${{ secrets.YT_CLIENT_SECRET_1 }}
+          YT_REFRESH_TOKEN_1: ${{ secrets.YT_REFRESH_TOKEN_1 }}
+          YT_CLIENT_ID_2: ${{ secrets.YT_CLIENT_ID_2 }}
+          YT_CLIENT_SECRET_2: ${{ secrets.YT_CLIENT_SECRET_2 }}
+          YT_REFRESH_TOKEN_2: ${{ secrets.YT_REFRESH_TOKEN_2 }}
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_ACCOUNT_ID: ${{ secrets.INSTAGRAM_ACCOUNT_ID }}
+          FACEBOOK_PAGE_ACCESS_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
+          FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
+          FACEBOOK_APP_ID: ${{ secrets.FACEBOOK_APP_ID }}
+          FACEBOOK_APP_SECRET: ${{ secrets.FACEBOOK_APP_SECRET }}
+          TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
+        run: |
+          mkdir -p data/youtube_tokens
+          if [ -n "$YOUTUBE_TOKEN_EN" ]; then
+            echo "$YOUTUBE_TOKEN_EN" | base4 -d > data/youtube_tokens/youtube_token_en.pickle 2>/dev/null || echo "$YOUTUBE_TOKEN_EN" | base64 -d > data/youtube_tokens/youtube_token_en.pickle
+            echo "✓ Restored primary YouTube OAuth token"
+          fi
+          if [ -n "$YT_OAUTH_POOL_JSON" ]; then
+            echo "$YT_OAUTH_POOL_JSON" > data/youtube_tokens/oauth_pool.json
+            echo "✓ Restored OAuth pool JSON"
+          fi
+
+      - name: 🚀 Auto-Heal Missing Segments, Aggregate & Publish Master Documentary
+        run: |
+          python scripts/cloud_parallel_video_engine.py \
+            --mode aggregate_and_publish \
+            --bundle-dir output/session_bundle \
+            --segments-dir output/downloaded_segments \
+            --output-dir output/master_broadcast
+
+      - name: 📤 Upload Master Broadcast Video Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: master-broadcast-resumed-${{ github.event.inputs.source_run_id }}
+          path: output/master_broadcast/
+          retention-days: 14
+          if-no-files-found: ignore
