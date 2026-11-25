@@ -32,7 +32,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mkdir -p doc1 doc2 output/thumbnails
+          mkdir -p doc1 doc2 output/clean_doc_thumbs
           echo "⚡ Downloading Segment 0 for Doc 1..."
           gh run download ${{ github.event.inputs.doc1_run_id }} -n segment-0 -D doc1
           echo "⚡ Downloading Segment 0 for Doc 2..."
@@ -42,15 +42,15 @@ jobs:
         run: |
           # Doc 1
           SEG1=$(find doc1 -name "*.mp4" | head -n 1)
-          ffmpeg -y -ss 0.45 -i "$SEG1" -vframes 1 -q:v 2 output/thumbnails/thumbnail_doc1_silicon_bubble.jpg
+          ffmpeg -y -ss 0.45 -i "$SEG1" -vframes 1 -q:v 2 output/clean_doc_thumbs/thumbnail_doc1_silicon_bubble.jpg
           # Doc 2
           SEG2=$(find doc2 -name "*.mp4" | head -n 1)
-          ffmpeg -y -ss 0.45 -i "$SEG2" -vframes 1 -q:v 2 output/thumbnails/thumbnail_doc2_retirement_mirage.jpg
-          ls -lh output/thumbnails/
+          ffmpeg -y -ss 0.45 -i "$SEG2" -vframes 1 -q:v 2 output/clean_doc_thumbs/thumbnail_doc2_retirement_mirage.jpg
+          ls -lh output/clean_doc_thumbs/
 
       - name: 📤 Upload Thumbnails Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: documentary-thumbnails
-          path: output/thumbnails/
+          name: clean-doc-thumbnails
+          path: output/clean_doc_thumbs/
           retention-days: 14
