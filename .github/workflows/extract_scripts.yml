@@ -1,0 +1,90 @@
+name: Extract Documentary Scripts
+
+on:
+  workflow_dispatch:
+    inputs:
+      doc1_run_id:
+        description: 'Run ID for Doc 1'
+        required: true
+        default: '45522547207'
+      doc2_run_id:
+        description: 'Run ID for Doc 2'
+        required: true
+        default: '45529929710'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  extract_scripts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: 📥 Download Session Bundles
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p b1 b2 out
+          echo "⚡ Downloading Doc 1 bundle..."
+          gh run download ${{ github.event.inputs.doc1_run_id }} -n session-bundle -D b1
+          echo "⚡ Downloading Doc 2 bundle..."
+          gh run download ${{ github.event.inputs.doc2_run_id }} -n session-bundle -D b2
+
+      - name: 📜 Parse and Dump Complete Narrative Scripts
+        run: |
+          python3 -c "
+          import json, os
+
+          def process_doc(path, out_file, title_fallback):
+              manifest_path = os.path.join(path, 'session_manifest.json')
+              if not os.path.exists(manifest_path):
+                  print(f'Error: {manifest_path} not found')
+                  return
+              with open(manifest_path, 'r', encoding='utf-8') as f:
+                  data = json.load(f)
+              
+              topic = data.get('topic', title_fallback)
+              sections = data.get('sections', [])
+              
+              lines = []
+              lines.append(f'# TOPIC: {topic}')
+              lines.append(f'Total Segments: {len(sections)}\n')
+              
+              for s in sections:
+                  idx = s.get('section_index', 0)
+                  dur = s.get('duration', 20.0)
+                  h_top = s.get('headline_top', '')
+                  h_mid = s.get('headline_mid', '')
+                  badge = s.get('badge_text', '')
+                  script = s.get('script', '').strip()
+                  
+                  lines.append(f'### Segment {idx + 1:02d} ({dur}s) | [{badge}] {h_top} {h_mid}')
+                  lines.append(f'{script}\n')
+              
+              full_text = '\n'.join(lines)
+              with open(out_file, 'w', encoding='utf-8') as f_out:
+                  f_out.write(full_text)
+              print(f'✅ Wrote {out_file} ({len(sections)} segments, {len(full_text)} chars)')
+
+          process_doc('b1', 'out/doc1_script.txt', 'Inside the Silicon Bubble')
+          process_doc('b2', 'out/doc2_script.txt', 'The Retirement Mirage')
+          "
+
+      - name: 📤 Upload Clean Scripts Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentary-scripts
+          path: out/
+          retention-days: 7
+
+      - name: 🖨️ Print Doc 1 Full Script
+        run: |
+          echo "==================== DOC 1 FULL SCRIPT ===================="
+          cat out/doc1_script.txt
+
+      - name: 🖨️ Print Doc 2 Full Script
+        run: |
+          echo "==================== DOC 2 FULL SCRIPT ===================="
+          cat out/doc2_script.txt
