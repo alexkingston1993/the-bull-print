@@ -1,0 +1,49 @@
+name: Daily Long-Tail SEO Publisher & IndexNow Ping
+
+on:
+  schedule:
+    # Run daily at 06:00 UTC / 11:30 AM IST (dalal street mid-morning research cycle)
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish-seo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pyyaml
+
+      - name: Run Daily Long-Tail SEO Article Publisher
+        run: |
+          python scripts/daily_longtail_seo_publisher.py
+
+      - name: Generate Community Syndication Posts (Reddit & X)
+        run: |
+          python scripts/community_syndicator.py
+
+      - name: Fast-Track Ping IndexNow
+        run: |
+          python scripts/ping_indexnow.py
+
+      - name: Commit and Push New Article & Syndication Packages
+        run: |
+          git config user.name "TheBullPrint-Autobot"
+          git config user.email "bot@bullprintmedia.com"
+          git add content/posts.json public/content/posts.json content/posts/ content/syndication/
+          git diff --quiet && git diff --staged --quiet || git commit -m "chore(seo): publish daily long-tail forensic article & ping IndexNow [skip ci]"
+          git push origin main
