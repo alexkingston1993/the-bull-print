@@ -1,9 +1,6 @@
 name: Daily 1:35 PM IST Deferred Artifact Publisher
 
 on:
-  schedule:
-    # 08:05 UTC = 1:35 PM IST (5 minutes after YouTube API daily quota reset at Midnight PT)
-    - cron: '5 8 * * *'
   workflow_dispatch:
 
 concurrency:

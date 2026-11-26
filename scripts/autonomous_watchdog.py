@@ -97,7 +97,7 @@ SLOT_SCHEDULE = {
     },
 }
 
-TOTAL_DAILY_TARGET = 16
+TOTAL_DAILY_TARGET = 4  # Strict Blueprint Standard: Exactly 3 Shorts + 1 Master Documentary
 
 
 def send_telegram(message: str) -> bool:

@@ -1,8 +1,6 @@
-name: Relentless Autonomous Supervisor (16 Videos Quota Enforcer)
+name: Relentless Autonomous Supervisor (Manual Quota Enforcer)
 
 on:
-  schedule:
-    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 permissions:
