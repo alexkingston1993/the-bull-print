@@ -284,7 +284,7 @@ jobs:
     needs: [prepare_session, render_segment_matrix]
     if: always() && needs.prepare_session.result == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 75
 
     steps:
       - name: 📥 Checkout Repository
@@ -415,7 +415,9 @@ jobs:
             git commit -m "feat(media): parallel cloud video & article release [skip ci]" || true
             for retry in 1 2 3 4 5; do
               git fetch origin main
-              git rebase -X ours origin/main || { git rebase --abort; git merge -X ours origin/main -m "merge: resolve content sync" || true; }
+              git stash --include-untracked || true
+              git rebase origin/main || { git rebase --abort; git merge -X ours origin/main -m "merge: resolve content sync" || true; }
+              git stash pop || true
               if git push origin HEAD:main; then
                 echo "✓ Changes committed and pushed to GitHub. Vercel deployment triggered automatically."
                 break
