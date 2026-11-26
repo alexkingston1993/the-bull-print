@@ -21,7 +21,11 @@ echo "=================================================================="
 
 # Check GitHub Authentication Token
 GH_TOKEN=""
-if command -v gh &>/dev/null; then
+if [ -x "/usr/local/bin/gh" ]; then
+  GH_TOKEN=$(/usr/local/bin/gh auth token 2>/dev/null || true)
+elif [ -x "/opt/homebrew/bin/gh" ]; then
+  GH_TOKEN=$(/opt/homebrew/bin/gh auth token 2>/dev/null || true)
+elif command -v gh &>/dev/null; then
   GH_TOKEN=$(gh auth token 2>/dev/null || true)
 fi
 if [ -z "$GH_TOKEN" ]; then
@@ -128,7 +132,14 @@ deploy_scheduler_job \
   "daily_135pm_deferred_publisher.yml" \
   "Publishes quota-deferred videos 5 minutes after YouTube API daily quota reset"
 
-# Job 4: Real-Time Hourly Breaking News Viral Radar (Every Hour at :00)
+# Job 4: Daily 11:30 AM IST Long-Tail SEO Publisher & IndexNow Fast-Track
+deploy_scheduler_job \
+  "tbp-daily-longtail-seo" \
+  "30 11 * * *" \
+  "daily_longtail_seo.yml" \
+  "Publishes daily high-converting long-tail SEO guide & pings IndexNow"
+
+# Job 5: Real-Time Hourly Breaking News Viral Radar (Every Hour at :00)
 deploy_scheduler_job \
   "tbp-hourly-viral-radar" \
   "0 * * * *" \

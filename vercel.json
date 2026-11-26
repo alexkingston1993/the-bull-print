@@ -162,6 +162,14 @@
       "destination": "/crypto"
     },
     {
+      "source": "/about",
+      "destination": "/about"
+    },
+    {
+      "source": "/contact",
+      "destination": "/contact"
+    },
+    {
       "source": "/articles",
       "destination": "/articles"
     },
