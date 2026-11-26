@@ -46,6 +46,10 @@
       "destination": "/api/mission-control/action.js"
     },
     {
+      "source": "/api/cron/trigger-workflow",
+      "destination": "/api/cron/trigger-workflow.js"
+    },
+    {
       "source": "/api/auth/tiktok/callback",
       "destination": "/api/auth/tiktok/callback.js"
     },
