@@ -66,7 +66,7 @@ jobs:
           import json, os, sys
           from datetime import datetime, timezone, timedelta
 
-          delay = float('${{ github.event.inputs.publish_delay_hours || 0 }}')
+          delay_str = '${{ github.event.inputs.publish_delay_hours }}'.strip().lower()
           priv = '${{ github.event.inputs.privacy_status || 'public' }}'
 
           mf_path = 'output/session_bundle/session_manifest.json'
@@ -74,7 +74,16 @@ jobs:
               with open(mf_path, 'r', encoding='utf-8') as f:
                   data = json.load(f)
               
-              if delay > 0:
+              if delay_str == 'auto':
+                  if data.get('publish_at'):
+                      print(f'📅 [Preserved Existing Schedule] Video will release at: {data[\"publish_at\"]}')
+                  else:
+                      pub_time = datetime.now(timezone.utc) + timedelta(hours=9.5)
+                      data['publish_at'] = pub_time.strftime('%Y-%m-%dT%H:%M:%SZ')
+                      data['privacy_status'] = 'private'
+                      print(f'📅 [Auto Scheduled for Prime Evening] Video will release at: {data[\"publish_at\"]}')
+              elif delay_str and float(delay_str) > 0:
+                  delay = float(delay_str)
                   pub_time = datetime.now(timezone.utc) + timedelta(hours=delay)
                   data['publish_at'] = pub_time.strftime('%Y-%m-%dT%H:%M:%SZ')
                   data['privacy_status'] = 'private'
