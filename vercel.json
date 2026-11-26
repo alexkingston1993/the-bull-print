@@ -170,6 +170,20 @@
       "destination": "/schemes"
     }
   ],
+  "crons": [
+    {
+      "path": "/api/cron/trigger-workflow?workflow=daily_longtail_seo.yml",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/trigger-workflow?workflow=daily_5am_production_master.yml",
+      "schedule": "30 23 * * *"
+    },
+    {
+      "path": "/api/cron/trigger-workflow?workflow=daily_135pm_deferred_publisher.yml",
+      "schedule": "5 8 * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
