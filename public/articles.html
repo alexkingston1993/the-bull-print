@@ -608,13 +608,14 @@
                 return `
                     <a href="/article.html?slug=${p.slug}" class="article-card">
                         <div class="article-card-cover">
-                            <img src="${p.infographic || p.coverImage || 'brand_assets/opengraph_social_card_1200x630.png'}" 
-                                 alt="${p.imageAlt || p.title}" 
+                            <img src="${p.coverImage || p.infographic || '/brand_assets/opengraph_social_card_1200x630.png'}" 
+                                 alt="${(p.imageAlt || p.title || 'The Bull Print Institutional Research').replace(/"/g, '&quot;')}" 
                                  class="article-card-img" 
                                  loading="lazy" 
-                                 decoding="async">
+                                 decoding="async"
+                                 onerror="this.onerror=null; this.src='/brand_assets/opengraph_social_card_1200x630.png';">
                             <span class="article-card-badge-pill">
-                                <span>📊</span> INFOGRAPHIC
+                                <span>⚡</span> ${category.toUpperCase()}
                             </span>
                         </div>
                         <div class="article-card-header">

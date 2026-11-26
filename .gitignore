@@ -67,6 +67,13 @@ brand_assets/*.mp4
 *.aiff
 *.zip
 
-public/assets/
+public/assets/audio/
+public/assets/voice_model/
+public/assets/approved_bundles/
+public/assets/broll_cache/
 *.zip
 *.bin
+
+*_CONVERSATION_BACKUP.md
+*.log
+

@@ -769,10 +769,14 @@
                 const ogImageTag = document.getElementById('og-image');
                 const twitterImageTag = document.getElementById('twitter-image');
 
-                const imageToUse = post.infographic || post.coverImage;
+                const imageToUse = post.coverImage || post.infographic;
                 if (imageToUse) {
                     infoImg.src = imageToUse;
                     infoImg.alt = post.imageAlt || `${post.title} Tailor-Made Research Infographic | The Bull Print`;
+                    infoImg.onerror = function() {
+                        this.onerror = null;
+                        this.src = '/brand_assets/opengraph_social_card_1200x630.png';
+                    };
                     if (post.imageCaption) {
                         infoCaption.textContent = post.imageCaption;
                     }

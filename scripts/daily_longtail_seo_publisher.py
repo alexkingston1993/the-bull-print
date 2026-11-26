@@ -476,6 +476,19 @@ def main():
         entry["html"] = clean_html
         entry["aliases"] = [f"/posts/{slug}", f"/article/{slug}"]
         
+        # Generate bespoke high-CTR thumbnail & imageAlt
+        try:
+            from scripts.heal_articles_and_generate_thumbnails import generate_article_thumbnail, parse_post_metadata, PUBLIC_EDITORIAL
+            badge, l1, l2, theme = parse_post_metadata(entry)
+            thumb_path = PUBLIC_EDITORIAL / f"{slug}.jpg"
+            generate_article_thumbnail(thumb_path, badge, l1, l2, theme)
+            entry["coverImage"] = f"/assets/editorial/{slug}.jpg"
+            entry["imageAlt"] = f"{meta['title']} — The Bull Print Institutional Research"
+        except Exception as e:
+            print(f"    [!] Thumbnail generation note: {e}")
+            entry["coverImage"] = f"/assets/editorial/{slug}.jpg"
+            entry["imageAlt"] = f"{meta['title']} — The Bull Print Institutional Research"
+        
         # Check if already exists in posts
         exists = any(p.get("slug") == slug for p in posts)
         if exists:
