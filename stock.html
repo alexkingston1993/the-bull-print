@@ -1601,7 +1601,14 @@
 
         // B. Parse Symbol
         const urlParams = new URLSearchParams(window.location.search);
-        let rawSymbol = urlParams.get("symbol") || "ITC";
+        let rawSymbol = urlParams.get("symbol");
+        if (!rawSymbol) {
+            const pathParts = window.location.pathname.split('/').filter(Boolean);
+            if (pathParts.length >= 2 && (pathParts[0] === 'stocks' || pathParts[0] === 'stock')) {
+                rawSymbol = pathParts[1];
+            }
+        }
+        rawSymbol = rawSymbol || "RELIANCE";
         const cleanSymbol = rawSymbol.trim().toUpperCase().replace(/\s+/g, '');
 
         let globalStockData = null;
