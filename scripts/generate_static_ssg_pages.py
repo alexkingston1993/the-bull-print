@@ -227,6 +227,16 @@ def generate_stock_html(stock):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Analytics 4 (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-S3E3FQ3SP0"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){{dataLayer.push(arguments);}}
+      gtag('js', new Date());
+      gtag('config', 'G-S3E3FQ3SP0', {{ 'anonymize_ip': true }});
+    </script>
+    <!-- Vercel Web Analytics & Insights -->
+    <script defer src="/_vercel/insights/script.js"></script>
     <title>{name} ({sym}) Share Price, 10-Yr Financial Statements, ROCE & Screener | The Bull Print</title>
     <meta name="description" content="Complete institutional fundamental research on {name} (NSE: {sym}). Real-time share price, 10-year balance sheet, P&L, quarterly results, promoter pledge audit, and ROCE trajectory.">
     <link rel="canonical" href="https://bullprintmedia.com/stocks/{sym}">
@@ -442,6 +452,16 @@ def generate_crypto_html(coin):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Analytics 4 (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-S3E3FQ3SP0"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){{dataLayer.push(arguments);}}
+      gtag('js', new Date());
+      gtag('config', 'G-S3E3FQ3SP0', {{ 'anonymize_ip': true }});
+    </script>
+    <!-- Vercel Web Analytics & Insights -->
+    <script defer src="/_vercel/insights/script.js"></script>
     <title>{name} ({sym}) Live Price, Candlestick Chart, Tokenomics & Indian Section 115BBH Tax Audit | The Bull Print</title>
     <meta name="description" content="Institutional digital asset analysis of {name} ({sym}). Real-time live prices in USD and INR, TradingView candlestick charts, tokenomics supply breakdown, AI moat breakdown, and Section 115BBH Indian crypto 30% tax audit.">
     <link rel="canonical" href="https://bullprintmedia.com/crypto/{sym}">

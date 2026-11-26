@@ -55,3 +55,18 @@ session-s*.md
 data/youtube_tokens/oauth_pool.json
 /freebuff-sites-build/
 assets/voice_model/whisper_cache/
+
+# Local tooling and sandbox caches
+.gflow/
+.local/
+remotion-engine/
+tools/
+brand_assets/*.mp4
+*.mp4
+*.mp3
+*.aiff
+*.zip
+
+public/assets/
+*.zip
+*.bin

@@ -18,12 +18,12 @@ upgraded_crypto_html = """<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BULLPRINT"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-S3E3FQ3SP0"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-BULLPRINT', { 'anonymize_ip': true });
+      gtag('config', 'G-S3E3FQ3SP0', { 'anonymize_ip': true });
     </script>
     <!-- Search Engine Verification -->
     <meta name="google-site-verification" content="-Gacr-RDEHc0XD9m55DQuX24CsUhlQyEOXegq4Ia4xo">
@@ -1159,12 +1159,12 @@ crypto_radar_html = """<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BULLPRINT"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-S3E3FQ3SP0"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-BULLPRINT', { 'anonymize_ip': true });
+      gtag('config', 'G-S3E3FQ3SP0', { 'anonymize_ip': true });
     </script>
 
     <meta charset="UTF-8">

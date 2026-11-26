@@ -11,12 +11,12 @@ import re
 ROOT = Path(__file__).resolve().parent.parent
 
 GA_SNIPPET = """    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BULLPRINT"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-S3E3FQ3SP0"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-BULLPRINT', { 'anonymize_ip': true });
+      gtag('config', 'G-S3E3FQ3SP0', { 'anonymize_ip': true });
     </script>
     <!-- Search Engine Verification -->
     <meta name="google-site-verification" content="google-site-verification-token">
@@ -166,7 +166,7 @@ def update_page(filename, conf):
         content = re.sub(canon_pattern, f'<link rel="canonical" href="{canon}">', content, count=1)
 
     # 4. Inject GA4 and verification if not already present
-    if "G-BULLPRINT" not in content and "<head>" in content:
+    if "G-S3E3FQ3SP0" not in content and "<head>" in content:
         content = content.replace("<head>", f"<head>\n{GA_SNIPPET}\n{conf['schema']}\n", 1)
 
     with open(path, "w", encoding="utf-8") as f:
