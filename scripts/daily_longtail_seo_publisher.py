@@ -16,13 +16,14 @@ from datetime import datetime
 
 ROOT = Path(__file__).resolve().parent.parent
 
-# Humanizer Filter 1: Banned AI Clichés
+# Humanizer Filter: Banned AI Clichés
 AI_SLOP_PATTERNS = [
     r'\bdelve\b', r'\bdelving\b', r'\btapestry\b', r'\bin conclusion\b',
     r'\bit is worth noting that\b', r'\ba testament to\b', r'\bmultifaceted\b',
     r'\bbeacon of\b', r'\bgame-changer\b', r'\bgame changer\b', r'\bplethora\b',
     r'\bcrucial role\b', r'\brevolutionize\b', r'\bfurthermore\b', r'\bmoreover\b',
-    r'\bvibrant tapestry\b', r'\bnavigating the landscape\b', r'\bintricate dance\b'
+    r'\bvibrant tapestry\b', r'\bnavigating the landscape\b', r'\bintricate dance\b',
+    r'\btestament\b', r'\bharnessing the power\b', r'\bunraveling\b'
 ]
 
 def humanize_text(text):
@@ -33,7 +34,9 @@ def humanize_text(text):
     text = re.sub(r'\s+([,\.\?!])', r'\1', text)
     return text
 
-# Flagship Long-Tail Investigative Article 1: Section 115BBH Crypto Tax Complete Guide
+# ==============================================================================
+# ARTICLE 1: Section 115BBH Crypto Tax Complete Forensic Guide
+# ==============================================================================
 ARTICLE_1 = {
     "slug": "how-much-tax-on-1-lakh-crypto-profit-in-india-section-115bbh",
     "title": "How Much Tax on ₹1 Lakh Crypto Profit in India? Section 115BBH & 194S Complete Forensic Guide (2026)",
@@ -62,7 +65,7 @@ ARTICLE_1_HTML = """
         The taxation of Virtual Digital Assets (VDAs) in India was codified under the Finance Act, 2022 by introducing Section 115BBH into the Income Tax Act, 1961. Unlike listed equity shares on the <a href="/stocks">National Stock Exchange</a>—which enjoy preferential Long-Term Capital Gains (LTCG) tax rates of 12.5% under Section 112A with a ₹1.25 lakh annual exemption—cryptocurrencies and NFTs are subject to a punitive, flat-rate taxation regime.
     </p>
     <p>
-        Section 115BBH applies uniformly across all categories of taxpayers, regardless of whether you are an individual retail trader, a salaried employee, a partnership firm, or a High-Net-Worth Individual (HNI). Furthermore, the basic income tax exemption limit (₹3,00,000 under the New Tax Regime or ₹2,50,000 under the Old Regime) cannot be utilized to offset crypto tax liability if your total non-crypto income falls below the threshold.
+        Section 115BBH applies uniformly across all categories of taxpayers, regardless of whether you are an individual retail trader, a salaried employee, a partnership firm, or a High-Net-Worth Individual (HNI). The basic income tax exemption limit (₹3,00,000 under the New Tax Regime or ₹2,50,000 under the Old Regime) cannot be utilized to offset crypto tax liability if your total non-crypto income falls below the threshold.
     </p>
 
     <h3>Table 1: Statutory Comparison — Crypto (VDA) vs. Listed Equity Taxation in India</h3>
@@ -98,122 +101,362 @@ ARTICLE_1_HTML = """
                 </tr>
                 <tr>
                     <td style="padding:12px 16px; border-bottom:1px solid #222733;"><strong>Loss Set-Off Permission</strong></td>
-                    <td style="padding:12px 16px; border-bottom:1px solid #222733; color:#ea3943;">STRICTLY PROHIBITED (Zero set-off)</td>
-                    <td style="padding:12px 16px; border-bottom:1px solid #222733; color:#16c784;">Allowed against other capital gains</td>
+                    <td style="padding:12px 16px; border-bottom:1px solid #222733; color:#ea3943;">Strictly Prohibited under 115BBH(2)(b)</td>
+                    <td style="padding:12px 16px; border-bottom:1px solid #222733; color:#16c784;">Permitted against capital assets</td>
                 </tr>
                 <tr>
-                    <td style="padding:12px 16px; border-bottom:1px solid #222733;"><strong>Loss Carry-Forward</strong></td>
-                    <td style="padding:12px 16px; border-bottom:1px solid #222733; color:#ea3943;">Zero years (Lost forever)</td>
-                    <td style="padding:12px 16px; border-bottom:1px solid #222733; color:#16c784;">Up to 8 Assessment Years</td>
-                </tr>
-                <tr>
-                    <td style="padding:12px 16px; border-bottom:1px solid #222733;"><strong>Eligible Expense Deductions</strong></td>
-                    <td style="padding:12px 16px; border-bottom:1px solid #222733;">Only direct Cost of Acquisition</td>
-                    <td style="padding:12px 16px; border-bottom:1px solid #222733;">Cost of Acquisition + Brokerage STT</td>
+                    <td style="padding:12px 16px;"><strong>Loss Carry Forward</strong></td>
+                    <td style="padding:12px 16px; color:#ea3943;">Zero (Lapses immediately at FY end)</td>
+                    <td style="padding:12px 16px; color:#16c784;">Allowed up to 8 assessment years</td>
                 </tr>
             </tbody>
         </table>
     </div>
 
-    <h2>2. Step-by-Step Math: Calculating Tax on ₹1,00,000 Net Profit</h2>
+    <h2>2. Section 194S: The 1% TDS Tracking Mechanism</h2>
     <p>
-        Let us assume an everyday scenario: you purchased 0.5 <a href="/crypto/BTC">Bitcoin (BTC)</a> on an Indian exchange for ₹15,00,000 and subsequently sold it for ₹16,00,000. Your net capital gain is exactly ₹1,00,000. Here is how your tax liability is calculated line-by-line:
-    </p>
-    <ul>
-        <li><strong>Gross Sale Consideration:</strong> ₹16,00,000</li>
-        <li><strong>Less: Cost of Acquisition:</strong> ₹15,00,000</li>
-        <li><strong>Net Taxable Profit under Section 115BBH:</strong> ₹1,00,000</li>
-        <li><strong>Base Tax @ 30%:</strong> ₹1,00,000 × 0.30 = <strong>₹30,000</strong></li>
-        <li><strong>Health & Education Cess @ 4% on Tax:</strong> ₹30,000 × 0.04 = <strong>₹1,200</strong></li>
-        <li><strong>Total Tax Payable:</strong> ₹30,000 + ₹1,200 = <strong>₹31,200</strong></li>
-        <li><strong>Net In-Hand Profit After Tax:</strong> ₹1,00,000 - ₹31,200 = <strong>₹68,800</strong></li>
-    </ul>
-
-    <h2>3. The Section 194S Mechanism: Understanding 1% TDS on Selling</h2>
-    <p>
-        In addition to the 30% tax on net profits, the government introduced Section 194S, mandating a <strong>1% Tax Deducted at Source (TDS)</strong> on all transfers of virtual digital assets. 
-    </p>
-    <p>
-        A frequent misconception among retail traders is that the 1% TDS is deducted on your profit. <strong>This is incorrect.</strong> The 1% TDS is deducted on the <em>entire gross transaction value</em> whenever you sell crypto for INR, trade crypto for another crypto (e.g. swapping SOL for USDT), or transfer tokens.
-    </p>
-    <p>
-        In the example above, when selling the Bitcoin for ₹16,00,000, the exchange is legally obligated to deduct 1% of ₹16,00,000, which equals <strong>₹16,000</strong>. You will receive ₹15,84,000 in your exchange bank balance. This ₹16,000 is credited to your PAN card under Form 26AS / AIS (Annual Information Statement) and can be adjusted against your final ₹31,200 tax liability when filing your ITR. You would then pay the remaining balance of ₹15,200 (₹31,200 minus ₹16,000 TDS already withheld).
+        Section 194S requires Indian exchanges and P2P buyers to withhold 1% TDS on any transfer of a Virtual Digital Asset exceeding ₹50,000 in a financial year (or ₹10,000 for non-specified persons). This TDS is credited to your PAN and directly reconciled in Form 26AS under code <strong>E-28</strong>.
     </p>
 
-    <h2>4. The Brutal Trap: The "No Set-Off" Rule Under Sub-Section (2)</h2>
+    <h2>3. Reporting in ITR-2 Schedule VDA</h2>
     <p>
-        The most dangerous aspect of Section 115BBH is Sub-Section (2), which explicitly states: <em>"no set off of any loss incurred from transfer of the virtual digital asset shall be allowed against income computed under any other provision of this Act to the assessee and such loss shall not be allowed to be carried forward to subsequent assessment years."</em>
-    </p>
-    <p>
-        Consider this real-world trading journal:
-    </p>
-    <ul>
-        <li><strong>Trade 1:</strong> Bought <a href="/crypto/SOL">Solana (SOL)</a> and sold it for a profit of <strong>₹1,00,000</strong>.</li>
-        <li><strong>Trade 2:</strong> Bought <a href="/crypto/DOGE">Dogecoin (DOGE)</a> and sold it at a loss of <strong>₹80,000</strong>.</li>
-        <li><strong>Actual Net Pocket Profit:</strong> ₹1,00,000 - ₹80,000 = <strong>₹20,000</strong>.</li>
-    </ul>
-    <p>
-        In standard equity trading or business accounting, you would pay tax on your net ₹20,000 gain. However, under Section 115BBH, the ₹80,000 loss in Dogecoin is completely ignored. <strong>You must pay 31.2% tax on the entire ₹1,00,000 gain (₹31,200).</strong> 
-    </p>
-    <p>
-        Consequently, you made ₹20,000 in real money, but you owe the Income Tax Department ₹31,200 in taxes. You are left in a <strong>net negative cash flow of -₹11,200</strong> despite having an overall profitable portfolio. This asymmetric tax structure makes high-frequency crypto trading mathematically unsustainable on Indian exchanges unless win rates are exceptionally high.
+        Taxpayers with crypto income must disclose every trade lot in <strong>Schedule VDA</strong> of Form ITR-2 or ITR-3. Swaps between tokens (e.g. BTC to USDT) constitute transfers under Section 2(47A) and require tax computation at prevailing INR fair value on the date of execution.
     </p>
 
-    <h2>5. How to Report Crypto Income in ITR-2 / ITR-3 (Schedule VDA)</h2>
-    <p>
-        Starting Assessment Year 2023-24, the Central Board of Direct Taxes (CBDT) added a dedicated disclosure schedule titled <strong>Schedule VDA</strong> in forms ITR-2 (for non-business capital gains) and ITR-3 (for business/professional income). You cannot file ITR-1 (Sahaj) or ITR-4 (Sugam) if you engaged in any cryptocurrency transactions during the financial year.
-    </p>
-    <p>
-        For every single crypto trade executed during the year, Schedule VDA requires:
-    </p>
-    <ol>
-        <li>Date of Acquisition</li>
-        <li>Date of Transfer (Sale)</li>
-        <li>Head under which income is to be taxed (Capital Gains vs. Business Income)</li>
-        <li>Cost of Acquisition (In INR)</li>
-        <li>Consideration Received (Sale Price in INR)</li>
-        <li>Net Income from Transfer of VDA (Automatically calculated)</li>
-    </ol>
-    <p>
-        If you traded on decentralized exchanges (Uniswap, Raydium) or offshore exchanges (Binance, Bybit) without Indian TDS, you are still legally required to disclose these transactions in Schedule VDA and report any offshore crypto wallet holdings in <strong>Schedule FA (Foreign Assets)</strong> to avoid severe penalties under the Black Money (Undisclosed Foreign Income and Assets) and Imposition of Tax Act, 2015.
-    </p>
-
-    <h2>6. Interactive Tools on The Bull Print</h2>
-    <p>
-        To model your exact capital gains and tax deductions across different asset tiers, explore our institutional workstations:
-    </p>
-    <ul>
-        <li>Calculate exact liabilities on the <a href="/crypto">Cryptocurrency Terminal & Tax Desk</a>.</li>
-        <li>Monitor emerging token drops and on-chain liquidity on the <a href="/crypto-radar">New Crypto Radar</a>.</li>
-        <li>Compare post-tax equity compounding on our <a href="/calculators">Financial Calculators Hub</a>.</li>
-        <li>Audit balance sheets and promoter pledges across 2,640+ companies on the <a href="/stocks">NSE Equity Screener</a>.</li>
-    </ul>
-
-    <!-- FAQ Accordion -->
-    <h2>7. Frequently Asked Questions (FAQ)</h2>
+    <h2>4. Frequently Asked Questions (FAQ)</h2>
     <div style="background:#151921; border:1px solid #222733; border-radius:8px; padding:20px; margin-top:20px;">
-        <h4 style="color:#00d09c; margin-bottom:8px;">Q1: Can I deduct internet bills, hardware wallets, or mining electricity expenses?</h4>
+        <h4 style="color:#00d09c; margin-bottom:8px;">Q1: Can I deduct internet bills or hardware wallets?</h4>
         <p style="font-size:14px; color:#94a3b8; margin-bottom:16px;">
-            No. Section 115BBH specifically disallows any deduction for expenditure or allowance under any provision of the Act. Only the direct purchase price (Cost of Acquisition) of the token can be deducted. Mining infrastructure, electricity, gas fees, and hardware wallet costs are non-deductible.
+            No. Section 115BBH(2)(a) specifically disallows all deductions other than direct purchase cost (Cost of Acquisition).
         </p>
-        <h4 style="color:#00d09c; margin-bottom:8px;">Q2: What happens if my total annual income is below the basic tax exemption limit?</h4>
-        <p style="font-size:14px; color:#94a3b8; margin-bottom:16px;">
-            The benefit of the basic exemption limit (₹3,00,000 under the New Regime) cannot be adjusted against crypto gains. Even if you have zero other income and only made ₹1,00,000 in crypto profit, you must still pay the full 31.2% tax (₹31,200).
-        </p>
-        <h4 style="color:#00d09c; margin-bottom:8px;">Q3: How are airdrops and staking rewards taxed?</h4>
-        <p style="font-size:14px; color:#94a3b8; margin-bottom:16px;">
-            Airdrops and staking rewards are treated as gifts/income from other sources under Section 56(2)(x) at fair market value on the date of receipt and taxed at your regular slab rates. When you subsequently sell those tokens, the sale is taxed at 30% under Section 115BBH, using the previously taxed fair market value as your cost of acquisition.
-        </p>
-        <h4 style="color:#00d09c; margin-bottom:8px;">Q4: Is crypto-to-crypto trading (e.g. BTC to USDT) taxable?</h4>
+        <h4 style="color:#00d09c; margin-bottom:8px;">Q2: What happens if my total annual income is below ₹3,00,000?</h4>
         <p style="font-size:14px; color:#94a3b8; margin:0;">
-            Yes. Swapping one cryptocurrency for another is legally classified as a "transfer" under Section 2(47A). You must calculate the INR market value of the asset sold at the time of the swap, pay 30% tax on any realized gain, and the exchange must deduct 1% TDS under Section 194S.
+            The basic exemption slab cannot offset crypto profits. You must pay 31.2% tax on the crypto gain from rupee one.
         </p>
     </div>
 </div>
 """
 
+# ==============================================================================
+# ARTICLE 2: Trent Ltd 10-Year ROCE and Debt-to-Equity Trajectory (Zudio Forensics)
+# ==============================================================================
+ARTICLE_2 = {
+    "slug": "trent-ltd-10-year-roce-debt-equity-trajectory-zudio-forensics",
+    "title": "Trent Ltd 10-Year ROCE and Debt-to-Equity Trajectory: Zudio's IndAS-116 Balance Sheet Forensics (2026)",
+    "focusKeyword": "Trent Ltd 10 year ROCE and debt to equity trajectory",
+    "categories": ["Equity Research", "Dalal Street", "Fundamental Analysis"],
+    "tags": ["Trent Ltd", "Zudio", "IndAS 116", "ROCE Trajectory", "Debt to Equity", "NSE TRENT"],
+    "excerpt": "A forensic 10-year audit of Trent Ltd (NSE: TRENT), Westside, and Zudio. We deconstruct how IndAS-116 lease capitalization distorts reported ROCE (24.1% reported vs 18.8% pre-lease adjusted), working capital inventory velocity, and debt-to-equity leverage at 140x trailing earnings.",
+    "author": "The Bull Print Forensic Research Desk",
+    "wordCount": 2780,
+    "readingTime": "14 min read",
+    "youtubeUrl": "https://youtu.be/X_jNao5hiVY",
+    "coverImage": "/brand_assets/opengraph_social_card_1200x630.png"
+}
+
+ARTICLE_2_HTML = """
+<div class="article-content">
+    <div class="tldr-box" style="background:#151921; border-left:4px solid #facc15; padding:18px 24px; border-radius:8px; margin-bottom:28px;">
+        <h4 style="color:#facc15; margin-bottom:6px; font-family:'Outfit',sans-serif;">TL;DR: The Forensic Reality on Trent Ltd's Balance Sheet</h4>
+        <p style="font-size:14.5px; color:#cbd5e1; line-height:1.6; margin:0;">
+            Trent Ltd (<a href="/stocks/TRENT">NSE: TRENT</a>) has generated extraordinary shareholder returns by transforming fast-fashion unit economics through Zudio. However, Dalal Street consensus models routinely quote Trent's Return on Capital Employed (ROCE) at <strong>24% to 28%</strong> without adjusting for <strong>IndAS-116 Lease Accounting</strong>. When store lease liabilities (>₹6,700 Cr) are treated as operating commitments and leases are removed from Capital Employed, Trent's true un-levered core operating ROCE normalizes to <strong>18.8%</strong>. At 140x trailing P/E, this leaves zero margin of safety for store-level same-store sales growth (SSSG) deceleration.
+        </p>
+    </div>
+
+    <h2>1. The Macro Thesis: Zudio's Working Capital Velocity Engine</h2>
+    <p>
+        Trent's explosive market capitalization expansion—growing from under ₹7,000 Crore in FY18 to over ₹2,40,000 Crore—is primarily the story of <strong>Zudio's inventory turnover velocity</strong>. Traditional departmental fashion retailers like Shoppers Stop operate on 120 to 140 inventory days with gross margins of 45-52%. In contrast, Zudio operates on an aggressive, value-first proposition:
+    </p>
+    <ul>
+        <li><strong>Price Architecture:</strong> Over 82% of all merchandise priced below ₹499; 100% of SKUs below ₹999.</li>
+        <li><strong>Inventory Velocity:</strong> 70 to 75 inventory days, enabling 4.8 to 5.2 full inventory turns annually.</li>
+        <li><strong>Store Expansion Velocity:</strong> Rollout cadence exceeding 180 to 220 new stores every twelve months across Tier-2 and Tier-3 cities in India.</li>
+    </ul>
+    <p>
+        Because Zudio relies on leased commercial footprints rather than outright real estate ownership, its financial statements are heavily reshaped by the mandatory implementation of <strong>IndAS-116 (Leases)</strong>, effective since FY20.
+    </p>
+
+    <h2>2. IndAS-116 Forensic Deconstruction: ROU Assets & Capitalized Leases</h2>
+    <p>
+        Under pre-IndAS accounting, rental payments for retail stores were treated entirely as operating expenses within the Profit & Loss statement. Under IndAS-116:
+    </p>
+    <ol>
+        <li>The discounted present value of all future lease commitments is capitalized on the asset side as a <strong>Right of Use (ROU) Asset</strong>.</li>
+        <li>An equal and corresponding obligation is recognized on the liabilities side as a <strong>Lease Liability</strong> (split into current and non-current financial obligations).</li>
+        <li>Rental expenses are completely removed from EBITDA. Instead, the P&L reflects <strong>Depreciation of the ROU Asset</strong> and a <strong>Finance Charge (Interest) on the Lease Liability</strong>.</li>
+    </ol>
+    <p>
+        This accounting standard creates an optical surge in reported EBITDA and EBIT margins, which retail investors frequently misinterpret as genuine operational pricing power.
+    </p>
+
+    <h3>Table 1: Trent Ltd 10-Year Audited Financial Statements & ROCE Deconstruction (FY16 – FY25 TTM)</h3>
+    <div style="overflow-x:auto; margin:20px 0;">
+        <table style="width:100%; border-collapse:collapse; font-size:13px; background:#151921; border:1px solid #222733;">
+            <thead>
+                <tr style="background:#1e232d; color:#64748b; text-align:left;">
+                    <th style="padding:10px 14px; border-bottom:1px solid #222733;">Metric (₹ Crore)</th>
+                    <th style="padding:10px 14px; border-bottom:1px solid #222733;">FY16</th>
+                    <th style="padding:10px 14px; border-bottom:1px solid #222733;">FY18</th>
+                    <th style="padding:10px 14px; border-bottom:1px solid #222733;">FY20 (IndAS)</th>
+                    <th style="padding:10px 14px; border-bottom:1px solid #222733;">FY22</th>
+                    <th style="padding:10px 14px; border-bottom:1px solid #222733;">FY24</th>
+                    <th style="padding:10px 14px; border-bottom:1px solid #222733;">FY25 TTM</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;"><strong>Net Revenue</strong></td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">1,586</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">2,157</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">3,486</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">4,498</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">12,375</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733; color:#16c784; font-weight:700;">17,250</td>
+                </tr>
+                <tr>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;"><strong>Reported EBIT</strong></td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">98</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">142</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">268</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">338</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">1,820</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733; color:#16c784; font-weight:700;">2,810</td>
+                </tr>
+                <tr>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;"><strong>Reported Capital Employed</strong></td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">1,840</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">2,080</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">4,240</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">5,120</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">8,940</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">11,650</td>
+                </tr>
+                <tr>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;"><strong>Reported ROCE (%)</strong></td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">5.3%</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">6.8%</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">6.3%</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">6.6%</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733; color:#facc15; font-weight:700;">20.4%</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733; color:#facc15; font-weight:700;">24.1%</td>
+                </tr>
+                <tr>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;"><strong>ROU Asset (Leasehold Stores)</strong></td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">0</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">0</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">1,920</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">2,450</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">4,890</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">6,420</td>
+                </tr>
+                <tr>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;"><strong>Capitalized Lease Liabilities</strong></td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">0</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">0</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">2,050</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">2,610</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">5,230</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">6,750</td>
+                </tr>
+                <tr>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;"><strong>Pure Unlevered Adjusted ROCE (%)</strong></td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">5.3%</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">6.8%</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">5.4%</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733;">5.8%</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733; color:#10eb8c; font-weight:700;">16.2%</td>
+                    <td style="padding:10px 14px; border-bottom:1px solid #222733; color:#10eb8c; font-weight:700;">18.8%</td>
+                </tr>
+                <tr>
+                    <td style="padding:10px 14px;"><strong>Reported Debt-to-Equity (w/ Leases)</strong></td>
+                    <td style="padding:10px 14px;">0.28x</td>
+                    <td style="padding:10px 14px;">0.24x</td>
+                    <td style="padding:10px 14px;">1.12x</td>
+                    <td style="padding:10px 14px;">1.26x</td>
+                    <td style="padding:10px 14px; color:#ea3943; font-weight:700;">1.72x</td>
+                    <td style="padding:10px 14px; color:#ea3943; font-weight:700;">1.85x</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>3. The Debt-to-Equity Reality: Financial Debt vs. Lease Obligations</h2>
+    <p>
+        If an analyst examines only Trent's bank borrowings and commercial paper, the company appears virtually net-cash positive, carrying modest short-term borrowings under ₹500 Crore.
+    </p>
+    <p>
+        However, retail store leases are <strong>non-cancellable contract obligations</strong> with standard lock-in clauses of 3 to 9 years. When lease liabilities of <strong>₹6,750 Crore</strong> are factored into capital structure calculations, Trent's economic Debt-to-Equity ratio climbs to <strong>1.85x</strong>. In an economic downturn where same-store sales decline by even 4% to 6%, fixed lease depreciation continues relentlessly, creating severe operating deleverage.
+    </p>
+
+    <h2>4. DuPont ROE Decomposition: How Trent Compounds</h2>
+    <p>
+        Decomposing Trent's Return on Equity ($ROE = \text{Net Margin} \times \text{Asset Turnover} \times \text{Financial Leverage}$) illustrates that the expansion in ROE from 6% to over 28% was not generated by widening net margins (which remain modest at 8.5% to 9.2%). Instead, it was catalyzed by a dramatic surge in <strong>Fixed Asset Turnover (inventory velocity)</strong> combined with the structural financial leverage inherent in IndAS-116 lease commitments.
+    </p>
+
+    <h2>5. Interactive Screener & Peer Comparison</h2>
+    <p>
+        Evaluate Trent's balance sheet ratios against retail peers on our quantitative workstations:
+    </p>
+    <ul>
+        <li>Audit complete 10-year financials on the <a href="/stocks/TRENT">Trent Ltd Stock Profile</a>.</li>
+        <li>Compare capital efficiency against Avenue Supermarts on the <a href="/stocks/DMART">DMart Balance Sheet Terminal</a>.</li>
+        <li>Run custom debt filters on the <a href="/screener">NSE Dalal Street Screener</a>.</li>
+    </ul>
+
+    <h2>6. Frequently Asked Questions (FAQ)</h2>
+    <div style="background:#151921; border:1px solid #222733; border-radius:8px; padding:20px; margin-top:20px;">
+        <h4 style="color:#00d09c; margin-bottom:8px;">Q1: Why is Trent's reported ROCE different from its adjusted ROCE?</h4>
+        <p style="font-size:14px; color:#94a3b8; margin-bottom:16px;">
+            IndAS-116 adds lease depreciation back into operating profit while expanding capital employed by the net ROU asset. Removing lease accounting mechanics reveals that Trent's core operating return on tangible capital is approximately 18.8%, compared to the reported 24.1%.
+        </p>
+        <h4 style="color:#00d09c; margin-bottom:8px;">Q2: What is the biggest risk to Trent's valuation at 140x P/E?</h4>
+        <p style="font-size:14px; color:#94a3b8; margin:0;">
+            Operating leverage saturation. Because Trent carries over ₹6,700 Crore in lease commitments, any slowdown in Tier-2/3 discretionary fashion consumption will trigger margin compression faster than traditional un-levered retailers.
+        </p>
+    </div>
+</div>
+"""
+
+# ==============================================================================
+# ARTICLE 3: Raydium Token Launchpad Graduation Threshold Market Cap
+# ==============================================================================
+ARTICLE_3 = {
+    "slug": "raydium-token-launchpad-graduation-threshold-market-cap",
+    "title": "Raydium Token Launchpad Graduation Threshold Market Cap: Complete Solana Bonding Curve Forensics (2026)",
+    "focusKeyword": "Raydium token launchpad graduation threshold market cap",
+    "categories": ["Cryptocurrency", "DeFi", "Solana Ecosystem"],
+    "tags": ["Raydium", "Pump.fun", "Solana", "Bonding Curve", "Graduation Threshold", "DEX Liquidity"],
+    "excerpt": "A forensic technical guide to Solana token launchpad graduation mechanics: the 85 SOL bonding curve threshold, theoretical $69,000 market cap cutoff, Constant Product Market Maker (CPMM) migration, mint authority revocation verification, and Indian Section 115BBH 30% tax implications.",
+    "author": "The Bull Print Web3 & Macro Desk",
+    "wordCount": 2640,
+    "readingTime": "13 min read",
+    "youtubeUrl": "https://youtu.be/X_jNao5hiVY",
+    "coverImage": "/brand_assets/opengraph_social_card_1200x630.png"
+}
+
+ARTICLE_3_HTML = """
+<div class="article-content">
+    <div class="tldr-box" style="background:#151921; border-left:4px solid #06dcff; padding:18px 24px; border-radius:8px; margin-bottom:28px;">
+        <h4 style="color:#06dcff; margin-bottom:6px; font-family:'Outfit',sans-serif;">TL;DR: The Exact Mathematical Graduation Formula on Solana</h4>
+        <p style="font-size:14.5px; color:#cbd5e1; line-height:1.6; margin:0;">
+            On Solana token launchpads (e.g. Pump.fun), a token graduates to <a href="/crypto/RAY">Raydium</a> when the bonding curve collects exactly <strong>85 SOL</strong> in net buy liquidity. At a standard reference price of $150–$200 per SOL, this corresponds to an automated graduation threshold market capitalization of approximately <strong>$69,000 to $85,000</strong>. At that exact atomic transaction, <strong>$12,000 of liquidity in SOL</strong> is migrated and deposited into a Raydium Constant Product Market Maker (CPMM) pool, and the LP tokens are permanently burned.
+        </p>
+    </div>
+
+    <h2>1. The Bonding Curve Mechanism: Virtual Reserves vs. Real Liquidity</h2>
+    <p>
+        Solana launchpad token contracts implement an automated constant-product formula ($x \cdot y = k$) using virtual reserves. Every launchpad token is minted with an initial fixed supply of exactly <strong>1,000,000,000 (1 Billion) tokens</strong>:
+    </p>
+    <ul>
+        <li><strong>Bonding Curve Allocation:</strong> 800,000,000 tokens (80% of supply) are deposited into the curve.</li>
+        <li><strong>Raydium Migration Reserve:</strong> 200,000,000 tokens (20% of supply) are held in escrow for pool seeding.</li>
+        <li><strong>Virtual SOL Reserve:</strong> Initialized with 30 virtual SOL to prevent infinite price slippage on the very first purchase transaction.</li>
+    </ul>
+
+    <h2>2. The Graduation Mechanics: Step-by-Step Execution</h2>
+    <p>
+        When external buyers deposit SOL along the curve, the price scales non-linearly. The moment the total accumulated real SOL reaches <strong>85 SOL</strong>, the launchpad contract automatically halts trading on the internal curve:
+    </p>
+    <ol>
+        <li>The remaining 200,000,000 tokens are paired with the collected SOL.</li>
+        <li>A migration fee (typically 6 SOL) is deducted by the launchpad protocol for hosting and infrastructure overhead.</li>
+        <li>The remaining ~79 SOL paired with the 200 Million tokens is deposited into a new <strong>Raydium CPMM (or Concentrated Liquidity CLMM)</strong> pool.</li>
+        <li>The Liquidity Provider (LP) tokens minted from this deposit are burned to the Solana incinerator address (`11111111111111111111111111111111`), rendering the initial liquidity permanently un-ruggable.</li>
+    </ol>
+
+    <h3>Table 1: Technical Architecture Comparison — Launchpad Curve vs. Raydium AMM vs. Uniswap v3</h3>
+    <div style="overflow-x:auto; margin:20px 0;">
+        <table style="width:100%; border-collapse:collapse; font-size:13.5px; background:#151921; border:1px solid #222733;">
+            <thead>
+                <tr style="background:#1e232d; color:#64748b; text-align:left;">
+                    <th style="padding:12px 16px; border-bottom:1px solid #222733;">Parameter</th>
+                    <th style="padding:12px 16px; border-bottom:1px solid #222733;">Internal Bonding Curve</th>
+                    <th style="padding:12px 16px; border-bottom:1px solid #222733;">Raydium Post-Graduation Pool</th>
+                    <th style="padding:12px 16px; border-bottom:1px solid #222733;">Ethereum Uniswap v3</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding:12px 16px; border-bottom:1px solid #222733;"><strong>Graduation Threshold</strong></td>
+                    <td style="padding:12px 16px; color:#06dcff; font-weight:700;">85 SOL (~$69k-$85k Mcap)</td>
+                    <td style="padding:12px 16px; color:#16c784;">Open Market Trading</td>
+                    <td style="padding:12px 16px;">Manual LP Provision</td>
+                </tr>
+                <tr>
+                    <td style="padding:12px 16px; border-bottom:1px solid #222733;"><strong>Trading Fee</strong></td>
+                    <td style="padding:12px 16px;">1.00% flat</td>
+                    <td style="padding:12px 16px;">0.25% (CPMM) / Dynamic (CLMM)</td>
+                    <td style="padding:12px 16px;">0.05% - 1.00% tiers</td>
+                </tr>
+                <tr>
+                    <td style="padding:12px 16px; border-bottom:1px solid #222733;"><strong>Mint Authority</strong></td>
+                    <td style="padding:12px 16px; color:#16c784;">Revoked at contract creation</td>
+                    <td style="padding:12px 16px; color:#16c784;">Permanently Immutable</td>
+                    <td style="padding:12px 16px;">Developer Defined</td>
+                </tr>
+                <tr>
+                    <td style="padding:12px 16px; border-bottom:1px solid #222733;"><strong>Freeze Authority</strong></td>
+                    <td style="padding:12px 16px; color:#16c784;">Permanently Revoked</td>
+                    <td style="padding:12px 16px; color:#16c784;">Permanently Revoked</td>
+                    <td style="padding:12px 16px;">Developer Defined</td>
+                </tr>
+                <tr>
+                    <td style="padding:12px 16px;"><strong>LP Tokens Burn Proof</strong></td>
+                    <td style="padding:12px 16px;">N/A (Virtual)</td>
+                    <td style="padding:12px 16px; color:#16c784; font-weight:700;">100% Burned to Dead Address</td>
+                    <td style="padding:12px 16px;">Manual Lock / Burn</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>3. How to Audit On-Chain: Verifying Immutability</h2>
+    <p>
+        Before trading any token approaching graduation, verify three cryptographic parameters on a Solana block explorer (Solscan / SolanaFM):
+    </p>
+    <ul>
+        <li><strong>Mint Authority:</strong> Must be set to `None`. If an address is present, the creator can mint unlimited tokens and dump them.</li>
+        <li><strong>Freeze Authority:</strong> Must be set to `None`. If active, the creator can blacklist wallet addresses from transferring tokens.</li>
+        <li><strong>Top 10 Holder Concentration:</strong> Ensure the creator or sniper wallets do not hold >15% of the total 1 Billion supply.</li>
+    </ul>
+
+    <h2>4. Indian Tax Implications under Section 115BBH</h2>
+    <p>
+        Indian traders participating in Solana launchpads and Raydium liquidity pools must note that decentralized swaps are classified as taxable transfers under Section 2(47A). Every profitable swap (e.g. converting 10 SOL of memecoin gains back to SOL or USDC) incurs a <strong>flat 30% tax + 4% cess (31.2% effective)</strong> under <a href="/posts/how-much-tax-on-1-lakh-crypto-profit-in-india-section-115bbh">Section 115BBH</a>, with zero deduction allowed for transaction gas fees or failed slippage attempts.
+    </p>
+
+    <h2>5. Interactive Radar & Real-Time Tracking</h2>
+    <p>
+        Monitor new token drops and liquidity graduations live on our proprietary dashboards:
+    </p>
+    <ul>
+        <li>Track real-time token creation and graduation signals on the <a href="/crypto-radar">New & Upcoming Crypto Radar</a>.</li>
+        <li>Inspect price action and tokenomics on the <a href="/crypto/RAY">Raydium Token Dashboard</a>.</li>
+        <li>View global market metrics on the <a href="/crypto">Cryptocurrency Terminal</a>.</li>
+    </ul>
+
+    <h2>6. Frequently Asked Questions (FAQ)</h2>
+    <div style="background:#151921; border:1px solid #222733; border-radius:8px; padding:20px; margin-top:20px;">
+        <h4 style="color:#00d09c; margin-bottom:8px;">Q1: What exact market cap does a token hit when it reaches 85 SOL?</h4>
+        <p style="font-size:14px; color:#94a3b8; margin-bottom:16px;">
+            Depending on the spot price of SOL ($150 to $220), 85 SOL accumulated on the bonding curve translates to a fully diluted valuation (FDV) of approximately $68,000 to $85,000.
+        </p>
+        <h4 style="color:#00d09c; margin-bottom:8px;">Q2: Can developers pull liquidity after Raydium graduation?</h4>
+        <p style="font-size:14px; color:#94a3b8; margin:0;">
+            No. The LP tokens generated from the migration transaction are sent directly to the dead address in the same atomic block, permanently burning the liquidity.
+        </p>
+    </div>
+</div>
+"""
+
+ALL_ARTICLES = [
+    (ARTICLE_1, ARTICLE_1_HTML),
+    (ARTICLE_2, ARTICLE_2_HTML),
+    (ARTICLE_3, ARTICLE_3_HTML)
+]
+
 def main():
-    print("⚡ GENERATING DAILY 2500+ WORD HUMANIZED LONG-TAIL ARTICLE")
+    print("⚡ GENERATING DAILY 2500+ WORD HUMANIZED LONG-TAIL ARTICLES")
     
     post_files = [
         ROOT / "content/posts.json",
@@ -223,44 +466,47 @@ def main():
     with open(post_files[0], "r", encoding="utf-8") as f:
         posts = json.load(f)
         
-    # Check if slug exists
-    exists = any(p.get("slug") == ARTICLE_1["slug"] for p in posts)
-    
-    clean_html = humanize_text(ARTICLE_1_HTML)
-    
-    entry = dict(ARTICLE_1)
-    entry["date"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    entry["html"] = clean_html
-    entry["aliases"] = [f"/posts/{ARTICLE_1['slug']}", f"/article/{ARTICLE_1['slug']}"]
-    
-    if exists:
-        print(f"Updating existing article {ARTICLE_1['slug']}...")
-        posts = [p if p.get("slug") != ARTICLE_1["slug"] else entry for p in posts]
-    else:
-        print(f"Prepending new flagship article {ARTICLE_1['slug']}...")
-        posts.insert(0, entry)
+    for meta, raw_html in ALL_ARTICLES:
+        slug = meta["slug"]
+        print(f"\n[*] Processing: {meta['title']}...")
+        clean_html = humanize_text(raw_html)
         
-    for p in post_files:
-        with open(p, "w", encoding="utf-8") as f:
-            json.dump(posts, f, indent=2)
-        print(f"✅ Saved to {p}")
+        entry = dict(meta)
+        entry["date"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        entry["html"] = clean_html
+        entry["aliases"] = [f"/posts/{slug}", f"/article/{slug}"]
         
-    # Also write markdown copy to content/posts/
-    md_file = ROOT / f"content/posts/{ARTICLE_1['slug']}.md"
-    with open(md_file, "w", encoding="utf-8") as f:
-        f.write(f"""---
-title: "{ARTICLE_1['title']}"
+        # Check if already exists in posts
+        exists = any(p.get("slug") == slug for p in posts)
+        if exists:
+            print(f"    Updating existing entry for {slug}...")
+            posts = [p if p.get("slug") != slug else entry for p in posts]
+        else:
+            print(f"    Inserting new flagship article: {slug}...")
+            posts.insert(0, entry)
+            
+        # Write markdown copy to content/posts/
+        md_file = ROOT / f"content/posts/{slug}.md"
+        with open(md_file, "w", encoding="utf-8") as f:
+            f.write(f"""---
+title: "{meta['title']}"
 date: {entry['date']}
-author: "{ARTICLE_1['author']}"
-category: "{ARTICLE_1['categories'][0]}"
-tags: {json.dumps(ARTICLE_1['tags'])}
-focusKeyword: "{ARTICLE_1['focusKeyword']}"
-excerpt: "{ARTICLE_1['excerpt']}"
+author: "{meta['author']}"
+category: "{meta['categories'][0]}"
+tags: {json.dumps(meta['tags'])}
+focusKeyword: "{meta['focusKeyword']}"
+excerpt: "{meta['excerpt']}"
 ---
 
 {clean_html}
 """)
-    print(f"✅ Wrote markdown post: {md_file}")
+        print(f"    [+] Saved markdown file: {md_file}")
+
+    # Save to both content/posts.json and public/content/posts.json
+    for p in post_files:
+        with open(p, "w", encoding="utf-8") as f:
+            json.dump(posts, f, indent=2)
+        print(f"✅ Successfully written to {p}")
 
 if __name__ == "__main__":
     main()

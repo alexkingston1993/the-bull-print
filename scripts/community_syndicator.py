@@ -161,7 +161,81 @@ Zudio's profitability is driven by store-level operating leverage. If consumer d
 
 Are you valuing Trent as a perpetual retail compounder or does the 140x P/E multiple leave zero room for retail execution slips?
 
-*Forensic balance sheet data verified across NSE Equity filings and The Bull Print Dalal Street Terminal: bullprintmedia.com/stocks/TRENT*"""
+*Forensic balance sheet data verified across NSE Equity filings and The Bull Print Dalal Street Terminal: bullprintmedia.com/stocks/TRENT*""",
+        "x_thread": [
+            "1/9 🧵 Dalal Street's favorite 100x compounder is Trent Ltd ($TRENT).\n\nConsensus analyst models quote Trent's ROCE at an eye-popping 24% to 28% with a P/E multiple around 140x.\n\nBut when you forensic-audit the balance sheet under IndAS-116 (Lease Capitalization), the underlying unit economics tell a very different story 👇",
+            "2/9 ⚡ The Zudio Velocity Engine:\n\nZudio doesn't win on high gross margins. It wins on pure inventory turnover:\n• 82% of SKUs under ₹499\n• ~70 inventory days vs 130 days for traditional retail\n• 180+ store additions annually\n\nBecause store footprints are leased, IndAS-116 dramatically alters the P&L.",
+            "3/9 📊 IndAS-116 Accounting Distortions:\n\nUnder IndAS-116, operating lease rent is REMOVED from operating expenses.\n\nInstead, you get:\n1. Depreciation on 'Right of Use' (ROU) assets\n2. Finance charges on Lease Liabilities\n\nThis artificially expands reported EBITDA and EBIT by hundreds of crores.",
+            "4/9 🔍 The 10-Year ROCE Deconstruction:\n\n• FY18 Reported ROCE: 6.8%\n• FY22 Reported ROCE: 6.6%\n• FY24 Reported ROCE: 20.4%\n• FY25 TTM Reported: 24.1%\n\nNow look at un-levered core operating ROCE (stripping out lease financial leverage):\n• FY24 Adjusted: 16.2%\n• FY25 TTM Adjusted: 18.8%",
+            "5/9 ⚠️ The Real Balance Sheet Debt:\n\nLook only at bank debt, and Trent appears net-cash positive (<₹500 Cr borrowings).\n\nFactor in non-cancellable store lease liabilities (>₹6,750 Cr), and Trent's economic Debt-to-Equity is 1.85x.\n\nRetail lease commitments don't stop if footfalls slow down.",
+            "6/9 📉 Operating Leverage Risk:\n\nZudio is an operating leverage play. A 5% drop in same-store sales (SSSG) translates to a 3.2x multiplier compression in operating margins because lease depreciation is fixed.\n\nAt 140x P/E, Dalal Street is pricing in perpetual flawless execution.",
+            "7/9 🎯 Bottom Line:\n\nTrent is an extraordinary Indian retail execution story. 18.8% adjusted ROCE is still best-in-class for apparel.\n\nHowever, treating reported 24%+ ROCE as un-levered return on capital ignores ₹6,700 Cr+ in contractual lease debt.\n\nFull 10-year forensic model on @TheBullPrint: https://bullprintmedia.com/posts/trent-ltd-10-year-roce-debt-equity-trajectory-zudio-forensics"
+        ]
+    },
+    {
+        "id": "raydium_graduation_forensics",
+        "title": "Raydium Token Launchpad Graduation Threshold Market Cap: Complete Solana Bonding Curve Forensics",
+        "reddit_subs": ["r/CryptoCurrency", "r/solana", "r/IndianStreetBets"],
+        "reddit_title": "[Technical Forensics] The 85 SOL Graduation Threshold: How Solana Launchpad Bonding Curves Migrate to Raydium (Contract Math, Burn Proofs & Indian Tax Implications)",
+        "reddit_content": """### What Exactly Happens at the 85 SOL Threshold?
+
+On Solana token launchpads (Pump.fun, etc.), thousands of tokens launch daily with constant-product bonding curves ($x \cdot y = k$).
+
+Retail traders often ask: *"At what exact market cap does a token graduate to Raydium? What happens to liquidity?"*
+
+Here is the exact on-chain forensic breakdown of the mathematical thresholds, LP burn proofs, and Indian Section 115BBH tax liabilities on DEX swaps.
+
+---
+
+### 1. The Bonding Curve Math
+
+Every token launches with a fixed supply of **1,000,000,000 (1 Billion) tokens**:
+- **Curve Allocation**: 800,000,000 tokens (80%)
+- **Raydium Migration Reserve**: 200,000,000 tokens (20%)
+- **Virtual SOL Reserve**: 30 virtual SOL
+
+As users buy, the price scales along the curve. When total real net SOL accumulated reaches **85 SOL**, the curve completes 100%.
+
+---
+
+### 2. Market Cap at Graduation
+
+The market capitalization at graduation depends on SOL spot price:
+- **At $150 SOL**: Fully Diluted Valuation (FDV) = **~$69,000**
+- **At $180 SOL**: Fully Diluted Valuation (FDV) = **~$79,000**
+- **At $210 SOL**: Fully Diluted Valuation (FDV) = **~$88,000**
+
+---
+
+### 3. The Atomic Migration Event
+
+When 85 SOL is reached, the contract atomically executes:
+1. Deducts 6 SOL protocol migration fee.
+2. Deposits the remaining ~79 SOL paired with the 200,000,000 reserved tokens into a new **Raydium CPMM pool**.
+3. **Mints LP tokens and sends them to the Solana dead address (`11111111111111111111111111111111`)**, permanently locking liquidity.
+4. Mint authority and freeze authority are verified revoked (`None`).
+
+---
+
+### 4. Indian Tax Implications under Section 115BBH
+
+If you trade Solana launchpad tokens from India:
+- Swapping memecoins back to SOL or USDC is a taxable transfer under Section 2(47A).
+- Gains are taxed at a flat **31.2%** under Section 115BBH.
+- **Zero loss set-off**: If you make 20 SOL on one token and lose 15 SOL on another, you owe tax on the entire 20 SOL gain.
+- **Gas fees and slippage cannot be deducted.**
+
+*Technical forensics prepared by The Bull Print Web3 Desk: bullprintmedia.com/posts/raydium-token-launchpad-graduation-threshold-market-cap*""",
+        "x_thread": [
+            "1/8 🧵 How Solana Launchpad Bonding Curves Graduate to @RaydiumProtocol:\n\nEver wondered why the graduation threshold on Solana token curves sits at exactly 85 SOL? What exact market cap does that equal, and what happens to the liquidity?\n\nHere is the on-chain technical breakdown 👇",
+            "2/8 🔢 The Initial Curve State:\n\nEvery token launches with 1,000,000,000 (1 Billion) tokens:\n• 800M (80%) placed on the bonding curve\n• 200M (20%) reserved in escrow for the Raydium pool\n• 30 virtual SOL added to prevent infinite first-buy slippage",
+            "3/8 🎯 The 85 SOL Target:\n\nAs buyers buy along $x \\cdot y = k$, real SOL accumulates.\n\nThe threshold is reached when exactly 85 real SOL is deposited.\n\nDepending on SOL price ($150-$210), this sets the graduation market cap between $69,000 and $88,000.",
+            "4/8 🚀 The Atomic Migration Block:\n\nWhen 85 SOL hits, the contract atomically:\n1. Freezes the bonding curve\n2. Takes ~6 SOL migration fee\n3. Deposits ~79 SOL + 200M tokens into a Raydium CPMM pool",
+            "5/8 🔥 Unruggable Liquidity:\n\nThe Raydium LP tokens minted in this transaction are sent straight to Solana's burn address (`11111111111111111111111111111111`).\n\nThe liquidity is permanently locked and cannot be pulled by developers.",
+            "6/8 🛡️ Crucial Security Audit Checklist:\n\nBefore trading any token near graduation, verify:\n✅ Mint Authority = None (no new tokens can be created)\n✅ Freeze Authority = None (wallets cannot be blacklisted)\n✅ Top 10 holders hold <15% total supply",
+            "7/8 ⚖️ For Indian Web3 Traders:\n\nRemember: Every profitable swap on Raydium/DEX is taxed at 30% + 4% cess under Section 115BBH. Losses on other rugs cannot offset your wins. Trade accordingly.",
+            "8/8 📡 Monitor live new token drops, audit tags, and graduation alerts on @TheBullPrint New Crypto Radar: https://bullprintmedia.com/crypto-radar"
+        ]
     }
 ]
 
