@@ -25,6 +25,18 @@
     <priority>0.90</priority>
   </url>
   <url>
+    <loc>https://bullprintmedia.com/crypto-radar</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>0.92</priority>
+  </url>
+  <url>
+    <loc>https://bullprintmedia.com/stocks</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
     <loc>https://bullprintmedia.com/crypto</loc>
     <lastmod>2026-11-12</lastmod>
     <changefreq>daily</changefreq>

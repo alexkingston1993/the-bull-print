@@ -138,6 +138,22 @@
       "destination": "/insurance"
     },
     {
+      "source": "/crypto/radar",
+      "destination": "/crypto-radar"
+    },
+    {
+      "source": "/crypto/upcoming",
+      "destination": "/crypto-radar"
+    },
+    {
+      "source": "/crypto/new",
+      "destination": "/crypto-radar"
+    },
+    {
+      "source": "/crypto-radar",
+      "destination": "/crypto-radar"
+    },
+    {
       "source": "/crypto/:symbol",
       "destination": "/crypto"
     },
