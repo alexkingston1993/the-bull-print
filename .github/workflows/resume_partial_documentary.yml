@@ -54,11 +54,11 @@ jobs:
           echo "⚡ Downloading session bundle from Run ${{ github.event.inputs.source_run_id }}..."
           gh run download ${{ github.event.inputs.source_run_id }} -n session-bundle -D output/session_bundle -R alexkingston1993/the-bull-print
           echo "⚡ Downloading segment artifacts from Run ${{ github.event.inputs.source_run_id }}..."
-          gh run download ${{ github.event.inputs.source_run_id }} -p "segment-*" -D output/downloaded_segments -R alexkingston1993/the-bull-print
+          gh run download ${{ github.event.inputs.source_run_id }} -p "segment-*" -D output/downloaded_segments -R alexkingston1993/the-bull-print || true
           # Flatten downloaded segments if nested by artifact name
-          find output/downloaded_segments -type f -name "segment_*.mp4" -exec mv -f {} output/downloaded_segments/ \;
+          find output/downloaded_segments -type f -name "segment_*.mp4" -exec mv -f {} output/downloaded_segments/ \; 2>/dev/null || true
           echo "=== Downloaded Segments ==="
-          ls -lh output/downloaded_segments/
+          ls -lh output/downloaded_segments/ || true
 
       - name: 📅 Configure Drip Feed & Publishing Schedule in Manifest
         run: |

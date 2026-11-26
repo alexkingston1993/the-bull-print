@@ -1,0 +1,8 @@
+Contact: mailto:contact@bullprintmedia.com
+Contact: https://bullprintmedia.com/
+Expires: 2027-12-31T23:59:59.000Z
+Preferred-Languages: en
+Canonical: https://bullprintmedia.com/.well-known/security.txt
+Policy: https://bullprintmedia.com/privacy.html
+Acknowledgments: https://bullprintmedia.com/terms.html
+Hiring: https://bullprintmedia.com/

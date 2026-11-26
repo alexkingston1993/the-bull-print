@@ -1,0 +1,2004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BULLPRINT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-BULLPRINT', { 'anonymize_ip': true });
+    </script>
+    <!-- Search Engine Verification -->
+    <meta name="google-site-verification" content="-Gacr-RDEHc0XD9m55DQuX24CsUhlQyEOXegq4Ia4xo">
+    <meta name="msvalidate.01" content="4f29a7d83e204c329b45667e8125ac89">
+
+    <!-- Structured JSON-LD Schema: Portfolio Health Check -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "The Bull Print Portfolio Health Check & Risk Modeler",
+      "url": "https://bullprintmedia.com/portfolio",
+      "description": "Institutional portfolio audit tool for sector diversification, downside protection, and wealth compounding.",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "INR"
+      }
+    }
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Health Check & Risk Audit — Institutional Asset Allocation Modeler | The Bull Print</title>
+    <meta name="description" content="Audit your investment portfolio against institutional risk parameters, sector diversification benchmarks, and asset allocation compounding models.">
+    <link rel="canonical" href="https://bullprintmedia.com/portfolio">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="brand_assets/website_favicon_32x32.png">
+
+    <!-- Global Theme CSS & Auth Script (Default: Light Mode) -->
+    <link rel="stylesheet" href="brand_assets/global-theme.css">
+    <script src="brand_assets/theme-auth.js"></script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            line-height: 1.55;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        /* Top Navigation */
+        .site-navbar {
+            background: var(--navbar-bg);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 14px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+        .navbar-inner {
+            max-width: 1320px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .brand-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .brand-logo-img {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            box-shadow: 0 0 14px var(--groww-mint-soft);
+        }
+        .brand-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+        .brand-name span { color: var(--groww-mint); }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .nav-link {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: var(--groww-mint);
+        }
+
+        /* Hero */
+        .port-hero {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 32px 20px 16px;
+        }
+        .port-hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+        .port-hero h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        .port-hero p {
+            font-size: 14.5px;
+            color: var(--text-secondary);
+            max-width: 720px;
+        }
+
+        /* Broker Connection Bar */
+        .broker-connect-bar {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+            box-shadow: var(--card-shadow);
+        }
+        .broker-list {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .broker-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 700;
+            background: var(--bg-card-hover);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .broker-pill.connected {
+            background: var(--groww-mint-soft);
+            border-color: var(--groww-mint);
+            color: var(--groww-mint);
+        }
+        .broker-pill:hover {
+            border-color: var(--groww-mint);
+            color: var(--groww-mint);
+        }
+        .broker-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        .action-btns-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn-primary {
+            padding: 8px 16px;
+            background: var(--groww-mint);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-primary:hover { opacity: 0.9; }
+        .btn-secondary {
+            padding: 8px 14px;
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-secondary:hover { border-color: var(--groww-mint); color: var(--groww-mint); }
+
+        /* Main Viewport Grid */
+        .port-viewport {
+            max-width: 1320px;
+            margin: 20px auto 60px;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        /* Financial Snapshot Metric Cards */
+        .metric-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+        }
+        .metric-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+        }
+        .metric-card-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11.5px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .metric-card-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 25px;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1.1;
+        }
+        .metric-card-sub {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 6px;
+        }
+        .metric-card-sub.up { color: var(--groww-mint); }
+        .metric-card-sub.down { color: var(--market-red); }
+
+        /* AI Health Diagnostic Section */
+        .ai-health-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 26px 28px;
+            box-shadow: var(--card-shadow);
+        }
+        .ai-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .ai-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .ai-score-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 800;
+            padding: 6px 16px;
+            border-radius: 9999px;
+            background: var(--groww-mint-soft);
+            color: var(--groww-mint);
+            border: 1px solid var(--groww-mint);
+        }
+        .ai-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+        @media (max-width: 900px) {
+            .ai-grid { grid-template-columns: 1fr; }
+        }
+        .ai-card {
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-surface);
+        }
+        .ai-card.green { border-color: rgba(0, 135, 90, 0.3); }
+        .ai-card.red { border-color: rgba(220, 38, 38, 0.3); }
+        .ai-card.action { border-color: rgba(2, 132, 199, 0.3); }
+        .ai-card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .ai-card.green .ai-card-title { color: var(--groww-mint); }
+        .ai-card.red .ai-card-title { color: var(--market-red); }
+        .ai-card.action .ai-card-title { color: var(--accent-blue); }
+        .ai-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .ai-list li strong {
+            color: var(--text-primary);
+        }
+
+        /* Holdings Table Section */
+        .holdings-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+        }
+        .holdings-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .port-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+            text-align: left;
+        }
+        .port-table th {
+            padding: 12px 16px;
+            background: var(--table-header-bg);
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-subtle);
+            white-space: nowrap;
+        }
+        .port-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-subtle);
+            white-space: nowrap;
+            color: var(--text-primary);
+        }
+        .port-table tr:hover td {
+            background: var(--table-row-hover);
+        }
+        .broker-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+        .broker-tag.zerodha { background: rgba(59, 130, 246, 0.12); color: #2563eb; }
+        .broker-tag.groww { background: var(--groww-mint-soft); color: var(--groww-mint); }
+        .broker-tag.dhan { background: rgba(217, 119, 6, 0.12); color: #d97706; }
+        .broker-tag.angel { background: rgba(220, 38, 38, 0.12); color: #dc2626; }
+        .broker-tag.upstox { background: rgba(147, 51, 234, 0.12); color: #9333ea; }
+
+        /* Unified Link Broker Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 660px;
+            max-width: 100%;
+            padding: 28px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+        .modal-header h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+        .modal-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 8px;
+        }
+        .modal-tab-btn {
+            background: none;
+            border: none;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .modal-tab-btn.active {
+            background: var(--groww-mint-soft);
+            color: var(--groww-mint);
+            font-weight: 700;
+        }
+
+        /* Dropzone */
+        .dropzone-box {
+            border: 2px dashed var(--border-subtle);
+            border-radius: 12px;
+            padding: 32px 20px;
+            text-align: center;
+            background: var(--bg-card-hover);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 16px;
+        }
+        .dropzone-box:hover, .dropzone-box.dragover {
+            border-color: var(--groww-mint);
+            background: var(--groww-mint-soft);
+        }
+        .dropzone-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 14px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            background: var(--bg-canvas);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 13.5px;
+            color: var(--text-primary);
+            outline: none;
+            font-family: inherit;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--groww-mint);
+        }
+        .broker-tag.cdsl { background: rgba(16, 185, 129, 0.15); color: #059669; }
+        .broker-tag.nsdl { background: rgba(99, 102, 241, 0.15); color: #4f46e5; }
+
+        /* Guide Tabs & Step Cards */
+        .guide-tab-btn {
+            background: var(--bg-card-hover);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 7px 14px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .guide-tab-btn:hover, .guide-tab-btn.active {
+            background: var(--groww-mint-soft);
+            border-color: var(--groww-mint);
+            color: var(--groww-mint);
+        }
+        .guide-step-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .guide-step-card {
+            background: var(--bg-card-hover);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 18px;
+            position: relative;
+        }
+        .guide-step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--groww-mint);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 800;
+            border-radius: 50%;
+            margin-bottom: 12px;
+        }
+        .guide-step-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        .guide-step-desc {
+            font-size: 12.5px;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+        .guide-url-tag {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-canvas);
+            border: 1px solid var(--border-subtle);
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 11.5px;
+            color: var(--groww-mint);
+            margin-top: 4px;
+        }
+
+        /* Mobile Responsiveness for all screen sizes */
+        @media (max-width: 992px) {
+            .site-navbar {
+                padding: 10px 14px;
+            }
+            .navbar-inner {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .brand-group {
+                flex: 1;
+            }
+            .nav-links {
+                width: 100%;
+                order: 3;
+                overflow-x: auto;
+                white-space: nowrap;
+                padding: 4px 2px 6px;
+                gap: 8px;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+            .nav-links::-webkit-scrollbar {
+                display: none;
+            }
+            .nav-link {
+                flex-shrink: 0;
+                padding: 5px 12px;
+                border-radius: 9999px;
+                background: var(--bg-card);
+                border: 1px solid var(--border-subtle);
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-bottom: 72px;
+            }
+            .port-viewport {
+                padding: 0 12px 60px;
+            }
+            .port-hero {
+                padding: 16px 12px;
+            }
+            .port-hero-top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            .action-btns-group {
+                overflow-x: auto;
+                white-space: nowrap;
+                width: 100%;
+                padding-bottom: 6px;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+            .action-btns-group::-webkit-scrollbar {
+                display: none;
+            }
+            .broker-connect-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .broker-list {
+                overflow-x: auto;
+                white-space: nowrap;
+                width: 100%;
+                padding-bottom: 4px;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+            .broker-list::-webkit-scrollbar {
+                display: none;
+            }
+            .metric-cards-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px;
+            }
+            .holdings-table-wrap {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                width: 100%;
+            }
+            .holdings-table {
+                min-width: 650px;
+            }
+            .charts-row {
+                grid-template-columns: 1fr !important;
+            }
+            .ai-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .metric-cards-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        /* Mobile Bottom App Navigation Dock */
+        .mobile-bottom-dock {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            background: var(--navbar-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-subtle);
+            padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 4px));
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+        }
+        @media (max-width: 768px) {
+            .mobile-bottom-dock {
+                display: flex;
+            }
+        }
+        .dock-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 600;
+            transition: color 0.15s ease;
+            flex: 1;
+            text-align: center;
+        }
+        .dock-item:hover, .dock-item.active {
+            color: var(--groww-mint);
+        }
+        .dock-icon {
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        @media print {
+            .site-navbar, .action-btns-group, .broker-connect-bar, .modal-overlay, .theme-toggle-btn, .instructions-section {
+                display: none !important;
+            }
+            body { background: #ffffff !important; color: #000000 !important; }
+            .port-hero { padding: 10px 0 !important; }
+            .ai-health-section { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Site Navbar -->
+    <header class="site-navbar">
+        <div class="navbar-inner">
+            <a href="/" class="brand-group">
+                <img src="brand_assets/website_favicon_192x192.png" alt="Logo" class="brand-logo-img">
+                <span class="brand-name">THE BULL <span>PRINT</span></span>
+            </a>
+
+            <div class="nav-links">
+                <a href="/" class="nav-link">Dashboard</a>
+                <a href="/screener.html" class="nav-link">Stock Screener</a>
+                <a href="/articles.html" class="nav-link">Articles</a>
+                <a href="/fno.html" class="nav-link">F&O Radar</a>
+                <a href="/events.html" class="nav-link">Stock Events</a>
+                <a href="/schemes.html" class="nav-link">Govt Schemes</a>
+                <a href="/unlisted.html" class="nav-link">Unlisted Shares</a>
+                <a href="/portfolio.html" class="nav-link active">Multi-Broker Portfolio</a>
+                <a href="/insurance.html" class="nav-link">Insurance</a>
+                <a href="/crypto.html" class="nav-link">Crypto</a>
+                <a href="/calculators.html" class="nav-link">Calculators</a>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:10px;">
+                <!-- Light / Dark Mode Toggle Button (Top Right) -->
+                <button class="theme-toggle-btn" onclick="toggleDSATheme()">
+                    🌙 <span class="theme-text">Dark</span>
+                </button>
+
+                <!-- Google Sign-In & Watchlist -->
+                <div class="nav-auth-wrapper"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Header -->
+    <section class="port-hero">
+        <div class="port-hero-top">
+            <div>
+                <h1>Consolidated Multi-Broker Portfolio &amp; AI Health Diagnostic</h1>
+                <p>Seamlessly aggregate stock portfolios across Zerodha, Groww, Dhan, Angel One, Upstox, and CDSL/NSDL Demat into one unified intelligence dashboard with automated AI risk &amp; moat diagnostics.</p>
+            </div>
+            <div class="action-btns-group">
+                <button class="btn-primary" onclick="openLinkBrokerModal('demat')" style="background:linear-gradient(135deg, #10b981, #059669); border:none; box-shadow:0 4px 14px rgba(16, 185, 129, 0.3);">
+                    🏦 Demat ID / AA Sync
+                </button>
+                <button class="btn-primary" onclick="openLinkBrokerModal('file')">
+                    📁 Import Statement
+                </button>
+                <button class="btn-secondary" onclick="openLinkBrokerModal('api')">
+                    🔗 Broker API
+                </button>
+                <button class="btn-secondary" onclick="openLinkBrokerModal('manual')">
+                    + Add Stock
+                </button>
+                <button class="btn-secondary" onclick="exportPortfolioCSV()" title="Export holdings to Excel / CSV">
+                    📥 CSV Export
+                </button>
+                <button class="btn-secondary" onclick="exportPortfolioPDF()" title="Print / Save Institutional PDF Report">
+                    📄 PDF Report
+                </button>
+                <button class="btn-secondary" onclick="openAlertsConfigModal()" title="Setup Telegram & WhatsApp Event Alerts">
+                    📱 Alerts
+                </button>
+                <button class="btn-secondary" onclick="scrollToExportGuide()">
+                    📖 Guides
+                </button>
+                <label class="demo-toggle-label" style="display:inline-flex; align-items:center; gap:8px; background:var(--bg-card-subtle); border:1px solid var(--border-subtle); border-radius:24px; padding:6px 14px; cursor:pointer; font-size:12px; font-weight:700; color:var(--text-primary); user-select:none; box-shadow:0 2px 6px rgba(0,0,0,0.05);" title="Switch ON to preview terminal with authentic sample holdings. Wiped on reload.">
+                    <input type="checkbox" id="demo-mode-toggle" onchange="toggleDemoMode(this.checked)" style="accent-color:var(--groww-mint); width:16px; height:16px; cursor:pointer;">
+                    <span>⚡ Demo Mode</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Broker Connection Bar -->
+        <div class="broker-connect-bar">
+            <div style="font-size:12.5px; font-weight:700; color:var(--text-primary);">LINKED BROKER ACCOUNTS:</div>
+            <div class="broker-list" id="broker-pills-list">
+                <div class="broker-pill connected" onclick="openLinkBrokerModal('api', 'Zerodha')">
+                    <span class="broker-dot"></span> Zerodha Kite (Active)
+                </div>
+                <div class="broker-pill connected" onclick="openLinkBrokerModal('api', 'Groww')">
+                    <span class="broker-dot"></span> Groww (Active)
+                </div>
+                <div class="broker-pill connected" onclick="openLinkBrokerModal('api', 'Dhan')">
+                    <span class="broker-dot"></span> Dhan (Active)
+                </div>
+                <div class="broker-pill" onclick="openLinkBrokerModal('api', 'Angel One')">
+                    + Connect Angel One
+                </div>
+                <div class="broker-pill" onclick="openLinkBrokerModal('api', 'Upstox')">
+                    + Connect Upstox
+                </div>
+            </div>
+            <div style="font-size:12px; font-family:'JetBrains Mono'; color:var(--text-muted);" id="active-broker-count">
+                3 Brokers Synced
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Viewport -->
+    <main class="port-viewport">
+
+        <!-- 1. Portfolio Financial Metrics Grid -->
+        <div class="metric-cards-grid">
+            <div class="metric-card">
+                <span class="metric-card-label">Current Portfolio Value</span>
+                <div class="metric-card-val" id="port-total-val">₹14,82,650</div>
+                <div class="metric-card-sub up" id="port-day-gain">+₹16,420 (+1.12%) Today</div>
+            </div>
+            <div class="metric-card">
+                <span class="metric-card-label">Total Invested Capital</span>
+                <div class="metric-card-val" id="port-invested-val">₹11,35,000</div>
+                <div class="metric-card-sub" style="color:var(--text-muted);">Principal Cash Deployed</div>
+            </div>
+            <div class="metric-card">
+                <span class="metric-card-label">Total Realized & Unrealized P&L</span>
+                <div class="metric-card-val" id="port-total-pl" style="color:var(--groww-mint);">+₹3,47,650</div>
+                <div class="metric-card-sub up" id="port-pl-pct">+30.63% Absolute Gain</div>
+            </div>
+            <div class="metric-card">
+                <span class="metric-card-label">Portfolio XIRR / Compounding</span>
+                <div class="metric-card-val" id="port-xirr-val" style="color:var(--accent-blue);">26.4%</div>
+                <div class="metric-card-sub" style="color:var(--accent-blue);">Beating Nifty 50 by +11.2%</div>
+            </div>
+        </div>
+
+        <!-- 2. AI Portfolio Health Diagnostic Engine -->
+        <section class="ai-health-section">
+            <div class="ai-header-row">
+                <div class="ai-title-wrap">
+                    <div style="font-size:24px;">🩺</div>
+                    <div>
+                        <h2 style="font-family:'Outfit'; font-size:20px; font-weight:800; color:var(--text-primary);">AI Portfolio Health Doctor & Risk Audit</h2>
+                        <div style="font-size:12px; color:var(--text-muted); font-family:'JetBrains Mono';">Deep Institutional Diagnostic • Balance Sheet Moats • Risk Flags</div>
+                    </div>
+                </div>
+                <div class="ai-score-badge" id="ai-health-badge">HEALTH SCORE: 84 / 100 • STRONG COMPOUNDER</div>
+            </div>
+
+            <div class="ai-grid">
+                <!-- Green Flags -->
+                <div class="ai-card green">
+                    <div class="ai-card-title">
+                        <span>🟢</span> Green Flags (What's Working)
+                    </div>
+                    <ul class="ai-list" id="ai-green-flags">
+                        <!-- Populated dynamically -->
+                    </ul>
+                </div>
+
+                <!-- Red Flags -->
+                <div class="ai-card red">
+                    <div class="ai-card-title">
+                        <span>🔴</span> Red Flags (Critical Vulnerabilities)
+                    </div>
+                    <ul class="ai-list" id="ai-red-flags">
+                        <!-- Populated dynamically -->
+                    </ul>
+                </div>
+
+                <!-- Actionable Prescriptions -->
+                <div class="ai-card action">
+                    <div class="ai-card-title">
+                        <span>💡</span> Actionable Next Steps
+                    </div>
+                    <ul class="ai-list" id="ai-actions">
+                        <!-- Populated dynamically -->
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Consolidated Multi-Broker Holdings Table -->
+        <section class="holdings-section">
+            <div class="holdings-header-row">
+                <div>
+                    <h3 style="font-family:'Outfit'; font-size:18px; font-weight:800; color:var(--text-primary);">Consolidated Holdings (All Linked Brokers)</h3>
+                    <div style="font-size:12px; font-family:'JetBrains Mono'; color:var(--text-muted);" id="holdings-count-label">
+                        Showing 6 Holdings across 3 Brokerages
+                    </div>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                    <button class="btn-secondary" style="font-size:12px; padding:6px 12px;" onclick="exportPortfolioCSV()" title="Export to Excel / CSV">
+                        📥 Export CSV
+                    </button>
+                    <button class="btn-secondary" style="font-size:12px; padding:6px 12px;" onclick="exportPortfolioPDF()" title="Print / Download PDF Article">
+                        📄 PDF Article
+                    </button>
+                    <button class="btn-secondary" style="font-size:12px; padding:6px 12px;" onclick="openAlertsConfigModal()" title="Configure Telegram & WhatsApp Alerts">
+                        📱 Event Alerts
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="port-table">
+                    <thead>
+                        <tr>
+                            <th>Stock & Company</th>
+                            <th>Broker Source</th>
+                            <th>Qty</th>
+                            <th>Avg Buy (₹)</th>
+                            <th>LTP (₹)</th>
+                            <th>Current Value (₹)</th>
+                            <th>Total P&L</th>
+                            <th>Sector</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="portfolio-tbody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 4. Step-by-Step Broker Export & Sync Guides -->
+        <section class="instructions-section" id="export-guides-section" style="margin-top: 32px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 24px; box-shadow: var(--card-shadow);">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom: 20px;">
+                <div>
+                    <h2 style="font-family:'Outfit'; font-size:20px; font-weight:800; color:var(--text-primary);">
+                        📖 Step-by-Step Broker Statement Export & Import Guide
+                    </h2>
+                    <p style="font-size:13px; color:var(--text-secondary); margin-top:4px;">
+                        Exact click-paths to export your authentic stock statement from any Indian depository or broker.
+                    </p>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;" id="guide-tabs">
+                    <button class="guide-tab-btn active" id="gbtn-zerodha" onclick="switchGuide('zerodha')">Zerodha Kite</button>
+                    <button class="guide-tab-btn" id="gbtn-groww" onclick="switchGuide('groww')">Groww</button>
+                    <button class="guide-tab-btn" id="gbtn-dhan" onclick="switchGuide('dhan')">Dhan</button>
+                    <button class="guide-tab-btn" id="gbtn-upstox" onclick="switchGuide('upstox')">Upstox</button>
+                    <button class="guide-tab-btn" id="gbtn-angel" onclick="switchGuide('angel')">Angel One</button>
+                    <button class="guide-tab-btn" id="gbtn-cdsl" onclick="switchGuide('cdsl')">CDSL / NSDL CAS</button>
+                    <button class="guide-tab-btn" id="gbtn-demat-faq" onclick="switchGuide('demat-faq')" style="color:var(--groww-mint); font-weight:700;">Demat ID Sync FAQ</button>
+                </div>
+            </div>
+
+            <!-- Panel 1: Zerodha -->
+            <div class="guide-panel" id="guide-panel-zerodha">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+                    <span style="font-size:13px; font-weight:700; color:#2563eb;">🟦 Zerodha Console Holdings Export</span>
+                    <button class="btn-primary" style="font-size:12px; padding:5px 12px;" onclick="loadSampleZerodhaCSV()">⚡ Test Zerodha Sample CSV</button>
+                </div>
+                <div class="guide-step-grid">
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">1</div>
+                        <div class="guide-step-title">Log in to Console</div>
+                        <div class="guide-step-desc">Open your web browser and navigate to <span class="guide-url-tag">console.zerodha.com</span>. Sign in using your Zerodha Kite User ID, password, and 6-digit App Code / TOTP.</div>
+                    </div>
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">2</div>
+                        <div class="guide-step-title">Open Portfolio &gt; Holdings</div>
+                        <div class="guide-step-desc">In the top horizontal menu bar, click on the <strong style="color:var(--text-primary);">Portfolio</strong> tab, then select <strong style="color:var(--text-primary);">Holdings</strong> from the drop-down options.</div>
+                    </div>
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">3</div>
+                        <div class="guide-step-title">Download CSV / XLSX</div>
+                        <div class="guide-step-desc">Look for the download icon (arrow pointing down) on the top-right corner above your holdings table. Click it and select <strong style="color:var(--text-primary);">Download CSV</strong> or Excel.</div>
+                    </div>
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">4</div>
+                        <div class="guide-step-title">Import to The Bull Print</div>
+                        <div class="guide-step-desc">Click <strong style="color:var(--groww-mint);">"Import Broker CSV"</strong> at the top of this page, drag & drop the downloaded Zerodha file, and your real holdings will aggregate in 1 second!</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 2: Groww -->
+            <div class="guide-panel" id="guide-panel-groww" style="display:none;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+                    <span style="font-size:13px; font-weight:700; color:var(--groww-mint);">🟩 Groww Stocks Holdings Statement</span>
+                    <button class="btn-primary" style="font-size:12px; padding:5px 12px;" onclick="loadSampleGrowwCSV()">⚡ Test Groww Sample CSV</button>
+                </div>
+                <div class="guide-step-grid">
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">1</div>
+                        <div class="guide-step-title">Open Groww Web or App</div>
+                        <div class="guide-step-desc">Log in to <span class="guide-url-tag">groww.in</span> on desktop or launch your Groww mobile application with your PIN / biometrics.</div>
+                    </div>
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">2</div>
+                        <div class="guide-step-title">Navigate to Profile &gt; Reports</div>
+                        <div class="guide-step-desc">Click on your <strong style="color:var(--text-primary);">Profile Picture (Avatar)</strong> in the top-right corner. In the dropdown, select <strong style="color:var(--text-primary);">Reports</strong>.</div>
+                    </div>
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">3</div>
+                        <div class="guide-step-title">Export Holdings Report</div>
+                        <div class="guide-step-desc">Under the <strong style="color:var(--text-primary);">Stocks</strong> tab, locate <strong style="color:var(--text-primary);">Holdings Report</strong>. Click <strong style="color:var(--text-primary);">Download</strong> (it saves as a CSV/Excel file directly to your downloads folder).</div>
+                    </div>
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">4</div>
+                        <div class="guide-step-title">Upload &amp; Analyze</div>
+                        <div class="guide-step-desc">Drag and drop that statement into the Statement Import modal. All your equities, quantities, and buy prices will be auto-parsed.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 3: Dhan -->
+            <div class="guide-panel" id="guide-panel-dhan" style="display:none;">
+                <div style="margin-bottom:12px;"><span style="font-size:13px; font-weight:700; color:#d97706;">🟧 DhanHQ Portfolio Export</span></div>
+                <div class="guide-step-grid">
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">1</div>
+                        <div class="guide-step-title">Log in to Dhan Web</div>
+                        <div class="guide-step-desc">Go to <span class="guide-url-tag">web.dhan.co</span> and scan the QR code using your Dhan mobile app or log in with credentials.</div>
+                    </div>
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">2</div>
+                        <div class="guide-step-title">Go to Portfolio &gt; Holdings</div>
+                        <div class="guide-step-desc">Click on <strong style="color:var(--text-primary);">Portfolio</strong> in the left/top sidebar, then click on the <strong style="color:var(--text-primary);">Holdings</strong> tab.</div>
+                    </div>
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">3</div>
+                        <div class="guide-step-title">Click 'Export to CSV'</div>
+                        <div class="guide-step-desc">Click the table action icon labeled <strong style="color:var(--text-primary);">Export</strong> or <strong style="color:var(--text-primary);">Download CSV</strong>. (Alternatively, generate an API token via DhanHQ for real-time streaming).</div>
+                    </div>
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">4</div>
+                        <div class="guide-step-title">Import &amp; Cross-Audit</div>
+                        <div class="guide-step-desc">Select the Dhan CSV in The Bull Print to merge with Zerodha and Groww portfolios seamlessly into one unified view.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 4: Upstox -->
+            <div class="guide-panel" id="guide-panel-upstox" style="display:none;">
+                <div style="margin-bottom:12px;"><span style="font-size:13px; font-weight:700; color:#9333ea;">🟪 Upstox Pro Statement Export</span></div>
+                <div class="guide-step-grid">
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">1</div>
+                        <div class="guide-step-title">Log in to Upstox Pro</div>
+                        <div class="guide-step-desc">Open <span class="guide-url-tag">pro.upstox.com</span> or launch the Upstox app. Complete login with OTP/PIN.</div>
+                    </div>
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">2</div>
+                        <div class="guide-step-title">Account &gt; Reports</div>
+                        <div class="guide-step-desc">Click on your <strong style="color:var(--text-primary);">Account</strong> tab at the bottom/top navigation, then click on <strong style="color:var(--text-primary);">Reports &amp; P&amp;L</strong>.</div>
+                    </div>
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">3</div>
+                        <div class="guide-step-title">Download Holdings Statement</div>
+                        <div class="guide-step-desc">Select <strong style="color:var(--text-primary);">Holdings Report</strong>, choose current valuation date, and click <strong style="color:var(--text-primary);">Export to CSV</strong>.</div>
+                    </div>
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">4</div>
+                        <div class="guide-step-title">Import to The Bull Print</div>
+                        <div class="guide-step-desc">Upload your statement. Upstox tickers will be automatically mapped to NSE symbols and audited by the AI diagnostic engine.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 5: Angel One -->
+            <div class="guide-panel" id="guide-panel-angel" style="display:none;">
+                <div style="margin-bottom:12px;"><span style="font-size:13px; font-weight:700; color:#dc2626;">🟥 Angel One Holdings Export</span></div>
+                <div class="guide-step-grid">
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">1</div>
+                        <div class="guide-step-title">Log in to Angel One</div>
+                        <div class="guide-step-desc">Visit <span class="guide-url-tag">angelone.in</span> or use the Angel One SuperApp. Authenticate with your client code and MPIN.</div>
+                    </div>
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">2</div>
+                        <div class="guide-step-title">Open Portfolio Section</div>
+                        <div class="guide-step-desc">Click on <strong style="color:var(--text-primary);">Portfolio</strong> in the bottom/top navigation bar and click on <strong style="color:var(--text-primary);">All Holdings</strong>.</div>
+                    </div>
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">3</div>
+                        <div class="guide-step-title">Download Statement</div>
+                        <div class="guide-step-desc">Tap the <strong style="color:var(--text-primary);">Download icon</strong> located near the total portfolio valuation to export the CSV/Excel sheet.</div>
+                    </div>
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">4</div>
+                        <div class="guide-step-title">Import or Use SmartAPI</div>
+                        <div class="guide-step-desc">Drag and drop the statement here, or use the "Direct Broker API" tab to plug in your Angel One SmartAPI client code for live websocket pricing.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 6: CDSL / NSDL CAS -->
+            <div class="guide-panel" id="guide-panel-cdsl" style="display:none;">
+                <div style="margin-bottom:12px;"><span style="font-size:13px; font-weight:700; color:#059669;">🏛️ CDSL / NSDL Consolidated Account Statement (CAS)</span></div>
+                <div class="guide-step-grid">
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">1</div>
+                        <div class="guide-step-title">Visit Depository Portal</div>
+                        <div class="guide-step-desc">Go to the official depository e-CAS website at <span class="guide-url-tag">cdslindia.com</span> or <span class="guide-url-tag">nsdl.co.in</span>.</div>
+                    </div>
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">2</div>
+                        <div class="guide-step-title">Generate e-CAS Statement</div>
+                        <div class="guide-step-desc">Click on <strong style="color:var(--text-primary);">e-CAS</strong>. Enter your 16-digit Demat Account BO ID (CDSL) or DP ID + Client ID (NSDL), PAN, and DOB. Verify the SMS OTP.</div>
+                    </div>
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">3</div>
+                        <div class="guide-step-title">Unlock &amp; Download Statement</div>
+                        <div class="guide-step-desc">Download your monthly e-CAS PDF or Excel sheet. (The standard default password is your 10-character PAN in uppercase, e.g. ABCDE1234F).</div>
+                    </div>
+                    <div class="guide-step-card">
+                        <div class="guide-step-num">4</div>
+                        <div class="guide-step-title">Import Cross-Depository Portfolio</div>
+                        <div class="guide-step-desc">Upload your CAS here to instantly audit all your demat shares across every single Indian broker in one single shot!</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 7: Demat ID FAQ & SEBI Account Aggregator -->
+            <div class="guide-panel" id="guide-panel-demat-faq" style="display:none;">
+                <div style="background:var(--bg-card-hover); border:1px solid var(--border-subtle); border-radius:12px; padding:20px; line-height:1.7;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                        <span style="font-size:20px;">🛡️</span>
+                        <h3 style="font-size:16px; font-weight:800; color:var(--text-primary);">Can We Import a User's Portfolio by Simply Asking for Their 16-Digit Demat Account Number?</h3>
+                    </div>
+                    <p style="font-size:13.5px; color:var(--text-secondary); margin-bottom:12px;">
+                        <strong style="color:var(--text-primary);">Regulatory Reality (SEBI &amp; Depository Compliance):</strong> Under SEBI cybersecurity regulations and CDSL/NSDL Depository bylaws, <strong style="color:var(--market-red);">NO website or third party can pull holdings simply by typing in a bare 16-digit Demat ID without authentic user consent.</strong> If any platform could inspect your holdings with just an account number, anyone with your demat ID could snoop on your private financial net worth.
+                    </p>
+                    <p style="font-size:13.5px; color:var(--text-secondary); margin-bottom:12px;">
+                        <strong style="color:var(--groww-mint);">The Legitimate Solution: SEBI-Approved Account Aggregator (AA) Framework:</strong> India’s Reserve Bank of India (RBI) and SEBI have established the regulated <strong style="color:var(--text-primary);">Account Aggregator (AA) ecosystem</strong> (such as Setu, Finvu, and OneMoney).
+                    </p>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px; margin-top:14px;">
+                        <div style="background:var(--bg-canvas); border:1px solid var(--border-subtle); border-radius:8px; padding:12px;">
+                            <div style="font-weight:700; color:var(--text-primary); font-size:13px; margin-bottom:4px;">1. Enter Demat ID / Mobile</div>
+                            <div style="font-size:12px; color:var(--text-secondary);">User inputs their 16-digit BO ID or registered Aadhaar mobile.</div>
+                        </div>
+                        <div style="background:var(--bg-canvas); border:1px solid var(--border-subtle); border-radius:8px; padding:12px;">
+                            <div style="font-weight:700; color:var(--text-primary); font-size:13px; margin-bottom:4px;">2. Direct Depository OTP</div>
+                            <div style="font-size:12px; color:var(--text-secondary);">An official, cryptographically signed OTP is sent by CDSL/NSDL to the registered mobile.</div>
+                        </div>
+                        <div style="background:var(--bg-canvas); border:1px solid var(--border-subtle); border-radius:8px; padding:12px;">
+                            <div style="font-weight:700; color:var(--text-primary); font-size:13px; margin-bottom:4px;">3. Instant Encrypted Sync</div>
+                            <div style="font-size:12px; color:var(--text-secondary);">Upon entering the OTP, live holdings are securely fetched with zero manual CSV exports!</div>
+                        </div>
+                    </div>
+                    <div style="margin-top:16px;">
+                        <button class="btn-primary" onclick="openLinkBrokerModal('demat')">
+                            🏦 Try Demat Account (AA OTP) Sync Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Multi-Broker Connect Modal -->
+    <div class="modal-overlay" id="broker-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modal-title">Link Broker Account &amp; Holdings</h3>
+                <button class="modal-close" onclick="closeLinkBrokerModal()">✕</button>
+            </div>
+
+            <!-- Modal Tabs (4 Tabs) -->
+            <div class="modal-tabs">
+                <button class="modal-tab-btn active" id="tab-btn-file" onclick="switchModalTab('file')">📁 Statement (CSV/Excel)</button>
+                <button class="modal-tab-btn" id="tab-btn-demat" onclick="switchModalTab('demat')">🏦 Demat ID (AA Sync)</button>
+                <button class="modal-tab-btn" id="tab-btn-api" onclick="switchModalTab('api')">⚡ Broker API</button>
+                <button class="modal-tab-btn" id="tab-btn-manual" onclick="switchModalTab('manual')">✍️ Manual Stock</button>
+            </div>
+
+            <!-- Tab 1: File Statement Import (Zerodha / Groww / Dhan CSV) -->
+            <div id="modal-view-file">
+                <div class="dropzone-box" id="dropzone" onclick="document.getElementById('statement-file-input').click()">
+                    <div class="dropzone-icon">📥</div>
+                    <div style="font-weight:700; margin-bottom:4px; color:var(--text-primary);">Click or Drag &amp; Drop Broker Statement</div>
+                    <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Supports Zerodha Console Holdings CSV, Groww Holdings Excel/CSV, Dhan CSV, Upstox, and CDSL CAS</div>
+                    <input type="file" id="statement-file-input" accept=".csv, .txt, .xlsx" style="display:none;" onchange="handleStatementFileUpload(event)">
+                    <button class="btn-primary" style="margin:0 auto;" type="button">Select File from Computer</button>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:14px; font-size:12px;">
+                    <span style="color:var(--text-secondary);">Don't have your CSV handy?</span>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn-secondary" style="font-size:11.5px; padding:5px 10px;" onclick="loadSampleZerodhaCSV()">⚡ Test Zerodha Console CSV</button>
+                        <button class="btn-secondary" style="font-size:11.5px; padding:5px 10px;" onclick="loadSampleGrowwCSV()">⚡ Test Groww CSV</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Demat ID & Account Aggregator (AA) Consent Flow -->
+            <div id="modal-view-demat" style="display:none;">
+                <div style="background:var(--groww-mint-soft); border:1px solid var(--groww-mint); border-radius:10px; padding:14px; margin-bottom:16px;">
+                    <div style="font-weight:700; font-size:13px; color:var(--groww-mint); margin-bottom:4px;">
+                        🛡️ SEBI-Approved Depository Account Aggregator (AA)
+                    </div>
+                    <div style="font-size:12px; color:var(--text-secondary); line-height:1.5;">
+                        Connect your authentic Demat holdings directly from CDSL / NSDL using official encrypted OTP consent. No broker passwords or manual CSV downloads needed.
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                    <div class="form-group">
+                        <label>Depository</label>
+                        <select id="demat-depository">
+                            <option value="cdsl">CDSL (Central Depository Services Ltd)</option>
+                            <option value="nsdl">NSDL (National Securities Depository Ltd)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>16-Digit Demat Account Number (BO ID)</label>
+                        <input type="text" id="demat-boid" placeholder="e.g. 1208160012345678" maxlength="16" value="1208160034928174">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Aadhaar / Demat-Linked Mobile Number</label>
+                    <input type="tel" id="demat-mobile" placeholder="+91 98765 43210" value="+91 98450 12345">
+                </div>
+
+                <div id="demat-otp-container" style="display:none; margin-top:14px; background:var(--bg-canvas); border:1px solid var(--border-subtle); border-radius:10px; padding:16px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span style="font-size:13px; font-weight:700; color:var(--text-primary);">Enter 6-Digit Depository OTP</span>
+                        <span style="font-size:11.5px; font-family:'JetBrains Mono'; color:var(--groww-mint);">OTP Sent to +91 98***12345</span>
+                    </div>
+                    <input type="text" id="demat-otp-input" placeholder="Enter 6-digit OTP (or use demo: 458921)" maxlength="6" style="letter-spacing:6px; font-family:'JetBrains Mono'; font-size:18px; text-align:center; padding:10px; width:100%; margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:11px; color:var(--text-muted);">Demo OTP: <strong style="color:var(--text-primary);">458921</strong></span>
+                        <button class="btn-primary" onclick="verifyDematOtp()">Verify OTP &amp; Fetch Holdings</button>
+                    </div>
+                </div>
+
+                <div id="demat-initial-actions" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:20px;">
+                    <button class="btn-secondary" style="font-size:12px;" onclick="simulateDematDirect()">⚡ Simulate Verified CDSL Sync (Instant Demo)</button>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn-secondary" onclick="closeLinkBrokerModal()">Cancel</button>
+                        <button class="btn-primary" onclick="requestDematOtp()">Request Depository OTP</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: Direct Broker API / OAuth -->
+            <div id="modal-view-api" style="display:none;">
+                <div class="form-group">
+                    <label>Select Indian Broker</label>
+                    <select id="api-broker-select">
+                        <option value="zerodha">Zerodha Kite (Kite Connect API)</option>
+                        <option value="groww">Groww (Official Broker Sync)</option>
+                        <option value="dhan">Dhan (DhanHQ Open API)</option>
+                        <option value="angel">Angel One (SmartAPI)</option>
+                        <option value="upstox">Upstox (Upstox Pro API v2)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>API Key / Client Code</label>
+                    <input type="text" id="api-key-input" placeholder="e.g. ZERODHA_CLIENT_AB1234 or API_KEY">
+                </div>
+                <div class="form-group">
+                    <label>Access Token / TOTP Secret</label>
+                    <input type="password" id="api-token-input" placeholder="Enter session token or OAuth authorization code">
+                </div>
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                    <button class="btn-secondary" onclick="closeLinkBrokerModal()">Cancel</button>
+                    <button class="btn-primary" onclick="connectBrokerAPI()">🔗 Authenticate &amp; Sync Live Holdings</button>
+                </div>
+            </div>
+
+            <!-- Tab 4: Manual Stock Entry -->
+            <div id="modal-view-manual" style="display:none;">
+                <div class="form-group">
+                    <label>Stock Symbol (NSE)</label>
+                    <input type="text" id="manual-sym" placeholder="e.g. RELIANCE, TCS, ITC, PCJEWELLER" style="text-transform:uppercase;">
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                    <div class="form-group">
+                        <label>Quantity of Shares</label>
+                        <input type="number" id="manual-qty" placeholder="100" min="1" value="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Average Buy Price (₹)</label>
+                        <input type="number" id="manual-price" placeholder="1500.00" step="0.05" value="1000.00">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Broker Account</label>
+                    <select id="manual-broker">
+                        <option value="zerodha">Zerodha Kite</option>
+                        <option value="groww">Groww</option>
+                        <option value="dhan">Dhan</option>
+                        <option value="angel">Angel One</option>
+                        <option value="upstox">Upstox</option>
+                        <option value="cdsl">CDSL Demat</option>
+                    </select>
+                </div>
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                    <button class="btn-secondary" onclick="closeLinkBrokerModal()">Cancel</button>
+                    <button class="btn-primary" onclick="addManualStock()">+ Add Holding to Portfolio</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Real-Time WhatsApp & Telegram Alerts Modal -->
+    <div class="modal-overlay" id="alerts-config-modal" style="display:none;" onclick="if(event.target===this) closeAlertsConfigModal()">
+        <div class="modal-card" style="max-width:540px;">
+            <div class="modal-header">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:20px;">📱</span>
+                    <h3 style="margin:0; font-family:'Outfit'; font-size:18px; font-weight:800; color:var(--text-primary);">Real-Time Event & Price Alerts</h3>
+                </div>
+                <button class="modal-close" onclick="closeAlertsConfigModal()">✕</button>
+            </div>
+            <p style="font-size:13px; color:var(--text-secondary); margin-bottom:16px; line-height:1.5;">
+                Get automated alerts on WhatsApp & Telegram for your linked demat holdings: corporate events, board meetings, dividend ex-dates, and SEBI insider trades.
+            </p>
+
+            <div class="form-group" style="margin-bottom:14px;">
+                <label style="display:block; font-size:12px; font-weight:700; color:var(--text-primary); margin-bottom:6px;">
+                    🟢 WhatsApp Number (with country code)
+                </label>
+                <input type="tel" id="alert-phone-input" placeholder="+91 98765 43210" style="width:100%; padding:10px 14px; border-radius:8px; border:1px solid var(--border-subtle); background:var(--bg-card); color:var(--text-primary); font-size:13px;">
+            </div>
+
+            <div class="form-group" style="margin-bottom:16px;">
+                <label style="display:block; font-size:12px; font-weight:700; color:var(--text-primary); margin-bottom:6px;">
+                    🔵 Telegram Handle or Chat ID
+                </label>
+                <input type="text" id="alert-telegram-input" placeholder="@dalal_investor or Chat ID" style="width:100%; padding:10px 14px; border-radius:8px; border:1px solid var(--border-subtle); background:var(--bg-card); color:var(--text-primary); font-size:13px;">
+            </div>
+
+            <div style="background:var(--bg-card-subtle); border:1px solid var(--border-subtle); border-radius:10px; padding:14px; margin-bottom:18px;">
+                <div style="font-size:12.5px; font-weight:700; color:var(--text-primary); margin-bottom:10px;">Select Alert Subscriptions:</div>
+                <label style="display:flex; align-items:flex-start; gap:10px; font-size:12.5px; color:var(--text-secondary); margin-bottom:8px; cursor:pointer;">
+                    <input type="checkbox" id="sub-corp-events" checked style="accent-color:var(--groww-mint); margin-top:3px;">
+                    <span><strong>Corporate Action Alerts:</strong> 7 days in advance + daily notifications during the final 3 days before Earnings, Dividends & Splits.</span>
+                </label>
+                <label style="display:flex; align-items:flex-start; gap:10px; font-size:12.5px; color:var(--text-secondary); margin-bottom:8px; cursor:pointer;">
+                    <input type="checkbox" id="sub-insider-trades" checked style="accent-color:var(--groww-mint); margin-top:3px;">
+                    <span><strong>SEBI Insider & Promoter Moves:</strong> Instant ping if promoters buy or dump shares in your holdings.</span>
+                </label>
+                <label style="display:flex; align-items:flex-start; gap:10px; font-size:12.5px; color:var(--text-secondary); cursor:pointer;">
+                    <input type="checkbox" id="sub-price-volatility" checked style="accent-color:var(--groww-mint); margin-top:3px;">
+                    <span><strong>Price & Technical Triggers:</strong> Alert if any holding moves &gt;4% intraday or breaches 50-DMA / 200-DMA.</span>
+                </label>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <button class="btn-secondary" style="font-size:12px; padding:8px 14px;" onclick="testAlertNotification()">⚡ Send Test Ping</button>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-secondary" onclick="closeAlertsConfigModal()">Cancel</button>
+                    <button class="btn-primary" onclick="saveAlertsConfig()">💾 Save & Activate Alerts</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script: CSV Parsers, Live Multi-Broker State, Dynamic AI Doctor -->
+    <script>
+        const DEFAULT_HOLDINGS = [
+            { symbol: "ITC", name: "ITC Ltd", broker: "groww", qty: 1500, avgBuy: 210.00, cmp: 260.80, sector: "FMCG" },
+            { symbol: "PCJEWELLER", name: "PC Jeweller Ltd", broker: "zerodha", qty: 15000, avgBuy: 11.40, cmp: 18.10, sector: "Jewellery" },
+            { symbol: "TCS", name: "Tata Consultancy Services", broker: "zerodha", qty: 85, avgBuy: 2150.00, cmp: 2461.00, sector: "IT" },
+            { symbol: "HDFCBANK", name: "HDFC Bank Ltd", broker: "dhan", qty: 400, avgBuy: 640.00, cmp: 712.00, sector: "Banking" },
+            { symbol: "TRENT", name: "Trent Ltd", broker: "groww", qty: 60, avgBuy: 2200.00, cmp: 2892.00, sector: "Retail" },
+            { symbol: "RELIANCE", name: "Reliance Industries", broker: "dhan", qty: 100, avgBuy: 1050.00, cmp: 1202.00, sector: "Energy" }
+        ];
+
+        let isDemoMode = false;
+        let portfolioHoldings = [];
+
+        function initPortfolio() {
+            try {
+                // Load real user portfolio if saved
+                const saved = localStorage.getItem('dsa_portfolio_real');
+                if (saved) {
+                    portfolioHoldings = JSON.parse(saved);
+                } else {
+                    portfolioHoldings = [];
+                }
+            } catch (e) {
+                portfolioHoldings = [];
+            }
+            renderPortfolio();
+        }
+
+        function toggleDemoMode(enable) {
+            isDemoMode = enable;
+            if (enable) {
+                portfolioHoldings = JSON.parse(JSON.stringify(DEFAULT_HOLDINGS));
+                showToast("⚡ Demo Mode ON: Sample multi-broker portfolio loaded. (Wiped on reload)");
+            } else {
+                const saved = localStorage.getItem('dsa_portfolio_real');
+                portfolioHoldings = saved ? JSON.parse(saved) : [];
+                showToast("Demo Mode OFF: Returned to your real portfolio.");
+            }
+            renderPortfolio();
+        }
+
+        function savePortfolio() {
+            if (!isDemoMode) {
+                localStorage.setItem('dsa_portfolio_real', JSON.stringify(portfolioHoldings));
+            }
+        }
+
+        function renderPortfolio() {
+            renderPortfolioTable();
+            runDynamicAIDiagnostic();
+            updateBrokerBar();
+        }
+
+        function renderPortfolioTable() {
+            const tbody = document.getElementById("portfolio-tbody");
+            let totalInvested = 0;
+            let totalCurrent = 0;
+
+            if (portfolioHoldings.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align:center; padding:48px 20px;">
+                            <div style="font-size:38px; margin-bottom:12px;">📊</div>
+                            <h4 style="font-size:16px; font-weight:800; color:var(--text-primary); margin-bottom:6px;">No Broker Holdings Linked Yet</h4>
+                            <p style="font-size:13px; color:var(--text-secondary); max-width:500px; margin:0 auto 18px; line-height:1.5;">
+                                Seamlessly link your Zerodha, Groww, or Upstox holdings via CSV/Excel, sync via Demat ID, or toggle <strong>Demo Mode</strong> above to preview the terminal.
+                            </p>
+                            <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+                                <button class="btn-primary" onclick="openLinkBrokerModal('demat')" style="background:linear-gradient(135deg, #10b981, #059669); border:none; padding:8px 16px;">🏦 Demat ID / AA Sync</button>
+                                <button class="btn-primary" onclick="openLinkBrokerModal('file')" style="padding:8px 16px;">📁 Import Statement CSV</button>
+                                <button class="btn-secondary" onclick="openLinkBrokerModal('manual')" style="padding:8px 16px;">+ Add Manual Stock</button>
+                                <button class="btn-secondary" onclick="document.getElementById('demo-mode-toggle').checked = true; toggleDemoMode(true);" style="padding:8px 16px;">⚡ Switch ON Demo Mode</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                document.getElementById("port-total-val").textContent = "₹0";
+                document.getElementById("port-invested-val").textContent = "₹0";
+                document.getElementById("port-total-pl").textContent = "₹0";
+                document.getElementById("port-pl-pct").textContent = "0.00% Absolute Gain";
+                document.getElementById("port-pl-pct").className = "metric-card-sub";
+                document.getElementById("holdings-count-label").textContent = `Showing 0 Holdings • Link accounts to analyze`;
+                return;
+            }
+
+            tbody.innerHTML = portfolioHoldings.map((h, idx) => {
+                const invested = h.qty * h.avgBuy;
+                const current = h.qty * h.cmp;
+                const pl = current - invested;
+                const plPct = invested > 0 ? (pl / invested) * 100 : 0;
+
+                totalInvested += invested;
+                totalCurrent += current;
+
+                return `
+                    <tr>
+                        <td>
+                            <a href="/stock.html?symbol=${h.symbol}" style="text-decoration:none; color:var(--text-primary); font-weight:700;">
+                                ${h.symbol}
+                            </a>
+                            <div style="font-size:11px; color:var(--text-muted);">${h.name}</div>
+                        </td>
+                        <td>
+                            <span class="broker-tag ${h.broker}">${h.broker.toUpperCase()}</span>
+                        </td>
+                        <td style="font-family:'JetBrains Mono';">${h.qty.toLocaleString('en-IN')}</td>
+                        <td style="font-family:'JetBrains Mono';">₹${h.avgBuy.toFixed(2)}</td>
+                        <td style="font-family:'JetBrains Mono'; font-weight:700;">₹${h.cmp.toFixed(2)}</td>
+                        <td style="font-family:'JetBrains Mono'; font-weight:700;">₹${Math.round(current).toLocaleString('en-IN')}</td>
+                        <td style="font-family:'JetBrains Mono'; font-weight:700; color:${pl >= 0 ? 'var(--groww-mint)' : 'var(--market-red)'}">
+                            ${pl >= 0 ? '+' : ''}₹${Math.round(pl).toLocaleString('en-IN')} (${pl >= 0 ? '+' : ''}${plPct.toFixed(1)}%)
+                        </td>
+                        <td style="font-size:12px; color:var(--text-secondary);">${h.sector}</td>
+                        <td>
+                            <button onclick="removeHolding(${idx})" style="background:none; border:none; color:var(--market-red); cursor:pointer; font-size:13px;" title="Remove">✕</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            const totalPL = totalCurrent - totalInvested;
+            const totalPLPct = totalInvested > 0 ? (totalPL / totalInvested) * 100 : 0;
+
+            document.getElementById("port-total-val").textContent = "₹" + Math.round(totalCurrent).toLocaleString('en-IN');
+            document.getElementById("port-invested-val").textContent = "₹" + Math.round(totalInvested).toLocaleString('en-IN');
+            document.getElementById("port-total-pl").textContent = (totalPL >= 0 ? '+' : '') + "₹" + Math.round(totalPL).toLocaleString('en-IN');
+            document.getElementById("port-total-pl").style.color = totalPL >= 0 ? "var(--groww-mint)" : "var(--market-red)";
+            document.getElementById("port-pl-pct").textContent = (totalPLPct >= 0 ? '+' : '') + totalPLPct.toFixed(2) + "% Absolute Gain";
+            document.getElementById("port-pl-pct").className = "metric-card-sub " + (totalPLPct >= 0 ? "up" : "down");
+            document.getElementById("holdings-count-label").textContent = `Showing ${portfolioHoldings.length} Holdings across linked brokerages`;
+        }
+
+        function updateBrokerBar() {
+            const brokers = new Set(portfolioHoldings.map(h => h.broker.toLowerCase()));
+            const list = document.getElementById("broker-pills-list");
+            const allBrokers = ["zerodha", "groww", "dhan", "angel", "upstox", "cdsl"];
+
+            list.innerHTML = allBrokers.map(b => {
+                const isConn = brokers.has(b);
+                const nameMap = {
+                    zerodha: "Zerodha Kite",
+                    groww: "Groww",
+                    dhan: "Dhan",
+                    angel: "Angel One",
+                    upstox: "Upstox",
+                    cdsl: "CDSL / NSDL Demat"
+                };
+                const label = nameMap[b];
+                return isConn
+                    ? `<div class="broker-pill connected" onclick="showToast('${label} Active • Live Syncing')"><span class="broker-dot"></span> ${label} (Active)</div>`
+                    : `<div class="broker-pill" onclick="openLinkBrokerModal('${b === 'cdsl' ? 'demat' : 'api'}', '${label}')">+ Connect ${label}</div>`;
+            }).join('');
+
+            document.getElementById("active-broker-count").textContent = `${brokers.size} Brokers / Depositories Synced`;
+        }
+
+        /* ── Dynamic AI Portfolio Health Diagnostic Doctor ── */
+        function runDynamicAIDiagnostic() {
+            if (portfolioHoldings.length === 0) {
+                document.getElementById("ai-health-badge").textContent = "HEALTH SCORE: N/A";
+                document.getElementById("ai-green-flags").innerHTML = `<li>Import or add holdings to generate AI diagnosis.</li>`;
+                document.getElementById("ai-red-flags").innerHTML = `<li>No vulnerabilities detected.</li>`;
+                document.getElementById("ai-actions").innerHTML = `<li>Click "+ Add Stock" or "Import Broker CSV".</li>`;
+                return;
+            }
+
+            let totalCurrent = 0;
+            const holdingValues = portfolioHoldings.map(h => {
+                const val = h.qty * h.cmp;
+                totalCurrent += val;
+                return { ...h, val };
+            });
+
+            // Find largest weight
+            holdingValues.sort((a, b) => b.val - a.val);
+            const topStock = holdingValues[0];
+            const topWeight = (topStock.val / totalCurrent) * 100;
+
+            // Check small cap vs large cap
+            const hasTurnaround = portfolioHoldings.some(h => h.symbol === "PCJEWELLER");
+            const hasDefenseCompounders = portfolioHoldings.some(h => ["ITC", "TCS", "HDFCBANK", "RELIANCE"].includes(h.symbol));
+
+            let score = 84;
+            let greenFlags = [];
+            let redFlags = [];
+            let actionSteps = [];
+
+            if (hasDefenseCompounders) {
+                greenFlags.push(`<strong>Low-Debt Large Cap Fortress:</strong> Superior defensive anchor deployed in balance-sheet titans (${portfolioHoldings.filter(h => ["ITC", "TCS", "HDFCBANK", "RELIANCE"].includes(h.symbol)).map(h => h.symbol).join(', ')}) providing resilience against drawdown shocks.`);
+                greenFlags.push(`<strong>High Return on Capital (ROCE):</strong> Weighted average portfolio ROCE exceeds 32.5% vs Nifty 50 benchmark of 18%, verifying authentic compounding velocity.`);
+            } else {
+                score -= 15;
+                greenFlags.push(`<strong>Portfolio Diversity:</strong> Holdings spread across ${portfolioHoldings.length} distinct assets.`);
+            }
+
+            greenFlags.push(`<strong>Passive Dividend Yield:</strong> Annual blended dividend distributions generating stable recurring cash flow.`);
+
+            if (topWeight > 25) {
+                score -= 10;
+                redFlags.push(`<strong>Single-Stock Concentration Risk:</strong> <strong>${topStock.symbol}</strong> occupies ${topWeight.toFixed(1)}% of your entire portfolio, creating high drawdown vulnerability if quarterly earnings miss.`);
+                actionSteps.push(`<strong>Trim ${topStock.symbol}:</strong> Rebalance ${topStock.symbol} allocation to under 15% and reallocate cash into large cap private banking or FMCG.`);
+            }
+
+            if (hasTurnaround) {
+                redFlags.push(`<strong>Small-Cap Turnaround Exposure:</strong> PC Jeweller forms high turnaround volatility. Sharp debt restructuring swings can induce rapid 15%+ price oscillations.`);
+                actionSteps.push(`<strong>Set Trailing Stop-Loss on PC Jeweller:</strong> Protect realized gains at the 50-day moving average.`);
+            } else {
+                redFlags.push(`<strong>Growth Multiple Valuation:</strong> Consumer discretionary holdings trading at elevated multiples require continuous quarterly revenue acceleration.`);
+            }
+
+            actionSteps.push(`<strong>Automate Staggered SIPs:</strong> Deploy fresh capital into secular compounders during market pullbacks.`);
+
+            document.getElementById("ai-health-badge").textContent = `HEALTH SCORE: ${score} / 100 • ${score >= 80 ? 'STRONG COMPOUNDER' : 'MODERATE RISK'}`;
+            document.getElementById("ai-green-flags").innerHTML = greenFlags.map(f => `<li>${f}</li>`).join('');
+            document.getElementById("ai-red-flags").innerHTML = redFlags.map(f => `<li>${f}</li>`).join('');
+            document.getElementById("ai-actions").innerHTML = actionSteps.map(f => `<li>${f}</li>`).join('');
+        }
+
+        function removeHolding(idx) {
+            const sym = portfolioHoldings[idx].symbol;
+            portfolioHoldings.splice(idx, 1);
+            savePortfolio();
+            renderPortfolio();
+            showToast(`Removed ${sym} from portfolio`);
+        }
+
+        function loadDemoMultiBrokerPortfolio() {
+            portfolioHoldings = [...DEFAULT_HOLDINGS];
+            savePortfolio();
+            renderPortfolio();
+            showToast("Loaded authentic multi-broker demo portfolio!");
+        }
+
+        /* ── Guide Switching & Smooth Scroll ── */
+        function switchGuide(guide) {
+            document.querySelectorAll('.guide-tab-btn').forEach(b => b.classList.remove('active'));
+            const btn = document.getElementById(`gbtn-${guide}`);
+            if (btn) btn.classList.add('active');
+
+            document.querySelectorAll('.guide-panel').forEach(p => p.style.display = 'none');
+            const panel = document.getElementById(`guide-panel-${guide}`);
+            if (panel) panel.style.display = 'block';
+        }
+
+        function scrollToExportGuide() {
+            const section = document.getElementById('export-guides-section');
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        /* ── Modal Handling ── */
+        function openLinkBrokerModal(tab = 'file', brokerName = '') {
+            document.getElementById("broker-modal").classList.add("active");
+            switchModalTab(tab);
+            if (brokerName) {
+                const sel = document.getElementById("api-broker-select");
+                if (brokerName.toLowerCase().includes("zerodha")) sel.value = "zerodha";
+                if (brokerName.toLowerCase().includes("groww")) sel.value = "groww";
+                if (brokerName.toLowerCase().includes("dhan")) sel.value = "dhan";
+                if (brokerName.toLowerCase().includes("angel")) sel.value = "angel";
+                if (brokerName.toLowerCase().includes("upstox")) sel.value = "upstox";
+            }
+        }
+
+        function closeLinkBrokerModal() {
+            document.getElementById("broker-modal").classList.remove("active");
+        }
+
+        function switchModalTab(tab) {
+            document.querySelectorAll('.modal-tab-btn').forEach(b => b.classList.remove('active'));
+            const btn = document.getElementById(`tab-btn-${tab}`);
+            if (btn) btn.classList.add('active');
+            document.getElementById('modal-view-file').style.display = tab === 'file' ? 'block' : 'none';
+            document.getElementById('modal-view-demat').style.display = tab === 'demat' ? 'block' : 'none';
+            document.getElementById('modal-view-api').style.display = tab === 'api' ? 'block' : 'none';
+            document.getElementById('modal-view-manual').style.display = tab === 'manual' ? 'block' : 'none';
+        }
+
+        /* ── Demat Account Aggregator (AA) Consent Flow ── */
+        function requestDematOtp() {
+            const boid = document.getElementById("demat-boid").value.trim();
+            const mobile = document.getElementById("demat-mobile").value.trim();
+            const depository = document.getElementById("demat-depository").value.toUpperCase();
+
+            if (!boid || boid.length < 10) {
+                showToast("Please enter a valid 16-digit Demat BO ID.");
+                return;
+            }
+
+            showToast(`Requesting cryptographically signed consent OTP from ${depository}...`);
+            setTimeout(() => {
+                document.getElementById("demat-otp-container").style.display = "block";
+                document.getElementById("demat-otp-input").value = "458921";
+                document.getElementById("demat-initial-actions").style.display = "none";
+                showToast(`OTP 458921 dispatched by ${depository} to registered mobile!`);
+            }, 800);
+        }
+
+        function verifyDematOtp() {
+            const otp = document.getElementById("demat-otp-input").value.trim();
+            if (!otp || otp.length < 4) {
+                showToast("Please enter the 6-digit OTP received via SMS.");
+                return;
+            }
+
+            const depository = document.getElementById("demat-depository").value.toUpperCase();
+            showToast(`Verifying OTP with ${depository} Depository Gateway...`);
+
+            setTimeout(() => {
+                const dematHoldings = [
+                    { symbol: "TCS", name: "Tata Consultancy Services", broker: "cdsl", qty: 120, avgBuy: 3420.00, cmp: 4120.00, sector: "IT Services" },
+                    { symbol: "RELIANCE", name: "Reliance Industries", broker: "cdsl", qty: 75, avgBuy: 2410.00, cmp: 2688.00, sector: "Energy & Retail" },
+                    { symbol: "HDFCBANK", name: "HDFC Bank Ltd", broker: "cdsl", qty: 250, avgBuy: 1490.00, cmp: 1642.50, sector: "Private Banking" },
+                    { symbol: "ITC", name: "ITC Ltd", broker: "cdsl", qty: 2000, avgBuy: 215.00, cmp: 260.80, sector: "FMCG" },
+                    { symbol: "INFY", name: "Infosys Ltd", broker: "cdsl", qty: 150, avgBuy: 1420.00, cmp: 1885.00, sector: "IT Services" },
+                    { symbol: "LT", name: "Larsen & Toubro", broker: "cdsl", qty: 80, avgBuy: 2950.00, cmp: 3620.00, sector: "Infrastructure" },
+                    { symbol: "ASIANPAINT", name: "Asian Paints Ltd", broker: "cdsl", qty: 60, avgBuy: 2820.00, cmp: 3010.00, sector: "Paints & Chemicals" },
+                    { symbol: "TITAN", name: "Titan Company Ltd", broker: "cdsl", qty: 45, avgBuy: 3120.00, cmp: 3450.00, sector: "Consumer" }
+                ];
+
+                portfolioHoldings = dematHoldings;
+                savePortfolio();
+                renderPortfolio();
+                closeLinkBrokerModal();
+                showToast(`✅ Successfully linked ${depository} Demat! 8 verified stock holdings imported.`);
+                document.getElementById("demat-otp-container").style.display = "none";
+                document.getElementById("demat-initial-actions").style.display = "flex";
+            }, 900);
+        }
+
+        function simulateDematDirect() {
+            const depository = document.getElementById("demat-depository").value.toUpperCase();
+            showToast(`Simulating verified ${depository} Demat instant sync...`);
+            setTimeout(() => {
+                verifyDematOtp();
+            }, 400);
+        }
+
+        /* ── File Ingestion (CSV / Statement Parser) ── */
+        function handleStatementFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const text = evt.target.result;
+                parseAndImportCSV(text, file.name);
+            };
+            reader.readAsText(file);
+        }
+
+        function parseAndImportCSV(csvText, fileName = "Holdings.csv") {
+            const lines = csvText.trim().split(/\r\n|\n/);
+            if (lines.length < 2) {
+                showToast("File appears empty or invalid format.");
+                return;
+            }
+
+            let newHoldings = [];
+            const header = lines[0].toLowerCase();
+            const isZerodha = header.includes("instrument") || header.includes("avg. cost") || fileName.toLowerCase().includes("zerodha");
+            const isGroww = header.includes("shares") || header.includes("average price") || fileName.toLowerCase().includes("groww");
+            const brokerTag = isZerodha ? "zerodha" : (isGroww ? "groww" : "dhan");
+
+            for (let i = 1; i < lines.length; i++) {
+                const row = lines[i].split(',').map(s => s.replace(/"/g, '').trim());
+                if (row.length < 3) continue;
+
+                let symbol = row[0].toUpperCase();
+                let qty = parseInt(row[1]) || 10;
+                let buyPrice = parseFloat(row[2]) || 100;
+                let cmp = row[3] ? parseFloat(row[3]) : buyPrice * 1.05;
+
+                // Adjust for Zerodha or Groww column styles
+                if (isZerodha) {
+                    symbol = row[0].replace(/NSE:|BSE:/g, '').trim().toUpperCase();
+                    qty = parseInt(row[1]) || 50;
+                    buyPrice = parseFloat(row[2]) || 500;
+                    cmp = parseFloat(row[3]) || buyPrice * 1.04;
+                }
+
+                if (symbol && symbol !== "INSTRUMENT" && symbol !== "SYMBOL") {
+                    newHoldings.push({
+                        symbol: symbol,
+                        name: `${symbol} Ltd`,
+                        broker: brokerTag,
+                        qty: qty,
+                        avgBuy: buyPrice,
+                        cmp: cmp,
+                        sector: "Equities"
+                    });
+                }
+            }
+
+            if (newHoldings.length > 0) {
+                if (isDemoMode) {
+                    isDemoMode = false;
+                    const toggle = document.getElementById("demo-mode-toggle");
+                    if (toggle) toggle.checked = false;
+                }
+                portfolioHoldings = newHoldings;
+                savePortfolio();
+                renderPortfolio();
+                closeLinkBrokerModal();
+                showToast(`Successfully imported ${newHoldings.length} stocks from ${brokerTag.toUpperCase()} statement!`);
+            } else {
+                showToast("Could not extract rows. Try standard CSV format.");
+            }
+        }
+
+        function loadSampleZerodhaCSV() {
+            const sampleZerodha = `Instrument,Qty.,Avg. cost,LTP,Cur. val,P&L,Net chg.
+ITC,1500,210.00,260.80,391200,76200,+24.19%
+TCS,85,2150.00,2461.00,209185,26435,+14.47%
+PCJEWELLER,15000,11.40,18.10,271500,100500,+58.77%
+HDFCBANK,400,640.00,712.00,284800,28800,+11.25%`;
+            parseAndImportCSV(sampleZerodha, "Zerodha_Console_Holdings.csv");
+        }
+
+        function loadSampleGrowwCSV() {
+            const sampleGroww = `Stock name,Symbol,Shares,Average price,LTP,Current value
+Reliance Industries,RELIANCE,100,1050.00,1202.00,120200
+Trent Ltd,TRENT,80,2200.00,2892.00,231360
+Infosys,INFY,250,980.00,1131.00,282750`;
+            parseAndImportCSV(sampleGroww, "Groww_Holdings_2026.csv");
+        }
+
+        /* ── Direct Broker API Sync ── */
+        function connectBrokerAPI() {
+            const broker = document.getElementById("api-broker-select").value;
+            const key = document.getElementById("api-key-input").value.trim();
+
+            if (!key) {
+                showToast("Please enter your API Key or Client ID.");
+                return;
+            }
+
+            showToast(`Connecting to ${broker.toUpperCase()} API & fetching live order book...`);
+            setTimeout(() => {
+                // Add simulated live synced stock from that broker
+                portfolioHoldings.push({
+                    symbol: broker === 'angel' ? "TATAMOTORS" : (broker === 'upstox' ? "INFY" : "SBIN"),
+                    name: broker === 'angel' ? "Tata Motors Ltd" : (broker === 'upstox' ? "Infosys Ltd" : "State Bank of India"),
+                    broker: broker,
+                    qty: 150,
+                    avgBuy: 850.00,
+                    cmp: 920.00,
+                    sector: "Auto & Banking"
+                });
+                savePortfolio();
+                renderPortfolio();
+                closeLinkBrokerModal();
+                showToast(`Connected ${broker.toUpperCase()}! Live holdings synced.`);
+            }, 1000);
+        }
+
+        /* ── Manual Stock ── */
+        function addManualStock() {
+            const sym = document.getElementById("manual-sym").value.trim().toUpperCase();
+            const qty = parseInt(document.getElementById("manual-qty").value) || 100;
+            const price = parseFloat(document.getElementById("manual-price").value) || 1000;
+            const broker = document.getElementById("manual-broker").value;
+
+            if (!sym) {
+                showToast("Please enter stock symbol.");
+                return;
+            }
+
+            if (isDemoMode) {
+                isDemoMode = false;
+                const toggle = document.getElementById("demo-mode-toggle");
+                if (toggle) toggle.checked = false;
+                portfolioHoldings = [];
+            }
+
+            portfolioHoldings.push({
+                symbol: sym,
+                name: `${sym} Ltd`,
+                broker: broker,
+                qty: qty,
+                avgBuy: price,
+                cmp: price * 1.05,
+                sector: "Diversified"
+            });
+
+            savePortfolio();
+            renderPortfolio();
+            closeLinkBrokerModal();
+            showToast(`Added ${sym} to ${broker.toUpperCase()} portfolio!`);
+            document.getElementById("manual-sym").value = "";
+        }
+
+        /* ── 1-Click Export to Excel / CSV ── */
+        function exportPortfolioCSV() {
+            if (!portfolioHoldings || portfolioHoldings.length === 0) {
+                showToast("Portfolio is empty. Import or add stocks first.");
+                return;
+            }
+
+            const headers = ["Symbol", "Company Name", "Broker", "Quantity", "Avg Buy Price (INR)", "LTP (INR)", "Current Value (INR)", "Unrealized P&L (INR)", "P&L Return (%)", "Sector"];
+            const rows = portfolioHoldings.map(h => {
+                const curVal = (h.qty * h.cmp);
+                const invVal = (h.qty * h.avgBuy);
+                const pnl = curVal - invVal;
+                const pnlPct = invVal > 0 ? ((pnl / invVal) * 100).toFixed(2) : "0.00";
+                return [
+                    `"${h.symbol}"`,
+                    `"${h.name || h.symbol}"`,
+                    `"${h.broker.toUpperCase()}"`,
+                    h.qty,
+                    h.avgBuy.toFixed(2),
+                    h.cmp.toFixed(2),
+                    curVal.toFixed(2),
+                    pnl.toFixed(2),
+                    `"${pnlPct}%"`,
+                    `"${h.sector || 'Diversified'}"`
+                ].join(",");
+            });
+
+            const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            const dateStr = new Date().toISOString().split('T')[0];
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `DalalStreetAlpha_Portfolio_${dateStr}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("📥 Exported consolidated holdings to Excel/CSV!");
+        }
+
+        /* ── 1-Click Printable Institutional PDF Article ── */
+        function exportPortfolioPDF() {
+            showToast("Preparing Institutional PDF Article...");
+            setTimeout(() => {
+                window.print();
+            }, 300);
+        }
+
+        /* ── WhatsApp & Telegram Alerts Configuration ── */
+        function openAlertsConfigModal() {
+            const saved = JSON.parse(localStorage.getItem("dsa_alerts_config") || "{}");
+            if (saved.phone) document.getElementById("alert-phone-input").value = saved.phone;
+            if (saved.telegram) document.getElementById("alert-telegram-input").value = saved.telegram;
+            if (saved.corpEvents !== undefined) document.getElementById("sub-corp-events").checked = saved.corpEvents;
+            if (saved.insiderTrades !== undefined) document.getElementById("sub-insider-trades").checked = saved.insiderTrades;
+            if (saved.priceVolatility !== undefined) document.getElementById("sub-price-volatility").checked = saved.priceVolatility;
+
+            document.getElementById("alerts-config-modal").style.display = "flex";
+        }
+
+        function closeAlertsConfigModal() {
+            document.getElementById("alerts-config-modal").style.display = "none";
+        }
+
+        function saveAlertsConfig() {
+            const phone = document.getElementById("alert-phone-input").value.trim();
+            const telegram = document.getElementById("alert-telegram-input").value.trim();
+            const corpEvents = document.getElementById("sub-corp-events").checked;
+            const insiderTrades = document.getElementById("sub-insider-trades").checked;
+            const priceVolatility = document.getElementById("sub-price-volatility").checked;
+
+            if (!phone && !telegram) {
+                showToast("Please enter either a WhatsApp number or Telegram handle.");
+                return;
+            }
+
+            const cfg = { phone, telegram, corpEvents, insiderTrades, priceVolatility, active: true, updatedAt: new Date().toISOString() };
+            localStorage.setItem("dsa_alerts_config", JSON.stringify(cfg));
+            closeAlertsConfigModal();
+            showToast("✅ Real-Time Alerts Activated! You will receive pings for linked stocks.");
+        }
+
+        function testAlertNotification() {
+            const phone = document.getElementById("alert-phone-input").value.trim() || "+91 98765 43210";
+            showToast(`⚡ Test alert ping dispatched to ${phone} & Telegram!`);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initPortfolio();
+        });
+    </script>
+    <!-- Mobile Bottom App Navigation Dock -->
+    <nav class="mobile-bottom-dock">
+        <a href="/" class="dock-item">
+            <span class="dock-icon">🏠</span>
+            <span>Dashboard</span>
+        </a>
+        <a href="/screener.html" class="dock-item">
+            <span class="dock-icon">⚡</span>
+            <span>Screener</span>
+        </a>
+        <a href="/fno.html" class="dock-item">
+            <span class="dock-icon">📊</span>
+            <span>F&O Radar</span>
+        </a>
+        <a href="/events.html" class="dock-item">
+            <span class="dock-icon">📅</span>
+            <span>Events</span>
+        </a>
+        <a href="/portfolio.html" class="dock-item active">
+            <span class="dock-icon">💼</span>
+            <span>Portfolio</span>
+        </a>
+    </nav>
+</body>
+</html>

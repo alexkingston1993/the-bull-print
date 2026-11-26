@@ -1,0 +1,202 @@
+{
+  "BTC": {
+    "symbol": "BTC",
+    "name": "Bitcoin",
+    "category": "Store of Value / Digital Gold",
+    "consensus": "Proof of Work (SHA-256)",
+    "circulating_supply": "19.78 Million BTC",
+    "max_supply": "21.00 Million BTC (Hard Capped)",
+    "tech_moat": "Immutable monetary policy, highest cumulative hash rate on Earth, decentralized liquidity anchor of digital assets.",
+    "tax_audit": "Under Indian Section 115BBH: Flat 30% tax on net profits + 4% cess (effective 31.2%). No set-off against losses in other crypto assets. 1% TDS deducted at source on Indian exchanges under Section 194S.",
+    "pros": [
+      "Institutional spot ETF adoption (BlackRock, Fidelity)",
+      "Absolute digital scarcity (21M ceiling)",
+      "Zero counterparty sovereign risk"
+    ],
+    "cons": [
+      "High regulatory scrutiny from global central banks",
+      "Short-term macroeconomic correlation with tech equities",
+      "No staking yield natively"
+    ]
+  },
+  "ETH": {
+    "symbol": "ETH",
+    "name": "Ethereum",
+    "category": "Smart Contract Platform / Layer 1",
+    "consensus": "Proof of Stake (Casper)",
+    "circulating_supply": "120.4 Million ETH",
+    "max_supply": "Algorithmic (EIP-1559 Burn Mechanism)",
+    "tech_moat": "Undisputed settlement layer for Decentralized Finance (DeFi) and Layer-2 rollups (Arbitrum, Base, Optimism). Largest developer ecosystem in crypto.",
+    "tax_audit": "Staking yields and trading profits taxed at flat 30% under Section 115BBH. Gas fee deductions are not allowable expenses under current IT rulings.",
+    "pros": [
+      "Dominant settlement volume in stablecoins & tokenized RWAs",
+      "Yield generation via native validator staking (~3.2%)",
+      "Layer 2 scaling ecosystem expanding"
+    ],
+    "cons": [
+      "Base layer gas fees remain high during volatility",
+      "Competition from high-throughput monolithic L1s (Solana)",
+      "Staking centralization in large liquid staking pools"
+    ]
+  },
+  "SOL": {
+    "symbol": "SOL",
+    "name": "Solana",
+    "category": "High-Throughput Layer 1",
+    "consensus": "Proof of History + Proof of Stake",
+    "circulating_supply": "472 Million SOL",
+    "max_supply": "Inflationary (Disinflationary Decay Schedule)",
+    "tech_moat": "Sub-second finality (400ms slots) with transaction throughput exceeding 3,000 TPS. Unrivalled retail adoption in decentralized exchanges and meme liquidity.",
+    "tax_audit": "DEX swap profits subject to 30% flat VDA tax. High-frequency micro-swaps complicate tax ledger reconciliation.",
+    "pros": [
+      "Negligible transaction costs (< \u20b90.10 per tx)",
+      "Explosive decentralized exchange volume",
+      "Firedancer independent validator client advancing"
+    ],
+    "cons": [
+      "Historical network congestion during peak meme mints",
+      "Hardware requirements for validator nodes are intensive",
+      "Higher inflation schedule than BTC/ETH"
+    ]
+  },
+  "BNB": {
+    "symbol": "BNB",
+    "name": "BNB Chain",
+    "category": "Exchange Utility & EVM L1",
+    "consensus": "Proof of Staked Authority (PoSA)",
+    "circulating_supply": "145 Million BNB",
+    "max_supply": "Continuous Auto-Burn to 100M BNB",
+    "tech_moat": "Direct utility tie-in with Binance (world's largest crypto exchange by volume) for trading fee discounts, launchpool farming, and gas on BNB Smart Chain.",
+    "tax_audit": "Launchpool token rewards taxed as 'Other Sources' or VDA income at 30% upon realization.",
+    "pros": [
+      "Massive trading fee discount utility on Binance",
+      "Aggressive quarterly token burns reducing circulating supply",
+      "High retail wallet integration"
+    ],
+    "cons": [
+      "Perceived centralization around Binance corporate leadership",
+      "Regulatory oversight on centralized exchange utility tokens",
+      "EVM compatibility facing L2 competition"
+    ]
+  },
+  "XRP": {
+    "symbol": "XRP",
+    "name": "XRP (Ripple)",
+    "category": "Cross-Border Settlement Currency",
+    "consensus": "XRP Ledger Consensus Protocol (Federated Byzantine Agreement)",
+    "circulating_supply": "56.8 Billion XRP",
+    "max_supply": "100 Billion XRP (Pre-mined)",
+    "tech_moat": "Ultra-fast (3-5 seconds) international remittance settlement used by cross-border banking corridors. Resolution of major US SEC programmatic sales litigation.",
+    "tax_audit": "All cross-border FX settlements converted through Indian rupees attract standard Section 115BBH capital gains tax.",
+    "pros": [
+      "Clear legal regulatory status following US court rulings",
+      "Sub-cent transaction settlement fees",
+      "Enterprise relationships with regional banks and remittance houses"
+    ],
+    "cons": [
+      "Substantial escrow release schedule managed by Ripple Labs",
+      "Competition from institutional stablecoin corridors (USDT/USDC)",
+      "Low decentralized finance composability"
+    ]
+  },
+  "DOGE": {
+    "symbol": "DOGE",
+    "name": "Dogecoin",
+    "category": "Decentralized Memecoin / P2P Currency",
+    "consensus": "Auxiliary Proof of Work (Scrypt)",
+    "circulating_supply": "146 Billion DOGE",
+    "max_supply": "Fixed 5 Billion DOGE / year issuance",
+    "tech_moat": "First-mover advantage in cultural memetics, high retail name recognition, and auxiliary mining security tied to Litecoin.",
+    "tax_audit": "Tipping or selling DOGE triggers 30% VDA capital gains.",
+    "pros": [
+      "Massive mainstream cultural brand awareness",
+      "High liquidity on every global spot exchange",
+      "Low transaction fees for peer-to-peer transfers"
+    ],
+    "cons": [
+      "Perpetual 5 billion annual token inflation",
+      "Concentrated whale wallet holdings",
+      "Limited smart contract capabilities natively"
+    ]
+  },
+  "ADA": {
+    "symbol": "ADA",
+    "name": "Cardano",
+    "category": "Peer-Reviewed Layer 1",
+    "consensus": "Ouroboros Proof of Stake",
+    "circulating_supply": "35.7 Billion ADA",
+    "max_supply": "45 Billion ADA",
+    "tech_moat": "Academic, peer-reviewed formal verification architecture with eUTXO transaction model for high security and determinism.",
+    "tax_audit": "Staking rewards received in Daedalus/Yoroi wallets taxed at 30% under Section 115BBH upon receipt.",
+    "pros": [
+      "High theoretical security and formal mathematical verification",
+      "Non-custodial, liquid staking without lockup periods",
+      "Dedicated global community following"
+    ],
+    "cons": [
+      "Slower feature rollout cadence due to academic peer review",
+      "DEX liquidity lower than Ethereum/Solana ecosystems",
+      "Haskell/Plutus smart contract barrier for developers"
+    ]
+  },
+  "AVAX": {
+    "symbol": "AVAX",
+    "name": "Avalanche",
+    "category": "Subnet & Enterprise Multi-Chain L1",
+    "consensus": "Avalanche Consensus (Sub-second Finality)",
+    "circulating_supply": "406 Million AVAX",
+    "max_supply": "720 Million AVAX",
+    "tech_moat": "Multi-chain architecture (X, P, and C chains) supporting custom sovereign enterprise subnets with bespoke compliance rules.",
+    "tax_audit": "Standard Indian 30% VDA tax applies on C-chain and subnet transaction profits.",
+    "pros": [
+      "Sub-second transaction finality",
+      "Enterprise subnet adoption in banking and gaming",
+      "Full Ethereum Virtual Machine (EVM) compatibility"
+    ],
+    "cons": [
+      "Subnet liquidity fragmentation",
+      "Validator staking bond requirements are high (2,000 AVAX)",
+      "Competition from Ethereum Layer-2 rollups"
+    ]
+  },
+  "LINK": {
+    "symbol": "LINK",
+    "name": "Chainlink",
+    "category": "Decentralized Oracle & Cross-Chain (CCIP)",
+    "consensus": "Decentralized Oracle Networks (DONs)",
+    "circulating_supply": "608 Million LINK",
+    "max_supply": "1.00 Billion LINK",
+    "tech_moat": "Near-monopoly in securing off-chain market data, price feeds, and verifiable randomness for $30+ billion in DeFi smart contracts. CCIP standard for institutional tokenization.",
+    "tax_audit": "Staking v0.2 rewards taxed at flat 30% under Section 115BBH.",
+    "pros": [
+      "Critical infrastructure moat \u2014 90%+ of major DeFi protocols depend on Chainlink feeds",
+      "Cross-Chain Interoperability Protocol (CCIP) partnered with SWIFT",
+      "Institutional grade data infrastructure"
+    ],
+    "cons": [
+      "Token economics historically lagged protocol adoption",
+      "Node operator infrastructure costs are subsidized",
+      "Alternative oracle competition (Pyth Network)"
+    ]
+  },
+  "NEAR": {
+    "symbol": "NEAR",
+    "name": "NEAR Protocol",
+    "category": "Sharded Layer 1 & User-Owned AI",
+    "consensus": "Nightshade Dynamic Sharding + PoS",
+    "circulating_supply": "1.21 Billion NEAR",
+    "max_supply": "Inflationary (5% annual minting)",
+    "tech_moat": "Dynamic state sharding ensuring unlimited horizontal scaling, human-readable account names, and leading user-owned AI decentralized compute initiatives.",
+    "tax_audit": "All sharded swap profits taxed under Section 115BBH.",
+    "pros": [
+      "Seamless Web3 onboarding with named accounts",
+      "Horizontal state sharding architecture",
+      "Strong positioning at the intersection of AI compute and blockchain"
+    ],
+    "cons": [
+      "Ecosystem mindshare fluctuates against Solana and Base",
+      "Validator hardware demands scale with sharding",
+      "5% annual inflation rate"
+    ]
+  }
+}
