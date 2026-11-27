@@ -1874,8 +1874,7 @@
             line-height: 1;
         }
     </style>
-    <!-- Vercel Web Analytics & Insights -->
-    <script defer src="/_vercel/insights/script.js"></script>
+
 </head>
 <body>
 
@@ -2081,7 +2080,7 @@
         <!-- Tab 1: Top Movers -->
         <div id="view-movers" class="tab-panel active-view">
             <div class="panel-header-row">
-                <h3 class="panel-title"><span>🔥</span> Market Movers Today</h3>
+                <h2 class="panel-title"><span>🔥</span> Market Movers Today</h2>
                 <div class="filter-pill-group">
                     <button class="filter-pill active" id="flt-gainers" onclick="filterMoversTable('gainers')">Gainers</button>
                     <button class="filter-pill" id="flt-losers" onclick="filterMoversTable('losers')">Losers</button>
@@ -2093,10 +2092,10 @@
                 <table class="groww-table">
                     <thead>
                         <tr>
-                            <th>Company & Symbol</th>
-                            <th>Intraday Trend</th>
-                            <th>Market Price</th>
-                            <th>1D Change</th>
+                            <th scope="col">Company & Symbol</th>
+                            <th scope="col">Intraday Trend</th>
+                            <th scope="col">Market Price</th>
+                            <th scope="col">1D Change</th>
                             <th style="width: 40px;"></th>
                         </tr>
                     </thead>
@@ -2129,7 +2128,7 @@
             </div>
 
             <div class="panel-header-row">
-                <h3 class="panel-title" id="home-scorecard-title"><span>📊</span> Audited Fundamental Scorecard — High ROCE & Low Debt</h3>
+                <h2 class="panel-title" id="home-scorecard-title"><span>📊</span> Audited Fundamental Scorecard — High ROCE & Low Debt</h2>
                 <div style="display:flex; align-items:center; gap:12px;">
                     <a id="home-open-screener-btn" href="/screener.html?screen=roce" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:var(--groww-mint); background:var(--groww-mint-soft); padding:6px 14px; border-radius:6px; border:1px solid var(--groww-mint);">⚡ Open Full Screener Dashboard →</a>
                     <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">Consolidated TTM Data</span>
@@ -2140,13 +2139,13 @@
                 <table class="groww-table">
                     <thead>
                         <tr>
-                            <th>Ticker & Company</th>
-                            <th>Sector</th>
-                            <th>Market Cap</th>
-                            <th>P/E Ratio</th>
-                            <th>ROCE %</th>
-                            <th>ROE %</th>
-                            <th>D/E Ratio</th>
+                            <th scope="col">Ticker & Company</th>
+                            <th scope="col">Sector</th>
+                            <th scope="col">Market Cap</th>
+                            <th scope="col">P/E Ratio</th>
+                            <th scope="col">ROCE %</th>
+                            <th scope="col">ROE %</th>
+                            <th scope="col">D/E Ratio</th>
                             <th style="width: 40px;"></th>
                         </tr>
                     </thead>
@@ -2176,7 +2175,7 @@
         <!-- Tab 4: Sectors Trending -->
         <div id="view-sectors" class="tab-panel" style="display: none;">
             <div class="panel-header-row">
-                <h3 class="panel-title"><span>📊</span> Sectors & Heatmap Distribution</h3>
+                <h2 class="panel-title"><span>📊</span> Sectors & Heatmap Distribution</h2>
                 <span style="font-family: var(--font-mono); font-size: 11px; color: var(--groww-mint);">Live Advances vs Declines</span>
             </div>
             <div class="sectors-grid" id="sectors-grid">
@@ -2187,7 +2186,7 @@
         <!-- Tab 5: Research Articles -->
         <div id="view-research" class="tab-panel" style="display: none;">
             <div class="panel-header-row">
-                <h3 class="panel-title"><span>📖</span> Institutional Research Articles & Video Library</h3>
+                <h2 class="panel-title"><span>📖</span> Institutional Research Articles & Video Library</h2>
                 <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">Dedicated Standalone Pages</span>
             </div>
         <!-- Section 6A: Indian IPO Radar Preview Section -->
@@ -2462,10 +2461,10 @@
                 <table class="groww-table">
                     <thead>
                         <tr>
-                            <th>Weight %</th>
-                            <th>Company & Symbol</th>
-                            <th>Market Price</th>
-                            <th>1D Change</th>
+                            <th scope="col">Weight %</th>
+                            <th scope="col">Company & Symbol</th>
+                            <th scope="col">Market Price</th>
+                            <th scope="col">1D Change</th>
                             <th style="width: 40px;"></th>
                         </tr>
                     </thead>
