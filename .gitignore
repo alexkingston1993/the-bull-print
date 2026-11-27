@@ -73,7 +73,5 @@ public/assets/approved_bundles/
 public/assets/broll_cache/
 *.zip
 *.bin
-
-*_CONVERSATION_BACKUP.md
-*.log
-
+*CONVERSATION_BACKUP.md
+*.jsonl

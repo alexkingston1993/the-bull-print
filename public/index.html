@@ -102,12 +102,12 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Lenis Smooth Scrolling Library -->
-    <script src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script>
+    <script defer src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script>
 
     <!-- Official TradingView Library for Interactive Charting -->
     <!-- Global Theme CSS & Auth System (Default: Light Mode) -->
     <link rel="stylesheet" href="brand_assets/global-theme.css">
-    <script src="brand_assets/theme-auth.js"></script>
+    <script defer src="brand_assets/theme-auth.js"></script>
 
     <style>
         :root {
@@ -477,19 +477,22 @@
             position: absolute;
             left: 0;
             right: 0;
+            top: 0;
             height: 2.5px;
             background: linear-gradient(90deg, transparent 5%, rgba(0, 208, 156, 0.9) 30%, #ffffff 50%, rgba(0, 208, 156, 0.9) 70%, transparent 95%);
             box-shadow: 0 0 10px #00D09C, 0 0 20px #00D09C;
             animation: scanMotion 2.6s ease-in-out infinite;
             pointer-events: none;
             z-index: 6;
+            will-change: transform, opacity;
+            contain: strict;
         }
 
         @keyframes scanMotion {
-            0% { top: -10%; opacity: 0; }
+            0% { transform: translateY(-10px); opacity: 0; }
             15% { opacity: 1; }
             85% { opacity: 1; }
-            100% { top: 110%; opacity: 0; }
+            100% { transform: translateY(160px); opacity: 0; }
         }
 
         /* 6. Blueprint Grid Overlay */
@@ -697,7 +700,7 @@
         .search-shortcut {
             font-family: var(--font-mono);
             font-size: 11px;
-            color: var(--text-muted);
+            color: #334155;
             background: var(--bg-card-hover);
             padding: 3px 7px;
             border-radius: 4px;
@@ -905,6 +908,8 @@
             max-width: 1280px;
             margin: 16px auto 60px auto;
             padding: 0 20px;
+            min-height: 580px;
+            contain: layout style;
         }
 
         /* Modern Segmented Tab Bar */
@@ -1332,8 +1337,8 @@
             letter-spacing: -0.2px;
         }
         .nav-articles-badge {
-            background: var(--groww-mint);
-            color: #0b0f17;
+            background: #006644;
+            color: #ffffff;
             font-size: 9.5px;
             font-weight: 800;
             padding: 2px 6px;
@@ -1918,7 +1923,7 @@
     <header class="main-navbar">
         <div class="navbar-inner">
             <a href="/" class="brand-group">
-                <img src="brand_assets/website_favicon_192x192.png" alt="The Bull Print Logo" class="brand-logo-img">
+                <img src="brand_assets/website_favicon_64x64.webp" width="32" height="32" alt="The Bull Print Logo" class="brand-logo-img">
                 <span class="brand-name">THE BULL <span>PRINT</span></span>
                 <span class="brand-badge">INSTITUTIONAL DESK</span>
             </a>
@@ -1974,7 +1979,7 @@
             <div class="bull-emblem-card">
                 <div class="blueprint-grid"></div>
                 <div class="scan-beam"></div>
-                <img src="brand_assets/logo_master_1024x1024.png" alt="The Bull Print Animated Logo" class="bull-emblem-img">
+                <img src="brand_assets/logo_160x160.webp" width="133" height="133" alt="The Bull Print Animated Logo" class="bull-emblem-img">
             </div>
 
             <div class="telemetry-row">
@@ -2469,7 +2474,13 @@
                         </tr>
                     </thead>
                     <tbody id="drawer-constituents-tbody">
-                        <!-- Populated dynamically -->
+                        <tr>
+                            <td>--</td>
+                            <td><strong>Select an index above</strong></td>
+                            <td>₹0.00</td>
+                            <td>0.00%</td>
+                            <td></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -3242,22 +3253,22 @@
         // 1. Dynamic Top Trending Equities Pools (No Favorites - Real Momentum)
         const TRENDING_POOLS = {
             gainers: [
-                { symbol: "TRENT", name: "Trent Ltd", ltp: "₹2,892.00", chg: "+3.26%", up: true, tag: "Retail Titan", avatar: "TR", bg: "#10b981", points: "0,22 20,18 45,20 70,12 95,14 120,4" },
-                { symbol: "BHARTIARTL", name: "Bharti Airtel", ltp: "₹1,875.00", chg: "+2.46%", up: true, tag: "ARPU Expansion", avatar: "BA", bg: "#ef4444", points: "0,24 25,20 50,16 75,18 95,10 120,4" },
-                { symbol: "ICICIBANK", name: "ICICI Bank", ltp: "₹1,381.00", chg: "+2.15%", up: true, tag: "Banking RoA", avatar: "IC", bg: "#8b5cf6", points: "0,22 25,18 50,16 75,14 100,10 120,4" },
-                { symbol: "PCJEWELLER", name: "PC Jeweller Ltd", ltp: "₹18.10", chg: "+4.95%", up: true, tag: "Debt Turnaround", avatar: "PC", bg: "#f59e0b", points: "0,25 25,22 50,18 75,14 100,8 120,4" }
+                { symbol: "TRENT", name: "Trent Ltd", ltp: "₹2,892.00", chg: "+3.26%", up: true, tag: "Retail Titan", avatar: "TR", bg: "#047857", points: "0,22 20,18 45,20 70,12 95,14 120,4" },
+                { symbol: "BHARTIARTL", name: "Bharti Airtel", ltp: "₹1,875.00", chg: "+2.46%", up: true, tag: "ARPU Expansion", avatar: "BA", bg: "#b91c1c", points: "0,24 25,20 50,16 75,18 95,10 120,4" },
+                { symbol: "ICICIBANK", name: "ICICI Bank", ltp: "₹1,381.00", chg: "+2.15%", up: true, tag: "Banking RoA", avatar: "IC", bg: "#6d28d9", points: "0,22 25,18 50,16 75,14 100,10 120,4" },
+                { symbol: "PCJEWELLER", name: "PC Jeweller Ltd", ltp: "₹18.10", chg: "+4.95%", up: true, tag: "Debt Turnaround", avatar: "PC", bg: "#b45309", points: "0,25 25,22 50,18 75,14 100,8 120,4" }
             ],
             active: [
-                { symbol: "RELIANCE", name: "Reliance Industries", ltp: "₹1,202.00", chg: "+0.42%", up: true, tag: "₹1,420 Cr Turnover", avatar: "RE", bg: "#2563eb", points: "0,22 20,18 45,20 70,10 95,14 120,4" },
-                { symbol: "HDFCBANK", name: "HDFC Bank", ltp: "₹712.00", chg: "+0.85%", up: true, tag: "Banking Anchor", avatar: "HD", bg: "#0d9488", points: "0,24 25,20 50,16 75,18 95,10 120,4" },
-                { symbol: "TCS", name: "TCS Ltd", ltp: "₹2,461.00", chg: "+0.95%", up: true, tag: "AI Transformation", avatar: "TC", bg: "#6366f1", points: "0,20 25,22 50,15 75,12 100,10 120,4" },
-                { symbol: "ITC", name: "ITC Ltd", ltp: "₹260.80", chg: "+0.75%", up: true, tag: "Cash Compounder", avatar: "IT", bg: "#059669", points: "0,24 25,20 50,18 75,14 100,12 120,6" }
+                { symbol: "RELIANCE", name: "Reliance Industries", ltp: "₹1,202.00", chg: "+0.42%", up: true, tag: "₹1,420 Cr Turnover", avatar: "RE", bg: "#1d4ed8", points: "0,22 20,18 45,20 70,10 95,14 120,4" },
+                { symbol: "HDFCBANK", name: "HDFC Bank", ltp: "₹712.00", chg: "+0.85%", up: true, tag: "Banking Anchor", avatar: "HD", bg: "#0f766e", points: "0,24 25,20 50,16 75,18 95,10 120,4" },
+                { symbol: "TCS", name: "TCS Ltd", ltp: "₹2,461.00", chg: "+0.95%", up: true, tag: "AI Transformation", avatar: "TC", bg: "#4338ca", points: "0,20 25,22 50,15 75,12 100,10 120,4" },
+                { symbol: "ITC", name: "ITC Ltd", ltp: "₹260.80", chg: "+0.75%", up: true, tag: "Cash Compounder", avatar: "IT", bg: "#047857", points: "0,24 25,20 50,18 75,14 100,12 120,6" }
             ],
             breakout: [
-                { symbol: "TRENT", name: "Trent Ltd", ltp: "₹2,892.00", chg: "+3.26%", up: true, tag: "All-Time High", avatar: "TR", bg: "#10b981", points: "0,22 20,18 45,20 70,12 95,14 120,4" },
-                { symbol: "LT", name: "Larsen & Toubro", ltp: "₹3,662.00", chg: "+1.95%", up: true, tag: "Infra Capex", avatar: "LT", bg: "#ec4899", points: "0,22 25,18 50,14 75,16 100,8 120,4" },
-                { symbol: "BHARTIARTL", name: "Bharti Airtel", ltp: "₹1,875.00", chg: "+1.80%", up: true, tag: "ARPU Expansion", avatar: "BA", bg: "#ef4444", points: "0,24 25,20 50,16 75,12 100,10 120,5" },
-                { symbol: "INFY", name: "Infosys Ltd", ltp: "₹1,131.00", chg: "+1.20%", up: true, tag: "BFSI Multi-Month", avatar: "IN", bg: "#0284c7", points: "0,24 30,18 55,20 80,12 100,14 120,4" }
+                { symbol: "TRENT", name: "Trent Ltd", ltp: "₹2,892.00", chg: "+3.26%", up: true, tag: "All-Time High", avatar: "TR", bg: "#047857", points: "0,22 20,18 45,20 70,12 95,14 120,4" },
+                { symbol: "LT", name: "Larsen & Toubro", ltp: "₹3,662.00", chg: "+1.95%", up: true, tag: "Infra Capex", avatar: "LT", bg: "#be185d", points: "0,22 25,18 50,14 75,16 100,8 120,4" },
+                { symbol: "BHARTIARTL", name: "Bharti Airtel", ltp: "₹1,875.00", chg: "+1.80%", up: true, tag: "ARPU Expansion", avatar: "BA", bg: "#b91c1c", points: "0,24 25,20 50,16 75,12 100,10 120,5" },
+                { symbol: "INFY", name: "Infosys Ltd", ltp: "₹1,131.00", chg: "+1.20%", up: true, tag: "BFSI Multi-Month", avatar: "IN", bg: "#0369a1", points: "0,24 30,18 55,20 80,12 100,14 120,4" }
             ]
         };
 

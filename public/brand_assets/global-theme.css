@@ -12,15 +12,15 @@
     --border-subtle: #e2e8f0;
     --border-hover: #00a878;
     --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-muted: #64748b;
-    --groww-mint: #00875a;
-    --groww-mint-soft: rgba(0, 135, 90, 0.10);
-    --market-red: #dc2626;
-    --market-red-soft: rgba(220, 38, 38, 0.10);
+    --text-secondary: #334155;
+    --text-muted: #475569;
+    --groww-mint: #006644;
+    --groww-mint-soft: rgba(0, 102, 68, 0.10);
+    --market-red: #b91c1c;
+    --market-red-soft: rgba(185, 28, 28, 0.10);
     --accent-blue: #0284c7;
     --accent-blue-soft: rgba(2, 132, 199, 0.10);
-    --accent-amber: #d97706;
+    --accent-amber: #92400e;
     --table-header-bg: #f1f5f9;
     --table-row-hover: #f8fafc;
     --table-border: #e2e8f0;
@@ -607,7 +607,7 @@
 .dsa-alert-badge-tag.earnings { background: rgba(59, 130, 246, 0.12); color: #2563eb; }
 .dsa-alert-badge-tag.dividend { background: var(--groww-mint-soft); color: var(--groww-mint); }
 .dsa-alert-badge-tag.split { background: rgba(147, 51, 234, 0.12); color: #9333ea; }
-.dsa-alert-badge-tag.board { background: rgba(217, 119, 6, 0.12); color: #d97706; }
+.dsa-alert-badge-tag.board { background: rgba(146, 64, 14, 0.12); color: #92400e; }
 .dsa-alert-days-pill {
     background: rgba(220, 38, 38, 0.12);
     color: var(--market-red);
