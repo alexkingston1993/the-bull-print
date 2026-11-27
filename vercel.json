@@ -50,6 +50,10 @@
       "destination": "/api/cron/trigger-workflow.js"
     },
     {
+      "source": "/api/cron/guardian",
+      "destination": "/api/cron/guardian.js"
+    },
+    {
       "source": "/api/auth/tiktok/callback",
       "destination": "/api/auth/tiktok/callback.js"
     },
@@ -175,6 +179,22 @@
     }
   ],
   "crons": [
+    {
+      "path": "/api/cron/guardian?session=market_open",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/guardian?session=mid_day",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/guardian?session=market_close",
+      "schedule": "0 15 * * *"
+    },
+    {
+      "path": "/api/cron/guardian?session=overnight",
+      "schedule": "0 21 * * *"
+    },
     {
       "path": "/api/cron/trigger-workflow?workflow=daily_longtail_seo.yml",
       "schedule": "0 6 * * *"
