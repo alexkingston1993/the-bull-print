@@ -1,6 +1,6 @@
 ---
 title: "Trent Ltd 10-Year ROCE and Debt-to-Equity Trajectory: Zudio's IndAS-116 Balance Sheet Forensics (2026)"
-date: 2026-11-27 06:34:08
+date: 2026-11-27 16:19:27
 author: "The Bull Print Forensic Research Desk"
 category: "Equity Research"
 tags: ["Trent Ltd", "Zudio", "IndAS 116", "ROCE Trajectory", "Debt to Equity", "NSE TRENT"]

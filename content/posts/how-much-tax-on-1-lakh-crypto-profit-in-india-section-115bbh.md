@@ -1,6 +1,6 @@
 ---
 title: "How Much Tax on ₹1 Lakh Crypto Profit in India? Section 115BBH & 194S Complete Forensic Guide (2026)"
-date: 2026-11-27 06:34:08
+date: 2026-11-27 16:19:27
 author: "The Bull Print Tax & Regulatory Desk"
 category: "Cryptocurrency"
 tags: ["Section 115BBH", "Section 194S", "Crypto Tax India", "Bitcoin Tax", "ITR-2 Schedule VDA"]
