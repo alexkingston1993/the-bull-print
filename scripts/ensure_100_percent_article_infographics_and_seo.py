@@ -16,8 +16,8 @@ TOPIC_SPECS = [
     {
         'key': 'silver_gold',
         'match': lambda text: any(k in text for k in ['silver', 'gold', 'precious metal', 'bullion', 'mcx']),
-        'coverImage': 'https://bullprintmedia.com/assets/editorial/gold_silver_macro_hero.jpg',
-        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_silver_gold_crash.png',
+        'coverImage': 'https://bullprintmedia.com/assets/editorial/gold_silver_macro_hero.webp',
+        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_silver_gold_crash.webp',
         'alt': 'Silver Crashes ₹56,000 & Gold Price Drop Analysis: Paper Futures Margin Liquidation vs Physical Bullion Reserve Fortress Infographic',
         'caption': 'Institutional macro breakdown: Why international commercial banks liquidate paper commodity derivatives during margin calls while sovereign entities accumulate physical bullion reserves.',
         'faq': [
@@ -28,8 +28,8 @@ TOPIC_SPECS = [
     {
         'key': 'sebi_fo_93',
         'match': lambda text: any(k in text for k in ['93%', '93 percent', '93-percent', '93-of-everyday', 'sebi', 'f&o', 'options loss', 'theta decay', 'quick market bet']),
-        'coverImage': 'https://bullprintmedia.com/assets/editorial/sebi_options_trading_hero.jpg',
-        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_sebi_93_percent_options_loss.png',
+        'coverImage': 'https://bullprintmedia.com/assets/editorial/sebi_options_trading_hero.webp',
+        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_sebi_93_percent_options_loss.webp',
         'alt': 'SEBI Study Infographic: Why 93% of Everyday Retail Traders Lose Money in Equity F&O Derivatives Due to Theta Time Decay',
         'caption': 'Official SEBI data telemetry: Retail option buyers lose an average of ₹1,25,000 as unrelenting Theta decay erodes contract value in the final 48 hours before weekly expiry.',
         'faq': [
@@ -40,8 +40,8 @@ TOPIC_SPECS = [
     {
         'key': 'fii_selling',
         'match': lambda text: any(k in text for k in ['foreign banks sell', 'big foreign bank', 'fii selling', 'fii-selling', 'block deals', 'foreign institutional']),
-        'coverImage': 'https://bullprintmedia.com/assets/editorial/dalal_street_fii_hero.jpg',
-        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_fii_selling_block_deals.png',
+        'coverImage': 'https://bullprintmedia.com/assets/editorial/dalal_street_fii_hero.webp',
+        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_fii_selling_block_deals.webp',
         'alt': 'Foreign Institutional Investor (FII) Selling vs Domestic SIP Absorption Infographic on Dalal Street',
         'caption': 'Market mechanics: How ₹25,300 Cr monthly domestic mutual fund SIP inflows structurally absorb foreign institutional block sales without triggering systemic crashes.',
         'faq': [
@@ -52,8 +52,8 @@ TOPIC_SPECS = [
     {
         'key': 'closing_bell',
         'match': lambda text: any(k in text for k in ['closing bell', 'closing-bell', 'price trap', '3:15 pm', 'vwap settlement', 'opening trap']),
-        'coverImage': 'https://bullprintmedia.com/assets/editorial/dalal_street_fii_hero.jpg',
-        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_closing_bell_price_trap.png',
+        'coverImage': 'https://bullprintmedia.com/assets/editorial/dalal_street_fii_hero.webp',
+        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_closing_bell_price_trap.webp',
         'alt': 'Closing Bell Price Trap Infographic: 3:15 PM Institutional Volume Dump and 30-Minute VWAP Settlement Auction Rules',
         'caption': 'Execution forensics: Why late afternoon retail momentum breakouts get crushed by the mandatory 3:00 PM to 3:30 PM Volume Weighted Average Price (VWAP) settlement.',
         'faq': [
@@ -64,8 +64,8 @@ TOPIC_SPECS = [
     {
         'key': 'option_chain',
         'match': lambda text: any(k in text for k in ['option chain', 'open interest', 'max pain', 'put-call ratio', 'pcr', 'gamma', 'derivatives']),
-        'coverImage': 'https://bullprintmedia.com/assets/editorial/sebi_options_trading_hero.jpg',
-        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_nifty_option_chain_ladder.png',
+        'coverImage': 'https://bullprintmedia.com/assets/editorial/sebi_options_trading_hero.webp',
+        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_nifty_option_chain_ladder.webp',
         'alt': 'Nifty 50 Option Chain Ladder & Open Interest Concentration Infographic: Max Pain and Put-Call Ratio Telemetry',
         'caption': 'Quantitative derivatives breakdown: Tracking institutional Call and Put Open Interest clusters to identify structural support floors and resistance ceilings.',
         'faq': [
@@ -76,8 +76,8 @@ TOPIC_SPECS = [
     {
         'key': 'order_flow',
         'match': lambda text: any(k in text for k in ['order flow', 'order-flow', 'footprint', 'volume delta', 'absorption', 'limit bid']),
-        'coverImage': 'https://bullprintmedia.com/assets/editorial/dalal_street_fii_hero.jpg',
-        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_nifty_order_flow_footprint.png',
+        'coverImage': 'https://bullprintmedia.com/assets/editorial/dalal_street_fii_hero.webp',
+        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_nifty_order_flow_footprint.webp',
         'alt': 'Nifty 50 Order Flow Absorption Infographic: Volume Delta Divergence and Institutional Footprint Chart Analysis',
         'caption': 'Tick-by-tick order book forensics: Detecting aggressive retail seller exhaustion into passive institutional limit bids before structural market reversals.',
         'faq': [
@@ -88,8 +88,8 @@ TOPIC_SPECS = [
     {
         'key': 'irdai_rules',
         'match': lambda text: any(k in text for k in ['irdai', 'claim settlement rules', 'surrender value', '30-day window', 'master circular']),
-        'coverImage': 'https://bullprintmedia.com/assets/editorial/irdai_insurance_claim_hero.jpg',
-        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_irdai_claim_settlement_rules.png',
+        'coverImage': 'https://bullprintmedia.com/assets/editorial/irdai_insurance_claim_hero.webp',
+        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_irdai_claim_settlement_rules.webp',
         'alt': 'IRDAI New Regulations Infographic: Mandatory 30-Day Claim Settlement Window and Enhanced Surrender Value Standards',
         'caption': 'Policyholder regulatory safeguards: Insurers face mandatory interest penalties (Bank Rate + 2%) for claim delays beyond 30 days under the IRDAI Master Circular.',
         'faq': [
@@ -100,8 +100,8 @@ TOPIC_SPECS = [
     {
         'key': 'csr_vs_icr',
         'match': lambda text: any(k in text for k in ['csr', 'icr', 'claim settlement ratio', 'incurred claim ratio', 'health insurance claim']),
-        'coverImage': 'https://bullprintmedia.com/assets/editorial/irdai_insurance_claim_hero.jpg',
-        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_csr_vs_icr_matrix.png',
+        'coverImage': 'https://bullprintmedia.com/assets/editorial/irdai_insurance_claim_hero.webp',
+        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_csr_vs_icr_matrix.webp',
         'alt': 'Insurance Marketing vs Reality Infographic: Why Claim Settlement Ratio (CSR) Hides Incurred Claim Ratio (ICR)',
         'caption': 'Forensic health insurance analysis: A 98% CSR measures claims by count, masking how low-ICR insurers routinely reject or haircut high-value critical care claims.',
         'faq': [
@@ -112,8 +112,8 @@ TOPIC_SPECS = [
     {
         'key': 'section_45',
         'match': lambda text: any(k in text for k in ['section 45', 'insurance act', 'incontestability', '3-year', 'repudiation', 'claim rejection']),
-        'coverImage': 'https://bullprintmedia.com/assets/editorial/irdai_insurance_claim_hero.jpg',
-        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_section_45_insurance_act.png',
+        'coverImage': 'https://bullprintmedia.com/assets/editorial/irdai_insurance_claim_hero.webp',
+        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_section_45_insurance_act.webp',
         'alt': 'Section 45 Insurance Act 1938 Infographic: The 3-Year Incontestability Shield and Absolute Death Claim Immunity',
         'caption': 'Statutory life insurance legal framework: Once 36 months elapse from policy issuance, Indian law strictly forbids insurers from questioning or repudiating claims.',
         'faq': [
@@ -124,8 +124,8 @@ TOPIC_SPECS = [
     {
         'key': 'proportionate_deduction',
         'match': lambda text: any(k in text for k in ['proportionate deduction', 'room rent', 'room cap', 'icu cap', 'hospital bill haircut']),
-        'coverImage': 'https://bullprintmedia.com/assets/editorial/irdai_insurance_claim_hero.jpg',
-        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_irdai_proportionate_deduction.png',
+        'coverImage': 'https://bullprintmedia.com/assets/editorial/irdai_insurance_claim_hero.webp',
+        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_irdai_proportionate_deduction.webp',
         'alt': 'Health Insurance Proportionate Deduction Infographic: How Daily Room Rent Caps Slash Hospital Doctor & Surgery Bills',
         'caption': 'Mathematical breakdown of proportionate deduction: Choosing a room that exceeds the 1% cap triggers a proportional haircut across the entire surgical invoice.',
         'faq': [
@@ -136,8 +136,8 @@ TOPIC_SPECS = [
     {
         'key': 'crypto_tax_115bbh',
         'match': lambda text: any(k in text for k in ['115bbh', '194s', 'vda', 'crypto tax', 'taxation', 'tds']),
-        'coverImage': 'https://bullprintmedia.com/assets/editorial/crypto_forensics_hero.jpg',
-        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_crypto_tax_section_115bbh.png',
+        'coverImage': 'https://bullprintmedia.com/assets/editorial/crypto_forensics_hero.webp',
+        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_crypto_tax_section_115bbh.webp',
         'alt': 'India Crypto Tax Compliance Infographic: Section 115BBH 30% Flat Tax and Section 194S 1% TDS Reconciliation',
         'caption': 'Income tax forensic protocols: Reconciling on-chain transactions, exchange reports, and AIS/TIS filings under Section 115BBH without loss offsetting.',
         'faq': [
@@ -148,8 +148,8 @@ TOPIC_SPECS = [
     {
         'key': 'crypto_funding',
         'match': lambda text: any(k in text for k in ['funding rate', 'perpetual', 'perp', 'basis trade', 'arbitrage', 'delta-neutral']),
-        'coverImage': 'https://bullprintmedia.com/assets/editorial/crypto_forensics_hero.jpg',
-        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_crypto_funding_rates.png',
+        'coverImage': 'https://bullprintmedia.com/assets/editorial/crypto_forensics_hero.webp',
+        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_crypto_funding_rates.webp',
         'alt': 'Crypto Perpetual Futures Funding Rates Infographic: Basis Arbitrage Mechanics and Delta-Neutral Cash & Carry Yields',
         'caption': 'Perpetual derivative mechanics: How periodic 8-hour funding rate transfers anchor crypto futures prices to spot markets and offer institutional arbitrage.',
         'faq': [
@@ -160,8 +160,8 @@ TOPIC_SPECS = [
     {
         'key': 'solana_mev',
         'match': lambda text: any(k in text for k in ['solana', 'mev', 'sandwich', 'memecoin', 'slippage', 'jito', 'dex']),
-        'coverImage': 'https://bullprintmedia.com/assets/editorial/crypto_forensics_hero.jpg',
-        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_solana_mev_sandwich_bots.png',
+        'coverImage': 'https://bullprintmedia.com/assets/editorial/crypto_forensics_hero.webp',
+        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_solana_mev_sandwich_bots.webp',
         'alt': 'Solana Memecoin Siphon Infographic: Anatomy of an MEV Sandwich Attack on Decentralized Exchanges',
         'caption': 'On-chain telemetry: How automated MEV bots exploit high retail slippage settings via Jito bundles to extract immediate riskless profit on DEX swaps.',
         'faq': [
@@ -172,8 +172,8 @@ TOPIC_SPECS = [
     {
         'key': 'tether_reserves',
         'match': lambda text: any(k in text for k in ['tether', 'usdt', 'shadow engine', 'cantor fitzgerald', 'commercial paper', 'reserves']),
-        'coverImage': 'https://bullprintmedia.com/assets/editorial/crypto_forensics_hero.jpg',
-        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_tether_reserve_forensics.png',
+        'coverImage': 'https://bullprintmedia.com/assets/editorial/crypto_forensics_hero.webp',
+        'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_tether_reserve_forensics.webp',
         'alt': 'Tether $110 Billion Shadow Engine Infographic: US Treasury Bills Backing and Cantor Fitzgerald Custody Audit',
         'caption': 'Forensic audit of USDT reserves: Deconstructing the $85B+ sovereign debt portfolio and interest income engine powering global stablecoin liquidity.',
         'faq': [
@@ -185,8 +185,8 @@ TOPIC_SPECS = [
 
 DEFAULT_SPEC = {
     'key': 'dalal_street_beginners',
-    'coverImage': 'https://bullprintmedia.com/assets/editorial/dalal_street_fii_hero.jpg',
-    'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_indian_stock_market_beginners.png',
+    'coverImage': 'https://bullprintmedia.com/assets/editorial/dalal_street_fii_hero.webp',
+    'infographic': 'https://bullprintmedia.com/assets/infographics/infographic_indian_stock_market_beginners.webp',
     'alt': 'Indian Stock Market Beginner Roadmap Infographic: The 3-Pillar Family Savings Fortress and Nifty 50 Secular Compounding',
     'caption': 'Dalal Street beginner guide: How everyday families build multi-generational compounding using low-cost index funds, sovereign gold, and zero debt leverage.',
     'faq': [
@@ -243,7 +243,7 @@ def build_schema(post, spec):
                 "url": "https://bullprintmedia.com",
                 "logo": {
                     "@type": "ImageObject",
-                    "url": "https://bullprintmedia.com/brand_assets/logo_master_1024x1024.png"
+                    "url": "https://bullprintmedia.com/brand_assets/logo_master_1024x1024.webp"
                 }
             },
             "image": {
@@ -276,7 +276,7 @@ def build_schema(post, spec):
                 "description": desc,
                 "thumbnailUrl": [
                     spec['coverImage'],
-                    f"https://img.youtube.com/vi/{vid_id}/maxresdefault.jpg"
+                    f"https://img.youtube.com/vi/{vid_id}/maxresdefault.webp"
                 ],
                 "uploadDate": date_pub,
                 "embedUrl": f"https://www.youtube.com/embed/{vid_id}"

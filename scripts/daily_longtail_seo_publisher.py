@@ -48,7 +48,7 @@ ARTICLE_1 = {
     "wordCount": 2650,
     "readingTime": "12 min read",
     "youtubeUrl": "https://youtu.be/X_jNao5hiVY",
-    "coverImage": "/brand_assets/opengraph_social_card_1200x630.png"
+    "coverImage": "/brand_assets/opengraph_social_card_1200x630.webp"
 }
 
 ARTICLE_1_HTML = """
@@ -151,7 +151,7 @@ ARTICLE_2 = {
     "wordCount": 2780,
     "readingTime": "14 min read",
     "youtubeUrl": "https://youtu.be/X_jNao5hiVY",
-    "coverImage": "/brand_assets/opengraph_social_card_1200x630.png"
+    "coverImage": "/brand_assets/opengraph_social_card_1200x630.webp"
 }
 
 ARTICLE_2_HTML = """
@@ -331,7 +331,7 @@ ARTICLE_3 = {
     "wordCount": 2640,
     "readingTime": "13 min read",
     "youtubeUrl": "https://youtu.be/X_jNao5hiVY",
-    "coverImage": "/brand_assets/opengraph_social_card_1200x630.png"
+    "coverImage": "/brand_assets/opengraph_social_card_1200x630.webp"
 }
 
 ARTICLE_3_HTML = """
@@ -480,7 +480,7 @@ def main():
         try:
             from scripts.heal_articles_and_generate_thumbnails import generate_article_thumbnail, parse_post_metadata, PUBLIC_EDITORIAL
             badge, l1, l2, theme = parse_post_metadata(entry)
-            thumb_path = PUBLIC_EDITORIAL / f"{slug}.jpg"
+            thumb_path = PUBLIC_EDITORIAL / f"{slug}.webp"
             generate_article_thumbnail(thumb_path, badge, l1, l2, theme)
             entry["coverImage"] = f"/assets/editorial/{slug}.jpg"
             entry["imageAlt"] = f"{meta['title']} — The Bull Print Institutional Research"

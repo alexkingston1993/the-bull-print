@@ -75,3 +75,5 @@ public/assets/broll_cache/
 *.bin
 *CONVERSATION_BACKUP.md
 *.jsonl
+lighthouse_*.json
+test_screen.png

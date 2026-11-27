@@ -158,7 +158,11 @@ def generate_high_ctr_thumbnail(output_path, badge_text, line1_text, line2_text,
     draw.text(((width - fw) // 2, 640), brand_text, font=footer_font, fill=(148, 163, 184))
     
     # Save optimized JPEG
-    img.save(output_path, "JPEG", quality=92, optimize=True)
+    # Save high-fidelity WebP (quality 92) and companion JPEG
+    webp_path = Path(output_path).with_suffix(".webp")
+    img.save(webp_path, "WEBP", quality=92, method=6)
+    jpg_path = Path(output_path).with_suffix(".webp")
+    img.save(jpg_path, "JPEG", quality=92, optimize=True)
     print(f"[+] Saved high-CTR thumbnail: {output_path}")
 
 def generate_bespoke_covers_for_flagship_articles():
@@ -167,7 +171,7 @@ def generate_bespoke_covers_for_flagship_articles():
     trent_l1 = "₹6,750 CR LEASES"
     trent_l2 = "ROCE DISTORTION"
     generate_high_ctr_thumbnail(
-        PUBLIC_EDITORIAL / "trent_cover.jpg",
+        PUBLIC_EDITORIAL / "trent_cover.webp",
         trent_badge, trent_l1, trent_l2, theme="orange"
     )
     
@@ -176,7 +180,7 @@ def generate_bespoke_covers_for_flagship_articles():
     tax_l1 = "31.2% FLAT TAX"
     tax_l2 = "ZERO LOSS SET-OFF"
     generate_high_ctr_thumbnail(
-        PUBLIC_EDITORIAL / "crypto_tax_cover.jpg",
+        PUBLIC_EDITORIAL / "crypto_tax_cover.webp",
         tax_badge, tax_l1, tax_l2, theme="red"
     )
     
@@ -185,7 +189,7 @@ def generate_bespoke_covers_for_flagship_articles():
     ray_l1 = "85 SOL THRESHOLD"
     ray_l2 = "RAYDIUM MIGRATION"
     generate_high_ctr_thumbnail(
-        PUBLIC_EDITORIAL / "raydium_cover.jpg",
+        PUBLIC_EDITORIAL / "raydium_cover.webp",
         ray_badge, ray_l1, ray_l2, theme="cyan"
     )
 

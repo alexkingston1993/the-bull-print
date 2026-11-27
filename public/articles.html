@@ -38,12 +38,12 @@
     <!-- Open Graph -->
     <meta property="og:title" content="Institutional Equity Research Articles | The Bull Print">
     <meta property="og:description" content="Comprehensive fundamental breakdown, 8-point checklists, and actionable video analyses for Indian equities.">
-    <meta property="og:image" content="brand_assets/opengraph_social_card_1200x630.png">
+    <meta property="og:image" content="brand_assets/opengraph_social_card_1200x630.webp">
     <meta name="twitter:card" content="summary_large_image">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="brand_assets/website_favicon_32x32.png">
-    <link rel="apple-touch-icon" sizes="192x192" href="brand_assets/website_favicon_192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="brand_assets/website_favicon_32x32.webp">
+    <link rel="apple-touch-icon" sizes="192x192" href="brand_assets/website_favicon_64x64.webp">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -608,14 +608,14 @@
                 return `
                     <a href="/article.html?slug=${p.slug}" class="article-card">
                         <div class="article-card-cover">
-                            <img src="${p.coverImage || p.infographic || '/brand_assets/opengraph_social_card_1200x630.png'}" 
+                            <img src="${p.coverImage || p.infographic || '/brand_assets/opengraph_social_card_1200x630.webp'}" 
                                  alt="${(p.imageAlt || p.title || 'The Bull Print Institutional Research').replace(/"/g, '&quot;')}" 
                                  class="article-card-img" 
                                  width="600"
                                  height="338"
                                  loading="lazy" 
                                  decoding="async"
-                                 onerror="this.onerror=null; this.src='/brand_assets/opengraph_social_card_1200x630.png';">
+                                 onerror="this.onerror=null; this.src='/brand_assets/opengraph_social_card_1200x630.webp';">
                             <span class="article-card-badge-pill">
                                 <span>⚡</span> ${category.toUpperCase()}
                             </span>

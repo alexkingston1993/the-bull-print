@@ -216,7 +216,11 @@ def generate_article_thumbnail(output_path, badge_text, line1_text, line2_text, 
     draw.text(((width - fw) // 2, 650), brand_text, font=footer_font, fill=(148, 163, 184))
     
     # Save optimized JPEG
-    img.save(output_path, "JPEG", quality=88, optimize=True)
+    # Save high-fidelity WebP (quality 92) and companion JPEG
+    webp_path = output_path.with_suffix(".webp")
+    img.save(webp_path, "WEBP", quality=92, method=6)
+    jpg_path = output_path.with_suffix(".jpg")
+    img.save(jpg_path, "JPEG", quality=92, optimize=True)
 
 def heal_all_articles():
     posts_path = ROOT / "content" / "posts.json"
@@ -237,7 +241,7 @@ def heal_all_articles():
         
         # 1. Parse metadata for thumbnail
         badge, l1, l2, theme = parse_post_metadata(p)
-        thumb_filename = f"{slug}.jpg"
+        thumb_filename = f"{slug}.webp"
         thumb_path = PUBLIC_EDITORIAL / thumb_filename
         
         # Generate thumbnail if not existing or if flagship
