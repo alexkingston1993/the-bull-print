@@ -1,7 +1,7 @@
 {
   "provider": "vercel-edge-cron",
   "session": "scheduled_cron",
-  "timestamp": "2026-11-27T19:25:37.996Z",
+  "timestamp": "2026-11-27T19:25:55.263Z",
   "crypto_sync": {
     "status": "SUCCESS",
     "source": "Binance Official 24hr Ticker",
@@ -66,5 +66,5 @@
   "github_sync": {
     "status": "SKIPPED"
   },
-  "duration_ms": 2337
+  "duration_ms": 1902
 }
