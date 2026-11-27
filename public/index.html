@@ -99,7 +99,9 @@
     <!-- Google Fonts: Plus Jakarta Sans, Outfit, JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
 
     <!-- Lenis Smooth Scrolling Library -->
     <script defer src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script>
@@ -3587,14 +3589,20 @@
 
         // Initialize Everything on DOM Load
         document.addEventListener('DOMContentLoaded', () => {
+            // Immediate: Above-the-fold telemetry & index strip
             loadIndexData();
-            loadNseStocks();
             renderTrendingStocks('gainers');
-            filterMoversTable('gainers');
-            renderSectorsGrid();
-            renderScreenerTable('roce');
-            loadHomeEventsPreview();
-            loadResearchReports();
+
+            // Idle deferred: Heavy below-the-fold tabs and datasets
+            const scheduleWork = window.requestIdleCallback || function(cb) { setTimeout(cb, 50); };
+            scheduleWork(() => {
+                loadNseStocks();
+                filterMoversTable('gainers');
+                renderSectorsGrid();
+                renderScreenerTable('roce');
+                loadHomeEventsPreview();
+                loadResearchReports();
+            });
         });
     </script>
     <!-- Mobile Bottom App Navigation Dock -->
