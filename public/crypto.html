@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
-    <title>Crypto Prices in INR & Section 115BBH Tax Audit</title>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-S3E3FQ3SP0"></script>
     <script>
@@ -16,7 +15,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="doc-title">Top 1,000 Cryptocurrencies Live Market Cap, Real-Time Prices, Candlestick Charts & Indian VDA 30% Tax Audit | The Bull Print</title>
+    <title id="doc-title">Top 1,000 Crypto Prices in INR & Section 115BBH Tax Audit</title>
     <meta name="description" content="Live prices, charts, and tokenomics for 1,000+ cryptocurrencies. Calculate 30% crypto tax and 1% TDS under Finance Act Section 115BBH.">
     <link rel="canonical" href="https://bullprintmedia.com/crypto">
 
@@ -701,13 +700,14 @@
 
         <!-- A. DIRECTORY VIEW -->
         <div id="crypto-directory-view">
+            <h2 class="visually-hidden" style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0);">Top 1,000 Cryptocurrencies Live Market Cap & Indian VDA Tax Audit</h2>
             <!-- Spotlight Highlights -->
             <div class="cmc-spotlight-row">
                 <div class="cmc-spotlight-card">
                     <div>
                         <div class="spotlight-title">🔥 Dominant Asset</div>
                         <div class="spotlight-hero-text">Bitcoin (BTC)</div>
-                        <div class="spotlight-sub">$68,450.00 <span class="badge-up">▲ 2.45%</span></div>
+                        <div class="spotlight-sub" id="spotlight-btc-price">$ 59,741.00 <span class="badge-up">▲ Live</span></div>
                     </div>
                     <div style="font-size:32px;">₿</div>
                 </div>
@@ -1197,6 +1197,60 @@
                 renderSingleCoin(cryptoDatabase[requestedSymbol]);
             } else {
                 renderTable(allCryptoData);
+            }
+
+            // Start 24x7 Live Binance Ticker Stream
+            fetchLiveBinanceStream();
+            setInterval(fetchLiveBinanceStream, 15000);
+        }
+
+        async function fetchLiveBinanceStream() {
+            try {
+                const res = await fetch('https://api.binance.com/api/v3/ticker/24hr');
+                if (!res.ok) return;
+                const tickers = await res.json();
+                const tickerMap = {};
+                tickers.forEach(t => {
+                    if (t.symbol && t.symbol.endsWith('USDT')) {
+                        const sym = t.symbol.slice(0, -4);
+                        tickerMap[sym] = {
+                            price: parseFloat(t.lastPrice),
+                            chg: parseFloat(t.priceChangePercent),
+                            vol: parseFloat(t.quoteVolume)
+                        };
+                    }
+                });
+
+                let updatedCount = 0;
+                allCryptoData.forEach(c => {
+                    if (tickerMap[c.symbol]) {
+                        const live = tickerMap[c.symbol];
+                        c.priceUSD = live.price;
+                        c.chg24h = live.chg;
+                        c.vol24hUSD = live.vol;
+                        if (cryptoDatabase[c.symbol]) {
+                            cryptoDatabase[c.symbol].priceUSD = live.price;
+                            cryptoDatabase[c.symbol].chg24h = live.chg;
+                            cryptoDatabase[c.symbol].vol24hUSD = live.vol;
+                        }
+                        updatedCount++;
+                    }
+                });
+
+                if (updatedCount > 0) {
+                    const pathParts = window.location.pathname.split('/').filter(Boolean);
+                    const requestedSymbol = (pathParts.length >= 2 && pathParts[0] === 'crypto') 
+                        ? pathParts[1].toUpperCase() 
+                        : new URLSearchParams(window.location.search).get('symbol')?.toUpperCase();
+
+                    if (requestedSymbol && cryptoDatabase[requestedSymbol]) {
+                        renderSingleCoin(cryptoDatabase[requestedSymbol]);
+                    } else {
+                        filterCategory(currentFilter);
+                    }
+                }
+            } catch (err) {
+                console.warn('Live Binance stream fallback:', err);
             }
         }
 

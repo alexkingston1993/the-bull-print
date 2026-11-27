@@ -1210,7 +1210,7 @@
                         roce: numRoce,
                         roe: numRoe,
                         debtToEquity: numDe,
-                        oneDayChange: ((Math.random() * 4) - 1.5).toFixed(2)
+                        oneDayChange: (s.chg !== undefined && s.chg !== null) ? Number(s.chg).toFixed(2) : "0.00"
                     };
                 });
 
