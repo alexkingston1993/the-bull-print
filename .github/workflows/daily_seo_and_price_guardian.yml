@@ -1,0 +1,47 @@
+name: 24x7 Neil Patel SEO & Price Guardian Engine
+
+on:
+  schedule:
+    # 03:00 UTC = 08:30 IST (Market Open)
+    - cron: '0 3 * * *'
+    # 09:00 UTC = 14:30 IST (Mid-Day Market Cycle)
+    - cron: '0 9 * * *'
+    # 15:00 UTC = 20:30 IST (Market Close & Evening Macro)
+    - cron: '0 15 * * *'
+    # 21:00 UTC = 02:30 IST (Overnight Global Crypto & Forex)
+    - cron: '0 21 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  guardian-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pillow
+
+      - name: Execute Daily SEO & Price Guardian Engine
+        run: |
+          python scripts/daily_seo_and_price_guardian.py
+
+      - name: Commit and Push Synchronized Assets & Reports
+        run: |
+          git config user.name "TheBullPrint-Guardian"
+          git config user.email "bot@bullprintmedia.com"
+          git add content/ public/content/ public/sitemap.xml public/assets/editorial/ state/
+          git diff --quiet && git diff --staged --quiet || git commit -m "chore(guardian): autonomous 24x7 price sync & Neil Patel SEO health audit [skip ci]"
+          git push origin main
