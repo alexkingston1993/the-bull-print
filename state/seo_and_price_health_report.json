@@ -1,14 +1,14 @@
 {
   "provider": "vercel-edge-cron",
-  "session": "scheduled_cron",
-  "timestamp": "2026-11-27T21:30:45.082Z",
+  "session": "overnight",
+  "timestamp": "2026-11-27T21:57:18.715Z",
   "crypto_sync": {
     "status": "SUCCESS",
     "source": "Binance Official 24hr Ticker",
     "pairs_updated": 243,
-    "btc_usd": 59802.46,
-    "eth_usd": 1665.48,
-    "sol_usd": 71.88
+    "btc_usd": 59825.52,
+    "eth_usd": 1664.89,
+    "sol_usd": 71.99
   },
   "stocks_sync": {
     "status": "SUCCESS",
@@ -66,5 +66,5 @@
   "github_sync": {
     "status": "SKIPPED"
   },
-  "duration_ms": 2398
+  "duration_ms": 2283
 }
