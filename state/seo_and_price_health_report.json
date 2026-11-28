@@ -1,14 +1,14 @@
 {
   "provider": "vercel-edge-cron",
-  "session": "overnight",
-  "timestamp": "2026-11-27T21:57:18.715Z",
+  "session": "market_open",
+  "timestamp": "2026-11-28T03:29:26.760Z",
   "crypto_sync": {
     "status": "SUCCESS",
     "source": "Binance Official 24hr Ticker",
     "pairs_updated": 243,
-    "btc_usd": 59825.52,
-    "eth_usd": 1664.89,
-    "sol_usd": 71.99
+    "btc_usd": 59937.23,
+    "eth_usd": 1663.19,
+    "sol_usd": 71.63
   },
   "stocks_sync": {
     "status": "SUCCESS",
@@ -48,9 +48,9 @@
   },
   "articles_audit": {
     "status": "OPTIMAL",
-    "total_articles": 462,
+    "total_articles": 53,
     "missing_thumbnails": 0,
-    "sample_thumbnail": "/assets/editorial/indian-stock-market-guide-for-beginners-what-big-bank-selli-2026-11-27-1812-ist.webp"
+    "sample_thumbnail": "/assets/editorial/silicon-siege-the-us-china-battle-for-2nm-domi.webp"
   },
   "seo_audit": {
     "status": "EXCELLENT",
@@ -66,5 +66,5 @@
   "github_sync": {
     "status": "SKIPPED"
   },
-  "duration_ms": 2283
+  "duration_ms": 2296
 }
