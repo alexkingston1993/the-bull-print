@@ -1,14 +1,14 @@
 {
   "provider": "vercel-edge-cron",
-  "session": "market_open",
-  "timestamp": "2026-11-28T03:29:26.760Z",
+  "session": "mid_day",
+  "timestamp": "2026-11-28T09:32:18.633Z",
   "crypto_sync": {
     "status": "SUCCESS",
     "source": "Binance Official 24hr Ticker",
     "pairs_updated": 243,
-    "btc_usd": 59937.23,
-    "eth_usd": 1663.19,
-    "sol_usd": 71.63
+    "btc_usd": 59657.79,
+    "eth_usd": 1652.7,
+    "sol_usd": 71.04
   },
   "stocks_sync": {
     "status": "SUCCESS",
@@ -47,10 +47,10 @@
     ]
   },
   "articles_audit": {
-    "status": "OPTIMAL",
-    "total_articles": 53,
-    "missing_thumbnails": 0,
-    "sample_thumbnail": "/assets/editorial/silicon-siege-the-us-china-battle-for-2nm-domi.webp"
+    "status": "WARNING",
+    "total_articles": 54,
+    "missing_thumbnails": 5,
+    "sample_thumbnail": "/assets/thumbnails/high_ctr_thumbnail.jpg"
   },
   "seo_audit": {
     "status": "EXCELLENT",
@@ -66,5 +66,5 @@
   "github_sync": {
     "status": "SKIPPED"
   },
-  "duration_ms": 2296
+  "duration_ms": 2172
 }
