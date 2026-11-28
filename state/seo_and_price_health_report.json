@@ -1,70 +1,10 @@
 {
-  "provider": "vercel-edge-cron",
-  "session": "mid_day",
-  "timestamp": "2026-11-28T09:32:18.633Z",
-  "crypto_sync": {
-    "status": "SUCCESS",
-    "source": "Binance Official 24hr Ticker",
-    "pairs_updated": 243,
-    "btc_usd": 59657.79,
-    "eth_usd": 1652.7,
-    "sol_usd": 71.04
-  },
-  "stocks_sync": {
-    "status": "SUCCESS",
-    "tickers_verified": 54,
-    "sample": [
-      {
-        "symbol": "RELIANCE",
-        "cmp": "₹ 1,382.60",
-        "cmp_num": 1382.6,
-        "chg": -0.97
-      },
-      {
-        "symbol": "TCS",
-        "cmp": "₹ 2,572.50",
-        "cmp_num": 2572.5,
-        "chg": -2.57
-      },
-      {
-        "symbol": "HDFCBANK",
-        "cmp": "₹ 857.25",
-        "cmp_num": 857.25,
-        "chg": -0.55
-      },
-      {
-        "symbol": "BHARTIARTL",
-        "cmp": "₹ 2,067.90",
-        "cmp_num": 2067.9,
-        "chg": -1.65
-      },
-      {
-        "symbol": "ICICIBANK",
-        "cmp": "₹ 1,593.40",
-        "cmp_num": 1593.4,
-        "chg": -1.09
-      }
-    ]
-  },
-  "articles_audit": {
-    "status": "WARNING",
-    "total_articles": 54,
-    "missing_thumbnails": 5,
-    "sample_thumbnail": "/assets/thumbnails/high_ctr_thumbnail.jpg"
-  },
-  "seo_audit": {
-    "status": "EXCELLENT",
-    "pages_checked": 22,
-    "score": 100,
-    "failed_count": 0,
-    "issues": []
-  },
-  "indexnow": {
-    "status": "SUCCESS",
-    "urls_submitted": 22
-  },
-  "github_sync": {
-    "status": "SKIPPED"
-  },
-  "duration_ms": 2172
+  "timestamp": "2026-11-28T10:59:44.769469",
+  "elapsed_seconds": 8.47,
+  "crypto_updated": 418,
+  "stocks_updated": 71,
+  "articles_verified": 219,
+  "pages_audited": 22,
+  "seo_health_score": 100,
+  "status": "ALL_SYSTEMS_OPTIMAL"
 }
