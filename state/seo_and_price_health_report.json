@@ -1,70 +1,10 @@
 {
-  "provider": "vercel-edge-cron",
-  "session": "overnight",
-  "timestamp": "2026-11-27T21:57:18.715Z",
-  "crypto_sync": {
-    "status": "SUCCESS",
-    "source": "Binance Official 24hr Ticker",
-    "pairs_updated": 243,
-    "btc_usd": 59825.52,
-    "eth_usd": 1664.89,
-    "sol_usd": 71.99
-  },
-  "stocks_sync": {
-    "status": "SUCCESS",
-    "tickers_verified": 54,
-    "sample": [
-      {
-        "symbol": "RELIANCE",
-        "cmp": "₹ 1,382.60",
-        "cmp_num": 1382.6,
-        "chg": -0.97
-      },
-      {
-        "symbol": "TCS",
-        "cmp": "₹ 2,572.50",
-        "cmp_num": 2572.5,
-        "chg": -2.57
-      },
-      {
-        "symbol": "HDFCBANK",
-        "cmp": "₹ 857.25",
-        "cmp_num": 857.25,
-        "chg": -0.55
-      },
-      {
-        "symbol": "BHARTIARTL",
-        "cmp": "₹ 2,067.90",
-        "cmp_num": 2067.9,
-        "chg": -1.65
-      },
-      {
-        "symbol": "ICICIBANK",
-        "cmp": "₹ 1,593.40",
-        "cmp_num": 1593.4,
-        "chg": -1.09
-      }
-    ]
-  },
-  "articles_audit": {
-    "status": "OPTIMAL",
-    "total_articles": 462,
-    "missing_thumbnails": 0,
-    "sample_thumbnail": "/assets/editorial/indian-stock-market-guide-for-beginners-what-big-bank-selli-2026-11-27-1812-ist.webp"
-  },
-  "seo_audit": {
-    "status": "EXCELLENT",
-    "pages_checked": 22,
-    "score": 100,
-    "failed_count": 0,
-    "issues": []
-  },
-  "indexnow": {
-    "status": "SUCCESS",
-    "urls_submitted": 22
-  },
-  "github_sync": {
-    "status": "SKIPPED"
-  },
-  "duration_ms": 2283
+  "timestamp": "2026-11-28T03:10:57.921735",
+  "elapsed_seconds": 9.49,
+  "crypto_updated": 418,
+  "stocks_updated": 71,
+  "articles_verified": 219,
+  "pages_audited": 22,
+  "seo_health_score": 100,
+  "status": "ALL_SYSTEMS_OPTIMAL"
 }
